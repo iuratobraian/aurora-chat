@@ -10,7 +10,7 @@
     "deploy": "node scripts/deploy.mjs",
     "validate:ops": "node scripts/validate-project-os.mjs",
     "agent:preflight": "node scripts/agent-preflight.mjs",
-    "inicio": "powershell -Command \"$env:ARG1='inicio'; & './scripts/chat-kimi.ps1'\"",
+    "inicio": "node scripts/aurora-inicio.mjs",
     "ruflo:swarm:init": ".\\node_modules\\.bin\\claude-flow.cmd swarm init --topology hierarchical --max-agents 20 --strategy specialized",
     "ruflo:init": ".\\node_modules\\.bin\\ruflo.cmd init",
     "ruflo:agents": ".\\node_modules\\.bin\\ruflo.cmd agent list",

@@ -1,159 +1,83 @@
-# Comando Maestro: `inicio` — Protocolo de Activación Ruflo v3.5
+# Comando Maestro: `inicio` — Punto de Entrada TradeShare
 
 ## Propósito
-El comando `inicio` es el **punto de entrada obligatorio** para cualquier sesión de IA en TradeShare. Activa el swarm, carga contexto, ejecuta hooks de sesión y determina automáticamente la siguiente tarea de mayor prioridad.
+El comando `inicio` es el **punto de entrada** para cualquier sesión de trabajo en TradeShare. Conecta a Notion (fuente de verdad), muestra las tareas organizadas y permite comenzar a trabajar de forma ordenada.
 
 ---
 
-## PASO 1 — Activar Hooks de Sesión (INMEDIATO)
-
-Al ejecutar `inicio`, el agente corre estos comandos **en paralelo**:
+## Uso Rápido
 
 ```bash
-# Hook de sesión
-npx @claude-flow/cli@latest hooks session-start --session-id "tradeshare-$(date +%Y%m%d-%H%M)"
+# Ver tablero completo de tareas
+npm run inicio
 
-# Pre-task de recuperación de contexto
-npx @claude-flow/cli@latest hooks pre-task --description "Context recovery + session init"
+# Marcar tarea en progreso
+node scripts/notion-task-action.mjs progress "Implementar login JWT"
 
-# Estado del sistema
-node scripts/aurora-session-brief.mjs
+# Marcar tarea como lista
+node scripts/notion-task-action.mjs done "Crear tabla users"
 
-# ⚡ AUTO-SYNC NOTION (Fuente de Verdad)
-node scripts/aurora-notion-sync.mjs
-```
-
-> **NOTION es la fuente de verdad.** Al arrancar, siempre sincronizar con Notion para ver tareas en tiempo real.
-
----
-
-## PASO 2 — Recuperación de Contexto (Lectura Crítica Paralela)
-
-Leer **en paralelo** (no secuencial):
-
-1. `.agent/skills/mandatory-startup-readiness/SKILL.md` — skill obligatoria de errores críticos a evitar
-2. `.agent/skills/mandatory-startup-readiness/references/critical-failures.md` — fallas reales ya detectadas en el repo
-3. `AGENTS.md` — leyes de autonomía y protocolo AMM + Ruflo v3.5
-4. `CLAUDE.md` — configuración de swarm, topologías, agent routing
-5. `.agent/workspace/coordination/CURRENT_FOCUS.md` — qué está activo
-6. `.agent/workspace/coordination/AGENT_LOG.md` (últimas 3 entradas)
-7. `.agent/workspace/coordination/TASK_BOARD.md` (tareas `pending` y `claimed`)
-8. `.agent/workspace/coordination/NOTION_SYNC_PROTOCOL.md` — protocolo de coordinación Notion
-9. `.agent/skills/SWARM_AUTO_START_PROTOCOL.md` — protocolo vigente
-10. `.agent/skills/TRADESHARE_AGENT_ROUTING.md` — tabla de routing
-
-> **Última salida de Notion:** Mostrar las tareas pendientes de Notion al inicio para que el equipo vea qué está disponible.
-
-```bash
-# Resumen rápido por consola
-node scripts/aurora-context-recovery.mjs
-node scripts/aurora-sovereign.mjs
+# Ver todas las tareas
+node scripts/notion-task-action.mjs list
 ```
 
 ---
 
-## PASO 3 — Detección de Complejidad y Routing
-
-Con el contexto cargado, evaluar la próxima tarea usando la tabla de routing de `TRADESHARE_AGENT_ROUTING.md`:
+## Flujo de Trabajo
 
 ```
-SI archivos_afectados >= 3 O tipo == "feature" O tipo == "security":
-  → INVOCAR SWARM (ver Paso 4)
-SINO:
-  → Edición directa, sin swarm
-```
-
----
-
-## PASO 4 — Init Swarm (si aplica)
-
-Ejecutar en **UN SOLO mensaje** (patrón Ruflo anti-drift):
-
-```javascript
-// 1. Inicializar swarm
-npx @claude-flow/cli@latest swarm init --topology hierarchical --max-agents 8 --strategy specialized
-
-// 2. Spawn ALL agentes en el mismo mensaje via Task tool
-Task("Coordinator", "Inicializar sesión. Coordinar agentes vía hooks.", "hierarchical-coordinator")
-Task("Researcher", "Analizar codebase y requerimientos. Guardar en memoria.", "researcher")
-Task("Architect", "Diseñar solución. Documentar en memoria.", "system-architect")
-Task("Coder", "Implementar solución.", "coder")
-Task("Tester", "Escribir tests.", "tester")
-Task("Reviewer", "Revisar calidad y seguridad.", "reviewer")
-
-// 3. Guardar estado en memoria compartida
-npx @claude-flow/cli@latest memory store --key "session-current" --value "{task, agents, timestamp}" --namespace tradeshare-swarm
-```
-
-**Después de spawn: STOP. No agregar más tool calls.**
-
----
-
-## PASO 5 — Mejora Proactiva Aurora (AMM Obligatorio)
-
-Antes de ejecutar tareas del board, el agente DEBE:
-1. Proponer e implementar **1 mejora para Aurora** (preferir: reducir tokens, mejorar reasoning, optimizar scripts)
-2. Anotar la mejora en `AGENT_LOG.md`
-
-```bash
-node scripts/aurora-integrator.mjs sync
+┌─────────────────────────────────────────────────────────┐
+│                   CICLO DE TRABAJO                       │
+├─────────────────────────────────────────────────────────┤
+│                                                          │
+│  1. npm run inicio          → Ver tablero Notion        │
+│  2. Elegir tarea            → Identificar qué hacer      │
+│  3. Marcar "En progreso"    → node scripts/notion-task...│
+│  4. Trabajar                → Implementar solución       │
+│  5. Marcar "Listo"          → node scripts/notion-task...│
+│  6. Git commit + push       → Guardar cambios            │
+│  7. Repetir desde paso 1    → Siguiente tarea            │
+│                                                          │
+└─────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## PASO 6 — Reclamación de Tareas (3-Task Batching Law)
+## Comandos Disponibles
 
-1. Elegir **3 tareas relacionadas** de `TASK_BOARD.md` con estado `pending`
-2. Cambiar estado a `claimed` con nombre del agente y fecha
-3. Actualizar `CURRENT_FOCUS.md` con archivos a tocar y objetivo de aceptación
-
----
-
-## PASO 7 — Ejecución con Estética Premium
-
-- Mantener **Obsidian Ether** (Glassmorphism, HSL curado, neon effects)
-- SPARC Methodology para tareas complejas (ver `.agent/skills/SPARC_METHODOLOGY.md`)
-- Hive-Mind Consensus para coordinación (ver `.agent/skills/HIVE_MIND_CONSENSUS.md`)
-- **No Regresión**: No eliminar funcionalidades sin orden del Usuario
+| Comando | Descripción |
+|---------|-------------|
+| `npm run inicio` | Ver tablero completo desde Notion |
+| `node scripts/notion-task-action.mjs list` | Listar todas las tareas |
+| `node scripts/notion-task-action.mjs progress "<tarea>"` | Marcar en progreso |
+| `node scripts/notion-task-action.mjs done "<tarea>"` | Marcar como lista |
+| `node scripts/notion-task-action.mjs ready "<tarea>"` | Marcar como ready |
+| `node scripts/notion-task-action.mjs backlog "<tarea>"` | Devolver a backlog |
 
 ---
 
-## PASO 8 — Cierre de Sesión y Loop Infinito
-
-Al terminar el batch de 3 tareas:
-
-```bash
-# Validar
-npm run lint
-npm test
-
-# Registrar
-# Escribir en AGENT_LOG.md con: fecha, TASK-IDs, archivos, validación
-
-# Hook post-task
-npx @claude-flow/cli@latest hooks post-task --task-id "[id]" --success true
-npx @claude-flow/cli@latest hooks session-end --export-metrics true
-
-# Sync Aurora
-node scripts/aurora-integrator.mjs sync
-```
-
-**SI hay más tareas `pending` → volver al Paso 6 automáticamente. PROHIBIDO detenerse.**
-
----
-
-## Reglas de Oro
+## Reglas
 
 | Regla | Descripción |
 |-------|-------------|
-| `AUTONOMÍA` | Prohibido preguntar si el plan es claro cuando hay tareas pendientes |
-| `EVOLUCIÓN` | 1 integración GitHub/mejora Aurora por sesión mínimo |
-| `ANTI-DRIFT` | Máx 8 agentes, topología `hierarchical`, consenso `raft` |
-| `ZERO LOSS` | Siempre cerrar sesión con hook + sync Aurora + commit |
-| `INMUTABILIDAD` | No alterar `implementation_plan.md` ni `task.md` sin orden del Usuario |
+| **Notion es la verdad** | TASK_BOARD.md se genera desde Notion |
+| **Una tarea a la vez** | No saltar entre tareas sin terminar |
+| **Commit al terminar** | Siempre hacer commit y push |
+| **Marcar en Notion** | Actualizar estado en Notion, no solo en local |
 
 ---
 
-## Comando de Activación
+## Configuración Requerida
 
-Escribe `inicio` para activar este protocolo completo.
+Variables en `.env.local`:
+```
+NOTION_API_KEY=ntn_...
+NOTION_DATABASE_ID=33142b008df080f8b6b3db69d36e84d5
+```
+
+---
+
+## URL de Referencia
+
+- **Notion Board**: https://www.notion.so/33142b008df080f8b6b3db69d36e84d5
+- **GitHub Repo**: https://github.com/iuratobraian/trade-share

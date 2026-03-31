@@ -2,11 +2,8 @@ import { api } from "../../convex/_generated/api";
 import { Ad, Publicacion, Usuario, Curso, Herramienta, Recurso, LiveStatus } from '../types';
 import { PROMOTIONAL_ADS, PromotionalAd } from '../../data/promotionalAds';
 import { EVENTOS_MOCK } from '../constants';
-<<<<<<< HEAD
-=======
 
 const NEWS_DEGRADATION_WARNING = '⚠️ Sistema de noticias en modo degradado. Configure fuentes de noticias en el panel de administración.';
->>>>>>> 07110acb043ded23499a598b89179b0713ea1f5f
 import logger from '../../lib/utils/logger';
 import { getConvexClient } from '../../lib/convex/client';
 import { extractTags } from '../utils/postMapper';

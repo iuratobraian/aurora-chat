@@ -1,0 +1,7 @@
+{
+  "name": "TradePortal 2025 Platinum",
+  "description": "Premium trading ecosystem with AI pattern detection, reputation badges, and real-time social dynamics.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

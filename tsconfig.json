@@ -1,0 +1,46 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+    "module": "ESNext",
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "skipLibCheck": true,
+    "types": [
+      "node"
+    ],
+    "moduleResolution": "bundler",
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "allowJs": true,
+    "jsx": "react-jsx",
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    },
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  },
+"exclude": [
+    "old_postcard.tsx",
+    "old_postcard_utf8.tsx",
+    "test-supabase.ts",
+    "VERSION ANTERIOR/PORTAL DE TRADING PARA VENTA",
+    "bitacora-de-trading",
+    "bitacora",
+    "scripts",
+    "dist",
+    ".agent",
+    "node_modules",
+    "__tests__",
+    "lib"
+  ],
+  "include": [
+    "src"
+  ]
+}

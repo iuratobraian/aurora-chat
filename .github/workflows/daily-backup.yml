@@ -1,0 +1,126 @@
+name: Daily Backup
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # 6 AM UTC = 2 AM CL
+  workflow_dispatch:
+    inputs:
+      restore_date:
+        description: 'Restore from backup (YYYY-MM-DD)'
+        required: false
+        type: string
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Start server
+        run: npm run dev &
+        env:
+          INTERNAL_API_SHARED_KEY: ${{ secrets.INTERNAL_API_SHARED_KEY }}
+          CONVEX_URL: ${{ vars.CONVEX_URL }}
+        shell: bash
+        timeout-minutes: 2
+
+      - name: Wait for server
+        run: sleep 15
+
+      - name: Create daily backup
+        if: github.event.inputs.restore_date == ''
+        run: |
+          node scripts/daily-backup.mjs
+        env:
+          INTERNAL_API_SHARED_KEY: ${{ secrets.INTERNAL_API_SHARED_KEY }}
+          BACKUP_SERVER_URL: http://localhost:3000
+
+      - name: Commit backup to git
+        if: github.event.inputs.restore_date == ''
+        run: |
+          BACKUP_FILE=$(ls backups/backup_*.json 2>/dev/null | head -1)
+          if [ -n "$BACKUP_FILE" ]; then
+            git add "$BACKUP_FILE"
+            git config user.name "GitHub Actions"
+            git config user.email "actions@github.com"
+            git commit -m "chore: daily backup $(date +%Y-%m-%d)" || echo "Nothing to commit"
+            git push
+            echo "Backup committed: $BACKUP_FILE"
+          else
+            echo "No backup file created"
+          fi
+        shell: bash
+
+      - name: Check backup status
+        run: |
+          node scripts/daily-backup.mjs --latest
+        env:
+          INTERNAL_API_SHARED_KEY: ${{ secrets.INTERNAL_API_SHARED_KEY }}
+
+      - name: List recent backups
+        run: |
+          node scripts/daily-backup.mjs --list
+        env:
+          INTERNAL_API_SHARED_KEY: ${{ secrets.INTERNAL_API_SHARED_KEY }}
+
+      - name: Cleanup
+        if: always()
+        run: pkill -f "vite" || true; pkill -f "tsx" || true
+        shell: bash
+
+  retention-cleanup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Clean old backups
+        run: |
+          BACKUP_DIR="backups"
+          RETENTION=3
+          CUTOFF=$(date -d "$RETENTION days ago" +%Y-%m-%d)
+          
+          if [ -d "$BACKUP_DIR" ]; then
+            COUNT=0
+            for f in "$BACKUP_DIR"/backup_*.json; do
+              if [ -f "$f" ]; then
+                DATE=$(basename "$f" .json | sed 's/backup_//')
+                if [[ "$DATE" < "$CUTOFF" ]]; then
+                  rm "$f"
+                  COUNT=$((COUNT + 1))
+                fi
+              fi
+            done
+            echo "Cleaned $COUNT old backup(s)"
+          fi
+        shell: bash
+
+      - name: Commit cleanup
+        run: |
+          if [ -d "backups" ]; then
+            git add backups/
+            git config user.name "GitHub Actions"
+            git config user.email "actions@github.com"
+            git commit -m "chore: cleanup old backups" || echo "Nothing to clean"
+            git push
+          fi
+        shell: bash

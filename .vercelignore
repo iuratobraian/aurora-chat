@@ -1,0 +1,3 @@
+# Vercel Ignore
+# This folder is for AI agents knowledge and workspace, not for production build
+.agent

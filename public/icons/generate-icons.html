@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Generate Icons - TradeHub</title>
+  <style>
+    body { font-family: system-ui; padding: 20px; background: #050608; color: white; }
+    .icon-container { display: flex; gap: 20px; flex-wrap: wrap; }
+    .icon-box { text-align: center; }
+    canvas { border: 2px solid #333; border-radius: 8px; }
+    .sizes { font-size: 12px; color: #888; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <h1>TradeHub PWA Icons Generator</h1>
+  <p>Right-click and save each icon, or use a tool to batch convert.</p>
+  
+  <div class="icon-container">
+    <div class="icon-box">
+      <canvas id="icon-72" width="72" height="72"></canvas>
+      <div class="sizes">72x72</div>
+    </div>
+    <div class="icon-box">
+      <canvas id="icon-96" width="96" height="96"></canvas>
+      <div class="sizes">96x96</div>
+    </div>
+    <div class="icon-box">
+      <canvas id="icon-128" width="128" height="128"></canvas>
+      <div class="sizes">128x128</div>
+    </div>
+    <div class="icon-box">
+      <canvas id="icon-144" width="144" height="144"></canvas>
+      <div class="sizes">144x144</div>
+    </div>
+    <div class="icon-box">
+      <canvas id="icon-152" width="152" height="152"></canvas>
+      <div class="sizes">152x152</div>
+    </div>
+    <div class="icon-box">
+      <canvas id="icon-192" width="192" height="192"></canvas>
+      <div class="sizes">192x192</div>
+    </div>
+    <div class="icon-box">
+      <canvas id="icon-384" width="384" height="384"></canvas>
+      <div class="sizes">384x384</div>
+    </div>
+    <div class="icon-box">
+      <canvas id="icon-512" width="512" height="512"></canvas>
+      <div class="sizes">512x512</div>
+    </div>
+  </div>
+
+  <script>
+    function drawIcon(ctx, size) {
+      const centerX = size / 2;
+      const centerY = size / 2;
+      const radius = size / 2 - 4;
+      const cornerRadius = size * 0.15;
+      
+      // Background gradient
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#3B82F6');
+      gradient.addColorStop(0.5, '#2563EB');
+      gradient.addColorStop(1, '#4F46E5');
+      
+      // Rounded rectangle background
+      ctx.beginPath();
+      ctx.moveTo(cornerRadius, 0);
+      ctx.lineTo(size - cornerRadius, 0);
+      ctx.quadraticCurveTo(size, 0, size, cornerRadius);
+      ctx.lineTo(size, size - cornerRadius);
+      ctx.quadraticCurveTo(size, size, size - cornerRadius, size);
+      ctx.lineTo(cornerRadius, size);
+      ctx.quadraticCurveTo(0, size, 0, size - cornerRadius);
+      ctx.lineTo(0, cornerRadius);
+      ctx.quadraticCurveTo(0, 0, cornerRadius, 0);
+      ctx.closePath();
+      ctx.fillStyle = gradient;
+      ctx.fill();
+      
+      // Hexagon
+      const hexRadius = size * 0.35;
+      const hexCenterY = size * 0.42;
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const angle = (Math.PI / 3) * i - Math.PI / 2;
+        const x = centerX + hexRadius * Math.cos(angle);
+        const y = hexCenterY + hexRadius * Math.sin(angle);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = size * 0.035;
+      ctx.stroke();
+      
+      // Inner hexagon
+      const innerRadius = size * 0.18;
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const angle = (Math.PI / 3) * i - Math.PI / 2;
+        const x = centerX + innerRadius * Math.cos(angle);
+        const y = hexCenterY + innerRadius * Math.sin(angle);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.fillStyle = 'white';
+      ctx.fill();
+      
+      // Arrow up (chart symbol)
+      const arrowSize = size * 0.12;
+      const arrowY = size * 0.72;
+      ctx.beginPath();
+      ctx.moveTo(centerX, arrowY - arrowSize);
+      ctx.lineTo(centerX + arrowSize, arrowY + arrowSize * 0.5);
+      ctx.lineTo(centerX - arrowSize, arrowY + arrowSize * 0.5);
+      ctx.closePath();
+      ctx.fillStyle = 'white';
+      ctx.fill();
+    }
+    
+    // Draw all icons
+    const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+    sizes.forEach(size => {
+      const canvas = document.getElementById(`icon-${size}`);
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        drawIcon(ctx, size);
+      }
+    });
+  </script>
+</body>
+</html>

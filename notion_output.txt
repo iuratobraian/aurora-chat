@@ -1,0 +1,21 @@
+Notion Connection: {
+  "connected": true
+}
+Fetching tasks...
+
+Found 15 active tasks:
+ - [Sin empezar] Register new architecture plans and tasks in `TASK_BOARD.md` to coordinate agent execution. (Assigned to: Unassigned)
+ - [Sin empezar] **TV Bitacora Bug:** Fix YouTube link failing to save on update. (Assigned to: Unassigned)
+ - [Sin empezar] **Global Styling:** Simplified outline icons, new business avatars, refine Light/Dark modes, redesign Negocios cards and Afiliados sales copy. (Assigned to: Unassigned)
+ - [Sin empezar] **Bitácora Native & User Profiles:** Sync Bitácora, distinct premium style for verified profiles using `Stitch`. (Assigned to: Unassigned)
+ - [Sin empezar] **Señales & Trading:** Dynamic background, Neon Bull/Bear loaders. Style Bitácora VIP. (Assigned to: Unassigned)
+ - [Sin empezar] **Premios (ex-Ranking):** List token prize redemptions (mentoring, live sessions, premium comm access). (Assigned to: Unassigned)
+ - [Sin empezar] **Noticias:** Remove images, switch to newspaper styling. Embed Economic Calendar. (Assigned to: Unassigned)
+ - [Sin empezar] **Ads Engine:** Add rotating banners in Sidebar (5 models, replace Tu comunidad/Propfirms), Top Feed (10 models), randomly throughout Feed, and Top/Bottom of Discover Communities. (Assigned to: Unassigned)
+ - [Sin empezar] Consolidate all bottom controls to ONE floating Menu button, fix routing. (Assigned to: Unassigned)
+ - [Sin empezar] Hide Pricing from navigation, rename to Suscripciones, integrate below Top 3 Communities. (Assigned to: Unassigned)
+ - [Sin empezar] Move "Mi Comunidad/Observatory" to integrate natively inside Creator Admin Panel. (Assigned to: Unassigned)
+ - [Sin empezar] Rename Marketplace to Negocios and move Publicidad inside it. (Assigned to: Unassigned)
+ - [Sin empezar] Reconfigure top menu sections (remove Aprender, move Psicotrading to Trading, remove Cursos, remove Voz IA). (Assigned to: Unassigned)
+ - [Sin empezar] Remove floating AI from `AdminView.tsx` and enforce 100% full-width styling. Add web stats. (Assigned to: Unassigned)
+ - [Sin empezar] Remove floating AI icons from `Navigation.tsx` (top right). (Assigned to: Unassigned)

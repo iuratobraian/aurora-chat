@@ -1,0 +1,749 @@
+{
+  "lastUpdated": "2026-03-19T18:00:00Z",
+  "version": "2.1",
+  "sprints": {
+    "current": "Sprint 9 - Ecosystem Expansion",
+    "week": "Mar 19-26, 2026",
+    "phases": {
+      "phase1": "Foundation (Mar 19-21) - Backend schemas & queries",
+      "phase2": "Payments (Mar 21-23) - Payment services & webhooks",
+      "phase3": "Frontend Core (Mar 21-24) - UI for all systems",
+      "phase4": "Advanced (Mar 24-26) - Email, push, analytics",
+      "phase5": "Polish (Mar 26-28) - Testing & launch prep"
+    }
+  },
+  "tasks": [
+    {
+      "id": "fix_loader",
+      "title": "Restaurar loader original",
+      "priority": "high",
+      "status": "completed"
+    },
+    {
+      "id": "fix_zone_ui",
+      "title": "Hacer zona operativa más fina y elegante",
+      "priority": "high",
+      "status": "completed"
+    },
+    {
+      "id": "fix_buttons_duplicate",
+      "title": "Eliminar botones de likes duplicados",
+      "priority": "high",
+      "status": "completed"
+    },
+    {
+      "id": "fix_auth_bugs",
+      "title": "Correcciones auth: logout, passwords, recordLogin",
+      "priority": "high",
+      "status": "completed"
+    },
+    {
+      "id": "fix_chat_typing",
+      "title": "Chat: typing con nombres, schema actualizado",
+      "priority": "medium",
+      "status": "completed"
+    },
+    {
+      "id": "posts_ia_noticia",
+      "title": "Posts IA estilo noticia informativa",
+      "priority": "high",
+      "status": "completed"
+    },
+    {
+      "id": "reviews_testimonials",
+      "title": "Reviews/Testimonios en tiempo real",
+      "priority": "medium",
+      "status": "completed"
+    },
+    {
+      "id": "moderation_panel",
+      "title": "Panel de moderación visible en Admin",
+      "priority": "medium",
+      "status": "completed"
+    },
+    {
+      "id": "performance_optimization",
+      "title": "Optimización performance (bundle splitting, memo)",
+      "priority": "medium",
+      "status": "completed"
+    },
+    {
+      "id": "connect_mercadopago",
+      "title": "Integrar MercadoPago real",
+      "priority": "high",
+      "status": "completed",
+      "notes": "Credenciales configuradas en Vercel"
+    },
+    {
+      "id": "fix_ai_agent_btc",
+      "title": "Corregir Agente IA - BTC en $N/A",
+      "priority": "high",
+      "status": "completed",
+      "skill": "ai_agent_debug.md",
+      "agent": "AGENT-BACKEND",
+      "notes": "Eliminado catch vacío silencioso, añadido logging y fallback"
+    },
+    {
+      "id": "fix_postcard_onreply",
+      "title": "PostCard - Fix onReply signature",
+      "priority": "high",
+      "status": "completed",
+      "agent": "AGENT-BACKEND",
+      "notes": "types.ts + PostCard.tsx actualizados"
+    },
+    {
+      "id": "schema_communities",
+      "title": "Communities - Schema: Añadir tablas (posts, subscriptions, payouts)",
+      "priority": "critical",
+      "status": "completed",
+      "skill": "COMMUNITY_DEVELOPMENT.md",
+      "agent": "AGENT-BACKEND",
+      "phase": 1,
+      "notes": "Tablas creadas: communityPosts, communitySubscriptions, communityPayouts"
+    },
+    {
+      "id": "mutations_communities",
+      "title": "Communities - Mutations: create, join, subscribe, payout",
+      "priority": "critical",
+      "status": "completed",
+      "skill": "COMMUNITY_DEVELOPMENT.md",
+      "agent": "AGENT-BACKEND",
+      "phase": 1,
+      "dependsOn": ["schema_communities"],
+      "notes": "Funciones creadas: getCommunityPosts, createPost, subscribeToCommunity, etc."
+    },
+
+    {
+      "id": "schema_marketplace",
+      "title": "Marketplace - Schema: Añadir tablas (products, purchases, payouts)",
+      "priority": "critical",
+      "status": "completed",
+      "skill": "MARKETPLACE_DEVELOPMENT.md",
+      "agent": "AGENT-BACKEND",
+      "phase": 1,
+      "dependsOn": [],
+      "notes": "Tablas creadas: products, purchases, author_payouts, wishlists"
+    },
+    {
+      "id": "schema_creator",
+      "title": "Creator Hub - Schema: Añadir tablas (profiles, earnings, followers)",
+      "priority": "critical",
+      "status": "completed",
+      "skill": "CREATOR_HUB.md",
+      "agent": "AGENT-BACKEND",
+      "phase": 1,
+      "dependsOn": [],
+      "notes": "Tablas creadas: creator_profiles, creator_earnings, creator_followers, creator_activities"
+    },
+    {
+      "id": "schema_signals",
+      "title": "Signals - Schema: signal_plans, signals, signal_subscriptions, signal_results",
+      "priority": "high",
+      "status": "completed",
+      "skill": "SIGNALS_TRADING_SYSTEM.md",
+      "agent": "AGENT-BACKEND",
+      "phase": 1,
+      "dependsOn": [],
+      "notes": "Tablas creadas: signal_plans, signal_subscriptions, signals, signal_subscribers_actions, signal_providers, signal_notifications, signal_performance"
+    },
+    {
+      "id": "queries_communities_minimal",
+      "title": "Communities - Queries mínimas para UI",
+      "priority": "critical",
+      "status": "pending",
+      "skill": "COMMUNITY_DEVELOPMENT.md",
+      "agent": "AGENT-BACKEND",
+      "phase": 1,
+      "dependsOn": ["schema_communities"]
+    },
+    {
+      "id": "queries_marketplace_minimal",
+      "title": "Marketplace - Queries mínimas para UI",
+      "priority": "critical",
+      "status": "pending",
+      "skill": "MARKETPLACE_DEVELOPMENT.md",
+      "agent": "AGENT-BACKEND",
+      "phase": 1,
+      "dependsOn": ["schema_marketplace"]
+    },
+    {
+      "id": "queries_creator_minimal",
+      "title": "Creator Hub - Queries mínimas para UI",
+      "priority": "critical",
+      "status": "pending",
+      "skill": "CREATOR_HUB.md",
+      "agent": "AGENT-BACKEND",
+      "phase": 1,
+      "dependsOn": ["schema_creator"]
+    },
+    {
+      "id": "rate_limiting",
+      "title": "Rate limiting por tier (FREE/PRO/ELITE)",
+      "priority": "high",
+      "status": "pending",
+      "skill": "backend_agent.md",
+      "agent": "AGENT-BACKEND",
+      "phase": 1,
+      "notes": "Implementar usando rateLimits table existente"
+    },
+    {
+      "id": "email_service_setup",
+      "title": "Email Service - Configurar Resend/SendGrid",
+      "priority": "high",
+      "status": "pending",
+      "agent": "AGENT-BACKEND",
+      "phase": 1,
+      "notes": "Servicio centralizado + templates básicos"
+    },
+    {
+      "id": "cdn_setup",
+      "title": "CDN Setup - Configurar storage para imágenes",
+      "priority": "medium",
+      "status": "pending",
+      "agent": "AGENT-BACKEND",
+      "phase": 1,
+      "notes": "Usar Convex storage o Cloudflare R2"
+    },
+
+    {
+      "id": "services_community_payments",
+      "title": "Communities - Payment Service: createSubscription, handleWebhook",
+      "priority": "critical",
+      "status": "pending",
+      "skill": "MERCADOPAGO_INTEGRATION.md",
+      "agent": "AGENT-MONETIZE",
+      "phase": 2,
+      "dependsOn": ["schema_communities"]
+    },
+    {
+      "id": "services_marketplace_payments",
+      "title": "Marketplace - Payment Service: createCheckout, handlePurchase",
+      "priority": "critical",
+      "status": "pending",
+      "skill": "MERCADOPAGO_INTEGRATION.md",
+      "agent": "AGENT-MONETIZE",
+      "phase": 2,
+      "dependsOn": ["schema_marketplace"]
+    },
+    {
+      "id": "webhook_mercadopago",
+      "title": "MercadoPago - Webhook Handler unificado",
+      "priority": "critical",
+      "status": "pending",
+      "skill": "MERCADOPAGO_INTEGRATION.md",
+      "agent": "AGENT-MONETIZE",
+      "phase": 2,
+      "dependsOn": ["services_community_payments", "services_marketplace_payments"]
+    },
+    {
+      "id": "payment_jobs",
+      "title": "MercadoPago - Scheduled Jobs: payouts mensuales",
+      "priority": "high",
+      "status": "pending",
+      "skill": "MERCADOPAGO_INTEGRATION.md",
+      "agent": "AGENT-MONETIZE",
+      "phase": 2,
+      "dependsOn": ["webhook_mercadopago"]
+    },
+    {
+      "id": "refund_flow",
+      "title": "Refund Flow - Manejo de reembolsos",
+      "priority": "medium",
+      "status": "pending",
+      "agent": "AGENT-MONETIZE",
+      "phase": 2,
+      "dependsOn": ["webhook_mercadopago"]
+    },
+
+    {
+      "id": "ui_communities_views",
+      "title": "Communities - UI: ComunidadesView, CommunityDetailView, CreateCommunityView",
+      "priority": "critical",
+      "status": "pending",
+      "skill": "COMMUNITY_DEVELOPMENT.md",
+      "agent": "AGENT-FRONTEND",
+      "phase": 3,
+      "dependsOn": ["queries_communities_minimal"]
+    },
+    {
+      "id": "ui_communities_components",
+      "title": "Communities - Components: CommunityCard, PricingModal, etc",
+      "priority": "high",
+      "status": "pending",
+      "skill": "COMMUNITY_DEVELOPMENT.md",
+      "agent": "AGENT-FRONTEND",
+      "phase": 3,
+      "dependsOn": ["ui_communities_views"]
+    },
+    {
+      "id": "ui_marketplace_views",
+      "title": "Marketplace - UI: MarketplaceView, ProductDetailView, AuthorDashboardView",
+      "priority": "critical",
+      "status": "pending",
+      "skill": "MARKETPLACE_DEVELOPMENT.md",
+      "agent": "AGENT-FRONTEND",
+      "phase": 3,
+      "dependsOn": ["queries_marketplace_minimal"]
+    },
+    {
+      "id": "ui_marketplace_components",
+      "title": "Marketplace - Components: ProductCard, PurchaseButton, ReviewSection",
+      "priority": "high",
+      "status": "pending",
+      "skill": "MARKETPLACE_DEVELOPMENT.md",
+      "agent": "AGENT-FRONTEND",
+      "phase": 3,
+      "dependsOn": ["ui_marketplace_views"]
+    },
+    {
+      "id": "ui_creator_views",
+      "title": "Creator Hub - UI: CreatorDashboardView, CreatorProfileView",
+      "priority": "critical",
+      "status": "pending",
+      "skill": "CREATOR_HUB.md",
+      "agent": "AGENT-FRONTEND",
+      "phase": 3,
+      "dependsOn": ["queries_creator_minimal"]
+    },
+    {
+      "id": "ui_creator_components",
+      "title": "Creator Hub - Components: CreatorCard, FollowButton, EarningsChart",
+      "priority": "high",
+      "status": "pending",
+      "skill": "CREATOR_HUB.md",
+      "agent": "AGENT-FRONTEND",
+      "phase": 3,
+      "dependsOn": ["ui_creator_views"]
+    },
+    {
+      "id": "ui_signals_views",
+      "title": "Signals - UI: SignalDashboard, SignalCreator, SignalHistory",
+      "priority": "high",
+      "status": "pending",
+      "skill": "SIGNALS_TRADING_SYSTEM.md",
+      "agent": "AGENT-FRONTEND",
+      "phase": 3,
+      "dependsOn": ["schema_signals"]
+    },
+    {
+      "id": "nav_update",
+      "title": "Navigation - Actualizar para incluir todas las secciones",
+      "priority": "high",
+      "status": "pending",
+      "agent": "AGENT-FRONTEND",
+      "phase": 3,
+      "dependsOn": ["ui_communities_views", "ui_marketplace_views", "ui_creator_views"]
+    },
+
+    {
+      "id": "email_templates",
+      "title": "Email Templates - Crear 10 templates (welcome, invoice, etc)",
+      "priority": "high",
+      "status": "pending",
+      "agent": "AGENT-FRONTEND",
+      "phase": 4,
+      "dependsOn": ["email_service_setup"]
+    },
+    {
+      "id": "push_triggers",
+      "title": "Push Notifications - Triggers automáticos",
+      "priority": "high",
+      "status": "pending",
+      "skill": "notifications_push.md",
+      "agent": "AGENT-BACKEND",
+      "phase": 4,
+      "notes": "Enviar push cuando se crea notification"
+    },
+    {
+      "id": "moderation_complete",
+      "title": "Chat Moderation - Sistema completo (IP blocking + UI)",
+      "priority": "medium",
+      "status": "pending",
+      "skill": "chat_moderation.md",
+      "agent": "AGENT-BACKEND",
+      "phase": 4
+    },
+    {
+      "id": "analytics_events",
+      "title": "Analytics - Sistema de eventos y métricas",
+      "priority": "medium",
+      "status": "pending",
+      "agent": "AGENT-BACKEND",
+      "phase": 4
+    },
+    {
+      "id": "ad_image_generator_schema",
+      "title": "Ad Generator - Schema: generatedAdImages",
+      "priority": "high",
+      "status": "pending",
+      "skill": "AD_IMAGE_GENERATOR.md",
+      "agent": "AGENT-BACKEND",
+      "phase": 4,
+      "dependsOn": ["cdn_setup"]
+    },
+    {
+      "id": "ad_image_generator_backend",
+      "title": "Ad Generator - Backend: Gemini API integration",
+      "priority": "high",
+      "status": "pending",
+      "skill": "AD_IMAGE_GENERATOR.md",
+      "agent": "AGENT-BACKEND",
+      "phase": 4,
+      "dependsOn": ["ad_image_generator_schema"]
+    },
+    {
+      "id": "ad_image_generator_frontend",
+      "title": "Ad Generator - Frontend: AdCreatorView",
+      "priority": "high",
+      "status": "pending",
+      "skill": "AD_IMAGE_GENERATOR.md",
+      "agent": "AGENT-FRONTEND",
+      "phase": 4,
+      "dependsOn": ["ad_image_generator_backend"]
+    },
+    {
+      "id": "ad_image_generator_integration",
+      "title": "Ad Generator - Integración con sistema de ads",
+      "priority": "medium",
+      "status": "pending",
+      "skill": "AD_IMAGE_GENERATOR.md",
+      "agent": "AGENT-FRONTEND",
+      "phase": 4,
+      "dependsOn": ["ad_image_generator_frontend"]
+    },
+
+    {
+      "id": "integration_tests",
+      "title": "Integration Tests - API endpoints críticos",
+      "priority": "high",
+      "status": "pending",
+      "agent": "AGENT-BACKEND",
+      "phase": 5
+    },
+    {
+      "id": "e2e_tests",
+      "title": "E2E Tests - Flows principales (login, post, payment)",
+      "priority": "high",
+      "status": "pending",
+      "agent": "AGENT-FRONTEND",
+      "phase": 5
+    },
+    {
+      "id": "performance_review",
+      "title": "Performance Review - Bundle size, load times",
+      "priority": "medium",
+      "status": "pending",
+      "agent": "AGENT-FRONTEND",
+      "phase": 5
+    },
+    {
+      "id": "security_audit",
+      "title": "Security Audit - XSS, CSRF, SQL injection checks",
+      "priority": "high",
+      "status": "pending",
+      "agent": "AGENT-BACKEND",
+      "phase": 5
+    },
+    {
+      "id": "documentation",
+      "title": "Documentation - README, API docs, deployment guide",
+      "priority": "medium",
+      "status": "pending",
+      "agent": "AGENT-LEADER",
+      "phase": 5
+    },
+    {
+      "id": "feed_pagination",
+      "title": "Feed con paginación lazy loading",
+      "priority": "medium",
+      "status": "completed",
+      "agent": "AGENT-2",
+      "phase": 3,
+      "notes": "Componente CommunityFeed mejorado con infinite scroll, estados vacíos, skeleton loaders"
+    },
+    {
+      "id": "exness_api",
+      "title": "Integración Exness API (balance real)",
+      "priority": "medium",
+      "status": "pending",
+      "skill": "exness_api_integration.md",
+      "agent": "AGENT-BACKEND"
+    },
+    {
+      "id": "affiliate_system",
+      "title": "Sistema de afiliados",
+      "priority": "medium",
+      "status": "pending",
+      "skill": "monetize_agent.md",
+      "agent": "AGENT-MONETIZE",
+      "phase": 5
+    },
+    {
+      "id": "redesign_leaderboard",
+      "title": "Rediseñar Ranking - UI compacto con premios y barra de progreso",
+      "priority": "high",
+      "status": "completed",
+      "agent": "big-pickle",
+      "phase": 1,
+      "notes": "Sidebar derecho con XP, Top 3, premios por nivel, UI compacta"
+    },
+    {
+      "id": "fix_creator_checkout",
+      "title": "Arreglar 'Comenzar como Creator' - Usar Convex en lugar de API endpoint",
+      "priority": "high",
+      "status": "completed",
+      "agent": "big-pickle",
+      "phase": 1,
+      "notes": "Ahora usa api.payments.createCheckoutSession"
+    },
+    {
+      "id": "fix_discover_communities",
+      "title": "Sección Descubrir - Mejoras en manejo de estados vacíos",
+      "priority": "high",
+      "status": "completed",
+      "agent": "big-pickle",
+      "phase": 1,
+      "notes": "Agregado fallback a listPublicCommunities, estado vacío apropiado"
+    },
+    {
+      "id": "show_communities_in_profiles",
+      "title": "Mostrar comunidades en perfiles de usuarios",
+      "priority": "medium",
+      "status": "completed",
+      "agent": "big-pickle",
+      "phase": 1,
+      "notes": "Nueva tab 'Comunidades' en PerfilView con comunidades creadas y unidas"
+    },
+    {
+      "id": "community_advertising_system",
+      "title": "Sistema de publicidad para comunidades",
+      "priority": "medium",
+      "status": "completed",
+      "agent": "big-pickle",
+      "phase": 1,
+      "notes": "CommunityPromoteModal con planes Basic/Pro/Enterprise, backend ads.ts actualizado"
+    },
+    {
+      "id": "community_promotion_schema",
+      "title": "Schema comunidades - Agregar campos de promoción (isPromoted, promotionPlan, etc)",
+      "priority": "medium",
+      "status": "completed",
+      "agent": "big-pickle",
+      "phase": 1,
+      "notes": "Campos agregados: coverImage, isPromoted, promotionPlan, promotionEndDate"
+    }
+  ],
+
+  "agent2_completed": [
+    {
+      "id": "s2_1_comunidadview_split",
+      "title": "Dividir ComunidadView.tsx en componentes",
+      "priority": "high",
+      "agent": "AGENT-2",
+      "date": "2026-03-20",
+      "notes": "Componentes creados: CommunityFeed, CommunityHeader, LiveTVSection, Modals, PostDetailModal. Reducción de 1020 a 810 líneas"
+    },
+    {
+      "id": "s2_2_postcard_components",
+      "title": "Verificar PostCard modularizado",
+      "priority": "high",
+      "agent": "AGENT-2",
+      "date": "2026-03-20",
+      "notes": "PostCard ya usa sub-componentes: PostCardHeader, PostCardMedia, PostCardZone, PostCardAIAgent, ParticleBurst"
+    },
+    {
+      "id": "feed_pagination",
+      "title": "Feed con paginación lazy loading",
+      "priority": "medium",
+      "agent": "AGENT-2",
+      "date": "2026-03-20",
+      "notes": "Componente CommunityFeed mejorado con infinite scroll, estados vacíos, skeleton loaders, animaciones suaves"
+    },
+    {
+      "id": "nav_signals_update",
+      "title": "Navigation - Agregar Señales",
+      "priority": "medium",
+      "agent": "AGENT-2",
+      "date": "2026-03-20",
+      "notes": "Agregada sección 'Señales' en dropdown de Trading"
+    }
+  ],
+
+  "instagram_api_integration": {
+    "id": "instagram_api_integration",
+    "title": "Marketing IA - Conectar API de Instagram (Meta Graph API)",
+    "description": "Integrar Meta Graph API para habilitar las funciones de Instagram Marketing en el panel de administración. Actualmente el módulo tiene UI completa pero funciona con datos mock.",
+    "priority": "high",
+    "status": "pending",
+    "agent": "AGENT-BACKEND",
+    "features_affected": [
+      "InstagramAccounts - getUserInstagramAccounts, connectAccount, disconnectAccount",
+      "InstagramAnalytics - getWeeklyReport, getPerformanceMetrics, getAudienceInsights",
+      "InstagramPosts - createPost, schedulePost, getScheduledPosts, cancelScheduled",
+      "InstagramMedia - uploadMedia, getMediaLibrary, deleteMedia",
+      "InstagramInbox - getMessages, sendReply, markAsRead",
+      "InstagramAutoReply - configureAutoReply, getAutoReplyRules"
+    ],
+    "required_env_vars": [
+      "INSTAGRAM_APP_ID",
+      "INSTAGRAM_APP_SECRET",
+      "INSTAGRAM_ACCESS_TOKEN",
+      "INSTAGRAM_BUSINESS_ACCOUNT_ID"
+    ],
+    "docs": "https://developers.facebook.com/docs/instagram-api",
+    "depends_on": [],
+    "blocking": ["instagram_marketing_full_flow"]
+  },
+
+  "skills": {
+    "available": [
+      "frontend_agent.md",
+      "backend_agent.md",
+      "monetize_agent.md",
+      "community_agent.md",
+      "notifications_push.md",
+      "chat_moderation.md",
+      "ai_agent_debug.md",
+      "exness_api_integration.md",
+      "COMMUNITY_DEVELOPMENT.md",
+      "MARKETPLACE_DEVELOPMENT.md",
+      "CREATOR_HUB.md",
+      "MERCADOPAGO_INTEGRATION.md",
+      "INTER_AGENT_PROTOCOL.md",
+      "DESIGN_SYSTEM.md",
+      "SYSTEM_ARCHITECTURE.md",
+      "AD_IMAGE_GENERATOR.md",
+      "SIGNALS_TRADING_SYSTEM.md"
+    ]
+  },
+
+  "team": {
+    "AGENT-LEADER": {
+      "specialties": ["coordination", "planning", "skills", "ci_cd", "debugging"],
+      "status": "active",
+      "currentTasks": ["documentation", "email_service_setup"],
+      "responsibilities": ["Coordinar agentes", "Crear/actualizar skills", "Verificar integración", "Release management"]
+    },
+    "AGENT-BACKEND": {
+      "specialties": ["convex", "api", "database", "security", "schema"],
+      "status": "active",
+      "currentTasks": ["schema_marketplace", "schema_creator", "schema_signals", "email_service_setup"],
+      "phase": 1,
+      "notes": "Paralelizar: schemas y queries al mismo tiempo"
+    },
+    "AGENT-FRONTEND": {
+      "specialties": ["react", "ui_ux", "css", "performance", "components"],
+      "status": "active",
+      "currentTasks": [],
+      "phase": 3,
+      "notes": "Empezar UI cuando queries_minimal estén listos (usar mock data si es necesario)"
+    },
+    "AGENT-MONETIZE": {
+      "specialties": ["mercadopago", "stripe", "payments", "analytics", "revenue"],
+      "status": "active",
+      "currentTasks": [],
+      "phase": 2,
+      "notes": "Depende de schemas - preparar código mientras tanto"
+    },
+    "AGENT-COMMUNITY": {
+      "specialties": ["social", "gamification", "moderation", "engagement", "creators"],
+      "status": "active",
+      "currentTasks": ["queries_creator_minimal"],
+      "phase": 1,
+      "notes": "Ayudar a AGENT-BACKEND con queries de creator"
+    },
+    "AGENT-MARKETPLACE": {
+      "specialties": ["marketplace", "products", "catalog", "search", "e-commerce"],
+      "status": "active",
+      "currentTasks": ["queries_marketplace_minimal"],
+      "phase": 1,
+      "notes": "Ayudar a AGENT-BACKEND con queries de marketplace"
+    }
+  },
+
+  "fees": {
+    "community_subscriptions": "10%",
+    "marketplace": "15%",
+    "creator_earnings": "10%",
+    "min_payout": "$50 USD"
+  },
+
+  "criticalPath": [
+    "schema_marketplace",
+    "queries_marketplace_minimal",
+    "ui_marketplace_views",
+    "services_marketplace_payments",
+    "webhook_mercadopago",
+    "integration_tests"
+  ],
+
+  "links": {
+    "live": "https://tradeportal-2025-platinum.vercel.app",
+    "backend": "https://notable-sandpiper-279.convex.cloud",
+    "mercadopago_docs": "https://www.mercadopago.com.co/developers",
+    "gemini_api": "https://ai.google.dev/gemini-api"
+  },
+
+  "services": {
+    "email": {
+      "provider": "pending",
+      "status": "not_configured",
+      "templates_needed": 10
+    },
+    "cdn": {
+      "provider": "pending",
+      "status": "not_configured"
+    },
+    "push": {
+      "vapid_keys": "pending",
+      "status": "not_configured"
+    }
+  },
+
+  "sprint10_big_pickle": {
+    "completed": [
+      {
+        "id": "redesign_leaderboard",
+        "title": "Rediseñar Ranking - UI compacto con premios y barra de progreso",
+        "priority": "high",
+        "agent": "big-pickle",
+        "notes": "Sidebar derecho con XP, Top 3, premios por nivel, UI compacta"
+      },
+      {
+        "id": "fix_creator_checkout",
+        "title": "Arreglar 'Comenzar como Creator' - Usar Convex",
+        "priority": "high",
+        "agent": "big-pickle",
+        "notes": "Ahora usa api.payments.createCheckoutSession"
+      },
+      {
+        "id": "fix_discover_communities",
+        "title": "Sección Descubrir - Mejoras en manejo de estados vacíos",
+        "priority": "high",
+        "agent": "big-pickle",
+        "notes": "Agregado fallback a listPublicCommunities, estado vacío apropiado"
+      },
+      {
+        "id": "show_communities_in_profiles",
+        "title": "Mostrar comunidades en perfiles de usuarios",
+        "priority": "medium",
+        "agent": "big-pickle",
+        "notes": "Nueva tab 'Comunidades' en PerfilView"
+      },
+      {
+        "id": "community_advertising_system",
+        "title": "Sistema de publicidad para comunidades",
+        "priority": "medium",
+        "agent": "big-pickle",
+        "notes": "CommunityPromoteModal con planes Basic/Pro/Enterprise"
+      },
+      {
+        "id": "community_promotion_schema",
+        "title": "Schema comunidades - Agregar campos de promoción",
+        "priority": "medium",
+        "agent": "big-pickle",
+        "notes": "Campos: coverImage, isPromoted, promotionPlan, promotionEndDate"
+      }
+    ]
+  }
+}

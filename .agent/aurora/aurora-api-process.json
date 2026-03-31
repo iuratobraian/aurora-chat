@@ -1,0 +1,17 @@
+{
+  "updatedAt": "2026-03-25T00:37:33.046Z",
+  "state": "failed",
+  "port": 4310,
+  "healthUrl": "http://127.0.0.1:4310/health",
+  "pidFile": ".agent/aurora/aurora-api.pid",
+  "logs": {
+    "stdout": ".agent/aurora/logs/aurora-api.out.log",
+    "stderr": ".agent/aurora/logs/aurora-api.err.log"
+  },
+  "pid": null,
+  "source": "launcher",
+  "healthy": false,
+  "recentStdout": "Aurora API listening on http://localhost:4310\nAurora API listening on http://localhost:4310\n",
+  "recentStderr": "",
+  "note": "PowerShell Start-Process bloqueado por permisos del entorno."
+}

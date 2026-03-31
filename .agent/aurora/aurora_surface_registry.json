@@ -1,0 +1,194 @@
+{
+  "version": 1,
+  "program": "Aurora Sovereign Intelligence",
+  "surfaces": [
+    {
+      "surfaceId": "control_plane",
+      "goal": "Concentrar la verdad operativa de Aurora en un snapshot confiable.",
+      "primaryMetric": "drift_detected_before_execution",
+      "dependencies": [
+        ".agent/workspace/coordination/TASK_BOARD.md",
+        ".agent/workspace/coordination/CURRENT_FOCUS.md",
+        ".agent/workspace/coordination/AGENT_LOG.md",
+        ".agent/workspace/coordination/RELEASE_BLOCKERS.md",
+        "scripts/aurora-api.mjs",
+        "scripts/aurora-shell.mjs"
+      ],
+      "ownerScope": "aurora_ops",
+      "coreOrSatellite": "core",
+      "smokeTest": "Aurora devuelve /status, /aurora/health-snapshot y /aurora/drift-report sin errores",
+      "knownFailureModes": [
+        "board desactualizado",
+        "focus vencido",
+        "logs contradictorios",
+        "archivos críticos sin claim"
+      ],
+      "nextBestImprovements": [
+        "score de drift",
+        "alertas por owner faltante",
+        "panel de blockers"
+      ]
+    },
+    {
+      "surfaceId": "memory_system",
+      "goal": "Separar memoria útil, reusable y de alta señal para Aurora.",
+      "primaryMetric": "knowledge_reuse_score",
+      "dependencies": [
+        ".agent/brain/db/*.jsonl",
+        "scripts/aurora-api.mjs",
+        "scripts/aurora-sovereign.mjs"
+      ],
+      "ownerScope": "aurora_ops",
+      "coreOrSatellite": "core",
+      "smokeTest": "Aurora puede listar conocimiento reusable y distinguirlo de logs crudos",
+      "knownFailureModes": [
+        "duplicados",
+        "knowledge rot",
+        "ruido documental",
+        "heurísticas contradictorias"
+      ],
+      "nextBestImprovements": [
+        "freshness scoring",
+        "dedupe automático",
+        "poda por baja señal"
+      ]
+    },
+    {
+      "surfaceId": "retrieval_engine",
+      "goal": "Entregar context pack mínimo y útil por tarea, dominio o riesgo.",
+      "primaryMetric": "context_pack_precision",
+      "dependencies": [
+        ".agent/aurora/aurora_surface_registry.json",
+        ".agent/brain/db/*.jsonl",
+        "scripts/aurora-sovereign.mjs"
+      ],
+      "ownerScope": "aurora_ops",
+      "coreOrSatellite": "core",
+      "smokeTest": "Aurora puede responder context packs por query o taskId",
+      "knownFailureModes": [
+        "context overflow",
+        "ranking pobre",
+        "source-of-truth incorrecta"
+      ],
+      "nextBestImprovements": [
+        "ranking por source type",
+        "packs por dominio",
+        "packs por superficie"
+      ]
+    },
+    {
+      "surfaceId": "reasoning_layer",
+      "goal": "Estructurar reasoning operativo con salidas observables y reutilizables.",
+      "primaryMetric": "reasoning_output_consistency",
+      "dependencies": [
+        "scripts/aurora-reasoning.mjs",
+        "scripts/aurora-api.mjs",
+        "scripts/aurora-shell.mjs"
+      ],
+      "ownerScope": "aurora_ops",
+      "coreOrSatellite": "core",
+      "smokeTest": "Aurora devuelve riesgo, siguiente paso, validación y cierre para una tarea",
+      "knownFailureModes": [
+        "salidas verbosas",
+        "sin siguiente paso",
+        "sin validación útil"
+      ],
+      "nextBestImprovements": [
+        "next_best_system_step",
+        "riesgo por dominio",
+        "handoff estructurado"
+      ]
+    },
+    {
+      "surfaceId": "execution_support",
+      "goal": "Acelerar el trabajo real con pre-task plan, checklist y cierre automático.",
+      "primaryMetric": "time_to_safe_execution",
+      "dependencies": [
+        "scripts/aurora-auto-runner.mjs",
+        "scripts/aurora-api.mjs",
+        "scripts/aurora-shell.mjs"
+      ],
+      "ownerScope": "aurora_ops",
+      "coreOrSatellite": "core",
+      "smokeTest": "Aurora puede producir checklist de validación y cierre de tarea desde shell/API",
+      "knownFailureModes": [
+        "validación genérica",
+        "cierre sin aprendizaje",
+        "plan sin acotación"
+      ],
+      "nextBestImprovements": [
+        "pre-task hooks",
+        "post-task hooks",
+        "checklists por tipo de cambio"
+      ]
+    },
+    {
+      "surfaceId": "eval_observability",
+      "goal": "Medir utilidad real, drift, reuse y salud general de Aurora.",
+      "primaryMetric": "aurora_daily_utility_score",
+      "dependencies": [
+        "scripts/aurora-scorecard.mjs",
+        "scripts/aurora-speed-check.mjs",
+        "scripts/aurora-sovereign.mjs"
+      ],
+      "ownerScope": "aurora_ops",
+      "coreOrSatellite": "core",
+      "smokeTest": "Aurora puede exponer scorecard diario y snapshot de health",
+      "knownFailureModes": [
+        "scorecards vacíos",
+        "metrics sin contexto",
+        "learner parado"
+      ],
+      "nextBestImprovements": [
+        "series históricas",
+        "alertas automáticas",
+        "ranking de utilidad por función"
+      ]
+    },
+    {
+      "surfaceId": "connectors_mcp",
+      "goal": "Volver a Aurora extensible con conectores y MCPs de alto valor y bajo ruido.",
+      "primaryMetric": "connector_readiness_score",
+      "dependencies": [
+        ".agent/aurora/connectors.json",
+        "scripts/aurora-connectors.mjs"
+      ],
+      "ownerScope": "aurora_ops",
+      "coreOrSatellite": "support",
+      "smokeTest": "Aurora lista conectores con propósito, prioridad y readiness",
+      "knownFailureModes": [
+        "tool sprawl",
+        "sin playbook",
+        "conector sin problema claro"
+      ],
+      "nextBestImprovements": [
+        "readiness por conector",
+        "playbooks por MCP",
+        "riesgos por integración"
+      ]
+    },
+    {
+      "surfaceId": "operator_experience",
+      "goal": "Dar visibilidad instantánea del estado de Aurora desde shell y API.",
+      "primaryMetric": "operator_time_to_context",
+      "dependencies": [
+        "scripts/aurora-api.mjs",
+        "scripts/aurora-shell.mjs",
+        ".agent/aurora/app/*"
+      ],
+      "ownerScope": "aurora_ops",
+      "coreOrSatellite": "support",
+      "smokeTest": "El operador puede consultar surfaces, drift, health y scorecard con comandos simples",
+      "knownFailureModes": [
+        "comandos ocultos",
+        "salidas no accionables",
+        "panel sin jerarquía"
+      ],
+      "nextBestImprovements": [
+        "operator UI",
+        "quick actions",
+        "digest visual"
+      ]
+    }
+  ]
+}

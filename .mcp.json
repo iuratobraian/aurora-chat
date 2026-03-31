@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "ruflo": {
+      "command": "npx",
+      "args": ["-y", "ruflo@latest"],
+      "description": "Ruflo - AI Agent Orchestration Platform (60+ specialized agents for Claude Code)"
+    }
+  }
+}

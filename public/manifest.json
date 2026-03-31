@@ -1,0 +1,88 @@
+{
+  "name": "TradeHub - Trading Social",
+  "short_name": "TradeHub",
+  "description": "La plataforma de trading social #1 en Latam. Comparte ideas, sigue traders y aprende.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#050608",
+  "theme_color": "#3B82F6",
+  "lang": "es",
+  "dir": "ltr",
+  "categories": ["finance", "social", "education", "business"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/icons/icon-192.svg",
+      "sizes": "192x192 any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-192.svg",
+      "sizes": "144x144 any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192.svg",
+      "sizes": "128x128 any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192.svg",
+      "sizes": "512x512 any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/desktop.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Vista principal del dashboard"
+    },
+    {
+      "src": "/screenshots/mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Vista móvil"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Calendario Económico",
+      "short_name": "Calendario",
+      "description": "Ver calendario económico",
+      "url": "/calendario",
+      "icons": [{ "src": "/icons/shortcut-calendar.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "News Hub",
+      "short_name": "Noticias",
+      "description": "Ver últimas noticias",
+      "url": "/news",
+      "icons": [{ "src": "/icons/shortcut-news.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Competitions",
+      "short_name": "Concursos",
+      "description": "Ver torneos activos",
+      "url": "/competitions",
+      "icons": [{ "src": "/icons/shortcut-competitions.png", "sizes": "96x96" }]
+    }
+  ],
+  "related_applications": [],
+  "handle_links": "preferred",
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "edge_side_panel": {
+    "preferred_width": 400
+  }
+}

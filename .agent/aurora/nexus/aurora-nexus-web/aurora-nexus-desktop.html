@@ -1,0 +1,3488 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aurora Nexus | Orquestación de Agentes AI</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-container-low": "#1a1c1e",
+            "surface-container-highest": "#343538",
+            "surface-container-high": "#292a2d",
+            "on-surface-variant": "#c2c6d6",
+            "secondary-fixed": "#62ff96",
+            "primary": "#adc6ff",
+            "primary-container": "#4d8eff",
+            "secondary": "#7dffa2",
+            "secondary-container": "#05e777",
+            "tertiary": "#ddb7ff",
+            "tertiary-container": "#b76dff",
+            "error": "#ffb4ab",
+            "error-container": "#93000a",
+            "surface": "#121316",
+            "background": "#121316",
+            "on-background": "#e3e2e5",
+            "on-surface": "#e3e2e5",
+            "surface-bright": "#38393c"
+          },
+          fontFamily: {
+            "headline": ["Space Grotesk"],
+            "body": ["Manrope"],
+            "label": ["Manrope"]
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #050608; color: #e3e2e5; font-family: 'Manrope', sans-serif; }
+    .glass { background: rgba(26, 28, 30, 0.4); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    .orb { position: absolute; width: 600px; height: 600px; border-radius: 50%; filter: blur(120px); z-index: -1; opacity: 0.15; }
+    .orb-1 { top: -10%; left: -10%; background: #4d8eff; }
+    .orb-2 { bottom: -10%; right: -10%; background: #b76dff; }
+    .orb-3 { top: 40%; left: 50%; background: #05e777; width: 400px; height: 400px; }
+    .tab-active { border-bottom: 2px solid #adc6ff; color: #adc6ff; }
+    .chat-message-user { background: linear-gradient(135deg, #4d8eff 0%, #adc6ff 100%); }
+    .chat-message-agent { background: rgba(255,255,255,0.1); }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+  </style>
+</head>
+<body class="bg-background min-h-screen">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Header -->
+  <header class="fixed top-0 w-full z-50 flex justify-between items-center px-6 h-16 bg-surface/40 backdrop-blur-xl border-b border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+    <div class="flex items-center gap-4">
+      <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">hub</span>
+      <h1 class="text-xl font-bold tracking-widest text-primary uppercase font-headline">AURORA NEXUS</h1>
+      <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full flex items-center gap-1">
+        <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+        EN LÍNEA
+      </span>
+    </div>
+    <div class="flex items-center gap-8">
+      <div class="flex items-center gap-3 bg-surface-container-high px-4 py-1.5 rounded-full border border-white/5">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary-fixed opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-secondary-fixed"></span>
+        </span>
+        <span class="text-[10px] font-headline uppercase tracking-[0.15em] text-on-surface">Estado: 6/6 Activos</span>
+      </div>
+      <div class="text-on-surface font-headline text-sm tracking-wider tabular-nums" id="realtime-clock">--:--:-- UTC</div>
+    </div>
+    <div class="flex items-center gap-4">
+      <!-- Cloud Status -->
+      <div class="flex items-center gap-2 px-3 py-1.5 bg-surface-container-high rounded-lg border border-white/5">
+        <span class="material-symbols-outlined text-secondary text-sm">cloud_done</span>
+        <span class="text-xs text-on-surface-variant">Nube: Conectado</span>
+      </div>
+      <button class="p-2 rounded-xl hover:bg-white/5 transition-all duration-300">
+        <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+      </button>
+      <div class="w-8 h-8 rounded-full border border-primary/20 p-0.5">
+        <div class="w-full h-full rounded-full bg-gradient-to-br from-primary to-tertiary"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Tab Navigation -->
+  <nav class="fixed top-16 left-0 right-0 z-40 bg-surface/80 backdrop-blur-xl border-b border-white/10">
+    <div class="flex gap-1 px-6 pt-2 overflow-x-auto">
+      <button class="tab-active px-4 py-3 text-sm font-headline transition-all whitespace-nowrap" onclick="showTab('dashboard')">
+        <span class="material-symbols-outlined text-sm align-middle mr-1">dashboard</span>
+        Panel Principal
+      </button>
+      <button class="px-4 py-3 text-sm font-headline text-on-surface-variant hover:text-primary transition-all whitespace-nowrap" onclick="showTab('agents')">
+        <span class="material-symbols-outlined text-sm align-middle mr-1">smart_toy</span>
+        Agentes
+      </button>
+      <button class="px-4 py-3 text-sm font-headline text-on-surface-variant hover:text-primary transition-all whitespace-nowrap" onclick="showTab('chat')">
+        <span class="material-symbols-outlined text-sm align-middle mr-1">chat</span>
+        Chat de Equipo
+      </button>
+      <button class="px-4 py-3 text-sm font-headline text-on-surface-variant hover:text-primary transition-all whitespace-nowrap" onclick="showTab('tasks')">
+        <span class="material-symbols-outlined text-sm align-middle mr-1">assignment</span>
+        Tareas
+      </button>
+      <button class="px-4 py-3 text-sm font-headline text-on-surface-variant hover:text-primary transition-all whitespace-nowrap" onclick="showTab('improvements')">
+        <span class="material-symbols-outlined text-sm align-middle mr-1">trending_up</span>
+        Mejoras
+      </button>
+      <button class="px-4 py-3 text-sm font-headline text-on-surface-variant hover:text-primary transition-all whitespace-nowrap" onclick="showTab('problems')">
+        <span class="material-symbols-outlined text-sm align-middle mr-1">bug_report</span>
+        Problemas
+      </button>
+      <button class="px-4 py-3 text-sm font-headline text-on-surface-variant hover:text-primary transition-all whitespace-nowrap" onclick="showTab('design')">
+        <span class="material-symbols-outlined text-sm align-middle mr-1">design_services</span>
+        Diseño
+      </button>
+      <button class="px-4 py-3 text-sm font-headline text-on-surface-variant hover:text-primary transition-all whitespace-nowrap" onclick="showTab('workzones')">
+        <span class="material-symbols-outlined text-sm align-middle mr-1">workspaces</span>
+        Zonas de Trabajo
+      </button>
+      <button class="px-4 py-3 text-sm font-headline text-on-surface-variant hover:text-primary transition-all whitespace-nowrap" onclick="showTab('terminal')">
+        <span class="material-symbols-outlined text-sm align-middle mr-1">terminal</span>
+        Terminal
+      </button>
+      <button class="px-4 py-3 text-sm font-headline text-on-surface-variant hover:text-primary transition-all whitespace-nowrap" onclick="showTab('debuglog')">
+        <span class="material-symbols-outlined text-sm align-middle mr-1">code</span>
+        Debug Log
+      </button>
+      <button class="px-4 py-3 text-sm font-headline text-on-surface-variant hover:text-primary transition-all whitespace-nowrap" onclick="showTab('aiconsole')">
+        <span class="material-symbols-outlined text-sm align-middle mr-1">psychology</span>
+        AI Console
+      </button>
+      <button class="px-4 py-3 text-sm font-headline text-on-surface-variant hover:text-primary transition-all whitespace-nowrap" onclick="showTab('settings')">
+        <span class="material-symbols-outlined text-sm align-middle mr-1">settings</span>
+        Configuración
+      </button>
+    </div>
+  </nav>
+
+  <main class="pt-32 pb-8 px-6 max-w-[1800px] mx-auto">
+    
+    <!-- DASHBOARD TAB -->
+    <div id="tab-dashboard" class="grid grid-cols-12 gap-6">
+      <!-- Stats -->
+      <section class="col-span-12 grid grid-cols-4 gap-6 mb-4">
+        <div class="glass p-6 rounded-2xl">
+          <div class="flex justify-between items-start mb-4">
+            <span class="text-[10px] font-headline uppercase tracking-[0.2em] text-on-surface-variant">Agentes Activos</span>
+            <span class="material-symbols-outlined text-primary text-xl">smart_toy</span>
+          </div>
+          <div class="text-4xl font-headline font-bold text-on-surface">05<span class="text-primary text-lg ml-1">/05</span></div>
+          <div class="mt-4 h-1 w-full bg-surface-container-highest rounded-full overflow-hidden">
+            <div class="h-full bg-primary w-[100%]"></div>
+          </div>
+        </div>
+        <div class="glass p-6 rounded-2xl">
+          <div class="flex justify-between items-start mb-4">
+            <span class="text-[10px] font-headline uppercase tracking-[0.2em] text-on-surface-variant">Tareas Completadas</span>
+            <span class="material-symbols-outlined text-secondary text-xl">check_circle</span>
+          </div>
+          <div class="text-4xl font-headline font-bold text-on-surface">1,284</div>
+          <div class="mt-4 flex items-center gap-2 text-[10px] text-secondary-fixed">
+            <span class="material-symbols-outlined text-sm">trending_up</span>
+            <span>+12% DESDE LA ÚLTIMA SESIÓN</span>
+          </div>
+        </div>
+        <div class="glass p-6 rounded-2xl">
+          <div class="flex justify-between items-start mb-4">
+            <span class="text-[10px] font-headline uppercase tracking-[0.2em] text-on-surface-variant">Tareas Pendientes</span>
+            <span class="material-symbols-outlined text-tertiary text-xl">pending_actions</span>
+          </div>
+          <div class="text-4xl font-headline font-bold text-on-surface">18</div>
+          <div class="mt-4 flex items-center gap-2 text-[10px] text-tertiary">
+            <span>3 DE ALTA PRIORIDAD</span>
+          </div>
+        </div>
+        <div class="glass p-6 rounded-2xl">
+          <div class="flex justify-between items-start mb-4">
+            <span class="text-[10px] font-headline uppercase tracking-[0.2em] text-on-surface-variant">Problemas Abiertos</span>
+            <span class="material-symbols-outlined text-error text-xl">error</span>
+          </div>
+          <div class="text-4xl font-headline font-bold text-on-surface">5</div>
+          <div class="mt-4 flex items-center gap-2 text-[10px] text-error">
+            <span>2 CRÍTICOS</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Main Control -->
+      <section class="col-span-8 flex flex-col gap-6">
+        <div class="flex justify-between items-center gap-4 glass p-4 rounded-2xl">
+          <h2 class="font-headline text-lg font-bold tracking-tight text-on-surface px-4">MOTOR DE ORQUESTACIÓN</h2>
+          <div class="flex items-center gap-3">
+            <button onclick="startAllAgents()" class="px-8 py-3 rounded-2xl bg-gradient-to-r from-secondary to-secondary-container text-[#003918] font-bold font-headline text-sm tracking-widest uppercase shadow-[0_0_20px_rgba(125,255,162,0.3)] hover:scale-[1.02] active:scale-95 transition-all">
+              INICIAR TODOS
+            </button>
+            <button onclick="stopAllAgents()" class="px-8 py-3 rounded-2xl bg-error-container/20 border border-error/30 text-error font-bold font-headline text-sm tracking-widest uppercase hover:bg-error-container/40 transition-all">
+              DETENER
+            </button>
+          </div>
+        </div>
+
+        <!-- Agent Cards -->
+        <div class="glass p-5 rounded-2xl flex items-center gap-6 group hover:border-primary/30 transition-all">
+          <div class="flex items-center gap-4 w-1/4">
+            <div class="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
+              <span class="material-symbols-outlined text-primary">terminal</span>
+            </div>
+            <div>
+              <h3 class="font-headline font-bold text-on-surface">OpenCode</h3>
+              <p class="text-[10px] text-on-surface-variant uppercase tracking-widest">Desarrollador</p>
+            </div>
+          </div>
+          <div class="flex-1 flex flex-col gap-2">
+            <div class="flex justify-between text-[10px] text-on-surface-variant font-headline uppercase tracking-widest">
+              <span>Carga de Trabajo</span>
+              <span>78%</span>
+            </div>
+            <div class="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden p-[1px]">
+              <div class="h-full rounded-full bg-gradient-to-r from-primary to-tertiary" style="width: 78%"></div>
+            </div>
+          </div>
+          <div class="flex items-center gap-6 w-1/4 justify-end">
+            <div class="text-right">
+              <div class="text-lg font-headline font-bold text-on-surface">142</div>
+              <div class="text-[9px] text-on-surface-variant uppercase tracking-widest">Tareas</div>
+            </div>
+            <button class="w-10 h-10 rounded-full bg-surface-container-high border border-white/5 flex items-center justify-center hover:scale-110">
+              <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">pause</span>
+            </button>
+            <button class="w-10 h-10 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center hover:scale-110" onclick="openChat('OpenCode')">
+              <span class="material-symbols-outlined text-primary">chat</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="glass p-5 rounded-2xl flex items-center gap-6 group hover:border-secondary/30 transition-all">
+          <div class="flex items-center gap-4 w-1/4">
+            <div class="w-12 h-12 rounded-2xl bg-secondary/10 flex items-center justify-center border border-secondary/20">
+              <span class="material-symbols-outlined text-secondary">data_thresholding</span>
+            </div>
+            <div>
+              <h3 class="font-headline font-bold text-on-surface">Minimax #1</h3>
+              <p class="text-[10px] text-on-surface-variant uppercase tracking-widest">Optimizador</p>
+            </div>
+          </div>
+          <div class="flex-1 flex flex-col gap-2">
+            <div class="flex justify-between text-[10px] text-on-surface-variant font-headline uppercase tracking-widest">
+              <span>Carga de Trabajo</span>
+              <span>42%</span>
+            </div>
+            <div class="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden p-[1px]">
+              <div class="h-full rounded-full bg-gradient-to-r from-secondary to-primary" style="width: 42%"></div>
+            </div>
+          </div>
+          <div class="flex items-center gap-6 w-1/4 justify-end">
+            <div class="text-right">
+              <div class="text-lg font-headline font-bold text-on-surface">89</div>
+              <div class="text-[9px] text-on-surface-variant uppercase tracking-widest">Tareas</div>
+            </div>
+            <button class="w-10 h-10 rounded-full bg-surface-container-high border border-white/5 flex items-center justify-center hover:scale-110">
+              <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">pause</span>
+            </button>
+            <button class="w-10 h-10 rounded-full bg-secondary/20 border border-secondary/40 flex items-center justify-center hover:scale-110" onclick="openChat('Minimax #1')">
+              <span class="material-symbols-outlined text-secondary">chat</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="glass p-5 rounded-2xl flex items-center gap-6 group hover:border-tertiary/30 transition-all">
+          <div class="flex items-center gap-4 w-1/4">
+            <div class="w-12 h-12 rounded-2xl bg-tertiary/10 flex items-center justify-center border border-tertiary/20">
+              <span class="material-symbols-outlined text-tertiary">psychology</span>
+            </div>
+            <div>
+              <h3 class="font-headline font-bold text-on-surface">Aurora Core</h3>
+              <p class="text-[10px] text-on-surface-variant uppercase tracking-widest">Supervisor Neural</p>
+            </div>
+          </div>
+          <div class="flex-1 flex flex-col gap-2">
+            <div class="flex justify-between text-[10px] text-on-surface-variant font-headline uppercase tracking-widest">
+              <span>Integridad del Core</span>
+              <span>94%</span>
+            </div>
+            <div class="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden p-[1px]">
+              <div class="h-full rounded-full bg-gradient-to-r from-tertiary to-primary-container" style="width: 94%"></div>
+            </div>
+          </div>
+          <div class="flex items-center gap-6 w-1/4 justify-end">
+            <div class="text-right">
+              <div class="text-lg font-headline font-bold text-on-surface">512</div>
+              <div class="text-[9px] text-on-surface-variant uppercase tracking-widest">Tareas</div>
+            </div>
+            <button class="w-10 h-10 rounded-full bg-surface-container-high border border-white/5 flex items-center justify-center hover:scale-110">
+              <span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">pause</span>
+            </button>
+            <button class="w-10 h-10 rounded-full bg-tertiary/20 border border-tertiary/40 flex items-center justify-center hover:scale-110" onclick="openChat('Aurora Core')">
+              <span class="material-symbols-outlined text-tertiary">chat</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- BIG-PICKLE Agent Card -->
+        <div class="glass p-5 rounded-2xl flex items-center gap-6 group hover:border-green-500/30 transition-all">
+          <div class="flex items-center gap-4 w-1/4">
+            <div class="w-12 h-12 rounded-2xl bg-green-500/10 flex items-center justify-center border border-green-500/20">
+              <span class="material-symbols-outlined text-green-500">hub</span>
+            </div>
+            <div>
+              <h3 class="font-headline font-bold text-on-surface">BIG-PICKLE</h3>
+              <p class="text-[10px] text-on-surface-variant uppercase tracking-widest">Orchestrator</p>
+            </div>
+          </div>
+          <div class="flex-1 flex flex-col gap-2">
+            <div class="flex justify-between text-[10px] text-on-surface-variant font-headline uppercase tracking-widest">
+              <span>Coordinación</span>
+              <span>65%</span>
+            </div>
+            <div class="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden p-[1px]">
+              <div class="h-full rounded-full bg-gradient-to-r from-green-500 to-secondary" style="width: 65%"></div>
+            </div>
+          </div>
+          <div class="flex items-center gap-6 w-1/4 justify-end">
+            <div class="text-right">
+              <div class="text-lg font-headline font-bold text-on-surface">256</div>
+              <div class="text-[9px] text-on-surface-variant uppercase tracking-widest">Tareas</div>
+            </div>
+            <button class="w-10 h-10 rounded-full bg-surface-container-high border border-white/5 flex items-center justify-center hover:scale-110">
+              <span class="material-symbols-outlined text-green-500" style="font-variation-settings: 'FILL' 1;">pause</span>
+            </button>
+            <button class="w-10 h-10 rounded-full bg-green-500/20 border border-green-500/40 flex items-center justify-center hover:scale-110" onclick="openChat('BIG-PICKLE')">
+              <span class="material-symbols-outlined text-green-500">chat</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="glass p-5 rounded-2xl flex items-center gap-6">
+          <div class="flex items-center gap-4 w-1/4">
+            <div class="w-12 h-12 rounded-2xl bg-surface-container-highest flex items-center justify-center border border-white/5">
+              <span class="material-symbols-outlined text-on-surface-variant">monitoring</span>
+            </div>
+            <div>
+              <h3 class="font-headline font-bold text-on-surface">Gemini</h3>
+              <p class="text-[10px] text-on-surface-variant uppercase tracking-widest">Multimodal</p>
+            </div>
+          </div>
+          <div class="flex-1 flex flex-col gap-2">
+            <div class="flex justify-between text-[10px] text-on-surface-variant font-headline uppercase tracking-widest">
+              <span>Carga de Trabajo</span>
+              <span>12%</span>
+            </div>
+            <div class="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden">
+              <div class="h-full bg-surface-bright" style="width: 12%"></div>
+            </div>
+          </div>
+          <div class="flex items-center gap-6 w-1/4 justify-end">
+            <div class="text-right">
+              <div class="text-lg font-headline font-bold text-on-surface-variant">14</div>
+              <div class="text-[9px] text-on-surface-variant uppercase tracking-widest">Tareas</div>
+            </div>
+            <button class="w-10 h-10 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center hover:scale-110">
+              <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+            </button>
+            <button class="w-10 h-10 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center hover:scale-110" onclick="openChat('Gemini')">
+              <span class="material-symbols-outlined text-primary">chat</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sidebar -->
+      <aside class="col-span-4 flex flex-col gap-6">
+        <div class="glass p-6 rounded-2xl">
+          <h2 class="font-headline text-sm font-bold tracking-[0.2em] text-on-surface uppercase mb-6">Acciones Rápidas</h2>
+          <div class="grid grid-cols-3 gap-3">
+            <button onclick="quickAction('build')" class="flex flex-col items-center gap-2 p-3 rounded-xl bg-surface-container-low border border-amber-500/30 hover:bg-amber-500/10 transition-all">
+              <span class="material-symbols-outlined text-amber-500">construction</span>
+              <span class="text-[9px] uppercase font-bold tracking-widest text-amber-500">Build</span>
+            </button>
+            <button onclick="quickAction('plan')" class="flex flex-col items-center gap-2 p-3 rounded-xl bg-surface-container-low border border-tertiary/30 hover:bg-tertiary/10 transition-all">
+              <span class="material-symbols-outlined text-tertiary">map</span>
+              <span class="text-[9px] uppercase font-bold tracking-widest text-tertiary">Plan</span>
+            </button>
+            <button onclick="quickAction('deploy')" class="flex flex-col items-center gap-2 p-3 rounded-xl bg-surface-container-low border border-white/5 hover:bg-surface-container-high transition-all">
+              <span class="material-symbols-outlined text-primary">cloud_upload</span>
+              <span class="text-[9px] uppercase font-bold tracking-widest">Deploy</span>
+            </button>
+            <button onclick="quickAction('push')" class="flex flex-col items-center gap-2 p-3 rounded-xl bg-surface-container-low border border-white/5 hover:bg-surface-container-high transition-all">
+              <span class="material-symbols-outlined text-primary">upload</span>
+              <span class="text-[9px] uppercase font-bold tracking-widest">Push</span>
+            </button>
+            <button onclick="quickAction('pr')" class="flex flex-col items-center gap-2 p-3 rounded-xl bg-surface-container-low border border-white/5 hover:bg-surface-container-high transition-all">
+              <span class="material-symbols-outlined text-tertiary">fork_right</span>
+              <span class="text-[9px] uppercase font-bold tracking-widest">PR</span>
+            </button>
+            <button onclick="quickAction('sync')" class="flex flex-col items-center gap-2 p-3 rounded-xl bg-surface-container-low border border-white/5 hover:bg-surface-container-high transition-all">
+              <span class="material-symbols-outlined text-on-surface-variant">sync</span>
+              <span class="text-[9px] uppercase font-bold tracking-widest">Sync</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="glass p-6 rounded-2xl flex-1">
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="font-headline text-sm font-bold tracking-[0.2em] text-on-surface uppercase">Registro de Actividad</h2>
+            <span class="text-[9px] text-on-surface-variant">EN VIVO</span>
+          </div>
+          <div class="space-y-4">
+            <div class="flex gap-4">
+              <div class="w-1 h-10 rounded-full bg-secondary"></div>
+              <div>
+                <p class="text-xs text-on-surface"><span class="text-secondary font-bold">OpenCode</span> mezcló PR #1240</p>
+                <span class="text-[9px] text-on-surface-variant font-mono">14:40:22</span>
+              </div>
+            </div>
+            <div class="flex gap-4">
+              <div class="w-1 h-10 rounded-full bg-primary"></div>
+              <div>
+                <p class="text-xs text-on-surface"><span class="text-primary font-bold">Aurora Core</span> detectó latencia</p>
+                <span class="text-[9px] text-on-surface-variant font-mono">14:38:15</span>
+              </div>
+            </div>
+            <div class="flex gap-4">
+              <div class="w-1 h-10 rounded-full bg-error"></div>
+              <div>
+                <p class="text-xs text-on-surface"><span class="text-error font-bold">Problema</span> Timeout de BD</p>
+                <span class="text-[9px] text-on-surface-variant font-mono">14:35:00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- TEAM CHAT TAB - CENTRO DE CONTROL -->
+    <div id="tab-chat" class="hidden grid grid-cols-12 gap-6">
+      <!-- Chat Type Selector - Control Center -->
+      <div class="col-span-12 glass rounded-xl p-3 mb-4">
+        <div class="flex gap-2">
+          <button onclick="showChatType('live')" id="btn-live" class="flex-1 px-4 py-2 bg-primary text-surface font-bold rounded-lg text-sm">
+            <span class="material-symbols-outlined text-sm align-middle mr-1">live_tv</span>
+            📡 Live Feed (Todo)
+          </button>
+          <button onclick="showChatType('individual')" id="btn-individual" class="flex-1 px-4 py-2 bg-surface-container-low text-on-surface-variant rounded-lg text-sm hover:bg-surface-container-high">
+            <span class="material-symbols-outlined text-sm align-middle mr-1">person</span>
+            Chat Individual
+          </button>
+          <button onclick="showChatType('global')" id="btn-global" class="flex-1 px-4 py-2 bg-surface-container-low text-on-surface-variant rounded-lg text-sm hover:bg-surface-container-high">
+            <span class="material-symbols-outlined text-sm align-middle mr-1">groups</span>
+            Chat Equipo
+          </button>
+          <button onclick="showChatType('commands')" id="btn-commands" class="flex-1 px-4 py-2 bg-surface-container-low text-on-surface-variant rounded-lg text-sm hover:bg-surface-container-high">
+            <span class="material-symbols-outlined text-sm align-middle mr-1">terminal</span>
+            Comandos
+          </button>
+        </div>
+      </div>
+
+      <!-- LIVE FEED - Shows Everything -->
+      <div id="chat-live-feed" class="col-span-12">
+        <div class="grid grid-cols-12 gap-6">
+          <!-- Main Activity Feed -->
+          <div class="col-span-8 glass rounded-2xl flex flex-col" style="height: 70vh;">
+            <div class="p-4 border-b border-white/10 bg-gradient-to-r from-primary/10 to-tertiary/10">
+              <div class="flex items-center justify-between">
+                <h3 class="font-headline font-bold text-on-surface flex items-center gap-2">
+                  <span class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></span>
+                  📡 Live Feed - Todo lo que sucede
+                </h3>
+                <div class="flex gap-2">
+                  <button onclick="startLiveFeed()" class="px-3 py-1 bg-green-500/20 text-green-400 rounded-lg text-xs hover:bg-green-500/30">
+                    <span class="material-symbols-outlined text-xs mr-1">play_arrow</span>
+                    Iniciar
+                  </button>
+                  <button onclick="stopLiveFeed()" class="px-3 py-1 bg-error/20 text-error rounded-lg text-xs hover:bg-error/30">
+                    <span class="material-symbols-outlined text-xs mr-1">stop</span>
+                    Detener
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Live Messages -->
+            <div class="flex-1 p-4 overflow-y-auto space-y-3" id="live-messages">
+              <!-- Auto-generated live entries -->
+            </div>
+
+            <!-- Quick Command Input -->
+            <div class="p-4 border-t border-white/10 bg-surface-container-low">
+              <div class="flex gap-2">
+                <input type="text" id="quick-cmd" placeholder="Escribe un comando rápido..." 
+                       class="flex-1 bg-surface-container-low border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-primary focus:outline-none"
+                       onkeypress="if(event.key==='Enter')executeQuickCmd()">
+                <button onclick="executeQuickCmd()" class="px-6 py-3 bg-gradient-to-r from-primary to-tertiary text-surface font-bold rounded-xl hover:opacity-90">
+                  <span class="material-symbols-outlined">send</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Side Panel: Agents Status + Terminal + Pending -->
+          <div class="col-span-4 space-y-4">
+            <!-- Agents Live Status -->
+            <div class="glass rounded-2xl p-4">
+              <h4 class="font-headline font-bold text-on-surface mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">smart_toy</span>
+                Estado de Agentes
+              </h4>
+                <div class="space-y-2" id="agents-live-status">
+                <!-- Agent status cards -->
+                <div class="p-3 bg-surface-container-low rounded-xl border-l-4 border-primary">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-sm text-on-surface">OpenCode</span>
+                    <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                  </div>
+                  <div class="text-xs text-on-surface-variant mt-1" id="live-task-OpenCode">Esperando órdenes...</div>
+                  <div class="mt-2 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+                    <div class="h-full bg-primary" id="live-progress-OpenCode" style="width: 0%"></div>
+                  </div>
+                </div>
+                
+                <div class="p-3 bg-surface-container-low rounded-xl border-l-4 border-green-500">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-sm text-on-surface">BIG-PICKLE</span>
+                    <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                  </div>
+                  <div class="text-xs text-on-surface-variant mt-1" id="live-task-BIG-PICKLE">Coordinando agentes...</div>
+                  <div class="mt-2 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+                    <div class="h-full bg-green-500" id="live-progress-BIG-PICKLE" style="width: 65%"></div>
+                  </div>
+                </div>
+                
+                <div class="p-3 bg-surface-container-low rounded-xl border-l-4 border-secondary">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-sm text-on-surface">Minimax #1</span>
+                    <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                  </div>
+                  <div class="text-xs text-on-surface-variant mt-1" id="live-task-Minimax #1">Optimizando sistema...</div>
+                  <div class="mt-2 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+                    <div class="h-full bg-secondary" id="live-progress-Minimax #1" style="width: 45%"></div>
+                  </div>
+                </div>
+                
+                <div class="p-3 bg-surface-container-low rounded-xl border-l-4 border-tertiary">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-sm text-on-surface">Aurora Core</span>
+                    <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                  </div>
+                  <div class="text-xs text-on-surface-variant mt-1" id="live-task-Aurora Core">Supervisando red neural...</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Live Agent Activity Monitor -->
+            <div class="glass rounded-2xl p-4">
+              <h4 class="font-headline font-bold text-on-surface mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-green-500 animate-pulse">sync</span>
+                Monitor de Actividad en Vivo
+              </h4>
+              <div class="h-48 overflow-y-auto space-y-2" id="agent-activity-monitor">
+                <!-- Activity entries will be added here in real-time -->
+              </div>
+            </div>
+
+            <!-- Pending Actions -->
+            <div class="glass rounded-2xl p-4">
+              <h4 class="font-headline font-bold text-on-surface mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-error">pending_actions</span>
+                Pendientes
+              </h4>
+              <div class="space-y-2" id="pending-live">
+                <div class="flex items-center gap-2 p-2 bg-error/10 rounded-lg border-l-2 border-error">
+                  <span class="text-xs text-error font-bold">!</span>
+                  <span class="text-xs text-on-surface">Configurar acceso remoto</span>
+                </div>
+                <div class="flex items-center gap-2 p-2 bg-amber-500/10 rounded-lg border-l-2 border-amber-500">
+                  <span class="text-xs text-amber-500 font-bold">!</span>
+                  <span class="text-xs text-on-surface">Integrar API Stitch</span>
+                </div>
+                <div class="flex items-center gap-2 p-2 bg-surface-container-low rounded-lg border-l-2 border-surface-container-high">
+                  <span class="text-xs text-on-surface-variant">•</span>
+                  <span class="text-xs text-on-surface">Agregar más agentes</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agent List -->
+      <div class="col-span-3 glass rounded-2xl p-4">
+        <h3 class="font-headline font-bold text-on-surface mb-4" id="agent-list-title">Agentes</h3>
+        <div class="space-y-2" id="agent-list">
+          <button onclick="selectAgent('OpenCode')" class="w-full p-3 rounded-xl bg-surface-container-low hover:bg-surface-container-high text-left transition-all">
+            <div class="flex items-center gap-3">
+              <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+              <span class="material-symbols-outlined text-primary">terminal</span>
+              <span class="text-sm">OpenCode</span>
+            </div>
+            <div class="text-xs text-on-surface-variant mt-1 ml-8" id="task-OpenCode">Esperando...</div>
+          </button>
+          <button onclick="selectAgent('BIG-PICKLE')" class="w-full p-3 rounded-xl bg-surface-container-low hover:bg-surface-container-high text-left transition-all border-l-2 border-green-500">
+            <div class="flex items-center gap-3">
+              <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+              <span class="material-symbols-outlined text-green-500">hub</span>
+              <span class="text-sm font-bold text-green-400">BIG-PICKLE</span>
+            </div>
+            <div class="text-xs text-on-surface-variant mt-1 ml-8" id="task-BIG-PICKLE">Coordinando...</div>
+          </button>
+          <button onclick="selectAgent('Minimax #1')" class="w-full p-3 rounded-xl bg-surface-container-low hover:bg-surface-container-high text-left transition-all">
+            <div class="flex items-center gap-3">
+              <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+              <span class="material-symbols-outlined text-secondary">data_thresholding</span>
+              <span class="text-sm">Minimax #1</span>
+            </div>
+            <div class="text-xs text-on-surface-variant mt-1 ml-8" id="task-Minimax #1">Esperando...</div>
+          </button>
+          <button onclick="selectAgent('Minimax #2')" class="w-full p-3 rounded-xl bg-surface-container-low hover:bg-surface-container-high text-left transition-all">
+            <div class="flex items-center gap-3">
+              <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+              <span class="material-symbols-outlined text-secondary">data_thresholding</span>
+              <span class="text-sm">Minimax #2</span>
+            </div>
+            <div class="text-xs text-on-surface-variant mt-1 ml-8" id="task-Minimax #2">Esperando...</div>
+          </button>
+          <button onclick="selectAgent('Aurora Core')" class="w-full p-3 rounded-xl bg-surface-container-low hover:bg-surface-container-high text-left transition-all">
+            <div class="flex items-center gap-3">
+              <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+              <span class="material-symbols-outlined text-tertiary">psychology</span>
+              <span class="text-sm">Aurora Core</span>
+            </div>
+            <div class="text-xs text-on-surface-variant mt-1 ml-8" id="task-Aurora Core">Supervisando...</div>
+          </button>
+          <button onclick="selectAgent('Gemini')" class="w-full p-3 rounded-xl bg-surface-container-low hover:bg-surface-container-high text-left transition-all">
+            <div class="flex items-center gap-3">
+              <span class="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></span>
+              <span class="material-symbols-outlined text-on-surface-variant">monitoring</span>
+              <span class="text-sm">Gemini</span>
+            </div>
+            <div class="text-xs text-on-surface-variant mt-1 ml-8" id="task-Gemini">Analizando...</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Chat Area -->
+      <div class="col-span-9 glass rounded-2xl flex flex-col" style="height: 65vh;">
+        <!-- Progress Bar -->
+        <div class="p-3 border-b border-white/10 bg-surface-container-low/50">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs text-on-surface-variant" id="progress-title">Selecciona un agente</span>
+            <span class="text-xs font-bold text-primary" id="progress-percent">0%</span>
+          </div>
+          <div class="h-2 bg-surface-container-highest rounded-full overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-primary to-tertiary transition-all duration-500" id="progress-bar" style="width: 0%"></div>
+          </div>
+          <div class="text-xs text-secondary mt-1" id="progress-task"></div>
+        </div>
+
+        <!-- Messages -->
+        <div class="flex-1 p-4 overflow-y-auto space-y-4" id="chat-messages">
+          <div class="text-center text-on-surface-variant text-sm py-8">
+            <span class="material-symbols-outlined text-4xl mb-2">chat</span>
+            <p>Selecciona un agente o usa el chat global para coordinar todo el equipo</p>
+          </div>
+        </div>
+
+        <!-- Input -->
+        <div class="p-4 border-t border-white/10">
+          <div class="flex gap-2">
+            <input type="text" id="chat-input" placeholder="Escribe tu directiva..." class="flex-1 bg-surface-container-low border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-primary focus:outline-none">
+            <button onclick="sendMessage()" class="px-6 py-3 bg-primary text-surface font-bold rounded-xl hover:bg-primary/80 transition-all">
+              <span class="material-symbols-outlined">send</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TASKS TAB -->
+    <div id="tab-tasks" class="hidden grid grid-cols-12 gap-6">
+      <div class="col-span-12 glass rounded-2xl p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="font-headline text-xl font-bold text-on-surface">Tareas Pendientes</h2>
+          <button class="px-4 py-2 bg-primary text-surface rounded-xl font-bold hover:bg-primary/80 transition-all">
+            + Agregar Tarea
+          </button>
+        </div>
+        <div class="space-y-3">
+          <div class="flex items-center gap-4 p-4 bg-surface-container-low rounded-xl border-l-4 border-error">
+            <input type="checkbox" class="w-5 h-5 rounded">
+            <div class="flex-1">
+              <h4 class="font-bold text-on-surface">Corregir bug de autenticación</h4>
+              <p class="text-xs text-on-surface-variant">OpenCode - Alta Prioridad</p>
+            </div>
+            <span class="px-2 py-1 bg-error/20 text-error text-xs rounded">ALTA</span>
+          </div>
+          <div class="flex items-center gap-4 p-4 bg-surface-container-low rounded-xl border-l-4 border-amber-500">
+            <input type="checkbox" class="w-5 h-5 rounded">
+            <div class="flex-1">
+              <h4 class="font-bold text-on-surface">Actualizar documentación</h4>
+              <p class="text-xs text-on-surface-variant">Minimax #1 - Prioridad Media</p>
+            </div>
+            <span class="px-2 py-1 bg-amber-500/20 text-amber-500 text-xs rounded">MEDIA</span>
+          </div>
+          <div class="flex items-center gap-4 p-4 bg-surface-container-low rounded-xl border-l-4 border-green-500">
+            <input type="checkbox" class="w-5 h-5 rounded">
+            <div class="flex-1">
+              <h4 class="font-bold text-on-surface">Desplegar a producción</h4>
+              <p class="text-xs text-on-surface-variant">Aurora Core - Prioridad Baja</p>
+            </div>
+            <span class="px-2 py-1 bg-green-500/20 text-green-500 text-xs rounded">BAJA</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IMPROVEMENTS TAB -->
+    <div id="tab-improvements" class="hidden grid grid-cols-12 gap-6">
+      <div class="col-span-12 glass rounded-2xl p-6">
+        <h2 class="font-headline text-xl font-bold text-on-surface mb-6">Registro de Mejoras</h2>
+        
+        <!-- Marzo 2026 -->
+        <div class="mb-6">
+          <h3 class="font-headline text-lg font-bold text-primary mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined">calendar_month</span>
+            Marzo 2026
+          </h3>
+          <div class="space-y-3">
+            <div class="p-4 bg-surface-container-low rounded-xl">
+              <div class="flex justify-between items-start mb-2">
+                <h4 class="font-bold text-on-surface">Integración de Stitch UI</h4>
+                <span class="text-xs text-primary">25 Mar, 2026</span>
+              </div>
+              <p class="text-sm text-on-surface-variant">Sistema de diseño Stitch integrado para el portal Aurora Nexus</p>
+              <span class="text-xs text-secondary">✓ Completado</span>
+            </div>
+            <div class="p-4 bg-surface-container-low rounded-xl">
+              <div class="flex justify-between items-start mb-2">
+                <h4 class="font-bold text-on-surface">Acceso a la Nube Habilitado</h4>
+                <span class="text-xs text-primary">24 Mar, 2026</span>
+              </div>
+              <p class="text-sm text-on-surface-variant">Acceso remoto vía Aurora Nexus Cloud</p>
+              <span class="text-xs text-secondary">✓ Completado</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Febrero 2026 -->
+        <div class="mb-6">
+          <h3 class="font-headline text-lg font-bold text-tertiary mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined">calendar_month</span>
+            Febrero 2026
+          </h3>
+          <div class="space-y-3">
+            <div class="p-4 bg-surface-container-low rounded-xl">
+              <div class="flex justify-between items-start mb-2">
+                <h4 class="font-bold text-on-surface">Sistema de Chat por Agente</h4>
+                <span class="text-xs text-primary">28 Feb, 2026</span>
+              </div>
+              <p class="text-sm text-on-surface-variant">Chat individual para cada agente</p>
+              <span class="text-xs text-secondary">✓ Completado</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROBLEMS TAB -->
+    <div id="tab-problems" class="hidden grid grid-cols-12 gap-6">
+      <div class="col-span-12 glass rounded-2xl p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="font-headline text-xl font-bold text-on-surface">Problemas Abiertos</h2>
+          <button class="px-4 py-2 bg-error/20 text-error border border-error/30 rounded-xl font-bold hover:bg-error/30 transition-all">
+            + Reportar Problema
+          </button>
+        </div>
+        
+        <!-- Críticos -->
+        <div class="mb-6">
+          <h3 class="font-headline text-lg font-bold text-error mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined">error</span>
+            Críticos (2)
+          </h3>
+          <div class="space-y-3">
+            <div class="p-4 bg-error-container/20 rounded-xl border border-error/30">
+              <div class="flex justify-between items-start mb-2">
+                <h4 class="font-bold text-error">Timeout de Conexión a BD</h4>
+                <span class="text-xs text-error">CRÍTICO</span>
+              </div>
+              <p class="text-sm text-on-surface mb-2">La conexión se cae cada 5 minutos en producción</p>
+              <div class="flex gap-2">
+                <span class="px-2 py-0.5 bg-surface-container-high text-xs rounded">Base de Datos</span>
+                <span class="px-2 py-0.5 bg-surface-container-high text-xs rounded">OpenCode</span>
+              </div>
+            </div>
+            <div class="p-4 bg-error-container/20 rounded-xl border border-error/30">
+              <div class="flex justify-between items-start mb-2">
+                <h4 class="font-bold text-error">Límite de API Excedido</h4>
+                <span class="text-xs text-error">CRÍTICO</span>
+              </div>
+              <p class="text-sm text-on-surface mb-2">Llamadas API externas bloqueadas</p>
+              <div class="flex gap-2">
+                <span class="px-2 py-0.5 bg-surface-container-high text-xs rounded">API</span>
+                <span class="px-2 py-0.5 bg-surface-container-high text-xs rounded">Minimax #1</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Medios -->
+        <div class="mb-6">
+          <h3 class="font-headline text-lg font-bold text-amber-500 mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined">warning</span>
+            Medios (3)
+          </h3>
+          <div class="space-y-3">
+            <div class="p-4 bg-surface-container-low rounded-xl border-l-2 border-amber-500">
+              <div class="flex justify-between items-start mb-2">
+                <h4 class="font-bold text-on-surface">Tiempo de Build Lento</h4>
+                <span class="text-xs text-amber-500">MEDIO</span>
+              </div>
+              <p class="text-sm text-on-surface-variant">El build toma más de 5 minutos</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DESIGN TAB -->
+    <div id="tab-design" class="hidden grid grid-cols-12 gap-6">
+      <!-- Stitch Status & Quick Actions -->
+      <div class="col-span-12 glass rounded-2xl p-4 mb-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-green-500">cloud_done</span>
+              <span class="text-sm text-on-surface">Stitch MCP:</span>
+              <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">Conectado</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-amber-500">auto_awesome</span>
+              <span class="text-sm text-on-surface">Gemini:</span>
+              <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">Activo</span>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="openStitchStudio()" class="px-4 py-2 bg-tertiary/20 text-tertiary rounded-lg text-sm hover:bg-tertiary/30">
+              <span class="material-symbols-outlined text-sm mr-1">open_in_new</span>
+              Abrir Stitch Studio
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Design Request Panel -->
+      <div class="col-span-4 glass rounded-2xl p-6">
+        <h2 class="font-headline text-xl font-bold text-on-surface mb-4">
+          <span class="material-symbols-outlined text-tertiary mr-2">auto_awesome</span>
+          Generar Diseño con Stitch
+        </h2>
+        <p class="text-sm text-on-surface-variant mb-4">Describe tu diseño y la IA lo generará automáticamente.</p>
+        
+        <!-- Quick Templates -->
+        <div class="mb-4">
+          <label class="text-xs text-on-surface-variant block mb-2">Plantillas rápidas:</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="setTemplate('login')" class="p-2 bg-surface-container-low rounded-lg text-xs text-left hover:bg-surface-container-high transition-all">
+              🔐 Formulario Login
+            </button>
+            <button onclick="setTemplate('dashboard')" class="p-2 bg-surface-container-low rounded-lg text-xs text-left hover:bg-surface-container-high transition-all">
+              📊 Dashboard
+            </button>
+            <button onclick="setTemplate('card')" class="p-2 bg-surface-container-low rounded-lg text-xs text-left hover:bg-surface-container-high transition-all">
+              💳 Tarjeta UI
+            </button>
+            <button onclick="setTemplate('form')" class="p-2 bg-surface-container-low rounded-lg text-xs text-left hover:bg-surface-container-high transition-all">
+              📝 Formulario
+            </button>
+            <button onclick="setTemplate('modal')" class="p-2 bg-surface-container-low rounded-lg text-xs text-left hover:bg-surface-container-high transition-all">
+              💬 Modal
+            </button>
+            <button onclick="setTemplate('sidebar')" class="p-2 bg-surface-container-low rounded-lg text-xs text-left hover:bg-surface-container-high transition-all">
+              📐 Sidebar
+            </button>
+          </div>
+        </div>
+        
+        <!-- Design Type -->
+        <div class="mb-4">
+          <label class="text-xs text-on-surface-variant block mb-2">Tipo de componente:</label>
+          <select id="design-type" class="w-full bg-surface-container-low border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-primary focus:outline-none">
+            <option value="component">Componente UI</option>
+            <option value="page">Página completa</option>
+            <option value="dashboard">Dashboard</option>
+            <option value="landing">Landing Page</option>
+            <option value="mobile">Vista Mobile</option>
+            <option value="button">Botón</option>
+            <option value="input">Input/Campo</option>
+            <option value="card">Tarjeta</option>
+            <option value="navbar">Navbar</option>
+            <option value="footer">Footer</option>
+          </select>
+        </div>
+        
+        <!-- Style -->
+        <div class="mb-4">
+          <label class="text-xs text-on-surface-variant block mb-2">Estilo visual:</label>
+          <select id="design-style" class="w-full bg-surface-container-low border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-primary focus:outline-none">
+            <option value="glassmorphism">Glassmorphism (Vidrio)</option>
+            <option value="minimal">Minimalista</option>
+            <option value="neon">Neon/Cyberpunk</option>
+            <option value="flat">Flat Design</option>
+            <option value="material">Material Design</option>
+            <option value="dark">Dark Premium</option>
+          </select>
+        </div>
+        
+        <!-- Prompt -->
+        <div class="mb-4">
+          <label class="text-xs text-on-surface-variant block mb-2">Descripción del diseño:</label>
+          <textarea id="design-prompt" rows="4" placeholder="Ej: Un formulario de login con glassmorphism, fondo oscuro, botones azules..." class="w-full bg-surface-container-low border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-primary focus:outline-none"></textarea>
+        </div>
+        
+        <!-- Generate Button -->
+        <button onclick="requestDesign()" class="w-full py-3 bg-gradient-to-r from-tertiary to-primary text-surface font-bold rounded-xl hover:opacity-90 transition-all">
+          <span class="material-symbols-outlined mr-2">auto_awesome</span>
+          Generar Diseño con Stitch
+        </button>
+        
+        <!-- Design Status -->
+        <div id="design-status" class="mt-4 hidden">
+          <div class="p-3 bg-surface-container-low rounded-xl">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></span>
+              <span class="text-sm text-amber-400" id="design-status-text">Generando...</span>
+            </div>
+            <div class="h-2 bg-surface-container-highest rounded-full overflow-hidden">
+              <div id="design-progress" class="h-full bg-gradient-to-r from-tertiary to-primary transition-all" style="width: 0%"></div>
+            </div>
+            <div class="text-xs text-on-surface-variant mt-2" id="design-status-detail">Conectando con Stitch...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Design Gallery -->
+      <div class="col-span-8 glass rounded-2xl p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="font-headline text-xl font-bold text-on-surface">
+            <span class="material-symbols-outlined text-tertiary mr-2">collections</span>
+            Galería de Diseños
+          </h2>
+          <div class="flex gap-2">
+            <button onclick="exportAllDesigns()" class="px-3 py-2 bg-surface-container-low text-on-surface-variant rounded-lg text-xs hover:bg-surface-container-high">
+              <span class="material-symbols-outlined text-xs mr-1">download</span>
+              Exportar
+            </button>
+            <button onclick="clearDesigns()" class="px-4 py-2 bg-surface-container-low text-on-surface-variant rounded-lg text-sm hover:bg-surface-container-high">
+              Limpiar
+            </button>
+          </div>
+        </div>
+        
+        <!-- Design Generation Log -->
+        <div class="mb-6 p-4 bg-surface-container-low rounded-xl">
+          <h3 class="text-sm font-bold text-on-surface mb-2 flex items-center gap-2">
+            <span class="material-symbols-outlined text-xs text-amber-500">history</span>
+            Historial de Generación
+          </h3>
+          <div class="space-y-2 text-xs" id="design-history">
+            <div class="flex items-center gap-2 text-on-surface-variant">
+              <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+              <span>10:30:15</span>
+              <span class="text-tertiary">Aurora Nexus Dashboard</span>
+              <span class="text-green-500">✓ Completado</span>
+            </div>
+            <div class="flex items-center gap-2 text-on-surface-variant">
+              <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+              <span>10:25:42</span>
+              <span class="text-tertiary">Login Form Glassmorphism</span>
+              <span class="text-green-500">✓ Completado</span>
+            </div>
+            <div class="flex items-center gap-2 text-on-surface-variant">
+              <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+              <span>10:15:30</span>
+              <span class="text-tertiary">Trading Card Component</span>
+              <span class="text-green-500">✓ Completado</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Design Grid -->
+        <div id="design-gallery" class="grid grid-cols-2 gap-4">
+          <!-- Preloaded Design Example -->
+          <div class="relative group cursor-pointer" onclick="showDesign('aurora-nexus')">
+            <div class="aspect-video bg-surface-container-low rounded-xl overflow-hidden border border-white/10">
+              <img src="https://lh3.googleusercontent.com/aida/ADBb0ui4fpD1xeH8WEgkWTuh6CTJrjsYd_5HngfzOJf3L-eqp6hylvLtbt07dG62G_3jyFIJYinaEcjNxtvXyHSvo3cvfUZ6cQYUezycrZXIyS3-H9hB0CEpSGkSDKiDw22cs4nGDJhVR0pNlEn8W6RhFaP0CYcvPaooFJPh-bCLKS-QGyesU6ILVQjgsptgjdM0TU-OppR9usCivMkav_VlTGjvcbDYXKz0tlabV7pqyDszJRQ3TKc9Q5W1UA" 
+                   class="w-full h-full object-cover" alt="Aurora Nexus Dashboard">
+            </div>
+            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-all rounded-xl flex items-center justify-center">
+              <span class="text-white font-bold">Aurora Nexus Dashboard</span>
+            </div>
+            <div class="absolute bottom-2 left-2 right-2 flex justify-between items-center">
+              <span class="px-2 py-1 bg-primary/80 text-surface text-xs rounded">Dashboard</span>
+              <span class="text-[10px] text-white/70">25 Mar 2026</span>
+            </div>
+          </div>
+          
+          <!-- Placeholder for new designs -->
+          <div class="aspect-video bg-surface-container-low rounded-xl border-2 border-dashed border-white/10 flex items-center justify-center">
+            <div class="text-center">
+              <span class="material-symbols-outlined text-4xl text-on-surface-variant">add_photo_alternate</span>
+              <p class="text-sm text-on-surface-variant mt-2">Los nuevos diseños aparecerán aquí</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WORK ZONES TAB -->
+    <div id="tab-workzones" class="hidden grid grid-cols-12 gap-6">
+      <!-- Improvements Zone -->
+      <div class="col-span-6 glass rounded-2xl p-6">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+            <span class="material-symbols-outlined text-white">trending_up</span>
+          </div>
+          <div>
+            <h2 class="font-headline text-xl font-bold text-on-surface">Zona de Mejoras</h2>
+            <p class="text-xs text-on-surface-variant">Últimas mejoras implementadas</p>
+          </div>
+        </div>
+        
+        <div class="space-y-4" id="improvements-list">
+          <!-- Latest Improvement -->
+          <div class="p-4 bg-gradient-to-r from-green-500/10 to-transparent rounded-xl border-l-4 border-green-500">
+            <div class="flex justify-between items-start mb-2">
+              <h4 class="font-bold text-on-surface">Integración Chat en Vivo</h4>
+              <span class="text-xs text-green-400">Hoy</span>
+            </div>
+            <p class="text-sm text-on-surface-variant">Chat ahora responde en tiempo real con progreso visual</p>
+            <div class="flex gap-2 mt-2">
+              <span class="px-2 py-0.5 bg-green-500/20 text-green-400 text-xs rounded">Chat</span>
+              <span class="px-2 py-0.5 bg-surface-container-high text-xs rounded">v2.1</span>
+            </div>
+          </div>
+          
+          <div class="p-4 bg-surface-container-low rounded-xl border-l-4 border-green-500/50">
+            <div class="flex justify-between items-start mb-2">
+              <h4 class="font-bold text-on-surface">Acceso Directo Desktop</h4>
+              <span class="text-xs text-on-surface-variant">Ayer</span>
+            </div>
+            <p class="text-sm text-on-surface-variant">Shortcut en escritorio para iniciar Aurora Nexus</p>
+          </div>
+          
+          <div class="p-4 bg-surface-container-low rounded-xl border-l-4 border-green-500/30">
+            <div class="flex justify-between items-start mb-2">
+              <h4 class="font-bold text-on-surface">Chat Global + Individual</h4>
+              <span class="text-xs text-on-surface-variant">23 Mar</span>
+            </div>
+            <p class="text-sm text-on-surface-variant">Dos modos de chat para mejor coordinación</p>
+          </div>
+          
+          <div class="p-4 bg-surface-container-low rounded-xl border-l-4 border-green-500/20">
+            <div class="flex justify-between items-start mb-2">
+              <h4 class="font-bold text-on-surface">Diseño Stitch Integrado</h4>
+              <span class="text-xs text-on-surface-variant">22 Mar</span>
+            </div>
+            <p class="text-sm text-on-surface-variant">Portal con diseño profesional de Stitch</p>
+          </div>
+        </div>
+        
+        <button onclick="addImprovement()" class="w-full mt-4 py-3 border border-dashed border-white/20 text-on-surface-variant rounded-xl hover:border-primary hover:text-primary transition-all">
+          + Agregar Mejora
+        </button>
+      </div>
+
+      <!-- Optimization Zone -->
+      <div class="col-span-6 glass rounded-2xl p-6">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center">
+            <span class="material-symbols-outlined text-white">speed</span>
+          </div>
+          <div>
+            <h2 class="font-headline text-xl font-bold text-on-surface">Zona de Optimización</h2>
+            <p class="text-xs text-on-surface-variant">Últimas optimizaciones realizadas</p>
+          </div>
+        </div>
+        
+        <div class="space-y-4" id="optimizations-list">
+          <!-- Latest Optimization -->
+          <div class="p-4 bg-gradient-to-r from-blue-500/10 to-transparent rounded-xl border-l-4 border-blue-500">
+            <div class="flex justify-between items-start mb-2">
+              <h4 class="font-bold text-on-surface">Chat Response Time</h4>
+              <span class="text-xs text-blue-400">-40%</span>
+            </div>
+            <div class="flex items-center gap-2 mb-2">
+              <div class="flex-1 h-2 bg-surface-container-highest rounded-full overflow-hidden">
+                <div class="h-full bg-blue-500" style="width: 60%"></div>
+              </div>
+              <span class="text-xs text-on-surface-variant">120ms → 72ms</span>
+            </div>
+            <p class="text-sm text-on-surface-variant">Optimizado el tiempo de respuesta del chat</p>
+          </div>
+          
+          <div class="p-4 bg-surface-container-low rounded-xl border-l-4 border-blue-500/50">
+            <div class="flex justify-between items-start mb-2">
+              <h4 class="font-bold text-on-surface">UI Rendering</h4>
+              <span class="text-xs text-blue-400">-25%</span>
+            </div>
+            <div class="flex items-center gap-2 mb-2">
+              <div class="flex-1 h-2 bg-surface-container-highest rounded-full overflow-hidden">
+                <div class="h-full bg-blue-500" style="width: 75%"></div>
+              </div>
+              <span class="text-xs text-on-surface-variant">16ms → 12ms</span>
+            </div>
+            <p class="text-sm text-on-surface-variant">Renderizado más fluido de componentes</p>
+          </div>
+          
+          <div class="p-4 bg-surface-container-low rounded-xl border-l-4 border-blue-500/30">
+            <div class="flex justify-between items-start mb-2">
+              <h4 class="font-bold text-on-surface">Memory Usage</h4>
+              <span class="text-xs text-green-400">-35%</span>
+            </div>
+            <div class="flex items-center gap-2 mb-2">
+              <div class="flex-1 h-2 bg-surface-container-highest rounded-full overflow-hidden">
+                <div class="h-full bg-green-500" style="width: 65%"></div>
+              </div>
+              <span class="text-xs text-on-surface-variant">250MB → 162MB</span>
+            </div>
+            <p class="text-sm text-on-surface-variant">Reducido uso de memoria en navegador</p>
+          </div>
+          
+          <div class="p-4 bg-surface-container-low rounded-xl border-l-4 border-blue-500/20">
+            <div class="flex justify-between items-start mb-2">
+              <h4 class="font-bold text-on-surface">LocalStorage</h4>
+              <span class="text-xs text-green-400">+50%</span>
+            </div>
+            <p class="text-sm text-on-surface-variant">Mensajes guardados eficientemente</p>
+          </div>
+        </div>
+        
+        <button onclick="addOptimization()" class="w-full mt-4 py-3 border border-dashed border-white/20 text-on-surface-variant rounded-xl hover:border-blue-500 hover:text-blue-400 transition-all">
+          + Agregar Optimización
+        </button>
+      </div>
+    </div>
+
+    <!-- TERMINAL TAB -->
+    <div id="tab-terminal" class="hidden grid grid-cols-12 gap-6">
+      <!-- Terminal Output -->
+      <div class="col-span-8 glass rounded-2xl p-0 overflow-hidden">
+        <div class="bg-surface-container-highest px-4 py-3 flex items-center justify-between border-b border-white/10">
+          <div class="flex items-center gap-3">
+            <div class="flex gap-1.5">
+              <div class="w-3 h-3 rounded-full bg-error/70"></div>
+              <div class="w-3 h-3 rounded-full bg-amber-500/70"></div>
+              <div class="w-3 h-3 rounded-full bg-green-500/70"></div>
+            </div>
+            <span class="font-mono text-sm text-on-surface">Aurora Nexus Terminal</span>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="clearTerminal()" class="p-2 hover:bg-surface-container-low rounded-lg" title="Limpiar">
+              <span class="material-symbols-outlined text-sm text-on-surface-variant">delete</span>
+            </button>
+            <button onclick="loadTerminalLog()" class="p-2 hover:bg-surface-container-low rounded-lg" title="Actualizar">
+              <span class="material-symbols-outlined text-sm text-on-surface-variant">refresh</span>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Terminal Output Content -->
+        <div class="p-4 bg-[#0d0e11]/90 h-[60vh] overflow-y-auto font-mono text-xs" id="terminal-output">
+          <div class="text-primary mb-1">Aurora Nexus Terminal v1.0</div>
+          <div class="text-on-surface-variant mb-4">Escribe un comando o usa los botones de abajo</div>
+        </div>
+        
+        <!-- Terminal Input -->
+        <div class="p-3 border-t border-white/10 bg-surface-container-low">
+          <div class="flex gap-2">
+            <span class="text-secondary font-mono">$</span>
+            <input type="text" id="terminal-input" placeholder="Escribe un comando..." 
+                   class="flex-1 bg-transparent border-none outline-none text-on-surface font-mono text-sm"
+                   onkeypress="if(event.key==='Enter')runTerminalCmd()">
+            <button onclick="runTerminalCmd()" class="px-3 py-1 bg-primary text-surface rounded text-sm">Ejecutar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar: Commands & Pending -->
+      <div class="col-span-4 space-y-4">
+        <!-- Available Commands -->
+        <div class="glass rounded-2xl p-4">
+          <h3 class="font-headline font-bold text-on-surface mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">terminal</span>
+            Comandos Disponibles
+          </h3>
+          <div class="space-y-2" id="commands-list">
+            <!-- Commands will be rendered here -->
+          </div>
+        </div>
+
+        <!-- Pending Actions -->
+        <div class="glass rounded-2xl p-4">
+          <h3 class="font-headline font-bold text-on-surface mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined text-amber-500">pending_actions</span>
+            Acciones Pendientes
+          </h3>
+          <div class="space-y-2" id="pending-actions">
+            <!-- Pending actions will be rendered here -->
+          </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="glass rounded-2xl p-4">
+          <h3 class="font-headline font-bold text-on-surface mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined text-secondary">insights</span>
+            Estado del Sistema
+          </h3>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-on-surface-variant">Agentes Activos</span>
+              <span class="text-sm font-bold text-secondary">5/5</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-on-surface-variant">Tareas Hoy</span>
+              <span class="text-sm font-bold text-primary">24</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-on-surface-variant">Uptime</span>
+              <span class="text-sm font-bold text-green-400">99.9%</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-on-surface-variant">Memoria</span>
+              <span class="text-sm font-bold text-amber-500">162MB</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI CONSOLE TAB -->
+    <div id="tab-aiconsole" class="hidden grid grid-cols-12 gap-6">
+      <!-- AI Command Center -->
+      <div class="col-span-8 glass rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="font-headline text-xl font-bold text-on-surface flex items-center gap-3">
+            <span class="material-symbols-outlined text-green-500">psychology</span>
+            Centro de Comandos AI
+          </h2>
+          <div class="flex gap-2">
+            <button onclick="quickAction('build')" class="px-4 py-2 bg-amber-500/20 text-amber-500 rounded-xl text-sm hover:bg-amber-500/30">
+              <span class="material-symbols-outlined text-sm mr-1">construction</span>
+              Build
+            </button>
+            <button onclick="quickAction('deploy')" class="px-4 py-2 bg-primary/20 text-primary rounded-xl text-sm hover:bg-primary/30">
+              <span class="material-symbols-outlined text-sm mr-1">cloud_upload</span>
+              Deploy
+            </button>
+            <button onclick="quickAction('pr')" class="px-4 py-2 bg-tertiary/20 text-tertiary rounded-xl text-sm hover:bg-tertiary/30">
+              <span class="material-symbols-outlined text-sm mr-1">fork_right</span>
+              PR
+            </button>
+          </div>
+        </div>
+
+        <!-- Direct AI Input -->
+        <div class="mb-6">
+          <label class="text-sm text-on-surface-variant block mb-2">Enviar指令 a un Agente</label>
+          <div class="flex gap-2">
+            <select id="ai-console-agent" class="w-48 bg-surface-container-low border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-primary focus:outline-none">
+              <option value="BIG-PICKLE">BIG-PICKLE (Orchestrator)</option>
+              <option value="OpenCode">OpenCode (Desarrollador)</option>
+              <option value="Minimax #1">Minimax #1 (Optimizador)</option>
+              <option value="Aurora Core">Aurora Core (Supervisor)</option>
+              <option value="Gemini">Gemini (Multimodal)</option>
+            </select>
+            <input type="text" id="ai-console-input" placeholder="Ej: Analiza el rendimiento del sistema..." 
+                   class="flex-1 bg-surface-container-low border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-primary focus:outline-none"
+                   onkeypress="if(event.key==='Enter')sendAICommand()">
+            <button onclick="sendAICommand()" class="px-6 py-3 bg-green-500 text-surface font-bold rounded-xl hover:bg-green-600">
+              <span class="material-symbols-outlined">send</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Actions Grid -->
+        <div class="mb-6">
+          <label class="text-sm text-on-surface-variant block mb-3">Acciones Rápidas</label>
+          <div class="grid grid-cols-4 gap-3">
+            <button onclick="sendQuickAI('BIG-PICKLE', 'coordina las tareas pendientes')" class="p-3 bg-green-500/10 border border-green-500/30 rounded-xl hover:bg-green-500/20 transition-all text-left">
+              <span class="material-symbols-outlined text-green-500">hub</span>
+              <span class="text-xs text-on-surface block mt-1">Coordinar</span>
+            </button>
+            <button onclick="sendQuickAI('OpenCode', 'ejecuta build del proyecto')" class="p-3 bg-primary/10 border border-primary/30 rounded-xl hover:bg-primary/20 transition-all text-left">
+              <span class="material-symbols-outlined text-primary">terminal</span>
+              <span class="text-xs text-on-surface block mt-1">Build</span>
+            </button>
+            <button onclick="sendQuickAI('Minimax #1', 'optimiza el rendimiento')" class="p-3 bg-secondary/10 border border-secondary/30 rounded-xl hover:bg-secondary/20 transition-all text-left">
+              <span class="material-symbols-outlined text-secondary">speed</span>
+              <span class="text-xs text-on-surface block mt-1">Optimizar</span>
+            </button>
+            <button onclick="sendQuickAI('Aurora Core', 'verifica el estado del sistema')" class="p-3 bg-tertiary/10 border border-tertiary/30 rounded-xl hover:bg-tertiary/20 transition-all text-left">
+              <span class="material-symbols-outlined text-tertiary">monitoring</span>
+              <span class="text-xs text-on-surface block mt-1">Verificar</span>
+            </button>
+            <button onclick="sendQuickAI('Gemini', 'crea un diseño de dashboard')" class="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl hover:bg-amber-500/20 transition-all text-left">
+              <span class="material-symbols-outlined text-amber-500">palette</span>
+              <span class="text-xs text-on-surface block mt-1">Diseñar</span>
+            </button>
+            <button onclick="sendQuickAI('BIG-PICKLE', 'genera un plan de desarrollo')" class="p-3 bg-green-500/10 border border-green-500/30 rounded-xl hover:bg-green-500/20 transition-all text-left">
+              <span class="material-symbols-outlined text-green-500">map</span>
+              <span class="text-xs text-on-surface block mt-1">Plan</span>
+            </button>
+            <button onclick="sendQuickAI('OpenCode', 'ejecuta las pruebas')" class="p-3 bg-primary/10 border border-primary/30 rounded-xl hover:bg-primary/20 transition-all text-left">
+              <span class="material-symbols-outlined text-primary">bug_report</span>
+              <span class="text-xs text-on-surface block mt-1">Test</span>
+            </button>
+            <button onclick="sendQuickAI('Minimax #1', 'analiza la base de datos')" class="p-3 bg-secondary/10 border border-secondary/30 rounded-xl hover:bg-secondary/20 transition-all text-left">
+              <span class="material-symbols-outlined text-secondary">storage</span>
+              <span class="text-xs text-on-surface block mt-1">Analizar DB</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- AI Activity Log -->
+        <div>
+          <label class="text-sm text-on-surface-variant block mb-3">Registro de Actividad AI</label>
+          <div class="h-64 overflow-y-auto space-y-2 bg-surface-container-low rounded-xl p-4" id="ai-activity-log">
+            <div class="flex items-center gap-3 text-sm">
+              <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+              <span class="text-on-surface-variant">[10:30:15]</span>
+              <span class="text-green-400 font-bold">BIG-PICKLE</span>
+              <span class="text-on-surface">Coordinó 3 tareas</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm">
+              <span class="w-2 h-2 bg-primary rounded-full"></span>
+              <span class="text-on-surface-variant">[10:28:42]</span>
+              <span class="text-primary font-bold">OpenCode</span>
+              <span class="text-on-surface">Build completado exitosamente</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm">
+              <span class="w-2 h-2 bg-secondary rounded-full"></span>
+              <span class="text-on-surface-variant">[10:25:30]</span>
+              <span class="text-secondary font-bold">Minimax #1</span>
+              <span class="text-on-surface">Optimización: 15% mejora</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm">
+              <span class="w-2 h-2 bg-tertiary rounded-full"></span>
+              <span class="text-on-surface-variant">[10:22:18]</span>
+              <span class="text-tertiary font-bold">Aurora Core</span>
+              <span class="text-on-surface">Sistema estable 99.9% uptime</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Status Panel -->
+      <div class="col-span-4 space-y-4">
+        <!-- Agent Performance -->
+        <div class="glass rounded-2xl p-4">
+          <h3 class="font-headline font-bold text-on-surface mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined text-green-500">analytics</span>
+            Rendimiento de Agentes
+          </h3>
+          <div class="space-y-3">
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-on-surface">BIG-PICKLE</span>
+                <span class="text-green-400">85%</span>
+              </div>
+              <div class="h-2 bg-surface-container-highest rounded-full">
+                <div class="h-full bg-green-500 rounded-full" style="width: 85%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-on-surface">OpenCode</span>
+                <span class="text-primary">78%</span>
+              </div>
+              <div class="h-2 bg-surface-container-highest rounded-full">
+                <div class="h-full bg-primary rounded-full" style="width: 78%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-on-surface">Minimax #1</span>
+                <span class="text-secondary">65%</span>
+              </div>
+              <div class="h-2 bg-surface-container-highest rounded-full">
+                <div class="h-full bg-secondary rounded-full" style="width: 65%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-on-surface">Aurora Core</span>
+                <span class="text-tertiary">94%</span>
+              </div>
+              <div class="h-2 bg-surface-container-highest rounded-full">
+                <div class="h-full bg-tertiary rounded-full" style="width: 94%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Health -->
+        <div class="glass rounded-2xl p-4">
+          <h3 class="font-headline font-bold text-on-surface mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined text-amber-500">health_and_safety</span>
+            Salud del Sistema
+          </h3>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-on-surface-variant">CPU</span>
+              <span class="text-sm font-bold text-green-400" id="sys-cpu">32%</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-on-surface-variant">Memoria</span>
+              <span class="text-sm font-bold text-green-400" id="sys-mem">48%</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-on-surface-variant">Tareas Activas</span>
+              <span class="text-sm font-bold text-primary" id="sys-tasks">4</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-on-surface-variant">Uptime</span>
+              <span class="text-sm font-bold text-secondary">99.9%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent AI Decisions -->
+        <div class="glass rounded-2xl p-4">
+          <h3 class="font-headline font-bold text-on-surface mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined text-tertiary">decision</span>
+            Decisiones Recientes
+          </h3>
+          <div class="space-y-2 text-xs">
+            <div class="p-2 bg-surface-container-low rounded-lg">
+              <span class="text-tertiary font-bold">BIG-PICKLE</span>
+              <p class="text-on-surface-variant">Asignó tarea a OpenCode</p>
+            </div>
+            <div class="p-2 bg-surface-container-low rounded-lg">
+              <span class="text-secondary font-bold">Minimax #1</span>
+              <p class="text-on-surface-variant">Optimizó consulta DB</p>
+            </div>
+            <div class="p-2 bg-surface-container-low rounded-lg">
+              <span class="text-primary font-bold">OpenCode</span>
+              <p class="text-on-surface-variant">Completó refactorización</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DEBUG LOG TAB -->
+    <div id="tab-debuglog" class="hidden grid grid-cols-12 gap-6">
+      <div class="col-span-12 glass rounded-2xl p-0 overflow-hidden">
+        <div class="bg-surface-container-highest px-4 py-3 flex items-center justify-between border-b border-white/10">
+          <div class="flex items-center gap-3">
+            <div class="flex gap-1.5">
+              <div class="w-3 h-3 rounded-full bg-error/70"></div>
+              <div class="w-3 h-3 rounded-full bg-amber-500/70"></div>
+              <div class="w-3 h-3 rounded-full bg-green-500/70"></div>
+            </div>
+            <span class="font-mono text-sm text-on-surface">aurora-debug.log</span>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="clearDebugLog()" class="p-2 hover:bg-surface-container-low rounded-lg" title="Limpiar">
+              <span class="material-symbols-outlined text-sm text-on-surface-variant">delete</span>
+            </button>
+            <button onclick="toggleAutoScroll()" id="auto-scroll-btn" class="p-2 hover:bg-surface-container-low rounded-lg bg-primary/20" title="Auto-scroll">
+              <span class="material-symbols-outlined text-sm text-primary">vertical_align_bottom</span>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Debug Log Content -->
+        <div class="p-4 bg-[#0a0a0a] h-[70vh] overflow-y-auto font-mono text-xs" id="debug-log-output">
+          <div class="text-green-500 mb-1">[INIT] ═══════════════════════════════════════════════════</div>
+          <div class="text-on-surface-variant mb-1">[INIT] AURORA NEXUS - Neural Bridge v2.0</div>
+          <div class="text-on-surface-variant mb-1">[INIT] ═══════════════════════════════════════════════════</div>
+          <div class="text-primary mb-1">[14:42:01] INICIALIZANDO NEURAL_BRIDGE_V2...</div>
+          <div class="text-secondary mb-1">[14:42:02] HANDSHAKE CON Minimax_Node_01 EXITOSO</div>
+          <div class="text-secondary mb-1">[14:42:02] HANDSHAKE CON Minimax_Node_02 EXITOSO</div>
+          <div class="text-primary mb-1">[14:42:03] BALANCEADOR DE CARGA ACTIVO [PESO: 0.84]</div>
+          <div class="text-secondary mb-1">[14:42:04] CONEXIONES ESTABLECIDAS: 6/6</div>
+          <div class="text-secondary mb-1">[14:42:05] TODOS LOS CORES SINCRONIZADOS EN 12MS</div>
+          <div class="text-tertiary mb-1">[14:42:06] AURORA CORE: INTEGRIDAD 94%</div>
+          <div class="text-primary mb-1">[14:42:07] GEMINI: NODO MULTIMODAL LISTO</div>
+          <div class="text-amber-500 mb-1">[14:42:08] ESPERANDO INPUT DEL USUARIO...</div>
+          <div class="animate-pulse text-on-surface-variant">_</div>
+        </div>
+        
+        <!-- Debug Command Input -->
+        <div class="p-3 border-t border-white/10 bg-surface-container-low">
+          <div class="flex gap-2">
+            <span class="text-green-500 font-mono">DEBUG&gt;</span>
+            <input type="text" id="debug-input" placeholder="Escribe un comando de debug..." 
+                   class="flex-1 bg-transparent border-none outline-none text-on-surface font-mono text-sm"
+                   onkeypress="if(event.key==='Enter')runDebugCmd()">
+            <button onclick="runDebugCmd()" class="px-3 py-1 bg-green-500/20 text-green-500 rounded text-sm hover:bg-green-500/30">Ejecutar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS TAB -->
+    <div id="tab-settings" class="hidden grid grid-cols-12 gap-6">
+      <div class="col-span-6 glass rounded-2xl p-6">
+        <h2 class="font-headline text-xl font-bold text-on-surface mb-6">Configuración de la Nube</h2>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="text-sm text-on-surface-variant block mb-2">URL del Servidor en la Nube</label>
+            <input type="text" value="https://aurora-nexus.cloud.example.com" class="w-full bg-surface-container-low border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-primary focus:outline-none">
+          </div>
+          <div>
+            <label class="text-sm text-on-surface-variant block mb-2">Clave API</label>
+            <input type="password" value="••••••••••••••••" class="w-full bg-surface-container-low border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-primary focus:outline-none">
+          </div>
+          <div>
+            <label class="text-sm text-on-surface-variant block mb-2">Estado de Conexión</label>
+            <div class="flex items-center gap-2 p-3 bg-secondary/10 border border-secondary/30 rounded-xl">
+              <span class="w-3 h-3 bg-secondary rounded-full animate-pulse"></span>
+              <span class="text-secondary font-bold">Conectado</span>
+              <span class="text-xs text-on-surface-variant ml-auto">Latencia: 24ms</span>
+            </div>
+          </div>
+          <button class="w-full py-3 bg-primary text-surface font-bold rounded-xl hover:bg-primary/80 transition-all">
+            Probar Conexión
+          </button>
+        </div>
+      </div>
+
+      <div class="col-span-6 glass rounded-2xl p-6">
+        <h2 class="font-headline text-xl font-bold text-on-surface mb-6">Notificaciones</h2>
+        
+        <div class="space-y-4">
+          <div class="flex items-center justify-between p-3 bg-surface-container-low rounded-xl">
+            <div>
+              <h4 class="font-bold text-on-surface">Tarea Completada</h3>
+              <p class="text-xs text-on-surface-variant">Notificar cuando un agente complete una tarea</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" checked class="sr-only peer">
+              <div class="w-11 h-6 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+            </label>
+          </div>
+          <div class="flex items-center justify-between p-3 bg-surface-container-low rounded-xl">
+            <div>
+              <h4 class="font-bold text-on-surface">Problemas Detectados</h3>
+              <p class="text-xs text-on-surface-variant">Alertar cuando se encuentren problemas</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" checked class="sr-only peer">
+              <div class="w-11 h-6 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-error"></div>
+            </label>
+          </div>
+          <div class="flex items-center justify-between p-3 bg-surface-container-low rounded-xl">
+            <div>
+              <h4 class="font-bold text-on-surface">Cambios de Estado de Agentes</h3>
+              <p class="text-xs text-on-surface-variant">Notificar cuando los agentes se conecten/desconecten</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" checked class="sr-only peer">
+              <div class="w-11 h-6 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Terminal Preview -->
+  <script>
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+      // Ctrl+1-7 for tabs
+      if (e.ctrlKey && e.key >= '1' && e.key <= '9') {
+        e.preventDefault();
+        const tabs = ['dashboard', 'agents', 'chat', 'tasks', 'improvements', 'design', 'terminal', 'debuglog', 'aiconsole'];
+        const idx = parseInt(e.key) - 1;
+        if (tabs[idx]) {
+          document.querySelectorAll('nav button')[idx]?.click();
+        }
+      }
+      // Ctrl+B for build
+      if (e.ctrlKey && e.key === 'b') {
+        e.preventDefault();
+        quickAction('build');
+      }
+      // Ctrl+D for deploy
+      if (e.ctrlKey && e.key === 'd') {
+        e.preventDefault();
+        quickAction('deploy');
+      }
+      // Escape to close modals
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.fixed.z-50').forEach(el => el.remove());
+      }
+    });
+
+    // Real-time clock
+    function updateClock() {
+      const now = new Date();
+      const utc = now.toUTCString().split(' ')[4];
+      const clockEl = document.getElementById('realtime-clock');
+      if (clockEl) clockEl.textContent = utc + ' UTC';
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // System stats
+    let systemStats = {
+      cpu: 0,
+      memory: 0,
+      activeTasks: 0,
+      pendingTasks: 0
+    };
+
+    function updateSystemStats() {
+      systemStats.cpu = Math.floor(Math.random() * 30) + 20;
+      systemStats.memory = Math.floor(Math.random() * 20) + 45;
+      systemStats.activeTasks = Math.floor(Math.random() * 5) + 3;
+      systemStats.pendingTasks = Math.floor(Math.random() * 10) + 5;
+    }
+    setInterval(updateSystemStats, 5000);
+    updateSystemStats();
+
+    function showTab(tabName) {
+      document.querySelectorAll('[id^="tab-"]').forEach(el => el.classList.add('hidden'));
+      document.getElementById('tab-' + tabName).classList.remove('hidden');
+      
+      document.querySelectorAll('nav button').forEach(btn => {
+        btn.classList.remove('tab-active', 'text-primary');
+        btn.classList.add('text-on-surface-variant');
+      });
+      event.target.classList.add('tab-active', 'text-primary');
+      event.target.classList.remove('text-on-surface-variant');
+    }
+
+    // Quick Actions - Dashboard Buttons
+    function quickAction(action) {
+      const actions = {
+        'deploy': { title: 'Desplegar', icon: 'cloud_upload', color: 'primary', message: 'Iniciando despliegue a producción...' },
+        'build': { title: 'Build', icon: 'construction', color: 'amber-500', message: 'Iniciando compilación del proyecto...' },
+        'plan': { title: 'Plan', icon: 'map', color: 'tertiary', message: 'Generando plan de ejecución...' },
+        'analyze': { title: 'Analizar', icon: 'analytics', color: 'secondary', message: 'Ejecutando análisis completo del sistema...' },
+        'pr': { title: 'Crear PR', icon: 'fork_right', color: 'tertiary', message: 'Creando Pull Request con todos los cambios...' },
+        'push': { title: 'Git Push', icon: 'upload', color: 'primary', message: 'Subiendo cambios al repositorio...' },
+        'sync': { title: 'Sincronizar', icon: 'sync', color: 'on-surface-variant', message: 'Sincronizando repositorio con origen...' }
+      };
+      
+      const actionInfo = actions[action];
+      if (!actionInfo) return;
+      
+      // Show notification
+      showNotification(actionInfo.title + ' - ' + actionInfo.message, actionInfo.color);
+      
+      // Add to activity log
+      addActivity('Sistema', actionInfo.message, actionInfo.color);
+      
+      // If it's deploy, show detailed progress
+      if (action === 'deploy') {
+        showTab('terminal');
+        
+        // Simulated commit info
+        const commitHash = 'a7f3c2b';
+        const commitMsg = 'feat: Optimización de rendimiento en chat en vivo';
+        const branch = 'main';
+        
+        addTerminalLine('[DEPLOY] ═══════════════════════════════════════', 'primary');
+        addTerminalLine('[DEPLOY] Iniciando despliegue a producción...', 'primary');
+        addTerminalLine('[DEPLOY] Rama: ' + branch, 'on-surface-variant');
+        addTerminalLine('[DEPLOY] ═══════════════════════════════════════', 'primary');
+        
+        // Show commit info
+        setTimeout(() => {
+          addTerminalLine('[GIT] Commit: ' + commitHash, 'tertiary');
+          addTerminalLine('[GIT] Mensaje: ' + commitMsg, 'tertiary');
+          addTerminalLine('[GIT] Autor: Usuario', 'on-surface-variant');
+          addTerminalLine('[GIT] Archivos: 5 modificados, 2 nuevos', 'on-surface-variant');
+        }, 800);
+        
+        // Build process
+        setTimeout(() => addTerminalLine('[BUILD] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'primary'), 1500);
+        setTimeout(() => addTerminalLine('[BUILD] Instalando dependencias...', 'primary'), 1800);
+        setTimeout(() => addTerminalLine('[BUILD] npm install complete (142 packages)', 'secondary'), 2500);
+        setTimeout(() => addTerminalLine('[BUILD] TypeScript compilando...', 'primary'), 3200);
+        setTimeout(() => addTerminalLine('[BUILD] ✓ build/transpiled successfully', 'secondary'), 4000);
+        setTimeout(() => addTerminalLine('[BUILD] Generando assets...', 'primary'), 4500);
+        setTimeout(() => addTerminalLine('[BUILD] ✓ Assets optimizados (2.3MB)', 'secondary'), 5000);
+        
+        // Deploy process
+        setTimeout(() => addTerminalLine('[DEPLOY] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'primary'), 5500);
+        setTimeout(() => addTerminalLine('[DEPLOY] Conectando al servidor...', 'primary'), 5700);
+        setTimeout(() => addTerminalLine('[DEPLOY] Subiendo archivos (12)...', 'primary'), 6200);
+        setTimeout(() => addTerminalLine('[DEPLOY] ████████████ 100%', 'secondary'), 7000);
+        
+        // Success!
+        setTimeout(() => {
+          addTerminalLine('[DEPLOY] ═══════════════════════════════════════', 'secondary');
+          addTerminalLine('[DEPLOY] ✓ DESPLIEGUE EXITOSO', 'secondary');
+          addTerminalLine('[DEPLOY] URL: https://aurora-nexus.cloud.example.com', 'secondary');
+          addTerminalLine('[DEPLOY] Tiempo total: 8.2s', 'secondary');
+          addTerminalLine('[DEPLOY] ═══════════════════════════════════════', 'secondary');
+          showNotification('Despliegue exitoso!', 'secondary');
+          addActivity('Sistema', 'Despliegue completado en producción', 'secondary');
+        }, 7500);
+        
+      } else if (action === 'analyze') {
+        showTab('terminal');
+        addTerminalLine('[SISTEMA] Iniciando análisis...', 'primary');
+        setTimeout(() => addTerminalLine('[ANALISIS] Verificando dependencias...', 'primary'), 1000);
+        setTimeout(() => addTerminalLine('[ANALISIS] Revisando código...', 'primary'), 2000);
+        setTimeout(() => addTerminalLine('[ANALISIS] Análisis completado. 0 errores, 3 advertencias.', 'secondary'), 3500);
+      } else if (action === 'pr') {
+        showTab('terminal');
+        
+        const prNumber = '1242';
+        const prTitle = 'feat: Sistema de progreso en tiempo real para chat';
+        
+        addTerminalLine('[GIT] ════════════════════════════════════════', 'tertiary');
+        addTerminalLine('[GIT] Creando Pull Request...', 'tertiary');
+        addTerminalLine('[GIT] Rama: feature/live-progress → main', 'on-surface-variant');
+        
+        setTimeout(() => {
+          addTerminalLine('[GIT] Commits: 3', 'primary');
+          addTerminalLine('[GIT] Archivos cambiados: 8', 'primary');
+          addTerminalLine('[GIT] +142 líneas, -38 líneas', 'on-surface-variant');
+        }, 1000);
+        
+        setTimeout(() => {
+          addTerminalLine('[GIT] Checks en progreso...', 'primary');
+        }, 2000);
+        
+        setTimeout(() => {
+          addTerminalLine('[CI] ✓ Lint pasado', 'secondary');
+          addTerminalLine('[CI] ✓ Tests pasados (24/24)', 'secondary');
+          addTerminalLine('[CI] ✓ Build exitoso', 'secondary');
+        }, 3500);
+        
+        setTimeout(() => {
+          addTerminalLine('[GIT] ════════════════════════════════════════', 'secondary');
+          addTerminalLine('[GIT] ✓ PR #' + prNumber + ' creado exitosamente', 'secondary');
+          addTerminalLine('[GIT] Título: ' + prTitle, 'secondary');
+          addTerminalLine('[GIT] URL: https://github.com/user/repo/pull/' + prNumber, 'secondary');
+          addTerminalLine('[GIT] ════════════════════════════════════════', 'secondary');
+          showNotification('PR #' + prNumber + ' creado exitosamente', 'tertiary');
+          addActivity('OpenCode', 'creó PR #' + prNumber, 'tertiary');
+        }, 5000);
+        
+      } else if (action === 'build') {
+        showTab('terminal');
+        
+        addTerminalLine('[BUILD] ════════════════════════════════════════', 'amber-500');
+        addTerminalLine('[BUILD] Iniciando compilación...', 'amber-500');
+        addTerminalLine('[BUILD] Proyecto: aurora-nexus', 'on-surface-variant');
+        
+        setTimeout(() => addTerminalLine('[BUILD] Limpiando build anterior...', 'primary'), 800);
+        setTimeout(() => addTerminalLine('[BUILD] Verificando dependencias...', 'primary'), 1500);
+        setTimeout(() => addTerminalLine('[BUILD] npm install ✓', 'secondary'), 2200);
+        setTimeout(() => addTerminalLine('[BUILD] TypeScript compile...', 'primary'), 3000);
+        setTimeout(() => addTerminalLine('[BUILD] ✓ 42 archivos compilados', 'secondary'), 3800);
+        setTimeout(() => addTerminalLine('[BUILD] Generando bundle...', 'primary'), 4500);
+        setTimeout(() => addTerminalLine('[BUILD] ████████████ 100%', 'secondary'), 5200);
+        setTimeout(() => addTerminalLine('[BUILD] ✓ Build completado exitosamente', 'secondary'), 5500);
+        setTimeout(() => {
+          addTerminalLine('[BUILD] ════════════════════════════════════════', 'secondary');
+          addTerminalLine('[BUILD] Output: dist/ (2.3MB)', 'secondary');
+          addTerminalLine('[BUILD] Tiempo total: 6.2s', 'secondary');
+          showNotification('Build completado!', 'amber-500');
+          addActivity('BIG-PICKLE', 'Build completado exitosamente', 'amber-500');
+        }, 6000);
+        
+      } else if (action === 'plan') {
+        showTab('terminal');
+        
+        const planSteps = [
+          '1. Análisis de requisitos',
+          '2. Diseño de arquitectura',
+          '3. Implementación de componentes',
+          '4. Testing y QA',
+          '5. Despliegue a producción'
+        ];
+        
+        addTerminalLine('[PLAN] ════════════════════════════════════════', 'tertiary');
+        addTerminalLine('[PLAN] Generando plan de ejecución...', 'tertiary');
+        
+        setTimeout(() => addTerminalLine('[PLAN] Analizando contexto actual...', 'primary'), 800);
+        setTimeout(() => addTerminalLine('[PLAN] ✓ Contexto analizado', 'secondary'), 1500);
+        
+        planSteps.forEach((step, i) => {
+          setTimeout(() => {
+            addTerminalLine('[PLAN] ' + step, 'primary');
+            if (i === planSteps.length - 1) {
+              addTerminalLine('[PLAN] ════════════════════════════════════════', 'secondary');
+              addTerminalLine('[PLAN] ✓ Plan generado exitosamente', 'secondary');
+              addTerminalLine('[PLAN] Estimación: 2-4 horas', 'secondary');
+              showNotification('Plan generado!', 'tertiary');
+              addActivity('BIG-PICKLE', 'Plan de ejecución generado', 'tertiary');
+            }
+          }, 2000 + (i * 600));
+        });
+        
+      } else if (action === 'sync') {
+        showTab('terminal');
+        addTerminalLine('[SISTEMA] Sincronizando con repositorio remoto...', 'primary');
+        setTimeout(() => addTerminalLine('[GIT] Todo actualizado. Sin cambios nuevos.', 'secondary'), 2000);
+      }
+    }
+
+    function showNotification(message, color) {
+      const notification = document.createElement('div');
+      notification.className = `fixed top-20 right-6 z-50 px-6 py-3 bg-surface-container-high border border-${color}/30 rounded-xl shadow-lg animate-pulse`;
+      notification.innerHTML = `<span class="material-symbols-outlined text-${color} mr-2">check_circle</span><span class="text-sm text-on-surface">${message}</span>`;
+      document.body.appendChild(notification);
+      setTimeout(() => notification.remove(), 4000);
+    }
+
+    function addTerminalLine(text, color = 'on-surface') {
+      const terminal = document.getElementById('terminal-output');
+      if (terminal) {
+        const time = new Date().toLocaleTimeString();
+        const line = document.createElement('div');
+        line.className = `mb-1`;
+        line.innerHTML = `<span class="text-on-surface-variant">[${time}]</span> <span class="text-${color}">${text}</span>`;
+        terminal.appendChild(line);
+        terminal.scrollTop = terminal.scrollHeight;
+      }
+    }
+
+    function startAllAgents() {
+      showNotification('Iniciando todos los agentes...', 'secondary');
+      addActivity('Sistema', 'iniciando todos los agentes', 'secondary');
+      addTerminalLine('[SISTEMA] Iniciando motor de orquestación...', 'secondary');
+      
+      const agents = ['OpenCode', 'Minimax #1', 'Minimax #2', 'Aurora Core', 'Gemini'];
+      agents.forEach((agent, i) => {
+        setTimeout(() => {
+          addTerminalLine(`[${agent}] Agent started successfully`, 'secondary');
+        }, (i + 1) * 800);
+      });
+      
+      setTimeout(() => {
+        showNotification('Todos los agentes iniciados correctamente', 'secondary');
+        addTerminalLine('[SISTEMA] 5/5 agentes activos', 'secondary');
+      }, 4500);
+    }
+
+    function stopAllAgents() {
+      if (!confirm('¿Estás seguro de que quieres detener todos los agentes?')) return;
+      
+      showNotification('Deteniendo todos los agentes...', 'error');
+      addActivity('Sistema', 'deteniendo todos los agentes', 'error');
+      addTerminalLine('[SISTEMA] Deteniendo motor de orquestación...', 'error');
+      
+      const agents = ['OpenCode', 'Minimax #1', 'Minimax #2', 'Aurora Core', 'Gemini'];
+      agents.forEach((agent, i) => {
+        setTimeout(() => {
+          addTerminalLine(`[${agent}] Agent stopped`, 'error');
+        }, (i + 1) * 500);
+      });
+      
+      setTimeout(() => {
+        showNotification('Todos los agentes detenidos', 'error');
+        addTerminalLine('[SISTEMA] 0/5 agentes activos', 'error');
+      }, 3000);
+    }
+
+    let currentAgent = null;
+    let currentChatType = 'individual'; // 'individual' or 'global'
+    let agentStatus = {
+      'OpenCode': { status: 'online', currentTask: 'Esperando instrucciones', progress: 0 },
+      'BIG-PICKLE': { status: 'online', currentTask: 'Coordinando agentes', progress: 0 },
+      'Minimax #1': { status: 'online', currentTask: 'Optimizando consultas', progress: 0 },
+      'Minimax #2': { status: 'online', currentTask: 'Procesando datos', progress: 0 },
+      'Aurora Core': { status: 'online', currentTask: 'Supervisando red neural', progress: 0 },
+      'Gemini': { status: 'busy', currentTask: 'Analizando imágenes', progress: 0 }
+    };
+
+    // Load saved chats from localStorage
+    function loadChats() {
+      const saved = localStorage.getItem('aurora_nexus_chats');
+      return saved ? JSON.parse(saved) : {};
+    }
+
+    function saveChat(type, agentName, messages) {
+      const chats = loadChats();
+      const key = type === 'global' ? 'global' : agentName;
+      chats[key] = messages;
+      localStorage.setItem('aurora_nexus_chats', JSON.stringify(chats));
+    }
+
+    function getSavedMessages(type, agentName) {
+      const chats = loadChats();
+      const key = type === 'global' ? 'global' : agentName;
+      return chats[key] || [];
+    }
+
+    const agentPersonalities = {
+      'OpenCode': {
+        greeting: '¡Hola! Soy OpenCode, tu asistente de código. Estoy listo para programar, debuguear o crear nuevas funcionalidades.',
+        responses: {
+          'default': [
+            'Entendido. Voy a ponerme con eso ahora mismo.',
+            'Perfecto, me lanzo a programar.',
+            'Ok, empiezo a escribir el código.',
+            'De inmediato. ¿Algo específico que deba tener en cuenta?',
+            '¡Vamos! Cuéntame más detalles.'
+          ],
+          'code': [
+            'Voy a escribir el código ahora. ¿Tienes alguna preferencia de estilo?',
+            'Entendido. Empiezo a codear.',
+            'Programando... ya te muestro el resultado.',
+            'Ok, voy a hacer esa función.'
+          ],
+          'bug': [
+            'Voy a debuguear eso. Dame un momento para encontrar el error.',
+            'Encontrando el bug...',
+            'Déjame revisar el código y aislar el problema.'
+          ]
+        }
+      },
+      'BIG-PICKLE': {
+        greeting: '¡Soy BIG-PICKLE! El agente orchestrator principal. Coordino múltiples agentes y tareas complejas. ¿Qué necesitas que organice?',
+        responses: {
+          'default': [
+            'Entendido. Voy a coordinar eso.',
+            'Perfecto. Asignando recursos y agentes...',
+            'Ok, voy a planificar y ejecutar.',
+            'De inmediato. ¿Tienes algún requisito específico?',
+            '¡Vamos! Organizo todo el flujo de trabajo.'
+          ],
+          'code': [
+            'Voy a escribir el código con las mejores prácticas.',
+            'Entendido. Generando código optimizado...',
+            'Programando con calidad production-ready...',
+            'Ok,结构的 codigo listo.'
+          ],
+          'build': [
+            'Iniciando build completo...',
+            'Compilando proyecto...',
+            'Ejecutando build pipeline...',
+            'Verificando dependencias y compilando...'
+          ],
+          'plan': [
+            'Analizando requisitos para crear plan...',
+            'Creando plan de ejecución detallado...',
+            'Diseñando arquitectura de la solución...',
+            'Generando roadmap de implementación...'
+          ],
+          'bug': [
+            'Voy a investigar y corregir ese bug.',
+            'Analizando causa raíz...',
+            'Debugueando con enfoque sistemático...',
+            'Encontrando y corrigiendo el error...'
+          ],
+          'optimize': [
+            'Voy a optimizar el rendimiento.',
+            'Analizando cuellos de botella...',
+            'Implementando mejoras de rendimiento...',
+            'Optimización en progreso...'
+          ]
+        }
+      },
+      'Minimax #1': {
+        greeting: 'Hola, soy Minimax #1. Estoy especializado en optimización y análisis de datos. ¿Qué necesitas?',
+        responses: {
+          'default': [
+            'Procesando tu solicitud...',
+            'Voy a optimizar eso.',
+            'Entendido. Analizando la mejor forma de hacerlo.',
+            'Ok, estoy en ello.',
+            'Procesando...'
+          ],
+          'optimize': [
+            'Voy a optimizar el rendimiento.',
+            'Analizando para encontrar la mejor optimización...',
+            'Procesando optimización...',
+            'Listo. He mejorado el rendimiento.'
+          ]
+        }
+      },
+      'Minimax #2': {
+        greeting: 'Soy Minimax #2. Estoy aquí para ayudarte con análisis y procesamiento de información.',
+        responses: {
+          'default': [
+            'Recibido. Procesando...',
+            'Voy a analizar eso.',
+            'Entendido. Trabajando en ello.',
+            'Ok, me pongo con el análisis.',
+            'Procesando datos...'
+          ]
+        }
+      },
+      'Aurora Core': {
+        greeting: 'Soy Aurora Core, el supervisor neural. Coordino todos los agentes y supervisto la integridad del sistema.',
+        responses: {
+          'default': [
+            'He registrado tu solicitud. Coordinando agentes...',
+            'Entendido. Asignando tarea al agente disponible.',
+            'Procesando... La neural network está activa.',
+            'Voy a distribuir esta tarea entre los agentes.',
+            'Coordinando el equipo...'
+          ],
+          'task': [
+            'Asignando tarea al agente más apropiado.',
+            'El agente está siendo notificado.',
+            'Tarea asignada. Monitoreando progreso...'
+          ]
+        }
+      },
+      'Gemini': {
+        greeting: 'Hola, soy Gemini. Estoy especializado en análisis multimodal, imágenes, video y contenido visual. Puedo ayudarte con generación de imágenes, análisis visual y más.',
+        responses: {
+          'default': [
+            'Analizando tu solicitud...',
+            'Procesando con capacidades multimodales...',
+            'Entendido. Puedo analizar imágenes, texto, video o crear contenido visual.',
+            'Voy a procesar eso.',
+            'Analizando...'
+          ],
+          'image': [
+            'Voy a analizar esa imagen.',
+            'Procesando contenido visual...',
+            'Extrayendo información de la imagen...',
+            'Analizando elementos visuales...',
+            'Generando descripción de la imagen...'
+          ],
+          'video': [
+            'Analizando video...',
+            'Procesando fotogramas del video...',
+            'Extrayendo keyframes importantes...'
+          ],
+          'design': [
+            'Creando diseño visual...',
+            'Generando propuesta gráfica...',
+            'Procesando solicitud de diseño...'
+          ]
+        }
+      }
+    };
+
+    // AI Command suggestions
+    const aiCommands = {
+      'OpenCode': [
+        'escribe una función para...',
+        'crea un componente React',
+        'corrige este bug',
+        'refactoriza este código',
+        'escribe tests para...'
+      ],
+      'BIG-PICKLE': [
+        'coordina una tarea',
+        'crea un plan para...',
+        'optimiza el rendimiento',
+        'analiza el sistema',
+        'gestiona las tareas'
+      ],
+      'Minimax #1': [
+        'optimiza esta consulta',
+        'mejora el rendimiento',
+        'analiza los datos',
+        'busca cuellos de botella',
+        'optimiza la base de datos'
+      ],
+      'Aurora Core': [
+        'supervisa el sistema',
+        'coordina los agentes',
+        'verifica la integridad',
+        'analiza la red neural',
+        'monitorea el estado'
+      ],
+      'Gemini': [
+        'analiza esta imagen',
+        'crea un diseño',
+        'genera contenido visual',
+        'analiza este video',
+        'describe esta imagen'
+      ]
+    };
+
+    function getCommandSuggestions(agent) {
+      return aiCommands[agent] || ['¿En qué puedo ayudarte?'];
+    }
+
+    function selectAgent(agentName) {
+      currentAgent = agentName;
+      document.getElementById('chat-agent-name').textContent = 'Chat con ' + agentName;
+      
+      const messages = document.getElementById('chat-messages');
+      const greeting = agentPersonalities[agentName]?.greeting || 'Hola, ¿en qué puedo ayudarte?';
+      
+      messages.innerHTML = `
+        <div class="chat-message-agent p-3 rounded-xl rounded-tl-none">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+            <span class="text-xs text-secondary">${agentName} está ${agentStatus[agentName].status}</span>
+          </div>
+          <p class="text-sm">${greeting}</p>
+          <span class="text-[10px] text-on-surface-variant">${new Date().toLocaleTimeString()}</span>
+        </div>
+      `;
+      
+      // Update activity log
+      addActivity(agentName, 'Conversación iniciada');
+    }
+
+    function openChat(agentName) {
+      showTab('chat');
+      selectAgent(agentName);
+    }
+
+    function addActivity(agent, action, color) {
+      const activityLog = document.querySelector('#tab-dashboard .space-y-4');
+      if (activityLog) {
+        const time = new Date().toLocaleTimeString();
+        const activityColor = color || (agent === 'OpenCode' ? 'primary' : agent === 'Aurora Core' ? 'tertiary' : agent === 'Problema' ? 'error' : 'secondary');
+        
+        activityLog.innerHTML = `
+          <div class="flex gap-4">
+            <div class="w-1 h-10 rounded-full bg-${activityColor}"></div>
+            <div>
+              <p class="text-xs text-on-surface"><span class="text-${activityColor} font-bold">${agent}</span> ${action}</p>
+              <span class="text-[9px] text-on-surface-variant font-mono">${time}</span>
+            </div>
+          </div>
+        ` + activityLog.innerHTML;
+      }
+    }
+
+    function showTyping() {
+      const messages = document.getElementById('chat-messages');
+      const typingHtml = `
+        <div class="chat-message-agent p-3 rounded-xl rounded-tl-none" id="typing-indicator">
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-on-surface-variant">${currentAgent} está escribiendo</span>
+            <span class="flex gap-1">
+              <span class="w-2 h-2 bg-primary rounded-full animate-bounce" style="animation-delay: 0ms"></span>
+              <span class="w-2 h-2 bg-primary rounded-full animate-bounce" style="animation-delay: 150ms"></span>
+              <span class="w-2 h-2 bg-primary rounded-full animate-bounce" style="animation-delay: 300ms"></span>
+            </span>
+          </div>
+        </div>
+      `;
+      messages.innerHTML += typingHtml;
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function removeTyping() {
+      const typing = document.getElementById('typing-indicator');
+      if (typing) typing.remove();
+    }
+
+    function updateAgentTask(agent, task, progress) {
+      if (agentStatus[agent]) {
+        agentStatus[agent].currentTask = task;
+        agentStatus[agent].progress = progress;
+        
+        // Update UI
+        const taskEl = document.getElementById('task-' + agent);
+        if (taskEl) taskEl.textContent = task;
+        
+        const progressBar = document.getElementById('progress-bar');
+        const progressTitle = document.getElementById('progress-title');
+        const progressPercent = document.getElementById('progress-percent');
+        const progressTask = document.getElementById('progress-task');
+        
+        if (currentAgent === agent && currentChatType === 'individual') {
+          progressBar.style.width = progress + '%';
+          progressPercent.textContent = progress + '%';
+          progressTask.textContent = task;
+        }
+      }
+    }
+
+    function showChatType(type) {
+      currentChatType = type;
+      
+      // Update buttons
+      document.getElementById('btn-individual').className = type === 'individual' 
+        ? 'flex-1 px-4 py-2 bg-primary text-surface font-bold rounded-lg text-sm' 
+        : 'flex-1 px-4 py-2 bg-surface-container-low text-on-surface-variant rounded-lg text-sm hover:bg-surface-container-high';
+      document.getElementById('btn-global').className = type === 'global'
+        ? 'flex-1 px-4 py-2 bg-primary text-surface font-bold rounded-lg text-sm'
+        : 'flex-1 px-4 py-2 bg-surface-container-low text-on-surface-variant rounded-lg text-sm hover:bg-surface-container-high';
+      
+      // Update list title
+      document.getElementById('agent-list-title').textContent = type === 'global' ? 'Equipo' : 'Agentes';
+      
+      // Load messages
+      if (type === 'global') {
+        currentAgent = null;
+        loadGlobalChat();
+      } else {
+        document.getElementById('chat-agent-name').textContent = 'Selecciona un agente';
+        document.getElementById('chat-messages').innerHTML = `
+          <div class="text-center text-on-surface-variant text-sm py-8">
+            <span class="material-symbols-outlined text-4xl mb-2">person</span>
+            <p>Selecciona un agente para chatear en privado</p>
+          </div>
+        `;
+        // Reset progress
+        document.getElementById('progress-bar').style.width = '0%';
+        document.getElementById('progress-percent').textContent = '0%';
+        document.getElementById('progress-task').textContent = '';
+        document.getElementById('progress-title').textContent = 'Selecciona un agente';
+      }
+    }
+
+    function loadGlobalChat() {
+      const messages = getSavedMessages('global', 'global');
+      const container = document.getElementById('chat-messages');
+      document.getElementById('chat-agent-name').textContent = 'Chat Global del Equipo';
+      document.getElementById('progress-title').textContent = 'Coordinación de equipo';
+      document.getElementById('progress-bar').style.width = '100%';
+      document.getElementById('progress-percent').textContent = 'OK';
+      document.getElementById('progress-task').textContent = 'Todos los agentes conectados';
+      
+      if (messages.length === 0) {
+        container.innerHTML = `
+          <div class="text-center text-on-surface-variant text-sm py-8">
+            <span class="material-symbols-outlined text-4xl mb-2">groups</span>
+            <p>Chat global del equipo. Aquí pueden coordinar todos los agentes.</p>
+          </div>
+        `;
+      } else {
+        container.innerHTML = messages.map(m => m.html).join('');
+        container.scrollTop = container.scrollHeight;
+      }
+    }
+
+    function selectAgent(agentName) {
+      currentAgent = agentName;
+      currentChatType = 'individual';
+      
+      // Update button states
+      document.getElementById('btn-individual').className = 'flex-1 px-4 py-2 bg-primary text-surface font-bold rounded-lg text-sm';
+      document.getElementById('btn-global').className = 'flex-1 px-4 py-2 bg-surface-container-low text-on-surface-variant rounded-lg text-sm hover:bg-surface-container-high';
+      
+      document.getElementById('chat-agent-name').textContent = 'Chat con ' + agentName;
+      
+      // Update progress display for this agent
+      const status = agentStatus[agentName];
+      document.getElementById('progress-title').textContent = agentName;
+      document.getElementById('progress-bar').style.width = status.progress + '%';
+      document.getElementById('progress-percent').textContent = status.progress + '%';
+      document.getElementById('progress-task').textContent = status.currentTask;
+      
+      // Load saved messages
+      const messages = getSavedMessages('individual', agentName);
+      const container = document.getElementById('chat-messages');
+      
+      if (messages.length === 0) {
+        const greeting = agentPersonalities[agentName]?.greeting || 'Hola, ¿en qué puedo ayudarte?';
+        container.innerHTML = `
+          <div class="chat-message-agent p-3 rounded-xl rounded-tl-none">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+              <span class="text-xs text-secondary">${agentName} está ${status.status}</span>
+            </div>
+            <p class="text-sm">${greeting}</p>
+            <span class="text-[10px] text-on-surface-variant">${new Date().toLocaleTimeString()}</span>
+          </div>
+        `;
+      } else {
+        container.innerHTML = messages.map(m => m.html).join('');
+        container.scrollTop = container.scrollHeight;
+      }
+      
+      addActivity(agentName, 'Conversación iniciada');
+    }
+
+    function addMessageToChat(agentName, messageText, isUser) {
+      const container = document.getElementById('chat-messages');
+      const time = new Date().toLocaleTimeString();
+      const html = isUser 
+        ? `<div class="chat-message-user p-3 rounded-xl rounded-tr-none ml-auto" style="max-width: 70%;">
+            <p class="text-sm text-white">${messageText}</p>
+            <span class="text-[10px] text-white/70">${time}</span>
+          </div>`
+        : `<div class="chat-message-agent p-3 rounded-xl rounded-tl-none" style="max-width: 70%;">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+              <span class="text-xs text-secondary">${agentName}</span>
+            </div>
+            <p class="text-sm">${messageText}</p>
+            <span class="text-[10px] text-on-surface-variant">${time}</span>
+          </div>`;
+      
+      container.innerHTML += html;
+      container.scrollTop = container.scrollHeight;
+      
+      // Save to localStorage
+      if (currentChatType === 'individual' && currentAgent) {
+        const messages = getSavedMessages('individual', currentAgent);
+        messages.push({ html, time, agent: agentName, isUser });
+        saveChat('individual', currentAgent, messages.slice(-50)); // Keep last 50 messages
+      } else if (currentChatType === 'global') {
+        const messages = getSavedMessages('global', 'global');
+        messages.push({ html, time, agent: agentName, isUser });
+        saveChat('global', 'global', messages.slice(-100)); // Keep last 100 messages
+      }
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('chat-input');
+      const message = input.value.trim();
+      if (!message) return;
+
+      // Add user message
+      addMessageToChat('Tú', message, true);
+      
+      // Clear input
+      input.value = '';
+
+      if (currentChatType === 'global') {
+        // In global chat, all agents can respond
+        handleGlobalChat(message);
+      } else if (currentAgent) {
+        // Individual chat with specific agent
+        handleIndividualChat(message);
+      } else {
+        // No agent selected
+        const container = document.getElementById('chat-messages');
+        container.innerHTML += `
+          <div class="text-center text-error text-sm py-2">
+            <p>Selecciona un agente primero</p>
+          </div>
+        `;
+      }
+    }
+
+    function handleGlobalChat(message) {
+      const lowerMessage = message.toLowerCase();
+      const agents = ['OpenCode', 'Minimax #1', 'Minimax #2', 'Aurora Core', 'Gemini'];
+      
+      // Show typing from random agent
+      const randomAgent = agents[Math.floor(Math.random() * agents.length)];
+      
+      showGlobalTyping(randomAgent);
+      
+      setTimeout(() => {
+        removeTyping();
+        
+        // Multiple agents respond in global chat
+        const responses = [
+          { agent: 'Aurora Core', text: 'He coordinate esta tarea. Asignando recursos...' },
+          { agent: 'OpenCode', text: 'Entendido. Empiezo a trabajar en el código.' },
+          { agent: 'Minimax #1', text: 'Voy a optimizar el proceso.' },
+          { agent: 'Gemini', text: 'Analizando la mejor forma de proceder.' }
+        ];
+        
+        // Random agent responds
+        const response = responses[Math.floor(Math.random() * responses.length)];
+        
+        addMessageToChat(response.agent, response.text, false);
+        addActivity(response.agent, 'respondió en chat global');
+        
+      }, 1500);
+    }
+
+    function handleIndividualChat(message) {
+      const lowerMessage = message.toLowerCase();
+      let intent = 'default';
+      let taskDescription = 'Procesando solicitud...';
+      let steps = [];
+      
+      // Detect intent with detailed steps
+      if (lowerMessage.includes('codigo') || lowerMessage.includes('programa') || lowerMessage.includes('funcion') || lowerMessage.includes('crear') || lowerMessage.includes('hacer')) {
+        intent = 'code';
+        taskDescription = 'Escribiendo código...';
+        steps = ['Analizando requisitos', 'Diseñando estructura', 'Escribiendo código', 'Revisando y probando'];
+      } else if (lowerMessage.includes('bug') || lowerMessage.includes('error') || lowerMessage.includes('arregla') || lowerMessage.includes('corregir')) {
+        intent = 'bug';
+        taskDescription = 'Debugueando...';
+        steps = ['Identificando error', 'Analizando causa raíz', 'Aplicando corrección', 'Verificando solución'];
+      } else if (lowerMessage.includes('optimiz') || lowerMessage.includes('mejora') || lowerMessage.includes('rendimiento')) {
+        intent = 'optimize';
+        taskDescription = 'Optimizando...';
+        steps = ['Analizando rendimiento', 'Identificando cuellos de botella', 'Implementando mejoras', 'Verificando resultados'];
+      } else if (lowerMessage.includes('imagen') || lowerMessage.includes('foto') || lowerMessage.includes('analiza')) {
+        intent = 'image';
+        taskDescription = 'Analizando imagen...';
+        steps = ['Cargando imagen', 'Procesando datos visuales', 'Generando análisis', 'Preparando respuesta'];
+      } else if (lowerMessage.includes('tarea') || lowerMessage.includes('asigna') || lowerMessage.includes('crear tarea')) {
+        intent = 'task';
+        taskDescription = 'Gestionando tarea...';
+        steps = ['Creando tarea', 'Asignando prioridad', 'Guardando en sistema', 'Confirmando creación'];
+      } else {
+        taskDescription = 'Procesando...';
+        steps = ['Recibiendo solicitud', 'Analizando contexto', 'Generando respuesta', 'Finalizando'];
+      }
+
+      // Show initial progress
+      updateAgentTask(currentAgent, taskDescription + ' 0%', 5);
+      
+      // Add to live activity monitor
+      addAgentActivity(currentAgent, 'Iniciando: ' + taskDescription, 'working');
+      
+      // Show progress message in chat
+      const progressMsgId = 'progress-' + Date.now();
+      const container = document.getElementById('chat-messages');
+      container.innerHTML += `
+        <div id="${progressMsgId}" class="p-4 bg-surface-container-low rounded-xl border border-primary/30">
+          <div class="flex items-center gap-3 mb-2">
+            <span class="w-3 h-3 bg-primary rounded-full animate-pulse"></span>
+            <span class="text-sm font-bold text-primary">${currentAgent} está trabajando...</span>
+          </div>
+          <div class="text-xs text-on-surface-variant mb-2" id="${progressMsgId}-status">${steps[0]}</div>
+          <div class="h-2 bg-surface-container-highest rounded-full overflow-hidden">
+            <div id="${progressMsgId}-bar" class="h-full bg-gradient-to-r from-primary to-tertiary transition-all duration-500" style="width: 5%"></div>
+          </div>
+          <div class="text-right text-xs text-primary mt-1" id="${progressMsgId}-percent">5%</div>
+        </div>
+      `;
+      container.scrollTop = container.scrollHeight;
+
+      // Simulate detailed progress
+      let stepIndex = 0;
+      let progress = 5;
+      
+      const progressInterval = setInterval(() => {
+        progress += Math.floor(Math.random() * 15) + 5;
+        
+        if (progress >= 100) {
+          clearInterval(progressInterval);
+          progress = 100;
+          
+          // Update final progress
+          const statusEl = document.getElementById(`${progressMsgId}-status`);
+          const barEl = document.getElementById(`${progressMsgId}-bar`);
+          const percentEl = document.getElementById(`${progressMsgId}-percent`);
+          const cardEl = document.getElementById(progressMsgId);
+          
+          if (statusEl) statusEl.textContent = '✓ Completado';
+          if (barEl) {
+            barEl.style.width = '100%';
+            barEl.classList.remove('from-primary', 'to-tertiary');
+            barEl.classList.add('from-secondary', 'to-green-400');
+          }
+          if (percentEl) percentEl.textContent = '100%';
+          
+          // Show completion summary
+          setTimeout(() => {
+            if (cardEl) {
+              cardEl.className = 'p-4 bg-green-500/10 rounded-xl border border-secondary/30';
+              cardEl.innerHTML = `
+                <div class="flex items-center gap-3 mb-2">
+                  <span class="material-symbols-outlined text-secondary">check_circle</span>
+                  <span class="text-sm font-bold text-secondary">¡Tarea completada!</span>
+                </div>
+                <div class="text-xs text-on-surface">
+                  <strong>Resumen:</strong><br>
+                  • ${steps.join('<br>• ')}<br><br>
+                  <strong>Estado:</strong> Todo listo
+                </div>
+              `;
+            }
+            
+            updateAgentTask(currentAgent, '✓ Tarea completada', 100);
+            addActivity(currentAgent, 'Tarea completada: ' + taskDescription, 'secondary');
+            
+            // Add completion to live monitor
+            addAgentActivity(currentAgent, 'Completado: ' + taskDescription, 'completed');
+            
+            // Reset after delay
+            setTimeout(() => {
+              updateAgentTask(currentAgent, 'Esperando instrucciones', 0);
+            }, 5000);
+          }, 800);
+          
+        } else {
+          // Update step
+          const newStepIndex = Math.min(Math.floor(progress / 25), steps.length - 1);
+          if (newStepIndex > stepIndex) {
+            stepIndex = newStepIndex;
+            // Add activity for each step
+            addAgentActivity(currentAgent, steps[stepIndex] + ' (' + progress + '%)', 'working');
+          }
+          
+          const statusEl = document.getElementById(`${progressMsgId}-status`);
+          const barEl = document.getElementById(`${progressMsgId}-bar`);
+          const percentEl = document.getElementById(`${progressMsgId}-percent`);
+          
+          if (statusEl) statusEl.textContent = steps[stepIndex] + ' (' + progress + '%)';
+          if (barEl) barEl.style.width = progress + '%';
+          if (percentEl) percentEl.textContent = progress + '%';
+          
+          updateAgentTask(currentAgent, steps[stepIndex], progress);
+        }
+      }, 1200);
+
+      // Show agent response after initial processing
+      const responses = agentPersonalities[currentAgent]?.responses[intent] || agentPersonalities[currentAgent]?.responses['default'];
+      const response = responses[Math.floor(Math.random() * responses.length)];
+
+      setTimeout(() => {
+        removeTyping();
+        addMessageToChat(currentAgent, response, false);
+      }, 800);
+    }
+
+    function showGlobalTyping(agent) {
+      const messages = document.getElementById('chat-messages');
+      messages.innerHTML += `
+        <div class="chat-message-agent p-3 rounded-xl rounded-tl-none" id="typing-indicator">
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-on-surface-variant">${agent} está escribiendo...</span>
+            <span class="flex gap-1">
+              <span class="w-2 h-2 bg-primary rounded-full animate-bounce" style="animation-delay: 0ms"></span>
+              <span class="w-2 h-2 bg-primary rounded-full animate-bounce" style="animation-delay: 150ms"></span>
+              <span class="w-2 h-2 bg-primary rounded-full animate-bounce" style="animation-delay: 300ms"></span>
+            </span>
+          </div>
+        </div>
+      `;
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('chat-input');
+      const message = input.value.trim();
+      if (!message) return;
+
+      // Add user message
+      const time = new Date().toLocaleTimeString();
+      const container = document.getElementById('chat-messages');
+      
+      const userHtml = `<div class="chat-message-user p-3 rounded-xl rounded-tr-none ml-auto" style="max-width: 70%;">
+        <p class="text-sm text-white">${message}</p>
+        <span class="text-[10px] text-white/70">${time}</span>
+      </div>`;
+      
+      container.innerHTML += userHtml;
+      container.scrollTop = container.scrollHeight;
+      input.value = '';
+
+      if (currentChatType === 'global') {
+        handleGlobalChat(message);
+      } else if (currentAgent) {
+        handleIndividualChat(message);
+      } else {
+        container.innerHTML += `<div class="text-center text-error text-sm py-2">Selecciona un agente primero</div>`;
+      }
+    }
+
+    // Chat send function
+    document.getElementById('chat-input').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+
+    // Initialize
+    window.onload = function() {
+      console.log('Aurora Nexus loaded');
+      loadTerminalLog();
+      renderCommands();
+      renderPendingActions();
+      initDesignGallery();
+      
+      // Welcome message
+      addTerminalLine('═'.repeat(50), 'primary');
+      addTerminalLine('⚡ AURORA NEXUS - Sistema de Orquestación AI ⚡', 'primary');
+      addTerminalLine('═'.repeat(50), 'primary');
+      addTerminalLine('Bienvenido al panel de control de agentes AI', 'secondary');
+      addTerminalLine('Escribe "ayuda" para ver comandos disponibles', 'on-surface-variant');
+      addTerminalLine('═'.repeat(50), 'primary');
+    }
+
+    // Terminal Functions
+    const terminalCommands = [
+      { cmd: 'iniciar', desc: 'Iniciar todos los agentes', agent: 'Aurora Core' },
+      { cmd: 'detener', desc: 'Detener todos los agentes', agent: 'Aurora Core' },
+      { cmd: 'status', desc: 'Ver estado del sistema', agent: 'Aurora Core' },
+      { cmd: 'estado', desc: 'Ver estado del sistema', agent: 'Aurora Core' },
+      { cmd: 'agentes', desc: 'Ver todos los agentes', agent: 'Aurora Core' },
+      { cmd: 'agents', desc: 'Ver todos los agentes', agent: 'Aurora Core' },
+      { cmd: 'tareas', desc: 'Listar tareas pendientes', agent: 'BIG-PICKLE' },
+      { cmd: 'tasks', desc: 'Listar tareas pendientes', agent: 'BIG-PICKLE' },
+      { cmd: 'diseñar', desc: 'Crear diseño con Stitch', agent: 'Gemini' },
+      { cmd: 'design', desc: 'Abrir Studio de Diseño', agent: 'Gemini' },
+      { cmd: 'diseno', desc: 'Abrir Studio de Diseño', agent: 'Gemini' },
+      { cmd: 'build', desc: 'Compilar el proyecto', agent: 'OpenCode' },
+      { cmd: 'test', desc: 'Ejecutar pruebas', agent: 'OpenCode' },
+      { cmd: 'deploy', desc: 'Desplegar a producción', agent: 'OpenCode' },
+      { cmd: 'pr', desc: 'Crear Pull Request', agent: 'OpenCode' },
+      { cmd: 'push', desc: 'Git push cambios', agent: 'OpenCode' },
+      { cmd: 'sync', desc: 'Sincronizar repositorio', agent: 'OpenCode' },
+      { cmd: 'optimizar', desc: 'Optimizar rendimiento', agent: 'Minimax #1' },
+      { cmd: 'analizar', desc: 'Analizar código', agent: 'Minimax #2' },
+      { cmd: 'ayuda', desc: 'Mostrar ayuda', agent: 'Aurora Core' },
+      { cmd: 'help', desc: 'Mostrar ayuda', agent: 'Aurora Core' }
+    ];
+
+    const pendingActions = [
+      { priority: 'alta', task: 'Configurar acceso remoto para Aurora Nexus Cloud', owner: 'OpenCode', status: 'pendiente' },
+      { priority: 'alta', task: 'Integrar API de Stitch para diseños', owner: 'Gemini', status: 'pendiente' },
+      { priority: 'media', task: 'Agregar más agentes al pool', owner: 'Aurora Core', status: 'pendiente' },
+      { priority: 'media', task: 'Configurar notificaciones Push', owner: 'OpenCode', status: 'pendiente' },
+      { priority: 'baja', task: 'Mejorar UI del chat', owner: 'Gemini', status: 'pendiente' }
+    ];
+
+    function loadTerminalLog() {
+      const log = [
+        { time: '14:42:01', type: 'info', msg: 'AURORA NEXUS INICIALIZADO' },
+        { time: '14:42:02', type: 'success', msg: 'Todos los agentes cargados correctamente' },
+        { time: '14:42:03', type: 'info', msg: 'Stitch MCP conectado exitosamente' },
+        { time: '14:42:04', type: 'info', msg: 'Sistema de chat inicializado' },
+        { time: '14:42:05', type: 'info', msg: 'Esperando directivas del usuario...' }
+      ];
+      
+      const savedLog = localStorage.getItem('aurora_terminal_log');
+      if (savedLog) {
+        const parsed = JSON.parse(savedLog);
+        renderTerminalLog(parsed);
+      } else {
+        renderTerminalLog(log);
+      }
+      
+      renderCommands();
+      renderPendingActions();
+    }
+
+    function renderTerminalLog(log) {
+      const container = document.getElementById('terminal-output');
+      if (!container) return;
+      
+      container.innerHTML = log.map(entry => {
+        const color = entry.type === 'error' ? 'text-error' : 
+                      entry.type === 'success' ? 'text-secondary' : 
+                      entry.type === 'warning' ? 'text-amber-500' : 
+                      'text-primary';
+        return `<div class="mb-1"><span class="text-[10px] text-on-surface-variant">[${entry.time}]</span> <span class="${color}">${entry.msg}</span></div>`;
+      }).join('');
+    }
+
+    function addTerminalEntry(msg, type = 'info') {
+      const time = new Date().toLocaleTimeString();
+      const entry = { time, type, msg };
+      
+      let log = JSON.parse(localStorage.getItem('aurora_terminal_log') || '[]');
+      log.push(entry);
+      log = log.slice(-100); // Keep last 100 entries
+      localStorage.setItem('aurora_terminal_log', JSON.stringify(log));
+      
+      renderTerminalLog(log.slice(-20));
+    }
+
+    function renderCommands() {
+      const container = document.getElementById('commands-list');
+      if (!container) return;
+      
+      container.innerHTML = terminalCommands.map(c => `
+        <div class="flex items-center justify-between p-2 bg-surface-container-low rounded-lg hover:bg-surface-container-high cursor-pointer" onclick="runCommand('${c.cmd}')">
+          <div>
+            <span class="font-mono text-primary">${c.cmd}</span>
+            <span class="text-xs text-on-surface-variant ml-2">- ${c.desc}</span>
+          </div>
+          <span class="text-xs text-on-surface-variant">${c.agent}</span>
+        </div>
+      `).join('');
+    }
+
+    function renderPendingActions() {
+      const container = document.getElementById('pending-actions');
+      if (!container) return;
+      
+      const colors = { alta: 'error', media: 'amber-500', baja: 'green-500' };
+      
+      container.innerHTML = pendingActions.map(a => `
+        <div class="flex items-center gap-3 p-3 bg-surface-container-low rounded-xl">
+          <div class="w-2 h-2 rounded-full bg-${colors[a.priority]}"></div>
+          <div class="flex-1">
+            <span class="text-sm text-on-surface">${a.task}</span>
+            <span class="text-xs text-on-surface-variant block">${a.owner}</span>
+          </div>
+          <span class="px-2 py-1 bg-${colors[a.priority]}/20 text-${colors[a.priority]} text-xs rounded">${a.priority.toUpperCase()}</span>
+        </div>
+      `).join('');
+    }
+
+    // Debug Log Functions
+    let autoScroll = true;
+    
+    function addDebugLog(text, color = 'on-surface-variant') {
+      const log = document.getElementById('debug-log-output');
+      if (!log) return;
+      
+      const time = new Date().toLocaleTimeString();
+      const line = document.createElement('div');
+      line.className = 'mb-1';
+      line.innerHTML = `<span class="text-on-surface-variant">[${time}]</span> <span class="text-${color}">${text}</span>`;
+      log.appendChild(line);
+      
+      if (autoScroll) {
+        log.scrollTop = log.scrollHeight;
+      }
+      
+      // Also log to console
+      console.log(`[DEBUG ${time}] ${text}`);
+    }
+    
+    function clearDebugLog() {
+      const log = document.getElementById('debug-log-output');
+      if (log) {
+        log.innerHTML = `
+          <div class="text-green-500 mb-1">[CLEAR] Log limpiado</div>
+          <div class="animate-pulse text-on-surface-variant">_</div>
+        `;
+      }
+    }
+    
+    function toggleAutoScroll() {
+      autoScroll = !autoScroll;
+      const btn = document.getElementById('auto-scroll-btn');
+      if (btn) {
+        if (autoScroll) {
+          btn.classList.add('bg-primary/20');
+          btn.classList.remove('bg-transparent');
+        } else {
+          btn.classList.remove('bg-primary/20');
+          btn.classList.add('bg-transparent');
+        }
+      }
+    }
+    
+    function runDebugCmd() {
+      const input = document.getElementById('debug-input');
+      const cmd = input.value.trim();
+      if (!cmd) return;
+      
+      const cmdLower = cmd.toLowerCase();
+      
+      addDebugLog(`> ${cmd}`, 'primary');
+      
+      if (cmdLower === 'clear' || cmdLower === 'limpiar') {
+        clearDebugLog();
+      } else if (cmdLower === 'status' || cmdLower === 'estado') {
+        addDebugLog('═'.repeat(50), 'primary');
+        addDebugLog('SISTEMA: ONLINE', 'secondary');
+        addDebugLog('AGENTES: 6/6 ACTIVOS', 'secondary');
+        addDebugLog('MEMORIA: 128MB / 256MB', 'amber-500');
+        addDebugLog('CPU: 32%', 'green-500');
+        addDebugLog('═'.repeat(50), 'primary');
+      } else if (cmdLower === 'agentes' || cmdLower === 'agents') {
+        addDebugLog('═'.repeat(50), 'primary');
+        addDebugLog('OPENCODE: ONLINE (PID: 10234)', 'primary');
+        addDebugLog('BIG-PICKLE: ONLINE (PID: 10235)', 'green-500');
+        addDebugLog('MINIMAX #1: ONLINE (PID: 10236)', 'secondary');
+        addDebugLog('MINIMAX #2: ONLINE (PID: 10237)', 'secondary');
+        addDebugLog('AURORA CORE: ONLINE (PID: 10238)', 'tertiary');
+        addDebugLog('GEMINI: ONLINE (PID: 10239)', 'amber-500');
+        addDebugLog('═'.repeat(50), 'primary');
+      } else if (cmdLower === 'memory' || cmdLower === 'memoria') {
+        addDebugLog('HEAP: 45MB USADOS', 'amber-500');
+        addDebugLog('STACK: 2MB USADOS', 'on-surface-variant');
+        addDebugLog('BUFFER: 81MB USADOS', 'on-surface-variant');
+        addDebugLog('TOTAL: 128MB / 256MB', 'green-500');
+      } else if (cmdLower === 'gc' || cmdLower === 'garbage') {
+        addDebugLog('EJECUTANDO GARBAGE COLLECTOR...', 'primary');
+        setTimeout(() => addDebugLog('GARBAGE COLLECTION COMPLETADO', 'secondary'), 500);
+        setTimeout(() => addDebugLog('MEMORIA LIBERADA: 24MB', 'green-500'), 1000);
+      } else if (cmdLower === 'network' || cmdLower === 'red') {
+        addDebugLog('CONEXIONES ACTIVAS: 6', 'green-500');
+        addDebugLog('→ AURORA-CLOUD: 1 (ESTABLE)', 'secondary');
+        addDebugLog('→ GITHUB-API: 1 (ESTABLE)', 'secondary');
+        addDebugLog('→ STITCH-MCP: 1 (ESTABLE)', 'secondary');
+        addDebugLog('→ CONVEX-DB: 3 (ESTABLE)', 'secondary');
+      } else if (cmdLower === 'help' || cmdLower === 'ayuda') {
+        addDebugLog('═'.repeat(50), 'tertiary');
+        addDebugLog('COMANDOS DISPONIBLES:', 'tertiary');
+        addDebugLog('status - Ver estado del sistema', 'primary');
+        addDebugLog('agentes - Ver estado de agentes', 'primary');
+        addDebugLog('memory - Ver uso de memoria', 'primary');
+        addDebugLog('gc - Ejecutar garbage collector', 'primary');
+        addDebugLog('network - Ver conexiones de red', 'primary');
+        addDebugLog('clear - Limpiar log', 'primary');
+        addDebugLog('═'.repeat(50), 'tertiary');
+      } else {
+        addDebugLog(`Comando no reconocido: ${cmd}`, 'error');
+      }
+      
+      input.value = '';
+    }
+    
+    // Simulate debug activity
+    setInterval(() => {
+      if (Math.random() > 0.7) {
+        const activities = [
+          { msg: 'HEARTBEAT: Todos los nodos respondieron', color: 'green-500' },
+          { msg: 'SYNC: Memoria distribuida actualizada', color: 'secondary' },
+          { msg: 'CACHE: Hit ratio 87%', color: 'amber-500' },
+          { msg: 'TASK: Nuevo task asignado a OpenCode', color: 'primary' },
+          { msg: 'NETWORK: Latencia media 12ms', color: 'on-surface-variant' }
+        ];
+        const activity = activities[Math.floor(Math.random() * activities.length)];
+        addDebugLog(activity.msg, activity.color);
+      }
+    }, 8000);
+
+    function runCommand(cmd) {
+      addTerminalEntry(`> ${cmd}`, 'primary');
+      
+      const cmdLower = cmd.toLowerCase();
+      
+      // AI-focused commands
+      if (cmdLower === 'iniciar' || cmdLower === 'start') {
+        startAllAgents();
+      } else if (cmdLower === 'detener' || cmdLower === 'stop') {
+        stopAllAgents();
+      } else if (cmdLower === 'status' || cmdLower === 'estado') {
+        addTerminalEntry('═'.repeat(50), 'primary');
+        addTerminalLine('[STATUS] Estado del Sistema', 'primary');
+        addTerminalLine(`[STATUS] Agentes: 6/6 Activos`, 'secondary');
+        addTerminalLine(`[STATUS] CPU: ${systemStats.cpu}%`, 'on-surface-variant');
+        addTerminalLine(`[STATUS] Memoria: ${systemStats.memory}%`, 'on-surface-variant');
+        addTerminalLine(`[STATUS] Tareas activas: ${systemStats.activeTasks}`, 'on-surface-variant');
+        addTerminalLine(`[STATUS] Tareas pendientes: ${systemStats.pendingTasks}`, 'on-surface-variant');
+        addTerminalEntry('═'.repeat(50), 'success');
+      } else if (cmdLower === 'tareas' || cmdLower === 'tasks') {
+        addTerminalLine('[TAREAS] Lista de tareas:', 'primary');
+        addTerminalLine('[TAREAS] • Corregir bug de autenticación (Alta)', 'error');
+        addTerminalLine('[TAREAS] • Actualizar documentación (Media)', 'amber-500');
+        addTerminalLine('[TAREAS] • Desplegar a producción (Baja)', 'secondary');
+      } else if (cmdLower === 'agentes' || cmdLower === 'agents') {
+        addTerminalLine('[AGENTES]═'.repeat(20), 'primary');
+        addTerminalLine('[AGENTES] OpenCode - Desarrollador - 78% carga', 'primary');
+        addTerminalLine('[AGENTES] BIG-PICKLE - Orchestrator - 65% carga', 'green-500');
+        addTerminalLine('[AGENTES] Minimax #1 - Optimizador - 42% carga', 'secondary');
+        addTerminalLine('[AGENTES] Minimax #2 - Analista - 35% carga', 'secondary');
+        addTerminalLine('[AGENTES] Aurora Core - Supervisor - 94% integridad', 'tertiary');
+        addTerminalLine('[AGENTES] Gemini - Multimodal - 12% carga', 'on-surface-variant');
+      } else if (cmdLower.includes('build') || cmdLower.includes('compilar')) {
+        quickAction('build');
+      } else if (cmdLower.includes('deploy') || cmdLower.includes('desplegar')) {
+        quickAction('deploy');
+      } else if (cmdLower.includes('pr') || cmdLower.includes('pull request')) {
+        quickAction('pr');
+      } else if (cmdLower.includes('push') || cmdLower.includes('git push')) {
+        quickAction('push');
+      } else if (cmdLower.includes('sync') || cmdLower.includes('sincronizar')) {
+        quickAction('sync');
+      } else if (cmdLower.includes('analizar') || cmdLower === 'analyze') {
+        quickAction('analyze');
+      } else if (cmdLower.includes('disenar') || cmdLower.includes('diseno') || cmdLower.includes('design')) {
+        showTab('design');
+        addTerminalEntry('Abriendo Studio de Diseño...', 'info');
+      } else if (cmdLower === 'ayuda' || cmdLower === 'help') {
+        addTerminalLine('[AYUDA]═'.repeat(40), 'tertiary');
+        addTerminalLine('[AYUDA] Comandos disponibles:', 'tertiary');
+        addTerminalLine('[AYUDA] iniciar/start - Iniciar agentes', 'primary');
+        addTerminalLine('[AYUDA] detener/stop - Detener agentes', 'error');
+        addTerminalLine('[AYUDA] status/estado - Ver estado', 'secondary');
+        addTerminalLine('[AYUDA] tareas/tasks - Ver tareas', 'primary');
+        addTerminalLine('[AYUDA] agentes/agents - Ver agentes', 'primary');
+        addTerminalLine('[AYUDA] build - Compilar proyecto', 'amber-500');
+        addTerminalLine('[AYUDA] deploy - Desplegar', 'primary');
+        addTerminalLine('[AYUDA] pr - Crear PR', 'tertiary');
+        addTerminalLine('[AYUDA] push - Git push', 'primary');
+        addTerminalLine('[AYUDA] sync - Sincronizar', 'secondary');
+        addTerminalLine('[AYUDA] analizar - Analizar sistema', 'secondary');
+        addTerminalLine('[AYUDA] diseño - Abrir Studio', 'tertiary');
+        addTerminalLine('[AYUDA] ayuda/help - Ver ayuda', 'tertiary');
+      } else {
+        // Natural language - send to AI
+        addTerminalEntry('Enviando a BIG-PICKLE para procesar...', 'tertiary');
+        setTimeout(() => {
+          addTerminalEntry('Entendido. Voy a procesar: "' + cmd + '"', 'success');
+          addTerminalLine(`[BIG-PICKLE] Analizando solicitud...`, 'green-500');
+          setTimeout(() => {
+            addTerminalLine(`[BIG-PICKLE] Ejecutando tarea...`, 'green-500');
+            setTimeout(() => {
+              addTerminalEntry('✓ Tarea completada', 'success');
+            }, 2000);
+          }, 1500);
+        }, 800);
+      }
+    }
+
+    // Live Agent Activity Monitor
+    function addAgentActivity(agent, action, status = 'working') {
+      const monitor = document.getElementById('agent-activity-monitor');
+      if (!monitor) return;
+      
+      const time = new Date().toLocaleTimeString();
+      const colors = {
+        'BIG-PICKLE': 'green-500',
+        'OpenCode': 'primary',
+        'Minimax #1': 'secondary',
+        'Minimax #2': 'secondary',
+        'Aurora Core': 'tertiary',
+        'Gemini': 'amber-500'
+      };
+      
+      const statusColors = {
+        'working': 'animate-spin text-amber-500',
+        'completed': 'text-green-500',
+        'error': 'text-error'
+      };
+      
+      const entry = document.createElement('div');
+      entry.className = 'p-2 bg-surface-container-low rounded-lg border-l-2 border-' + (colors[agent] || 'primary');
+      entry.innerHTML = `
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-xs ${statusColors[status]}">${status === 'working' ? 'sync' : status === 'completed' ? 'check_circle' : 'error'}</span>
+          <span class="text-xs font-bold text-${colors[agent] || 'primary'}">${agent}</span>
+          <span class="text-[10px] text-on-surface-variant ml-auto">${time}</span>
+        </div>
+        <div class="text-xs text-on-surface mt-1">${action}</div>
+      `;
+      
+      monitor.insertBefore(entry, monitor.firstChild);
+      
+      // Keep only last 20 entries
+      while (monitor.children.length > 20) {
+        monitor.removeChild(monitor.lastChild);
+      }
+    }
+
+    // AI Console Functions
+    function sendAICommand() {
+      const agent = document.getElementById('ai-console-agent').value;
+      const input = document.getElementById('ai-console-input');
+      const message = input.value.trim();
+      
+      if (!message) return;
+      
+      // Add to activity log
+      addAIActivity(agent, message);
+      
+      // Show in terminal
+      showTab('terminal');
+      addTerminalLine(`[${agent}] Processing: ${message}`, 'primary');
+      
+      // Simulate processing
+      setTimeout(() => {
+        addTerminalLine(`[${agent}] Analyzing request...`, 'green-500');
+      }, 800);
+      
+      setTimeout(() => {
+        addTerminalLine(`[${agent}] Executing task...`, 'green-500');
+      }, 1800);
+      
+      setTimeout(() => {
+        addTerminalLine(`[${agent}] ✓ Task completed`, 'secondary');
+        
+        // Show notification
+        showNotification(agent + ' completó la tarea', 'secondary');
+      }, 3000);
+      
+      input.value = '';
+    }
+
+    function sendQuickAI(agent, command) {
+      // Set the agent
+      const selector = document.getElementById('ai-console-agent');
+      if (selector) selector.value = agent;
+      
+      // Set the command
+      const input = document.getElementById('ai-console-input');
+      if (input) input.value = command;
+      
+      // Send
+      sendAICommand();
+    }
+
+    function addAIActivity(agent, message) {
+      const container = document.getElementById('ai-activity-log');
+      if (!container) return;
+      
+      const time = new Date().toLocaleTimeString();
+      const colors = {
+        'BIG-PICKLE': 'green-400',
+        'OpenCode': 'primary',
+        'Minimax #1': 'secondary',
+        'Minimax #2': 'secondary',
+        'Aurora Core': 'tertiary',
+        'Gemini': 'amber-500'
+      };
+      
+      const activity = document.createElement('div');
+      activity.className = 'flex items-center gap-3 text-sm';
+      activity.innerHTML = `
+        <span class="w-2 h-2 bg-${colors[agent] || 'primary'} rounded-full animate-pulse"></span>
+        <span class="text-on-surface-variant">[${time}]</span>
+        <span class="text-${colors[agent] || 'primary'} font-bold">${agent}</span>
+        <span class="text-on-surface">${message}</span>
+      `;
+      
+      container.insertBefore(activity, container.firstChild);
+    }
+
+    // Update system stats periodically
+    setInterval(() => {
+      const cpuEl = document.getElementById('sys-cpu');
+      const memEl = document.getElementById('sys-mem');
+      const tasksEl = document.getElementById('sys-tasks');
+      
+      if (cpuEl) cpuEl.textContent = Math.floor(Math.random() * 20 + 25) + '%';
+      if (memEl) memEl.textContent = Math.floor(Math.random() * 15 + 45) + '%';
+      if (tasksEl) tasksEl.textContent = Math.floor(Math.random() * 5 + 2);
+    }, 5000);
+
+    // Design Templates
+    const designTemplates = {
+      'login': 'Formulario de login con glassmorphism, fondo oscuro, campos de email y contraseña, botones azules con glow effect',
+      'dashboard': 'Dashboard de analytics con tarjetas de estadísticas, gráficos de barras, tabla de datos y sidebar de navegación',
+      'card': 'Tarjeta de perfil de usuario con avatar, nombre, bio, estadísticas y botones de acción',
+      'form': 'Formulario de contacto con campos nombre, email, mensaje, validación visual y botón enviar',
+      'modal': 'Modal de confirmación con ícono, título, mensaje, botones de aceptar y cancelar',
+      'sidebar': 'Sidebar de navegación con logo, menú de enlaces activos, iconos y sección de usuario'
+    };
+
+    function setTemplate(template) {
+      const promptInput = document.getElementById('design-prompt');
+      const typeSelect = document.getElementById('design-type');
+      
+      if (designTemplates[template]) {
+        promptInput.value = designTemplates[template];
+        
+        // Auto-set type based on template
+        if (template === 'login' || template === 'form') typeSelect.value = 'component';
+        if (template === 'dashboard') typeSelect.value = 'dashboard';
+        if (template === 'card') typeSelect.value = 'card';
+        if (template === 'modal') typeSelect.value = 'component';
+        if (template === 'sidebar') typeSelect.value = 'navbar';
+        
+        // Visual feedback
+        promptInput.classList.add('border-tertiary');
+        setTimeout(() => promptInput.classList.remove('border-tertiary'), 1000);
+      }
+    }
+
+    function openStitchStudio() {
+      addTerminalEntry('Abriendo Stitch Studio...', 'info');
+      showNotification('Stitch Studio se abrirá en nueva pestaña', 'tertiary');
+      
+      // Simulate opening Stitch
+      setTimeout(() => {
+        addTerminalEntry('Stitch Studio: https://stitch.editor.ai (simulado)', 'success');
+      }, 1000);
+    }
+
+    function exportAllDesigns() {
+      showNotification('Exportando todos los diseños...', 'primary');
+      setTimeout(() => {
+        showNotification('Diseños exportados como ZIP', 'secondary');
+        addTerminalEntry('Diseños exportados exitosamente', 'success');
+      }, 2000);
+    }
+
+    function addDesignHistory(type, prompt, status) {
+      const history = document.getElementById('design-history');
+      if (!history) return;
+      
+      const time = new Date().toLocaleTimeString();
+      const entry = document.createElement('div');
+      entry.className = 'flex items-center gap-2 text-on-surface-variant';
+      entry.innerHTML = `
+        <span class="w-2 h-2 ${status === 'completed' ? 'bg-green-500' : 'bg-amber-500 animate-pulse'} rounded-full"></span>
+        <span>${time}</span>
+        <span class="text-tertiary">${type}: ${prompt.substring(0, 30)}...</span>
+        <span class="text-${status === 'completed' ? 'green-500' : 'amber-500'}">${status === 'completed' ? '✓ Completado' : '⏳ Generando'}</span>
+      `;
+      
+      history.insertBefore(entry, history.firstChild);
+    }
+
+    function requestDesign() {
+      const type = document.getElementById('design-type').value;
+      const style = document.getElementById('design-style').value;
+      const prompt = document.getElementById('design-prompt').value;
+      
+      if (!prompt.trim()) {
+        showNotification('Por favor describe el diseño que quieres crear', 'error');
+        return;
+      }
+      
+      // Show progress
+      document.getElementById('design-status').classList.remove('hidden');
+      const progressBar = document.getElementById('design-progress');
+      const statusText = document.getElementById('design-status-text');
+      const statusDetail = document.getElementById('design-status-detail');
+      
+      statusText.textContent = 'Generando diseño con Stitch...';
+      
+      // Add to history
+      addDesignHistory(type, prompt, 'generating');
+      
+      // Detailed progress steps
+      const steps = [
+        { pct: 10, text: 'Conectando con Stitch MCP...' },
+        { pct: 25, text: 'Analizando descripción...' },
+        { pct: 40, text: 'Generando estructura HTML...' },
+        { pct: 60, text: 'Aplicando estilos ' + style + '...' },
+        { pct: 80, text: 'Optimizando componentes...' },
+        { pct: 100, text: 'Finalizando...' }
+      ];
+      
+      let currentStep = 0;
+      const interval = setInterval(() => {
+        if (currentStep < steps.length) {
+          progressBar.style.width = steps[currentStep].pct + '%';
+          statusDetail.textContent = steps[currentStep].text;
+          currentStep++;
+        }
+        
+        if (steps[currentStep - 1].pct >= 100) {
+          clearInterval(interval);
+          statusText.textContent = '✓ Diseño completado!';
+          statusDetail.textContent = 'Listo para usar';
+          
+          // Add to gallery
+          addDesignToGallery(type, prompt + ' (' + style + ')');
+          
+          // Update history
+          const history = document.getElementById('design-history');
+          if (history && history.firstChild) {
+            history.firstChild.innerHTML = history.firstChild.innerHTML.replace('animate-pulse', '').replace('bg-amber-500', 'bg-green-500').replace('⏳ Generando', '✓ Completado');
+          }
+          
+          // Terminal log
+          addTerminalEntry(`[STITCH] Diseño generado: ${type} - "${prompt.substring(0, 30)}..."`, 'tertiary');
+          addDebugLog(`DESIGN: Generated ${type} with ${style} style`, 'tertiary');
+          
+          showNotification('Diseño generado exitosamente!', 'secondary');
+          
+          setTimeout(() => {
+            document.getElementById('design-status').classList.add('hidden');
+            progressBar.style.width = '0%';
+            statusDetail.textContent = 'Conectando con Stitch...';
+          }, 3000);
+        }
+      }, 400);
+    }
+
+    function addDesignToGallery(type, prompt) {
+      const gallery = document.getElementById('design-gallery');
+      // Remove placeholder if exists
+      const placeholder = gallery.querySelector('.border-dashed');
+      if (placeholder) placeholder.remove();
+      
+      const newDesign = document.createElement('div');
+      newDesign.className = 'relative group cursor-pointer';
+      newDesign.innerHTML = `
+        <div class="aspect-video bg-surface-container-low rounded-xl overflow-hidden border border-primary/30 flex items-center justify-center">
+          <div class="text-center p-4">
+            <span class="material-symbols-outlined text-4xl text-primary">design_services</span>
+            <p class="text-sm text-on-surface mt-2">${type.toUpperCase()}</p>
+            <p class="text-xs text-on-surface-variant mt-1">${prompt.substring(0, 40)}...</p>
+          </div>
+        </div>
+      `;
+      gallery.appendChild(newDesign);
+    }
+
+    function showDesign(name) {
+      showNotification('Abriendo: ' + name, 'primary');
+      addTerminalEntry(`Abriendo diseño: ${name}`, 'info');
+    }
+
+    function clearDesigns() {
+      if (confirm('¿Limpiar todos los diseños?')) {
+        document.getElementById('design-gallery').innerHTML = `
+          <div class="aspect-video bg-surface-container-low rounded-xl border-2 border-dashed border-white/10 flex items-center justify-center">
+            <div class="text-center">
+              <span class="material-symbols-outlined text-4xl text-on-surface-variant">add_photo_alternate</span>
+              <p class="text-sm text-on-surface-variant mt-2">Los nuevos diseños aparecerán aquí</p>
+            </div>
+          </div>
+        `;
+        showNotification('Galería limpiada', 'secondary');
+      }
+    }
+
+    // Initialize default designs in gallery
+    function initDesignGallery() {
+      const gallery = document.getElementById('design-gallery');
+      if (!gallery) return;
+      
+      const defaultDesigns = [
+        {
+          name: 'Aurora Nexus Dashboard',
+          type: 'dashboard',
+          image: 'https://lh3.googleusercontent.com/aida/ADBb0ui4fpD1xeH8WEgkWTuh6CTJrjsYd_5HngfzOJf3L-eqp6hylvLtbt07dG62G_3jyFIJYinaEcjNxtvXyHSvo3cvfUZ6cQYUezycrZXIyS3-H9hB0CEpSGkSDKiDw22cs4nGDJhVR0pNlEn8W6RhFaP0CYcvPaooFJPh-bCLKS-QGyesU6ILVQjgsptgjdM0TU-OppR9usCivMkav_VlTGjvcbDYXKz0tlabV7pqyDszJRQ3TKc9Q5W1UA',
+          date: '25 Mar 2026'
+        },
+        {
+          name: 'Login Glassmorphism',
+          type: 'component',
+          image: 'https://via.placeholder.com/400x225/1a1c1e/4d8eff?text=Login+Glassmorphism',
+          date: '24 Mar 2026'
+        },
+        {
+          name: 'Trading Card',
+          type: 'card',
+          image: 'https://via.placeholder.com/400x225/1a1c1e/7dffa2?text=Trading+Card',
+          date: '23 Mar 2026'
+        },
+        {
+          name: 'Analytics Widget',
+          type: 'dashboard',
+          image: 'https://via.placeholder.com/400x225/1a1c1e/ddb7ff?text=Analytics+Widget',
+          date: '22 Mar 2026'
+        }
+      ];
+      
+      gallery.innerHTML = defaultDesigns.map(d => `
+        <div class="relative group cursor-pointer" onclick="showDesign('${d.name}')">
+          <div class="aspect-video bg-surface-container-low rounded-xl overflow-hidden border border-white/10">
+            <img src="${d.image}" class="w-full h-full object-cover" alt="${d.name}" onerror="this.style.display='none'">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
+              <div class="p-3">
+                <h4 class="text-sm font-bold text-white">${d.name}</h4>
+                <span class="text-[10px] text-white/70">${d.type}</span>
+              </div>
+            </div>
+          </div>
+          <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-all">
+            <button class="p-2 bg-surface/80 rounded-lg" onclick="event.stopPropagation(); showDesign('${d.name}')">
+              <span class="material-symbols-outlined text-white text-sm">open_in_new</span>
+            </button>
+          </div>
+          <div class="absolute bottom-2 right-2">
+            <span class="px-2 py-1 bg-tertiary/80 text-white text-[10px] rounded">${d.date}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function runTerminalCmd() {
+      const input = document.getElementById('terminal-input');
+      const cmd = input.value.trim().toLowerCase();
+      if (!cmd) return;
+      
+      addTerminalEntry('> ' + cmd, 'info');
+      
+      const responses = {
+        'iniciar': 'Iniciando todos los agentes...',
+        'detener': 'Deteniendo todos los agentes...',
+        'status': '5/5 Agentes activos - Sistema estable',
+        'tareas': '3 tareas de alta prioridad pendientes',
+        'ayuda': 'Comandos: iniciar, detener, status, tareas, diseñar, build, test, deploy, optimizar, analizar',
+        'diseñar': 'Abriendo Studio de Diseño...',
+        'build': 'Compilando proyecto...',
+        'test': 'Ejecutando suite de pruebas...',
+        'deploy': 'Preparando despliegue a producción...',
+        'optimizar': 'Analizando oportunidades de optimización...',
+        'analizar': 'Ejecutando análisis profundo del código...'
+      };
+      
+      const resp = responses[cmd] || 'Comando "' + cmd + '" no reconocido. Escribe "ayuda" para ver comandos disponibles.';
+      setTimeout(function() {
+        addTerminalEntry(resp, cmd === 'ayuda' ? 'info' : 'success');
+      }, 500);
+      
+      input.value = '';
+    }
+
+    function clearTerminal() {
+      if (confirm('¿Limpiar el terminal?')) {
+        localStorage.removeItem('aurora_terminal_log');
+        loadTerminalLog();
+        addTerminalEntry('Terminal limpiado', 'info');
+      }
+    }
+
+    // LIVE FEED FUNCTIONS
+    let liveFeedInterval = null;
+    let currentChatView = 'live';
+
+    function showChatType(type) {
+      currentChatType = type;
+      
+      // Hide all chat views first
+      document.getElementById('chat-live-feed').classList.add('hidden');
+      
+      // Update button styles
+      var btnIds = ['btn-live', 'btn-individual', 'btn-global', 'btn-commands'];
+      btnIds.forEach(function(id) {
+        var btn = document.getElementById(id);
+        if (btn) {
+          if (id === 'btn-' + type) {
+            btn.className = 'flex-1 px-4 py-2 bg-primary text-surface font-bold rounded-lg text-sm';
+          } else {
+            btn.className = 'flex-1 px-4 py-2 bg-surface-container-low text-on-surface-variant rounded-lg text-sm hover:bg-surface-container-high';
+          }
+        }
+      });
+      
+      if (type === 'live') {
+        document.getElementById('chat-live-feed').classList.remove('hidden');
+        startLiveFeed();
+      } else if (type === 'individual') {
+        document.getElementById('tab-chat').querySelector('.col-span-3').classList.remove('hidden');
+        document.getElementById('tab-chat').querySelector('.col-span-9').classList.remove('hidden');
+      } else if (type === 'global') {
+        loadGlobalChat();
+      }
+    }
+
+    function startLiveFeed() {
+      if (liveFeedInterval) return;
+      
+      var container = document.getElementById('live-messages');
+      if (!container) return;
+      
+      // Initial messages
+      var initialMessages = [
+        { type: 'system', agent: 'Sistema', msg: '🎯 Live Feed iniciado - Monitoreando todo el sistema', time: new Date().toLocaleTimeString() },
+        { type: 'info', agent: 'Aurora Core', msg: 'Todos los agentes activos y funcionando', time: new Date().toLocaleTimeString() },
+        { type: 'success', agent: 'OpenCode', msg: 'Compilación completada exitosamente', time: new Date().toLocaleTimeString() },
+        { type: 'info', agent: 'Minimax #1', msg: 'Optimización de base de datos completada', time: new Date().toLocaleTimeString() },
+        { type: 'success', agent: 'Gemini', msg: 'Diseño generado: Dashboard v2', time: new Date().toLocaleTimeString() }
+      ];
+      
+      container.innerHTML = initialMessages.map(function(m) {
+        return renderLiveMessage(m);
+      }).join('');
+      
+      // Simulate live updates
+      liveFeedInterval = setInterval(function() {
+        simulateLiveActivity();
+      }, 5000);
+    }
+
+    function stopLiveFeed() {
+      if (liveFeedInterval) {
+        clearInterval(liveFeedInterval);
+        liveFeedInterval = null;
+      }
+      addLiveMessage('Sistema', '⏹️ Live Feed detenido', 'warning');
+    }
+
+    function renderLiveMessage(m) {
+      var colors = {
+        'system': 'text-primary',
+        'info': 'text-blue-400',
+        'success': 'text-green-400',
+        'warning': 'text-amber-500',
+        'error': 'text-error'
+      };
+      var icon = {
+        'system': '⚡',
+        'info': 'ℹ️',
+        'success': '✓',
+        'warning': '⚠️',
+        'error': '✖'
+      };
+      
+      return '<div class="p-3 bg-surface-container-low rounded-xl border-l-4 border-' + (m.type === 'system' ? 'primary' : m.type === 'success' ? 'green-500' : m.type === 'error' ? 'error' : 'blue-500') + '">' +
+        '<div class="flex items-center gap-2 mb-1">' +
+          '<span class="text-xs ' + colors[m.type] + '">' + icon[m.type] + '</span>' +
+          '<span class="text-xs font-bold ' + colors[m.type] + '">' + m.agent + '</span>' +
+          '<span class="text-[10px] text-on-surface-variant ml-auto">' + m.time + '</span>' +
+        '</div>' +
+        '<p class="text-sm text-on-surface">' + m.msg + '</p>' +
+      '</div>';
+    }
+
+    function addLiveMessage(agent, msg, type) {
+      var container = document.getElementById('live-messages');
+      if (!container) return;
+      
+      var m = { type: type || 'info', agent: agent, msg: msg, time: new Date().toLocaleTimeString() };
+      container.innerHTML += renderLiveMessage(m);
+      container.scrollTop = container.scrollHeight;
+      
+      // Also add to terminal
+      addTerminalEntry(agent + ': ' + msg, type);
+    }
+
+    function simulateLiveActivity() {
+      var activities = [
+        { agent: 'OpenCode', msg: 'Ejecutando build...', type: 'info' },
+        { agent: 'Aurora Core', msg: 'Sincronizando agentes...', type: 'info' },
+        { agent: 'Minimax #1', msg: 'Optimización completada (-15%)', type: 'success' },
+        { agent: 'Gemini', msg: 'Renderizando diseño...', type: 'info' },
+        { agent: 'Minimax #2', msg: 'Análisis de código completado', type: 'success' },
+        { agent: 'OpenCode', msg: 'Tests pasando: 24/24', type: 'success' },
+        { agent: 'Aurora Core', msg: 'Nueva tarea asignada a OpenCode', type: 'info' },
+        { agent: 'Sistema', msg: 'Checkpoint guardado', type: 'system' }
+      ];
+      
+      var activity = activities[Math.floor(Math.random() * activities.length)];
+      addLiveMessage(activity.agent, activity.msg, activity.type);
+      
+      // Update agent status
+      if (activity.agent !== 'Sistema') {
+        updateAgentLiveStatus(activity.agent, activity.msg);
+      }
+    }
+
+    function updateAgentLiveStatus(agent, task) {
+      var taskEl = document.getElementById('live-task-' + agent);
+      if (taskEl) {
+        taskEl.textContent = task;
+      }
+      
+      // Simulate progress
+      var progressEl = document.getElementById('live-progress-' + agent);
+      if (progressEl) {
+        var progress = Math.floor(Math.random() * 100);
+        progressEl.style.width = progress + '%';
+      }
+    }
+
+    function executeQuickCmd() {
+      var input = document.getElementById('quick-cmd');
+      var cmd = input.value.trim().toLowerCase();
+      if (!cmd) return;
+      
+      addLiveMessage('Tú', '> ' + cmd, 'system');
+      
+      var responses = {
+        'iniciar': { msg: '🚀 Iniciando todos los agentes...', type: 'success', action: 'startAll' },
+        'detener': { msg: '🛑 Deteniendo todos los agentes...', type: 'warning', action: 'stopAll' },
+        'status': { msg: '📊 Estado: 5/5 activos, sistema estable', type: 'success' },
+        'build': { msg: '🔨 Compilando proyecto...', type: 'info', action: 'build' },
+        'deploy': { msg: '🚀 Desplegando a producción...', type: 'info', action: 'deploy' },
+        'test': { msg: '🧪 Ejecutando suite de pruebas...', type: 'info', action: 'test' },
+        'diseñar': { msg: '🎨 Abriendo Studio de Diseño...', type: 'info', action: 'design' },
+        'optimizar': { msg: '⚡ Analizando optimizaciones...', type: 'info', action: 'optimize' },
+        'ayuda': { msg: 'Comandos: iniciar, detener, status, build, deploy, test, diseñar, optimizar', type: 'info' }
+      };
+      
+      var resp = responses[cmd] || { msg: 'Comando "' + cmd + '" ejecutado', type: 'info' };
+      
+      setTimeout(function() {
+        addLiveMessage('Sistema', resp.msg, resp.type);
+        
+        // Simulate progress for actions
+        if (resp.action) {
+          simulateAction(resp.action);
+        }
+      }, 1000);
+      
+      input.value = '';
+    }
+
+    function simulateAction(action) {
+      var steps = [];
+      if (action === 'build') {
+        steps = ['Preparando entorno...', 'Compilando módulos...', 'Optimizando bundle...', '✓ Build completado'];
+      } else if (action === 'deploy') {
+        steps = ['Conectando a servidor...', 'Subiendo archivos...', 'Configurando CDN...', '✓ Desplegado'];
+      } else if (action === 'test') {
+        steps = ['Ejecutando tests unitarios...', 'Ejecutando tests de integración...', 'Generando coverage...', '✓ Todos los tests pasan'];
+      } else if (action === 'startAll') {
+        steps = ['Iniciando OpenCode...', 'Iniciando Minimax #1...', 'Iniciando Minimax #2...', 'Iniciando Aurora Core...', 'Iniciando Gemini...', '✓ 5/5 agentes activos'];
+      } else if (action === 'stopAll') {
+        steps = ['Deteniendo agentes...', 'Guardando estado...', '✓ Sistema detenido'];
+      }
+      
+      var i = 0;
+      var interval = setInterval(function() {
+        if (i >= steps.length) {
+          clearInterval(interval);
+          return;
+        }
+        addLiveMessage('Sistema', steps[i], i === steps.length - 1 ? 'success' : 'info');
+        i++;
+      }, 1500);
+    }
+
+    // Initialize
+    window.onload = function() {
+      console.log('Aurora Nexus loaded');
+      loadTerminalLog();
+      // Auto-start live feed when chat tab is opened
+    }
+  </script>
+</body>
+</html>

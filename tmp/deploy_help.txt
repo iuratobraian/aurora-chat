@@ -1,0 +1,44 @@
+Usage: convex deploy [options]
+
+Deploy to your deployment. By default, this deploys to your prod deployment.
+
+Deploys to a preview deployment if the `CONVEX_DEPLOY_KEY` environment variable
+is set to a Preview Deploy Key.
+
+Options:
+  -v, --verbose                  Show full listing of changes
+  --dry-run                      Print out the generated configuration without
+                                 deploying to your Convex deployment
+  -y, --yes                      Skip confirmation prompt when running locally
+  --typecheck <mode>             Whether to check TypeScript files with `tsc
+                                 --noEmit` before deploying. (choices: "enable",
+                                 "try", "disable", default: "try")
+  --typecheck-components         Check TypeScript files within component
+                                 implementations with `tsc --noEmit`. (default:
+                                 false)
+  --codegen <mode>               Whether to regenerate code in
+                                 `convex/_generated/` before pushing. (choices:
+                                 "enable", "disable", default: "enable")
+  --cmd <command>                Command to run as part of deploying your app
+                                 (e.g. `vite build`). This command can depend on
+                                 the environment variables specified in
+                                 `--cmd-url-env-var-name` being set.
+  --cmd-url-env-var-name <name>  Environment variable name to set Convex
+                                 deployment URL (e.g. `VITE_CONVEX_URL`) when
+                                 using `--cmd`
+  --preview-run <functionName>   Function to run if deploying to a preview
+                                 deployment. This is ignored if deploying to a
+                                 production deployment.
+  --preview-create <name>        The name to associate with this deployment if
+                                 deploying to a newly created preview
+                                 deployment. Defaults to the current Git branch
+                                 name in Vercel, Netlify and GitHub CI. This
+                                 parameter can only be used with a preview
+                                 deploy key (when used with another type of key,
+                                 the command will return an error).
+  --env-file <envFile>           Path to a custom file of environment variables,
+                                 for choosing the deployment, e.g.
+                                 CONVEX_DEPLOYMENT or CONVEX_SELF_HOSTED_URL.
+                                 Same format as .env.local or .env files, and
+                                 overrides them.
+  -h, --help                     display help for command

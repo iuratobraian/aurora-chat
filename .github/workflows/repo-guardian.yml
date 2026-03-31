@@ -1,0 +1,41 @@
+name: Repo Guardian
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  guardian:
+    name: Repo Guardian
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate Project OS
+        run: npm run validate:ops
+
+      - name: Detect hardcodes and secrets
+        run: npm run guard:hardcodes
+
+      - name: Enforce immutable core
+        run: npm run guard:immutable
+
+      - name: Report critical changes
+        run: npm run ops:critical
+
+      - name: Check work finisher
+        run: npm run ops:finish

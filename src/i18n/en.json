@@ -1,0 +1,90 @@
+{
+  "navigation": {
+    "comunidad": "Community",
+    "academia": "Academy",
+    "herramientas": "Tools",
+    "grafico": "Chart",
+    "leaderboard": "Leaderboard",
+    "cursos": "Courses",
+    "perfil": "Profile",
+    "configuracion": "Settings",
+    "mas": "More"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "delete": "Delete",
+    "edit": "Edit",
+    "submit": "Submit",
+    "search": "Search",
+    "noResults": "No results",
+    "retry": "Retry"
+  },
+  "auth": {
+    "login": "Log In",
+    "register": "Sign Up",
+    "logout": "Log Out",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?"
+  },
+  "feed": {
+    "title": "Community",
+    "createPost": "Create post",
+    "noPosts": "No posts",
+    "loadMore": "Load more",
+    "whatsHappening": "What's happening?",
+    "postPlaceholder": "Share your analysis..."
+  },
+  "profile": {
+    "followers": "Followers",
+    "following": "Following",
+    "posts": "Posts",
+    "editProfile": "Edit profile",
+    "follow": "Follow",
+    "unfollow": "Unfollow",
+    "accuracy": "Accuracy"
+  },
+  "settings": {
+    "title": "Settings",
+    "appearance": "Appearance",
+    "notifications": "Notifications",
+    "privacy": "Privacy",
+    "account": "Account",
+    "theme": "Theme",
+    "themeDark": "Dark",
+    "themeLight": "Light",
+    "themeSystem": "System",
+    "language": "Language"
+  },
+  "competitions": {
+    "title": "Competitions",
+    "comingSoon": "Coming Soon",
+    "join": "Join",
+    "leave": "Leave",
+    "leaderboard": "Leaderboard",
+    "participants": "Participants",
+    "endsIn": "Ends in",
+    "startsIn": "Starts in",
+    "notifyMe": "Notify me",
+    "emailPlaceholder": "Your email for notifications"
+  },
+  "verification": {
+    "title": "Trader Verification",
+    "level": "Level",
+    "basic": "Basic",
+    "intermediate": "Intermediate",
+    "advanced": "Advanced",
+    "institutional": "Institutional",
+    "verify": "Verify",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected"
+  }
+}

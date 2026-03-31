@@ -1,0 +1,14 @@
+{"timestamp":"2026-03-26T06:10:46.790Z","level":"info","message":"Starting Smart Retry Strategy","command":"--help","args":[]}
+{"timestamp":"2026-03-26T06:10:46.828Z","level":"info","message":"Attempt 1/4: --help "}
+{"timestamp":"2026-03-26T06:10:46.997Z","level":"warn","message":"Command failed (attempt 1), retrying...","findings":[]}
+{"timestamp":"2026-03-26T06:10:46.999Z","level":"info","message":"Waiting 2197ms before retry..."}
+{"timestamp":"2026-03-26T06:10:49.205Z","level":"info","message":"Attempt 2/4: --help "}
+{"timestamp":"2026-03-26T06:10:49.257Z","level":"warn","message":"Command failed (attempt 2), retrying...","findings":[]}
+{"timestamp":"2026-03-26T06:10:49.259Z","level":"info","message":"Waiting 4351ms before retry..."}
+{"timestamp":"2026-03-26T06:10:53.617Z","level":"info","message":"Attempt 3/4: --help "}
+{"timestamp":"2026-03-26T06:10:53.678Z","level":"warn","message":"Command failed (attempt 3), retrying...","findings":[]}
+{"timestamp":"2026-03-26T06:10:53.679Z","level":"info","message":"Waiting 9663ms before retry..."}
+{"timestamp":"2026-03-26T06:11:03.349Z","level":"info","message":"Attempt 4/4: --help "}
+{"timestamp":"2026-03-26T06:11:03.378Z","level":"error","message":"Command failed after 4 attempts"}
+{"timestamp":"2026-03-26T06:11:32.347Z","level":"info","message":"Starting Smart Retry Strategy","command":"npx","args":["tsc","--noEmit"]}
+{"timestamp":"2026-03-26T06:11:32.354Z","level":"info","message":"Attempt 1/4: npx tsc --noEmit"}

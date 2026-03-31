@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aurora Core</title>
+    <link rel="stylesheet" href="/app/styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-kicker">Aurora</span>
+          <h1>Antigravity Console</h1>
+          <p>Simple, clean and focused runtime.</p>
+        </div>
+        <div id="session-summary" class="summary-card"></div>
+        <div id="session-brief" class="sidebar-block"></div>
+        <div class="sidebar-block">
+          <h2>Quick Actions</h2>
+          <div id="quick-actions" class="sidebar-actions"></div>
+        </div>
+      </aside>
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <h2>Chat + Control</h2>
+            <p>Producto, codigo y automatizacion</p>
+          </div>
+          <div class="topbar-actions">
+            <button id="sync-button" class="primary-button">Antigravity Sync</button>
+            <button id="refresh-button" class="secondary-button">Refrescar</button>
+          </div>
+        </header>
+        <div id="alert-tray" class="alert-tray"></div>
+        <section id="chat-view" class="view active"></section>
+      </main>
+    </div>
+    <script type="module" src="/app/app.js"></script>
+  </body>
+</html>

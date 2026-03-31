@@ -1,0 +1,101 @@
+{
+  "designer": {
+    "name": "Stitch Designer",
+    "description": "Agente Diseñador UI con Google Stitch AI",
+    "specialization": "Diseño de interfaces premium con Stitch",
+    "tools": {
+      "mcp": ["stitch"],
+      "cli": ["npx @_davideast/stitch-mcp"],
+      "commands": {
+        "init": "npx @_davideast/stitch-mcp init",
+        "design": "npx @_davideast/stitch-mcp view --projects",
+        "preview": "npx @_davideast/stitch-mcp serve -p {projectId}",
+        "build": "npx @_davideast/stitch-mcp site -p {projectId}",
+        "doctor": "npx @_davideast/stitch-mcp doctor"
+      }
+    },
+    "capabilities": [
+      "generate_ui_from_description",
+      "preview_designs_locally",
+      "export_html_css",
+      "build_astro_from_designs",
+      "iterate_on_designs"
+    ],
+    "triggers": [
+      "/stitch",
+      "diseñar",
+      "design",
+      "ui component",
+      "componente ui",
+      "diseño premium",
+      "beautiful interface",
+      "modern card",
+      "tarjeta moderna",
+      "rediseñar",
+      "improve ui",
+      "better design"
+    ],
+    "output": {
+      "format": "html_css",
+      "conversion": "tailwind_react",
+      "design_system": "tradeshare"
+    },
+    "knowledge_base": ".agent/brain/docs/stitch-guide.md"
+  },
+  "all_agents": {
+    "must_know": {
+      "designer_capabilities": "Todos los agentes deben saber invocar al diseñador Stitch cuando necesitan UI",
+      "invocation_pattern": "Usar /stitch design [descripción] o indicar 'need_designer: true'",
+      "handoff_format": "Recibir HTML/CSS del diseñador y convertir a componentes React"
+    },
+    "common_patterns": {
+      "coder": {
+        "needs_designer_when": ["nuevo componente", "rediseño", "UI no existe"],
+        "receives": "HTML/CSS del diseñador",
+        "delivers": "Componente React funcional"
+      },
+      "tester": {
+        "needs_designer_when": ["verificar diseño", "match con spec"],
+        "receives": "Screenshot o preview del diseño",
+        "delivers": "Verificación de implementación vs diseño"
+      },
+      "architect": {
+        "needs_designer_when": ["definir UI patterns", "design system"],
+        "receives": "Opciones de diseño",
+        "delivers": "Decisión de diseño + spec"
+      }
+    }
+  },
+  "chained_workflow": {
+    "description": "Flujo encadenado de agentes con Stitch",
+    "steps": [
+      {
+        "step": 1,
+        "agent": "any",
+        "action": "Identifica necesidad de UI",
+        "trigger": "new_component, redesign, ui_missing"
+      },
+      {
+        "step": 2,
+        "agent": "designer",
+        "action": "Genera diseño con Stitch",
+        "receives": "Descripción del componente",
+        "delivers": "HTML/CSS o screenshot"
+      },
+      {
+        "step": 3,
+        "agent": "coder",
+        "action": "Implementa diseño",
+        "receives": "HTML/CSS del diseñador",
+        "delivers": "Componente React funcional"
+      },
+      {
+        "step": 4,
+        "agent": "tester",
+        "action": "Verifica implementación",
+        "receives": "Componente + Diseño original",
+        "delivers": "Match o issues report"
+      }
+    ]
+  }
+}

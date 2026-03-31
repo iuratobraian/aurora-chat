@@ -1,0 +1,34 @@
+{
+  "hooks": {
+    "stitch-designer": {
+      "trigger": "/stitch",
+      "description": "Activa el agente diseñador Stitch",
+      "agent": "designer",
+      "skill": "stitch-ui-designer",
+      "commands": {
+        "init": "npx @_davideast/stitch-mcp init",
+        "design": "npx @_davideast/stitch-mcp tool get_screen_code",
+        "preview": "npx @_davideast/stitch-mcp serve",
+        "projects": "npx @_davideast/stitch-mcp view --projects",
+        "doctor": "npx @_davideast/stitch-mcp doctor"
+      },
+      "autoTrigger": [
+        "diseñar",
+        "design",
+        "ui component",
+        "componente ui",
+        "diseño premium",
+        "beautiful interface",
+        "modern card",
+        "tarjeta moderna"
+      ]
+    }
+  },
+  "mcp": {
+    "stitch": {
+      "command": "npx",
+      "args": ["@_davideast/stitch-mcp", "proxy"],
+      "env": {}
+    }
+  }
+}

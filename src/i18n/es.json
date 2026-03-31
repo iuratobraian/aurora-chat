@@ -1,0 +1,90 @@
+{
+  "navigation": {
+    "comunidad": "Comunidad",
+    "academia": "Academia",
+    "herramientas": "Herramientas",
+    "grafico": "Gráfico",
+    "leaderboard": "Ranking",
+    "cursos": "Cursos",
+    "perfil": "Perfil",
+    "configuracion": "Configuración",
+    "mas": "Más"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "submit": "Enviar",
+    "search": "Buscar",
+    "noResults": "Sin resultados",
+    "retry": "Reintentar"
+  },
+  "auth": {
+    "login": "Iniciar Sesión",
+    "register": "Registrarse",
+    "logout": "Cerrar Sesión",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "noAccount": "¿No tienes cuenta?",
+    "hasAccount": "¿Ya tienes cuenta?"
+  },
+  "feed": {
+    "title": "Comunidad",
+    "createPost": "Crear publicación",
+    "noPosts": "No hay publicaciones",
+    "loadMore": "Cargar más",
+    "whatsHappening": "¿Qué está pasando?",
+    "postPlaceholder": "Comparte tu análisis..."
+  },
+  "profile": {
+    "followers": "Seguidores",
+    "following": "Siguiendo",
+    "posts": "Publicaciones",
+    "editProfile": "Editar perfil",
+    "follow": "Seguir",
+    "unfollow": "Dejar de seguir",
+    "accuracy": "Precisión"
+  },
+  "settings": {
+    "title": "Configuración",
+    "appearance": "Apariencia",
+    "notifications": "Notificaciones",
+    "privacy": "Privacidad",
+    "account": "Cuenta",
+    "theme": "Tema",
+    "themeDark": "Oscuro",
+    "themeLight": "Claro",
+    "themeSystem": "Sistema",
+    "language": "Idioma"
+  },
+  "competitions": {
+    "title": "Competencias",
+    "comingSoon": "Próximamente",
+    "join": "Unirse",
+    "leave": "Salir",
+    "leaderboard": "Clasificación",
+    "participants": "Participantes",
+    "endsIn": "Termina en",
+    "startsIn": "Comienza en",
+    "notifyMe": "Notificarme",
+    "emailPlaceholder": "Tu email para notify"
+  },
+  "verification": {
+    "title": "Verificación de Trader",
+    "level": "Nivel",
+    "basic": "Básico",
+    "intermediate": "Intermedio",
+    "advanced": "Avanzado",
+    "institutional": "Institucional",
+    "verify": "Verificar",
+    "pending": "Pendiente",
+    "approved": "Aprobado",
+    "rejected": "Rechazado"
+  }
+}

@@ -1,0 +1,79 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+.vercel
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+
+# Convex
+.convex
+convex/_generated
+
+# Sensitive files
+*.pem
+*.key
+credentials.json
+secrets.json
+.agent/local/
+
+# Version folders
+VERSION ANTERIOR/
+VERSION ANTERIOR/
+
+# Temp files
+nul
+
+# Sync conflict files
+*.sync-conflict-*
+
+# Large media files
+*.mp4
+*.mov
+*.avi
+*.mkv
+
+# PowerShell command files
+CHAT.cmd
+chat.ps1
+setup-chat.ps1
+
+# ZIP files
+*.zip
+
+# Qwen internal files
+.qwen/
+QWEN.md
+qwen-skills/
+
+# ENV folder
+ENV/
+
+# Personal docs not needed in repo
+PRESENTACION.mp4

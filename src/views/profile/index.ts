@@ -1,0 +1,12 @@
+export { ProfileHeader } from './ProfileHeader';
+export { ProfileTabs, type ProfileTab } from './ProfileTabs';
+export { ProfilePosts } from './ProfilePosts';
+export { ProfileAchievements } from './ProfileAchievements';
+export { ProfileConfig } from './ProfileConfig';
+export { ProfilePostsTab } from './ProfilePostsTab';
+export { ProfileMedalsTab } from './ProfileMedalsTab';
+export { ProfileCommunitiesTab } from './ProfileCommunitiesTab';
+export { ProfileConfigTab } from './ProfileConfigTab';
+export { ProfileModTab } from './ProfileModTab';
+export { ProfileComprasTab } from './ProfileComprasTab';
+export { ProfileBibliotecaTab } from './ProfileBibliotecaTab';

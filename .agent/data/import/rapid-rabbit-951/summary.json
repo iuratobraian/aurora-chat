@@ -1,0 +1,125 @@
+{
+  "profiles": {
+    "error": "Error querying profiles: 401 Unauthorized"
+  },
+  "posts": {
+    "error": "Error querying posts: 401 Unauthorized"
+  },
+  "communities": {
+    "error": "Error querying communities: 401 Unauthorized"
+  },
+  "communityMembers": {
+    "error": "Error querying communityMembers: 401 Unauthorized"
+  },
+  "achievements": {
+    "error": "Error querying achievements: 401 Unauthorized"
+  },
+  "userAchievements": {
+    "error": "Error querying userAchievements: 401 Unauthorized"
+  },
+  "notifications": {
+    "error": "Error querying notifications: 401 Unauthorized"
+  },
+  "recursos": {
+    "error": "Error querying recursos: 401 Unauthorized"
+  },
+  "videos": {
+    "error": "Error querying videos: 401 Unauthorized"
+  },
+  "ads": {
+    "error": "Error querying ads: 401 Unauthorized"
+  },
+  "referrals": {
+    "error": "Error querying referrals: 401 Unauthorized"
+  },
+  "referralCodes": {
+    "error": "Error querying referralCodes: 401 Unauthorized"
+  },
+  "chat": {
+    "error": "Error querying chat: 401 Unauthorized"
+  },
+  "chatChannels": {
+    "error": "Error querying chatChannels: 401 Unauthorized"
+  },
+  "qa": {
+    "error": "Error querying qa: 401 Unauthorized"
+  },
+  "strategies": {
+    "error": "Error querying strategies: 401 Unauthorized"
+  },
+  "bookLibrary": {
+    "error": "Error querying bookLibrary: 401 Unauthorized"
+  },
+  "strategyPurchases": {
+    "error": "Error querying strategyPurchases: 401 Unauthorized"
+  },
+  "subscriptions": {
+    "error": "Error querying subscriptions: 401 Unauthorized"
+  },
+  "payments": {
+    "error": "Error querying payments: 401 Unauthorized"
+  },
+  "products": {
+    "error": "Error querying products: 401 Unauthorized"
+  },
+  "purchases": {
+    "error": "Error querying purchases: 401 Unauthorized"
+  },
+  "signals": {
+    "error": "Error querying signals: 401 Unauthorized"
+  },
+  "signal_plans": {
+    "error": "Error querying signal_plans: 401 Unauthorized"
+  },
+  "signal_subscriptions": {
+    "error": "Error querying signal_subscriptions: 401 Unauthorized"
+  },
+  "signal_providers": {
+    "error": "Error querying signal_providers: 401 Unauthorized"
+  },
+  "signal_performance": {
+    "error": "Error querying signal_performance: 401 Unauthorized"
+  },
+  "competitions": {
+    "error": "Error querying competitions: 401 Unauthorized"
+  },
+  "competition_participants": {
+    "error": "Error querying competition_participants: 401 Unauthorized"
+  },
+  "trader_verification": {
+    "error": "Error querying trader_verification: 401 Unauthorized"
+  },
+  "prop_firms": {
+    "error": "Error querying prop_firms: 401 Unauthorized"
+  },
+  "subcommunities": {
+    "error": "Error querying subcommunities: 401 Unauthorized"
+  },
+  "subcommunityMembers": {
+    "error": "Error querying subcommunityMembers: 401 Unauthorized"
+  },
+  "subcommunitySubscriptions": {
+    "error": "Error querying subcommunitySubscriptions: 401 Unauthorized"
+  },
+  "token_balances": {
+    "error": "Error querying token_balances: 401 Unauthorized"
+  },
+  "token_transactions": {
+    "error": "Error querying token_transactions: 401 Unauthorized"
+  },
+  "instagram_accounts": {
+    "error": "Error querying instagram_accounts: 401 Unauthorized"
+  },
+  "instagram_scheduled_posts": {
+    "error": "Error querying instagram_scheduled_posts: 401 Unauthorized"
+  },
+  "instagram_messages": {
+    "error": "Error querying instagram_messages: 401 Unauthorized"
+  },
+  "market_news": {
+    "error": "Error querying market_news: 401 Unauthorized"
+  },
+  "economic_calendar": {
+    "error": "Error querying economic_calendar: 401 Unauthorized"
+  }
+}

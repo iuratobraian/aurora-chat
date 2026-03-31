@@ -1,0 +1,110 @@
+# CodeRabbit Configuration for TradeShare
+# AI-powered code review settings
+
+language: en
+
+# Review settings
+reviews:
+  profile: ask
+  request_changes_workflow: true
+  high_level_summary: true
+  auto_title_placeholder: ''
+  collapseWalkthrough: false
+  sequence_diagrams: true
+
+# What to review
+review_statuses:
+  P0:
+    request_changes_workflow: true
+    high_level_summary: true
+    collapse_walkthrough: false
+    sequence_diagrams: true
+  P1:
+    request_changes_workflow: true
+    high_level_summary: true
+    collapse_walkthrough: true
+  P2:
+    high_level_summary: true
+    collapse_walkthrough: true
+
+# Tools and linters
+tools:
+  auto_tool_rewrite: true
+  shellcheck:
+    enabled: true
+  eslint:
+    enabled: true
+    config: ''
+  biome:
+    enabled: true
+  github_checks:
+    enabled: true
+    accumulate_errors_not_new_results: true
+  ruff:
+    enabled: true
+  starlark:
+    enabled: true
+
+# Path-based instructions
+path_instructions:
+  - path: '**/*.tsx'
+    instructions: |
+      Review React/TypeScript components carefully:
+      - Check for proper TypeScript types
+      - Look for memory leaks in hooks
+      - Verify React best practices
+      - Check accessibility attributes
+
+  - path: '**/*.ts'
+    instructions: |
+      TypeScript review standards:
+      - No 'any' types unless necessary
+      - Proper interface definitions
+      - Error handling patterns
+      - Async operation safety
+
+  - path: 'convex/**'
+    instructions: |
+      Convex backend review:
+      - Query efficiency
+      - Auth middleware
+      - Rate limiting
+      - Error handling
+
+  - path: 'server.ts'
+    instructions: |
+      Express server security:
+      - Input validation
+      - Auth middleware
+      - Rate limiting
+      - No hardcoded secrets
+
+  - path: '**/*.test.ts'
+    instructions: |
+      Test quality:
+      - Coverage of edge cases
+      - Proper mocking
+      - Clear test descriptions
+
+# Chat template
+chat:
+  auto_reply: true
+
+# Experience settings
+experience:
+  provider: anthropic
+  model: sonnet-4
+  temperature: 0.3
+
+# Configuration for knowledge base
+kb_resources:
+  - resource: 'docs/'
+    title: 'TradeShare Documentation'
+    description: 'Project documentation and guides'
+
+  - resource: 'AGENTS.md'
+    title: 'Agent Guidelines'
+    description: 'Development standards and practices'
+
+# MCP servers (if needed)
+mcp_servers: []

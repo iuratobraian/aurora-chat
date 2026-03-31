@@ -1,0 +1,1111 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for src/services/storage.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/services</a> storage.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">2.66% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>11/413</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>0/168</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">3.12% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>4/128</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">5.16% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>11/213</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a>
+<a name='L232'></a><a href='#L232'>232</a>
+<a name='L233'></a><a href='#L233'>233</a>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a>
+<a name='L326'></a><a href='#L326'>326</a>
+<a name='L327'></a><a href='#L327'>327</a>
+<a name='L328'></a><a href='#L328'>328</a>
+<a name='L329'></a><a href='#L329'>329</a>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a>
+<a name='L336'></a><a href='#L336'>336</a>
+<a name='L337'></a><a href='#L337'>337</a>
+<a name='L338'></a><a href='#L338'>338</a>
+<a name='L339'></a><a href='#L339'>339</a>
+<a name='L340'></a><a href='#L340'>340</a>
+<a name='L341'></a><a href='#L341'>341</a>
+<a name='L342'></a><a href='#L342'>342</a>
+<a name='L343'></a><a href='#L343'>343</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { api } from "../../convex/_generated/api";
+import { Ad, Publicacion, Usuario, Curso, Herramienta, Recurso, LiveStatus } from '../types';
+import { PROMOTIONAL_ADS, PromotionalAd } from '../../data/promotionalAds';
+import { EVENTOS_MOCK, NOTICIAS_MOCK } from '../constants';
+import logger from '../../lib/utils/logger';
+import { getConvexClient } from '../lib/convex/client';
+import { extractTags } from '../utils/postMapper';
+import { AuthService } from './auth/authService';
+import { UserService } from './users/userService';
+import { PostService } from './posts/postService';
+import { NotificationService } from './notifications/notificationService';
+import { BackupManager, SyncService } from './backup/syncService';
+&nbsp;
+const convex = getConvexClient();
+&nbsp;
+const getLocalItem = <span class="fstat-no" title="function not covered" >&lt;T&gt;(k</span>ey: string, defaultVal: T): T =&gt; {
+<span class="cstat-no" title="statement not covered" >    try {</span>
+        const item = <span class="cstat-no" title="statement not covered" >localStorage.getItem(key);</span>
+<span class="cstat-no" title="statement not covered" >        return item ? JSON.parse(item) : defaultVal;</span>
+    } catch { <span class="cstat-no" title="statement not covered" >return defaultVal; }</span>
+};
+&nbsp;
+const setLocalItem = <span class="fstat-no" title="function not covered" >(k</span>ey: string, data: any) =&gt; {
+<span class="cstat-no" title="statement not covered" >    localStorage.setItem(key, JSON.stringify(data));</span>
+};
+&nbsp;
+export const SUBSCRIPTION_PLANS = {
+    free: { name: 'Gratis', price: 0, features: ['Acceso básico', 'Feed público', '3 posts/día'] },
+    basic: { name: 'Básico', price: 9.99, features: ['Todo lo de Gratis', 'Acceso a herramientas', 'Posts ilimitados', 'Análisis básicos'] },
+    pro: { name: 'PRO', price: 29.99, features: ['Todo lo de Básico', 'Análisis avanzados', 'Alertas en tiempo real', 'Comunidad VIP'] },
+    vip: { name: 'VIP', price: 99.99, features: ['Todo lo de PRO', 'Acceso exclusivo', 'Consultorías 1:1', 'Contenido premium'] },
+} as const;
+&nbsp;
+export const COURSE_PRICES = { 'masterclass-trading': 149, 'bot-institucional': 299 } as const;
+&nbsp;
+export const COURSE_DETAILS = {
+    'masterclass-trading': { name: 'Masterclass de Trading', price: 149, currency: 'USD', description: 'Aprende estrategias de trading profesionales', duration: '12 horas', modules: 8 },
+    'bot-institucional': { name: 'Bot Institucional', price: 299, currency: 'USD', description: 'Construye tu propio bot de trading automatizado', duration: '20 horas', modules: 15 },
+} as const;
+&nbsp;
+export type PlanType = keyof typeof SUBSCRIPTION_PLANS;
+export type CourseType = keyof typeof COURSE_PRICES;
+&nbsp;
+export const StorageService = {
+    uploadFile: <span class="fstat-no" title="function not covered" >async (f</span>ile: File): Promise&lt;string&gt; =&gt; {
+        const cloudName = <span class="cstat-no" title="statement not covered" >"dpm4bnral";</span>
+        const uploadPreset = <span class="cstat-no" title="statement not covered" >"ml_default";</span>
+<span class="cstat-no" title="statement not covered" >        try {</span>
+            const formData = <span class="cstat-no" title="statement not covered" >new FormData();</span>
+<span class="cstat-no" title="statement not covered" >            formData.append("file", file);</span>
+<span class="cstat-no" title="statement not covered" >            formData.append("upload_preset", uploadPreset);</span>
+            const response = <span class="cstat-no" title="statement not covered" >await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: "POST", body: formData });</span>
+<span class="cstat-no" title="statement not covered" >            if (response.ok) { const data = <span class="cstat-no" title="statement not covered" >await response.json(); <span class="cstat-no" title="statement not covered" >r</span>eturn data.secure_url; }</span></span>
+        } catch (err) { <span class="cstat-no" title="statement not covered" >logger.warn("Cloudinary Upload Error, falling back:", err); }</span>
+<span class="cstat-no" title="statement not covered" >        if (!convex) <span class="cstat-no" title="statement not covered" >return URL.createObjectURL(file);</span></span>
+<span class="cstat-no" title="statement not covered" >        try {</span>
+            const uploadUrl = <span class="cstat-no" title="statement not covered" >await convex.mutation(api.files.generateUploadUrl);</span>
+            const result = <span class="cstat-no" title="statement not covered" >await fetch(uploadUrl, { method: "POST", headers: { "Content-Type": file.type }, body: file });</span>
+            const { storageId } = <span class="cstat-no" title="statement not covered" >await result.json();</span>
+            const url = <span class="cstat-no" title="statement not covered" >await convex.query(api.files.getImageUrl, { storageId });</span>
+<span class="cstat-no" title="statement not covered" >            return url || '';</span>
+        } catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Convex Upload Error:", err); <span class="cstat-no" title="statement not covered" >r</span>eturn URL.createObjectURL(file); }</span>
+    },
+&nbsp;
+    uploadImageUrl: <span class="fstat-no" title="function not covered" >async (u</span>rl: string): Promise&lt;string&gt; =&gt; <span class="cstat-no" title="statement not covered" >url,</span>
+&nbsp;
+    getAds: <span class="fstat-no" title="function not covered" >async (): Promise&lt;Ad[]&gt; =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >        try {</span>
+<span class="cstat-no" title="statement not covered" >            if (convex) {</span>
+                const data = <span class="cstat-no" title="statement not covered" >await convex.query(api.ads.getAds);</span>
+<span class="cstat-no" title="statement not covered" >                if (data &amp;&amp; data.length &gt; 0) { const mapped = <span class="cstat-no" title="statement not covered" >data.map(<span class="fstat-no" title="function not covered" >(a</span>d: any) =&gt; (<span class="cstat-no" title="statement not covered" >{ ...ad, id: ad._id }))</span>; <span class="cstat-no" title="statement not covered" >s</span>etLocalItem('local_ads_db', mapped); <span class="cstat-no" title="statement not covered" >r</span>eturn mapped; }</span></span>
+            }
+        } catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Convex Get Ads Error:", err); }</span>
+        const local = <span class="cstat-no" title="statement not covered" >getLocalItem&lt;Ad[]&gt;('local_ads_db', []);</span>
+<span class="cstat-no" title="statement not covered" >        if (local.length &gt; 0) <span class="cstat-no" title="statement not covered" >return local;</span></span>
+<span class="cstat-no" title="statement not covered" >        try { const { STATIC_ADS } = <span class="cstat-no" title="statement not covered" >await import('../data/staticData'); <span class="cstat-no" title="statement not covered" >r</span>eturn STATIC_ADS as Ad[]; }</span> catch { <span class="cstat-no" title="statement not covered" >return []; }</span></span>
+    },
+&nbsp;
+    saveAd: <span class="fstat-no" title="function not covered" >async (a</span>d: Ad): Promise&lt;void&gt; =&gt; {
+        const ads = <span class="cstat-no" title="statement not covered" >getLocalItem&lt;Ad[]&gt;('local_ads_db', []);</span>
+        const index = <span class="cstat-no" title="statement not covered" >ads.findIndex(<span class="fstat-no" title="function not covered" >a =&gt; <span class="cstat-no" title="statement not covered" >a</span>.id === ad.id)</span>;</span>
+<span class="cstat-no" title="statement not covered" >        if (index !== -1) { <span class="cstat-no" title="statement not covered" >ads[index] = ad; }</span> else { <span class="cstat-no" title="statement not covered" >ads.push(ad); }</span></span>
+<span class="cstat-no" title="statement not covered" >        setLocalItem('local_ads_db', ads);</span>
+<span class="cstat-no" title="statement not covered" >        try {</span>
+<span class="cstat-no" title="statement not covered" >            if (convex) {</span>
+                const isConvexId = <span class="cstat-no" title="statement not covered" >ad.id &amp;&amp; ad.id.length &gt; 10 &amp;&amp; !ad.id.includes('-') &amp;&amp; !ad.id.startsWith('ad-') &amp;&amp; !ad.id.startsWith('default-');</span>
+                const convexId = <span class="cstat-no" title="statement not covered" >isConvexId ? ad.id : undefined;</span>
+                const result = <span class="cstat-no" title="statement not covered" >await convex.mutation(api.ads.saveAd, { ...(convexId ? { id: convexId } : {}), titulo: ad.titulo || 'Sin título', descripcion: ad.descripcion || '', imagenUrl: ad.imagenUrl || '', link: ad.link || '', sector: ad.sector || 'sidebar', activo: ad.activo ?? true, subtitle: ad.subtitle, extra: ad.extra });</span>
+<span class="cstat-no" title="statement not covered" >                if (!convexId &amp;&amp; result) { const currentAds = <span class="cstat-no" title="statement not covered" >getLocalItem&lt;Ad[]&gt;('local_ads_db', []); c</span>onst idx = <span class="cstat-no" title="statement not covered" >currentAds.findIndex(<span class="fstat-no" title="function not covered" >a =&gt; <span class="cstat-no" title="statement not covered" >a</span>.id === ad.id)</span>; <span class="cstat-no" title="statement not covered" >i</span>f (idx !== -1) { <span class="cstat-no" title="statement not covered" >currentAds[idx].id = result as string; <span class="cstat-no" title="statement not covered" >s</span>etLocalItem('local_ads_db', currentAds); }</span> }</span></span>
+            }
+        } catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Convex Save Ad Error:", err); <span class="cstat-no" title="statement not covered" >t</span>hrow err; }</span>
+    },
+&nbsp;
+    deleteAd: <span class="fstat-no" title="function not covered" >async (i</span>d: string): Promise&lt;void&gt; =&gt; {
+        const ads = <span class="cstat-no" title="statement not covered" >getLocalItem&lt;Ad[]&gt;('local_ads_db', []);</span>
+<span class="cstat-no" title="statement not covered" >        setLocalItem('local_ads_db', ads.filter(<span class="fstat-no" title="function not covered" >a =&gt; <span class="cstat-no" title="statement not covered" >a</span>.id !== id)</span>);</span>
+<span class="cstat-no" title="statement not covered" >        try { <span class="cstat-no" title="statement not covered" >if (convex &amp;&amp; id &amp;&amp; id.length &gt; 10 &amp;&amp; !id.startsWith('ad-') &amp;&amp; !id.startsWith('default-') &amp;&amp; !id.includes('-')) { <span class="cstat-no" title="statement not covered" >await convex.mutation(api.ads.deleteAd, { id }); }</span> }</span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Convex Delete Ad Error:", err); }</span></span>
+    },
+&nbsp;
+    updateAd: <span class="fstat-no" title="function not covered" >async (a</span>d: Ad): Promise&lt;void&gt; =&gt; { <span class="cstat-no" title="statement not covered" >await StorageService.saveAd(ad); }</span>,
+&nbsp;
+    getCurrentSession: <span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >A</span>uthService.getCurrentSession(),</span>
+    login: (identifier: string, password: string) =&gt; AuthService.login(identifier, password),
+    register: <span class="fstat-no" title="function not covered" >(d</span>atos: any) =&gt; <span class="cstat-no" title="statement not covered" >AuthService.register(datos, AuthService.getPendingReferralCode()),</span>
+    logout: <span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >A</span>uthService.logout(),</span>
+    handleGoogleSignIn: <span class="fstat-no" title="function not covered" >(c</span>redentialRes: any) =&gt; <span class="cstat-no" title="statement not covered" >AuthService.handleGoogleSignIn(credentialRes),</span>
+    sendPasswordResetEmail: <span class="fstat-no" title="function not covered" >(e</span>mail: string) =&gt; <span class="cstat-no" title="statement not covered" >AuthService.sendPasswordResetEmail(email),</span>
+    resetPassword: <span class="fstat-no" title="function not covered" >(e</span>mail: string, newPass: string) =&gt; <span class="cstat-no" title="statement not covered" >AuthService.resetPassword(email, newPass),</span>
+    captureReferralFromUrl: <span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >A</span>uthService.captureReferralFromUrl(),</span>
+    getPendingReferralCode: () =&gt; AuthService.getPendingReferralCode(),
+    setPendingReferralCode: (code: string | null) =&gt; AuthService.setPendingReferralCode(code),
+    clearPendingReferralCode: () =&gt; AuthService.clearPendingReferralCode(),
+    recordLogin: <span class="fstat-no" title="function not covered" >(u</span>serId: string) =&gt; <span class="cstat-no" title="statement not covered" >AuthService.recordLogin(userId),</span>
+&nbsp;
+    getAllUsers: <span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >U</span>serService.getAllUsers(),</span>
+    getUserById: <span class="fstat-no" title="function not covered" >(i</span>d: string) =&gt; <span class="cstat-no" title="statement not covered" >UserService.getUserById(id),</span>
+    updateUser: <span class="fstat-no" title="function not covered" >(u</span>suario: Usuario) =&gt; <span class="cstat-no" title="statement not covered" >UserService.updateUser(usuario),</span>
+    deleteUser: <span class="fstat-no" title="function not covered" >(i</span>d: string) =&gt; <span class="cstat-no" title="statement not covered" >UserService.deleteUser(id),</span>
+    blockUser: <span class="fstat-no" title="function not covered" >(u</span>serId: string, isBlocked: boolean, ipToBlock?: string) =&gt; <span class="cstat-no" title="statement not covered" >UserService.blockUser(userId, isBlocked, ipToBlock),</span>
+    toggleFollowUser: <span class="fstat-no" title="function not covered" >(m</span>yId: string, targetId: string) =&gt; <span class="cstat-no" title="statement not covered" >UserService.toggleFollowUser(myId, targetId),</span>
+    getTopTraders: <span class="fstat-no" title="function not covered" >(f</span>ilter?: 'likes' | 'posts' | 'comments') =&gt; <span class="cstat-no" title="statement not covered" >UserService.getTopTraders(filter),</span>
+    mergeUsers: <span class="fstat-no" title="function not covered" >(p</span>rimaryId: string, secondaryId: string) =&gt; <span class="cstat-no" title="statement not covered" >UserService.mergeUsers(primaryId, secondaryId),</span>
+    seedAdmin: <span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >U</span>serService.seedAdmin(),</span>
+    clearLocalUsersCache: <span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >U</span>serService.clearLocalUsersCache(),</span>
+&nbsp;
+    getPosts: <span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >P</span>ostService.getPosts(),</span>
+    createPost: <span class="fstat-no" title="function not covered" >(p</span>ostPartial: Partial&lt;Publicacion&gt;, userId: string) =&gt; <span class="cstat-no" title="statement not covered" >PostService.createPost(postPartial, userId),</span>
+    updatePost: <span class="fstat-no" title="function not covered" >(p</span>ost: Publicacion) =&gt; <span class="cstat-no" title="statement not covered" >PostService.updatePost(post),</span>
+    deletePost: <span class="fstat-no" title="function not covered" >(i</span>d: string) =&gt; <span class="cstat-no" title="statement not covered" >PostService.deletePost(id),</span>
+    getTrashPosts: <span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >P</span>ostService.getTrashPosts(),</span>
+    restorePost: <span class="fstat-no" title="function not covered" >(i</span>d: string) =&gt; <span class="cstat-no" title="statement not covered" >PostService.restorePost(id),</span>
+    permanentDeletePost: <span class="fstat-no" title="function not covered" >(i</span>d: string) =&gt; <span class="cstat-no" title="statement not covered" >PostService.permanentDeletePost(id),</span>
+    toggleLikePost: <span class="fstat-no" title="function not covered" >(p</span>ostId: string, userId: string, authorId: string) =&gt; <span class="cstat-no" title="statement not covered" >PostService.toggleLikePost(postId, userId, authorId),</span>
+    toggleLikeComment: <span class="fstat-no" title="function not covered" >(p</span>ostId: string, commentId: string, userId: string) =&gt; <span class="cstat-no" title="statement not covered" >PostService.toggleLikeComment(postId, commentId, userId),</span>
+    ratePost: <span class="fstat-no" title="function not covered" >(p</span>ostId: string, userId: string, score: number) =&gt; <span class="cstat-no" title="statement not covered" >PostService.ratePost(postId, userId, score),</span>
+    givePointsToPost: <span class="fstat-no" title="function not covered" >(p</span>ostId: string, points: number, userId?: string) =&gt; <span class="cstat-no" title="statement not covered" >PostService.givePointsToPost(postId, points, userId),</span>
+&nbsp;
+    getNotifications: <span class="fstat-no" title="function not covered" >(u</span>serId: string) =&gt; <span class="cstat-no" title="statement not covered" >NotificationService.getNotifications(userId),</span>
+    getNewNotifications: <span class="fstat-no" title="function not covered" >(u</span>serId: string) =&gt; <span class="cstat-no" title="statement not covered" >NotificationService.getNewNotifications(userId),</span>
+    getUnreadNotificationCount: <span class="fstat-no" title="function not covered" >(u</span>serId: string) =&gt; <span class="cstat-no" title="statement not covered" >NotificationService.getUnreadNotificationCount(userId),</span>
+    addNotification: <span class="fstat-no" title="function not covered" >(u</span>serId: string, notif: any) =&gt; <span class="cstat-no" title="statement not covered" >NotificationService.addNotification(userId, notif),</span>
+    markNotificationRead: <span class="fstat-no" title="function not covered" >(n</span>otifId: string) =&gt; <span class="cstat-no" title="statement not covered" >NotificationService.markNotificationRead(notifId),</span>
+    markAllNotificationsRead: <span class="fstat-no" title="function not covered" >(u</span>serId: string) =&gt; <span class="cstat-no" title="statement not covered" >NotificationService.markAllNotificationsRead(userId),</span>
+    deleteNotification: <span class="fstat-no" title="function not covered" >(n</span>otifId: string) =&gt; <span class="cstat-no" title="statement not covered" >NotificationService.deleteNotification(notifId),</span>
+    cleanupOldNotifications: <span class="fstat-no" title="function not covered" >(u</span>serId: string, daysOld?: number) =&gt; <span class="cstat-no" title="statement not covered" >NotificationService.cleanupOldNotifications(userId, daysOld),</span>
+&nbsp;
+    getLiveStatus: <span class="fstat-no" title="function not covered" >async (): Promise&lt;LiveStatus&gt; =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >        try { <span class="cstat-no" title="statement not covered" >if (convex) { const config = <span class="cstat-no" title="statement not covered" >await convex.query(api.config.getConfig, { key: 'live_status' }); <span class="cstat-no" title="statement not covered" >i</span>f (config) <span class="cstat-no" title="statement not covered" >return config.value; }</span></span> }</span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Convex Get Live Status Error:", err); }</span></span>
+<span class="cstat-no" title="statement not covered" >        return { isLive: false, url: '', lastUpdated: new Date().toISOString() };</span>
+    },
+&nbsp;
+    updateLiveStatus: <span class="fstat-no" title="function not covered" >async (s</span>tatus: LiveStatus): Promise&lt;void&gt; =&gt; {
+<span class="cstat-no" title="statement not covered" >        try { <span class="cstat-no" title="statement not covered" >if (convex) { <span class="cstat-no" title="statement not covered" >await convex.mutation(api.config.setConfig, { key: 'live_status', value: status }); }</span> }</span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Convex Update Live Status Error:", err); }</span></span>
+    },
+&nbsp;
+    getCursos: <span class="fstat-no" title="function not covered" >async (): Promise&lt;Curso[]&gt; =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >        try { <span class="cstat-no" title="statement not covered" >if (convex) { const data = <span class="cstat-no" title="statement not covered" >await convex.query(api.config.getConfig, { key: "academia_cursos" }); <span class="cstat-no" title="statement not covered" >i</span>f (data &amp;&amp; data.value) <span class="cstat-no" title="statement not covered" >return data.value; }</span></span> }</span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Convex getCursos Error:", err); }</span></span>
+        const local = <span class="cstat-no" title="statement not covered" >getLocalItem&lt;Curso[]&gt;('local_cursos_db', []);</span>
+<span class="cstat-no" title="statement not covered" >        if (local.length &gt; 0) <span class="cstat-no" title="statement not covered" >return local;</span></span>
+<span class="cstat-no" title="statement not covered" >        try { const { STATIC_CURSOS } = <span class="cstat-no" title="statement not covered" >await import('../data/staticData'); <span class="cstat-no" title="statement not covered" >r</span>eturn STATIC_CURSOS as Curso[]; }</span> catch { <span class="cstat-no" title="statement not covered" >return []; }</span></span>
+    },
+&nbsp;
+    saveCurso: <span class="fstat-no" title="function not covered" >async (c</span>urso: Curso): Promise&lt;void&gt; =&gt; {
+        const cursos = <span class="cstat-no" title="statement not covered" >await StorageService.getCursos();</span>
+        const index = <span class="cstat-no" title="statement not covered" >cursos.findIndex(<span class="fstat-no" title="function not covered" >c =&gt; <span class="cstat-no" title="statement not covered" >c</span>.id === curso.id)</span>;</span>
+<span class="cstat-no" title="statement not covered" >        if (index !== -1) { <span class="cstat-no" title="statement not covered" >cursos[index] = curso; }</span> else { <span class="cstat-no" title="statement not covered" >cursos.push(curso); }</span></span>
+<span class="cstat-no" title="statement not covered" >        setLocalItem('local_cursos_db', cursos);</span>
+<span class="cstat-no" title="statement not covered" >        if (convex) { <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >await convex.mutation(api.config.setConfig, { key: "academia_cursos", value: cursos }); }</span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Convex Save Curso Error:", err); }</span> }</span></span>
+    },
+&nbsp;
+    deleteCurso: <span class="fstat-no" title="function not covered" >async (i</span>d: string): Promise&lt;void&gt; =&gt; {
+        const cursos = <span class="cstat-no" title="statement not covered" >await StorageService.getCursos();</span>
+        const updated = <span class="cstat-no" title="statement not covered" >cursos.filter(<span class="fstat-no" title="function not covered" >c =&gt; <span class="cstat-no" title="statement not covered" >c</span>.id !== id)</span>;</span>
+<span class="cstat-no" title="statement not covered" >        setLocalItem('local_cursos_db', updated);</span>
+<span class="cstat-no" title="statement not covered" >        if (convex) { <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >await convex.mutation(api.config.setConfig, { key: "academia_cursos", value: updated }); }</span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Convex Delete Curso Error:", err); }</span> }</span></span>
+    },
+&nbsp;
+    getHerramientas: <span class="fstat-no" title="function not covered" >async (): Promise&lt;Herramienta[]&gt; =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >        try { <span class="cstat-no" title="statement not covered" >if (convex) { const data = <span class="cstat-no" title="statement not covered" >await convex.query(api.config.getConfig, { key: "academia_herramientas" }); <span class="cstat-no" title="statement not covered" >i</span>f (data &amp;&amp; data.value) <span class="cstat-no" title="statement not covered" >return data.value; }</span></span> }</span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Convex getHerramientas Error:", err); }</span></span>
+        const local = <span class="cstat-no" title="statement not covered" >getLocalItem&lt;Herramienta[]&gt;('local_herramientas_db', []);</span>
+<span class="cstat-no" title="statement not covered" >        if (local.length &gt; 0) <span class="cstat-no" title="statement not covered" >return local;</span></span>
+<span class="cstat-no" title="statement not covered" >        try { const { STATIC_HERRAMIENTAS } = <span class="cstat-no" title="statement not covered" >await import('../data/staticData'); <span class="cstat-no" title="statement not covered" >r</span>eturn STATIC_HERRAMIENTAS as Herramienta[]; }</span> catch { <span class="cstat-no" title="statement not covered" >return []; }</span></span>
+    },
+&nbsp;
+    saveHerramienta: <span class="fstat-no" title="function not covered" >async (t</span>ool: Herramienta): Promise&lt;void&gt; =&gt; {
+        const tools = <span class="cstat-no" title="statement not covered" >await StorageService.getHerramientas();</span>
+        const index = <span class="cstat-no" title="statement not covered" >tools.findIndex(<span class="fstat-no" title="function not covered" >t =&gt; <span class="cstat-no" title="statement not covered" >t</span>.id === tool.id)</span>;</span>
+<span class="cstat-no" title="statement not covered" >        if (index !== -1) { <span class="cstat-no" title="statement not covered" >tools[index] = tool; }</span> else { <span class="cstat-no" title="statement not covered" >tools.push(tool); }</span></span>
+<span class="cstat-no" title="statement not covered" >        setLocalItem('local_herramientas_db', tools);</span>
+<span class="cstat-no" title="statement not covered" >        if (convex) { <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >await convex.mutation(api.config.setConfig, { key: "academia_herramientas", value: tools }); }</span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Convex Save Herramienta Error:", err); }</span> }</span></span>
+    },
+&nbsp;
+    deleteHerramienta: <span class="fstat-no" title="function not covered" >async (i</span>d: string): Promise&lt;void&gt; =&gt; {
+        const tools = <span class="cstat-no" title="statement not covered" >await StorageService.getHerramientas();</span>
+        const updated = <span class="cstat-no" title="statement not covered" >tools.filter(<span class="fstat-no" title="function not covered" >t =&gt; <span class="cstat-no" title="statement not covered" >t</span>.id !== id)</span>;</span>
+<span class="cstat-no" title="statement not covered" >        setLocalItem('local_herramientas_db', updated);</span>
+<span class="cstat-no" title="statement not covered" >        if (convex) { <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >await convex.mutation(api.config.setConfig, { key: "academia_herramientas", value: updated }); }</span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Convex Delete Herramienta Error:", err); }</span> }</span></span>
+    },
+&nbsp;
+    getGraficoConfig: <span class="fstat-no" title="function not covered" >async (): Promise&lt;any&gt; =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >        try { <span class="cstat-no" title="statement not covered" >if (convex) { const data = <span class="cstat-no" title="statement not covered" >await convex.query(api.config.getConfig, { key: "grafico_assets" }); <span class="cstat-no" title="statement not covered" >i</span>f (data &amp;&amp; data.value) <span class="cstat-no" title="statement not covered" >return { id: data._id, key: "grafico_assets", assets: data.value }; }</span></span> }</span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Convex Get Grafico Config Error:", err); }</span></span>
+<span class="cstat-no" title="statement not covered" >        return getLocalItem('local_grafico_config', null);</span>
+    },
+&nbsp;
+    saveGraficoConfig: <span class="fstat-no" title="function not covered" >async (c</span>onfig: { assets: any[] }): Promise&lt;void&gt; =&gt; {
+<span class="cstat-no" title="statement not covered" >        setLocalItem('local_grafico_config', config);</span>
+<span class="cstat-no" title="statement not covered" >        if (convex) { <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >await convex.mutation(api.config.setConfig, { key: "grafico_assets", value: config.assets }); }</span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Convex Save Grafico Config Error:", err); }</span> }</span></span>
+    },
+&nbsp;
+    toggleResourceProgress: <span class="fstat-no" title="function not covered" >async (u</span>serId: string, resourceId: string) =&gt; {
+        const user = <span class="cstat-no" title="statement not covered" >await UserService.getUserById(userId);</span>
+<span class="cstat-no" title="statement not covered" >        if (!user) <span class="cstat-no" title="statement not covered" >return null;</span></span>
+        const currentProgress = <span class="cstat-no" title="statement not covered" >user.progreso || {};</span>
+        const newStatus = <span class="cstat-no" title="statement not covered" >!currentProgress[resourceId];</span>
+        const updatedUser = <span class="cstat-no" title="statement not covered" >{ ...user, progreso: { ...currentProgress, [resourceId]: newStatus } };</span>
+<span class="cstat-no" title="statement not covered" >        await UserService.updateUser(updatedUser);</span>
+<span class="cstat-no" title="statement not covered" >        return updatedUser;</span>
+    },
+&nbsp;
+    getVideos: <span class="fstat-no" title="function not covered" >async (): Promise&lt;any[]&gt; =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >        try { <span class="cstat-no" title="statement not covered" >if (convex) { const data = <span class="cstat-no" title="statement not covered" >await convex.query(api.videos.getVideos); <span class="cstat-no" title="statement not covered" >i</span>f (data) <span class="cstat-no" title="statement not covered" >return data.map(<span class="fstat-no" title="function not covered" >(v</span>: any) =&gt; (<span class="cstat-no" title="statement not covered" >{ ...v, id: v._id }))</span>; }</span></span> }</span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Convex Get Videos Error:", err); }</span></span>
+<span class="cstat-no" title="statement not covered" >        return getLocalItem&lt;any[]&gt;('local_videos_db', []);</span>
+    },
+&nbsp;
+    saveVideo: <span class="fstat-no" title="function not covered" >async (v</span>ideo: any): Promise&lt;void&gt; =&gt; {
+        const videos = <span class="cstat-no" title="statement not covered" >getLocalItem&lt;any[]&gt;('local_videos_db', []);</span>
+        const index = <span class="cstat-no" title="statement not covered" >videos.findIndex(<span class="fstat-no" title="function not covered" >v =&gt; <span class="cstat-no" title="statement not covered" >v</span>.id === video.id)</span>;</span>
+<span class="cstat-no" title="statement not covered" >        if (index !== -1) { <span class="cstat-no" title="statement not covered" >videos[index] = video; }</span> else { <span class="cstat-no" title="statement not covered" >videos.unshift(video); }</span></span>
+<span class="cstat-no" title="statement not covered" >        setLocalItem('local_videos_db', videos);</span>
+<span class="cstat-no" title="statement not covered" >        try { <span class="cstat-no" title="statement not covered" >if (convex) { const convexId = <span class="cstat-no" title="statement not covered" >video.id &amp;&amp; video.id.length &gt; 15 &amp;&amp; !video.id.includes('-') ? video.id : undefined; <span class="cstat-no" title="statement not covered" >a</span>wait convex.mutation(api.videos.saveVideo, { ...(convexId ? { id: convexId } : {}), tipo: video.tipo, titulo: video.titulo, autor: video.autor, descripcion: video.descripcion, thumbnail: video.thumbnail, embedUrl: video.embedUrl, duracion: video.duracion, categoria: video.categoria }); }</span> }</span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Convex Save Video Error:", err); }</span></span>
+    },
+&nbsp;
+    deleteVideo: <span class="fstat-no" title="function not covered" >async (i</span>d: string): Promise&lt;void&gt; =&gt; {
+        const videos = <span class="cstat-no" title="statement not covered" >getLocalItem&lt;any[]&gt;('local_videos_db', []);</span>
+<span class="cstat-no" title="statement not covered" >        setLocalItem('local_videos_db', videos.filter(<span class="fstat-no" title="function not covered" >v =&gt; <span class="cstat-no" title="statement not covered" >v</span>.id !== id)</span>);</span>
+<span class="cstat-no" title="statement not covered" >        try { <span class="cstat-no" title="statement not covered" >if (convex &amp;&amp; id &amp;&amp; id.length &gt; 15 &amp;&amp; !id.includes('-')) { <span class="cstat-no" title="statement not covered" >await convex.mutation(api.videos.deleteVideo, { id }); }</span> }</span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Convex Delete Video Error:", err); }</span></span>
+    },
+&nbsp;
+    getResources: <span class="fstat-no" title="function not covered" >async (): Promise&lt;Recurso[]&gt; =&gt; {</span> <span class="cstat-no" title="statement not covered" >return getLocalItem&lt;Recurso[]&gt;('local_resources_db', []); }</span>,
+    saveResource: <span class="fstat-no" title="function not covered" >async (r</span>esource: Recurso): Promise&lt;void&gt; =&gt; { const resources = <span class="cstat-no" title="statement not covered" >getLocalItem&lt;Recurso[]&gt;('local_resources_db', []); c</span>onst index = <span class="cstat-no" title="statement not covered" >resources.findIndex(<span class="fstat-no" title="function not covered" >r =&gt; <span class="cstat-no" title="statement not covered" >r</span>.id === resource.id)</span>; <span class="cstat-no" title="statement not covered" >i</span>f (index !== -1) { <span class="cstat-no" title="statement not covered" >resources[index] = resource; }</span> else { <span class="cstat-no" title="statement not covered" >resources.unshift(resource); }</span> <span class="cstat-no" title="statement not covered" >s</span>etLocalItem('local_resources_db', resources); }</span>,
+    deleteResource: <span class="fstat-no" title="function not covered" >async (i</span>d: string): Promise&lt;void&gt; =&gt; { const resources = <span class="cstat-no" title="statement not covered" >getLocalItem&lt;Recurso[]&gt;('local_resources_db', []); <span class="cstat-no" title="statement not covered" >s</span>etLocalItem('local_resources_db', resources.filter(<span class="fstat-no" title="function not covered" >r =&gt; <span class="cstat-no" title="statement not covered" >r</span>.id !== id)</span>); }</span>,
+&nbsp;
+    getEventos: <span class="fstat-no" title="function not covered" >async () =&gt; <span class="cstat-no" title="statement not covered" >E</span>VENTOS_MOCK,</span>
+    getNoticias: <span class="fstat-no" title="function not covered" >async () =&gt; <span class="cstat-no" title="statement not covered" >N</span>OTICIAS_MOCK,</span>
+&nbsp;
+    seedSmartData: <span class="fstat-no" title="function not covered" >async () =&gt; {</span>
+        const dummyNames = <span class="cstat-no" title="statement not covered" >['Alex Forex', 'Bullish King', 'Pau Trading', 'Market Maker', 'Crypto Queen'];</span>
+        const dummyUsers = <span class="cstat-no" title="statement not covered" >dummyNames.map(<span class="fstat-no" title="function not covered" >name =&gt; {</span></span>
+            const handle = <span class="cstat-no" title="statement not covered" >name.toLowerCase().replace(' ', '');</span>
+<span class="cstat-no" title="statement not covered" >            return { id: crypto.randomUUID?.() || 'xxx', nombre: name, usuario: handle, email: `${handle}@dummy.com`, avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${handle}`, esPro: Math.random() &gt; 0.5, esVerificado: Math.random() &gt; 0.7, rol: 'trader_experimentado', role: 0, xp: 0, level: 1, biografia: 'Trader profesional.', seguidores: [], siguiendo: [], aportes: Math.floor(Math.random() * 20), accuracy: 60 + Math.random() * 30, watchlist: ['BTC/USD', 'ETH/USD'], estadisticas: { tasaVictoria: 65, factorBeneficio: 1.8, pnlTotal: 5000 }, saldo: 5000, reputation: 0, badges: [], fechaRegistro: new Date().toISOString() } as Usuario;</span>
+        });
+        const localUsers = <span class="cstat-no" title="statement not covered" >getLocalItem&lt;Usuario[]&gt;('local_users_db', []);</span>
+<span class="cstat-no" title="statement not covered" >        setLocalItem('local_users_db', [...localUsers, ...dummyUsers]);</span>
+<span class="cstat-no" title="statement not covered" >        for (const user of dummyUsers) { <span class="cstat-no" title="statement not covered" >await PostService.createPost({ titulo: `Análisis de ${user.watchlist[0]}`, contenido: 'Veo una oportunidad clara en este nivel. #trading #analisis', categoria: 'Idea', par: user.watchlist[0], tipo: 'Compra', datosGrafico: [10, 20, 15, 30, 25, 40] }, user.id); }</span></span>
+<span class="cstat-no" title="statement not covered" >        return dummyUsers.length;</span>
+    },
+&nbsp;
+    sendBrandEmail: <span class="fstat-no" title="function not covered" >async ({</span> to, nombre, subject, body }: { to: string; nombre: string; subject: string; body: string }) =&gt; {
+        const serviceId = (<span class="cstat-no" title="statement not covered" >import.meta as any).env?.VITE_EMAILJS_SERVICE_ID;</span>
+        const templateId = (<span class="cstat-no" title="statement not covered" >import.meta as any).env?.VITE_EMAILJS_TEMPLATE_ID;</span>
+        const publicKey = (<span class="cstat-no" title="statement not covered" >import.meta as any).env?.VITE_EMAILJS_PUBLIC_KEY;</span>
+<span class="cstat-no" title="statement not covered" >        if (!serviceId || !publicKey) { <span class="cstat-no" title="statement not covered" >logger.warn('[EMAIL] EmailJS not configured.'); <span class="cstat-no" title="statement not covered" >r</span>eturn false; }</span></span>
+<span class="cstat-no" title="statement not covered" >        try {</span>
+            const payload = <span class="cstat-no" title="statement not covered" >{</span>
+                service_id: serviceId,
+                template_id: templateId,
+                user_id: publicKey,
+                template_params: {
+                    to_email: to,
+                    to_name: nombre,
+                    subject,
+                    message: body,
+                    from_name: 'TradeShare',
+                    reply_to: 'noreply@tradeshare.io'
+                }
+            };
+            const res = <span class="cstat-no" title="statement not covered" >await fetch('https://api.emailjs.com/api/v1.0/email/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });</span>
+<span class="cstat-no" title="statement not covered" >            return res.ok;</span>
+        } catch (err) { <span class="cstat-no" title="statement not covered" >logger.error('[EMAIL] Error sending email:', err); <span class="cstat-no" title="statement not covered" >r</span>eturn false; }</span>
+    },
+&nbsp;
+    sendWelcomeEmail: <span class="fstat-no" title="function not covered" >async (u</span>ser: Usuario) =&gt; {
+<span class="cstat-no" title="statement not covered" >        if (!user.email) <span class="cstat-no" title="statement not covered" >return false;</span></span>
+<span class="cstat-no" title="statement not covered" >        return StorageService.sendBrandEmail({ to: user.email, nombre: user.nombre, subject: '¡Bienvenido a TradeShare Ecosystem! 🚀', body: `&lt;div style="font-family:sans-serif;max-width:600px;margin:0 auto;background:#0a0f18;color:#fff;border-radius:16px"&gt;&lt;div style="background:linear-gradient(135deg,#1d4ed8,#7c3aed);padding:40px 32px;text-align:center"&gt;&lt;h1 style="margin:0;font-size:28px;font-weight:900"&gt;TradeShare&lt;br&gt;&lt;span style="color:#93c5fd"&gt;Ecosystem&lt;/span&gt;&lt;/h1&gt;&lt;/div&gt;&lt;div style="padding:40px 32px"&gt;&lt;h2 style="font-size:22px"&gt;¡Hola ${user.nombre}!&lt;/h2&gt;&lt;p&gt;Tu cuenta ha sido creada exitosamente.&lt;/p&gt;&lt;p style="font-size:18px;font-weight:900;color:#3b82f6"&gt;@${user.usuario}&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;` });</span>
+    },
+&nbsp;
+    getUserProgress: <span class="fstat-no" title="function not covered" >async (u</span>serId: string) =&gt; { <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >return await convex.query(api.gamification.getUserProgress as any, { userId }); }</span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Get User Progress Error:", err); <span class="cstat-no" title="statement not covered" >r</span>eturn null; }</span> }</span>,
+    getGlobalLeaderboard: <span class="fstat-no" title="function not covered" >async (l</span>imit?: number) =&gt; { <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >return await convex.query(api.gamification.getLeaderboard as any, { limit }); }</span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Get Leaderboard Error:", err); <span class="cstat-no" title="statement not covered" >r</span>eturn []; }</span> }</span>,
+    getWeeklyLeaderboard: <span class="fstat-no" title="function not covered" >async (l</span>imit?: number) =&gt; { <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >return await convex.query(api.gamification.getWeeklyLeaderboard as any, { limit }); }</span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Get Weekly Leaderboard Error:", err); <span class="cstat-no" title="statement not covered" >r</span>eturn []; }</span> }</span>,
+    getMonthlyLeaderboard: <span class="fstat-no" title="function not covered" >async (l</span>imit?: number) =&gt; { <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >return await convex.query(api.gamification.getMonthlyLeaderboard as any, { limit }); }</span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Get Monthly Leaderboard Error:", err); <span class="cstat-no" title="statement not covered" >r</span>eturn []; }</span> }</span>,
+    getUserAchievements: <span class="fstat-no" title="function not covered" >async (u</span>serId: string) =&gt; { <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >return await convex.query(api.gamification.getUserAchievements as any, { userId }); }</span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Get User Achievements Error:", err); <span class="cstat-no" title="statement not covered" >r</span>eturn []; }</span> }</span>,
+    checkAchievements: <span class="fstat-no" title="function not covered" >async (u</span>serId: string) =&gt; { <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >return await convex.mutation(api.gamification.checkAchievements as any, { userId }); }</span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Check Achievements Error:", err); <span class="cstat-no" title="statement not covered" >r</span>eturn []; }</span> }</span>,
+    awardXP: <span class="fstat-no" title="function not covered" >async (u</span>serId: string, amount: number, reason: string) =&gt; { <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >return await convex.mutation(api.gamification.awardXP as any, { userId, amount, reason }); }</span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Award XP Error:", err); <span class="cstat-no" title="statement not covered" >r</span>eturn null; }</span> }</span>,
+    getAchievementProgress: <span class="fstat-no" title="function not covered" >async (u</span>serId: string) =&gt; { <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >return await convex.query(api.achievements.getAchievementProgress as any, { userId }); }</span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Get Achievement Progress Error:", err); <span class="cstat-no" title="statement not covered" >r</span>eturn []; }</span> }</span>,
+    getAllAchievements: <span class="fstat-no" title="function not covered" >async () =&gt; {</span> <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >return await convex.query(api.achievements.getAllAchievements as any, {}); }</span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Get All Achievements Error:", err); <span class="cstat-no" title="statement not covered" >r</span>eturn []; }</span> }</span>,
+    getAchievementStats: <span class="fstat-no" title="function not covered" >async (u</span>serId: string) =&gt; { <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >return await convex.query(api.achievements.getAchievementStats as any, { userId }); }</span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Get Achievement Stats Error:", err); <span class="cstat-no" title="statement not covered" >r</span>eturn null; }</span> }</span>,
+    getAchievementLeaderboard: <span class="fstat-no" title="function not covered" >async (l</span>imit?: number) =&gt; { <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >return await convex.query(api.achievements.getLeaderboardByAchievements as any, { limit }); }</span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Get Achievement Leaderboard Error:", err); <span class="cstat-no" title="statement not covered" >r</span>eturn []; }</span> }</span>,
+    triggerAchievementCheck: <span class="fstat-no" title="function not covered" >async (u</span>serId: string, action: string, metadata?: any) =&gt; { <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >return await convex.mutation(api.achievements.checkAndAwardAchievements as any, { userId, action, metadata }); }</span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Trigger Achievement Check Error:", err); <span class="cstat-no" title="statement not covered" >r</span>eturn null; }</span> }</span>,
+&nbsp;
+    getSesion: <span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >A</span>uthService.getCurrentSession(),</span>
+    trackActiveDay: <span class="fstat-no" title="function not covered" >(u</span>serId: string) =&gt; <span class="cstat-no" title="statement not covered" >AuthService.recordLogin(userId),</span>
+    cerrarSesion: <span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >A</span>uthService.logout(),</span>
+&nbsp;
+    saveItem: <span class="fstat-no" title="function not covered" >async (k</span>ey: string, data: any) =&gt; <span class="cstat-no" title="statement not covered" >setLocalItem(key, data),</span>
+    getItem: <span class="fstat-no" title="function not covered" >async (k</span>ey: string) =&gt; <span class="cstat-no" title="statement not covered" >getLocalItem(key, null),</span>
+    removeItem: <span class="fstat-no" title="function not covered" >async (k</span>ey: string) =&gt; <span class="cstat-no" title="statement not covered" >localStorage.removeItem(key),</span>
+&nbsp;
+    getPatterns: <span class="fstat-no" title="function not covered" >async () =&gt; <span class="cstat-no" title="statement not covered" >g</span>etLocalItem&lt;any[]&gt;('ai_patterns', []),</span>
+    savePattern: <span class="fstat-no" title="function not covered" >async (p</span>attern: any) =&gt; { const patterns = <span class="cstat-no" title="statement not covered" >await StorageService.getPatterns(); c</span>onst existing = <span class="cstat-no" title="statement not covered" >patterns.findIndex(<span class="fstat-no" title="function not covered" >p =&gt; <span class="cstat-no" title="statement not covered" >p</span>.id === pattern.id)</span>; <span class="cstat-no" title="statement not covered" >i</span>f (existing &gt;= 0) { <span class="cstat-no" title="statement not covered" >patterns[existing] = pattern; }</span> else { <span class="cstat-no" title="statement not covered" >patterns.push(pattern); }</span> <span class="cstat-no" title="statement not covered" >s</span>etLocalItem('ai_patterns', patterns); }</span>,
+&nbsp;
+    hasCompletedOnboarding: <span class="fstat-no" title="function not covered" >async () =&gt; <span class="cstat-no" title="statement not covered" >l</span>ocalStorage.getItem('onboarding_completed') === 'true',</span>
+    setOnboardingCompleted: <span class="fstat-no" title="function not covered" >async () =&gt; {</span> <span class="cstat-no" title="statement not covered" >localStorage.setItem('onboarding_completed', 'true'); }</span>,
+&nbsp;
+    getBackupHistory: <span class="fstat-no" title="function not covered" >(i</span>temId: string, itemType: string) =&gt; <span class="cstat-no" title="statement not covered" >BackupManager.getBackupHistory(itemId, itemType),</span>
+    getBackupById: <span class="fstat-no" title="function not covered" >(i</span>temId: string, itemType: string, backupId: string) =&gt; <span class="cstat-no" title="statement not covered" >BackupManager.getBackupById(itemId, itemType, backupId),</span>
+    restoreFromBackup: <span class="fstat-no" title="function not covered" >async (i</span>temId: string, itemType: string, backupId: string): Promise&lt;boolean&gt; =&gt; {
+        const backup = <span class="cstat-no" title="statement not covered" >BackupManager.restoreFromBackup(itemId, itemType, backupId);</span>
+<span class="cstat-no" title="statement not covered" >        if (!backup || !backup.previousData) <span class="cstat-no" title="statement not covered" >return false;</span></span>
+<span class="cstat-no" title="statement not covered" >        if (itemType === 'post') { const post = <span class="cstat-no" title="statement not covered" >backup.previousData as Publicacion; <span class="cstat-no" title="statement not covered" >d</span>elete (post as any).id; <span class="cstat-no" title="statement not covered" >a</span>wait PostService.updatePost(post as Publicacion); <span class="cstat-no" title="statement not covered" >r</span>eturn true; }</span></span>
+<span class="cstat-no" title="statement not covered" >        if (itemType === 'profile') { <span class="cstat-no" title="statement not covered" >await UserService.updateUser(backup.previousData as Usuario); <span class="cstat-no" title="statement not covered" >r</span>eturn true; }</span></span>
+<span class="cstat-no" title="statement not covered" >        return false;</span>
+    },
+&nbsp;
+    getSyncStatus: <span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >S</span>yncService.getSyncStatus(),</span>
+    forceSyncNow: <span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >S</span>yncService.forceSyncNow(),</span>
+    clearOldLocalBackups: <span class="fstat-no" title="function not covered" >(d</span>aysOld?: number) =&gt; <span class="cstat-no" title="statement not covered" >BackupManager.clearOldBackups(daysOld),</span>
+    getBackupStats: <span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >B</span>ackupManager.getBackupStats(),</span>
+&nbsp;
+    getPromotionalAds: <span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >P</span>ROMOTIONAL_ADS,</span>
+    getPromotionalAdsBySector: <span class="fstat-no" title="function not covered" >(s</span>ector: 'feed' | 'sidebar') =&gt; <span class="cstat-no" title="statement not covered" >PROMOTIONAL_ADS.filter(<span class="fstat-no" title="function not covered" >ad =&gt; <span class="cstat-no" title="statement not covered" >a</span>d.sector === sector)</span>,</span>
+    convertPromoAdToAd: <span class="fstat-no" title="function not covered" >(p</span>romoAd: PromotionalAd): Partial&lt;Ad&gt; =&gt; (<span class="cstat-no" title="statement not covered" >{ titulo: promoAd.title, descripcion: promoAd.description, imagenUrl: promoAd.imageUrl, link: promoAd.link, sector: promoAd.sector, activo: true, subtitle: promoAd.subtitle, extra: promoAd.badge ? `${promoAd.badge}${promoAd.currentPrice ? `|${promoAd.currentPrice}` : ''}` : undefined }),</span>
+&nbsp;
+    getInstagramAccounts: <span class="fstat-no" title="function not covered" >async (u</span>serId: string) =&gt; { <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >if (convex) <span class="cstat-no" title="statement not covered" >return await convex.query(api.instagram.accounts.getUserInstagramAccounts as any, { userId }); }</span></span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Convex Get IG Accounts Error:", err); }</span> <span class="cstat-no" title="statement not covered" >r</span>eturn []; }</span>,
+    disconnectInstagramAccount: <span class="fstat-no" title="function not covered" >async (u</span>serId: string, accountId: string) =&gt; { <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >if (convex) <span class="cstat-no" title="statement not covered" >return await convex.mutation(api.instagram.accounts.disconnectInstagramAccount as any, { userId, accountId }); }</span></span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Convex Disconnect IG Error:", err); <span class="cstat-no" title="statement not covered" >t</span>hrow err; }</span> }</span>,
+    getScheduledInstagramPosts: <span class="fstat-no" title="function not covered" >async (u</span>serId: string, accountId?: string) =&gt; { <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >if (convex) <span class="cstat-no" title="statement not covered" >return await convex.query(api.instagram.posts.getScheduledPosts as any, { userId, accountId: accountId || undefined }); }</span></span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Convex Get IG Posts Error:", err); }</span> <span class="cstat-no" title="statement not covered" >r</span>eturn []; }</span>,
+    createScheduledInstagramPost: <span class="fstat-no" title="function not covered" >async (p</span>ostData: any) =&gt; { <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >if (convex) <span class="cstat-no" title="statement not covered" >return await convex.mutation(api.instagram.posts.createScheduledPost as any, postData); }</span></span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Convex Create IG Post Error:", err); <span class="cstat-no" title="statement not covered" >t</span>hrow err; }</span> }</span>,
+    deleteScheduledInstagramPost: <span class="fstat-no" title="function not covered" >async (u</span>serId: string, postId: string) =&gt; { <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >if (convex) <span class="cstat-no" title="statement not covered" >return await convex.mutation(api.instagram.posts.deleteScheduledPost as any, { userId, postId }); }</span></span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Convex Delete IG Post Error:", err); <span class="cstat-no" title="statement not covered" >t</span>hrow err; }</span> }</span>,
+    publishInstagramPostNow: <span class="fstat-no" title="function not covered" >async (u</span>serId: string, postId: string) =&gt; { <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >if (convex) { <span class="cstat-no" title="statement not covered" >await convex.mutation(api.instagram.posts.publishPostNow as any, { userId, postId }); c</span>onst apiUrl = <span class="cstat-no" title="statement not covered" >import.meta.env.VITE_API_URL || '/api'; c</span>onst response = <span class="cstat-no" title="statement not covered" >await fetch(`${apiUrl}/instagram/publish`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId, postId }) }); <span class="cstat-no" title="statement not covered" >r</span>eturn await response.json(); }</span> }</span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Convex Publish IG Post Error:", err); <span class="cstat-no" title="statement not covered" >t</span>hrow err; }</span> }</span>,
+    getInstagramStats: <span class="fstat-no" title="function not covered" >async (u</span>serId: string, accountId?: string) =&gt; { <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >if (convex) <span class="cstat-no" title="statement not covered" >return await convex.query(api.instagram.posts.getPostStats as any, { userId, accountId }); }</span></span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Convex Get IG Stats Error:", err); }</span> <span class="cstat-no" title="statement not covered" >r</span>eturn null; }</span>,
+    updateInstagramSettings: <span class="fstat-no" title="function not covered" >async (s</span>ettings: any) =&gt; { <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >if (convex) <span class="cstat-no" title="statement not covered" >return await convex.mutation(api.instagram.accounts.updateAccountSettings as any, settings); }</span></span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Convex Update IG Settings Error:", err); <span class="cstat-no" title="statement not covered" >t</span>hrow err; }</span> }</span>,
+    refreshInstagramStats: <span class="fstat-no" title="function not covered" >async (a</span>ccountId: string) =&gt; { <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >if (convex) <span class="cstat-no" title="statement not covered" >return await convex.action(api.instagram.accounts.refreshAccountStats as any, { accountId }); }</span></span> catch (err) { <span class="cstat-no" title="statement not covered" >logger.error("Convex Refresh IG Stats Error:", err); <span class="cstat-no" title="statement not covered" >t</span>hrow err; }</span> }</span>,
+};
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-03-25T20:46:31.607Z
+            </div>
+        <script src="../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../sorter.js"></script>
+        <script src="../../block-navigation.js"></script>
+    </body>
+</html>
+    

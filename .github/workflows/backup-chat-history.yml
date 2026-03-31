@@ -1,0 +1,75 @@
+name: Backup Chat History
+
+on:
+  # Daily at 6 AM UTC
+  schedule:
+    - cron: '0 6 * * *'
+  
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      task_completed:
+        description: 'Task ID completed'
+        required: false
+        type: string
+      notes:
+        description: 'Notes about the task'
+        required: false
+        type: string
+  
+  # After every push to main
+  push:
+    branches:
+      - main
+
+jobs:
+  backup-chat-history:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Setup Git
+        run: |
+          git config --global user.name "Aurora Bot"
+          git config --global user.email "aurora@antigravity.io"
+          
+      - name: Add backup entry
+        id: backup
+        run: |
+          TIMESTAMP=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+          COMMIT_MSG=$(git log -1 --pretty=%B | head -1 || echo "Commit")
+          FILES_CHANGED=$(git diff --name-only HEAD HEAD~1 2>/dev/null | wc -l | tr -d ' ' || echo "0")
+          
+          mkdir -p .agent/workspace/coordination/
+          
+          # Check if it's a task completion commit
+          if echo "$COMMIT_MSG" | grep -qiE "(feat|fix|docs|chore).*:"; then
+            echo "## Task Completed - $(date +'%Y-%m-%d %H:%M UTC')" >> .agent/workspace/coordination/GLOBAL_CHAT_HISTORY.md
+            echo "" >> .agent/workspace/coordination/GLOBAL_CHAT_HISTORY.md
+            echo "### Automated Task Backup" >> .agent/workspace/coordination/GLOBAL_CHAT_HISTORY.md
+            echo "- Timestamp: $TIMESTAMP" >> .agent/workspace/coordination/GLOBAL_CHAT_HISTORY.md
+            echo "- Commit: $COMMIT_MSG" >> .agent/workspace/coordination/GLOBAL_CHAT_HISTORY.md
+            echo "- SHA: ${{ github.sha }}" >> .agent/workspace/coordination/GLOBAL_CHAT_HISTORY.md
+            echo "- Files changed: $FILES_CHANGED" >> .agent/workspace/coordination/GLOBAL_CHAT_HISTORY.md
+            
+            if [ -n "${{ inputs.task_completed }}" ]; then
+              echo "- Task: ${{ inputs.task_completed }}" >> .agent/workspace/coordination/GLOBAL_CHAT_HISTORY.md
+            fi
+            if [ -n "${{ inputs.notes }}" ]; then
+              echo "- Notes: ${{ inputs.notes }}" >> .agent/workspace/coordination/GLOBAL_CHAT_HISTORY.md
+            fi
+            echo "" >> .agent/workspace/coordination/GLOBAL_CHAT_HISTORY.md
+            
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Commit and push
+        if: steps.backup.outputs.has_changes == 'true'
+        run: |
+          git add .agent/workspace/coordination/GLOBAL_CHAT_HISTORY.md
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: auto-backup chat history $(date +'%Y-%m-%d')" && git push)

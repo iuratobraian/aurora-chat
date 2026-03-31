@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc:*)",
+      "Bash(node scripts/aurora-session-brief.mjs)",
+      "Bash(node -e \"import\\(''./scripts/aurora-cli.mjs''\\).then\\(m => m.getStatus ? console.log\\(''aurora-cli ok''\\) : console.log\\(''no getStatus''\\)\\).catch\\(e => console.log\\(''aurora-cli error:'', e.message\\)\\)\")",
+      "Bash(node scripts/aurora-memory.mjs stats)",
+      "Bash(node scripts/aurora-memory.mjs compression-stats)",
+      "Bash(npm run:*)",
+      "Bash(node scripts/aurora-integrator.mjs sync)"
+    ]
+  }
+}

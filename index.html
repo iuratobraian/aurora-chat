@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  
+  <!-- PWA / Mobile -->
+  <meta name="theme-color" content="#050608" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="TradeHub" />
+  <meta name="application-name" content="TradeHub" />
+  <meta name="msapplication-TileColor" content="#050608" />
+  <meta name="msapplication-tap-highlight" content="no" />
+  <meta name="format-detection" content="telephone=no" />
+
+  <!-- SEO Optimization -->
+  <title>TradeHub 2025 | Comunidad de Trading Profesional en Latam</title>
+  <meta name="description"
+    content="La comunidad de traders más grande de Latinoamérica. Análisis reales, señales verificadas y aprendizaje de traders institucionales. Sin ruido, solo señal.">
+  <meta name="keywords"
+    content="trading, forex, criptomonedas, comunidad, inversiones, análisis técnico, señales trading, copytrading, educación financiera, trading social">
+  <meta name="author" content="TradeHub">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="TradeHub 2025 | Trading Social Profesional" />
+  <meta property="og:description" content="La comunidad de traders más grande de Latam. Análisis reales, señales verificadas y aprendizaje institucional." />
+  <meta property="og:site_name" content="TradeHub" />
+  <meta property="og:image" content="https://images.unsplash.com/photo-1611974714024-462cd467af65?w=1200&h=630&fit=crop" />
+  
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="TradeHub 2025 | Trading Social Profesional" />
+  <meta name="twitter:description" content="La comunidad de traders más grande de Latam. Análisis reales, señales verificadas y aprendizaje institucional." />
+  <meta name="twitter:image" content="https://images.unsplash.com/photo-1611974714024-462cd46714024-462cd467af65?w=1200&h=630&fit=crop" />
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json" />
+  
+  <!-- Icons -->
+  <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+  <link rel="icon" type="image/svg+xml" sizes="any" href="/logo.svg" />
+  <link rel="apple-touch-icon" href="https://api.dicebear.com/7.x/shapes/png?seed=TP&size=192" />
+  <meta name="msapplication-square150x150logo" content="/icons/icon-192.svg" />
+
+  <!-- Fuentes con display=swap para evitar FOIT -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
+    rel="stylesheet"
+    media="print"
+    onload="this.media='all'">
+  <noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  </noscript>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block"></noscript>
+  
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  
+  <!-- Preconnect to external resources -->
+  <link rel="preconnect" href="https://api.dicebear.com" />
+  <link rel="dns-prefetch" href="https://api.dicebear.com" />
+
+  <!-- CSP is configured in vite.config.ts for production builds -->
+  <!-- Note: frame-ancestors must be set via HTTP headers on Vercel -->
+</head>
+
+<body
+  class="text-text-light-primary dark:text-gray-200 font-display antialiased selection:bg-primary/30 selection:text-white">
+
+  <!-- Dynamic Background -->
+  <div class="ambient-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <!-- Grid Overlay sutil -->
+    <div
+      style="position:absolute; inset:0; background-image: linear-gradient(rgba(120,120,120,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(120,120,120,0.05) 1px, transparent 1px); background-size: 50px 50px; opacity: 0.5; pointer-events: none;">
+    </div>
+  </div>
+
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+
+</html>

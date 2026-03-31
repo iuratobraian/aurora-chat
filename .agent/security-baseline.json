@@ -1,0 +1,15 @@
+{
+  "allowed_findings": [
+    { "file": "components/SEO.tsx", "label": "hardcoded production vercel url" },
+    { "file": "convex/lib/mercadopago.ts", "label": "hardcoded production vercel url" },
+    { "file": "data/promotionalAds.ts", "label": "hardcoded production vercel url" },
+    { "file": "services/notifications/notificationService.ts", "label": "hardcoded convex url" },
+    { "file": "services/storage/email.ts", "label": "hardcoded production vercel url" },
+    { "file": "src/config.ts", "label": "hardcoded production vercel url" },
+    { "file": "src/data/staticData.ts", "label": "hardcoded production vercel url" },
+    { "file": "vercel.json", "label": "hardcoded production vercel url" },
+    { "file": "views/BitacoraView.tsx", "label": "hardcoded production vercel url" },
+    { "file": "views/ComunidadView.tsx", "label": "hardcoded production vercel url" },
+    { "file": "views/DashboardView.tsx", "label": "hardcoded production vercel url" }
+  ]
+}

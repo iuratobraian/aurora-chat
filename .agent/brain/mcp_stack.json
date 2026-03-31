@@ -1,0 +1,21 @@
+{
+  "version": "1.0",
+  "updated": "2026-03-23",
+  "mcpStack": [
+    { "id": "filesystem_mcp", "name": "Filesystem", "status": "ready", "priority": 1 },
+    { "id": "agent_memory_mcp", "name": "Agent Memory", "status": "installed", "priority": 2 },
+    { "id": "context_graph_mcp", "name": "Context Graph", "status": "pending", "priority": 3 },
+    { "id": "github_mcp", "name": "GitHub", "status": "candidate", "priority": 4 },
+    { "id": "postgres_mcp", "name": "PostgreSQL", "status": "candidate", "priority": 5 },
+    { "id": "search_mcp", "name": "Web Search", "status": "candidate", "priority": 6 },
+    { "id": "code_analysis_mcp", "name": "Code Analysis", "status": "candidate", "priority": 7 },
+    { "id": "test_runner_mcp", "name": "Test Runner", "status": "candidate", "priority": 8 },
+    { "id": "deployment_mcp", "name": "Deployment", "status": "candidate", "priority": 9 },
+    { "id": "monitoring_mcp", "name": "Monitoring", "status": "candidate", "priority": 10 }
+  ],
+  "selection": {
+    "selected": ["filesystem_mcp", "agent_memory_mcp"],
+    "nextCandidate": "github_mcp",
+    "rationale": "Filesystem basic ops, Agent Memory para contexto. GitHub para investigación de código."
+  }
+}

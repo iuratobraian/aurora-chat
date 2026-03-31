@@ -1,0 +1,90 @@
+{
+  "version": "1.0.0",
+  "updated_at": "2026-03-24",
+  "design_system": "tradeshare",
+  "patterns": [],
+  "conversions": {
+    "html_to_react": {
+      "description": "Reglas para convertir HTML de Stitch a React + Tailwind",
+      "rules": [
+        "class → className",
+        "background: rgba(...) → bg-[color]",
+        "backdrop-filter: blur → backdrop-blur-*",
+        "border-radius → rounded-*",
+        "box-shadow → shadow-*",
+        "flex → flex",
+        "grid → grid"
+      ],
+      "examples": [
+        {
+          "html": "<div class='glass-card'>",
+          "react": "<div className='rounded-2xl border border-white/10 backdrop-blur-xl bg-card-dark'>"
+        }
+      ]
+    }
+  },
+  "shared_knowledge": {
+    "all_agents_must_know": [
+      "Cómo invocar al diseñador Stitch",
+      "El sistema de diseño de TradeShare",
+      "Keywords de auto-activación",
+      "Flujo de handoff: Designer → Coder → Tester",
+      "Cómo reportar issues de diseño"
+    ],
+    "coder_knowledge": [
+      "Convertir HTML/CSS a React + Tailwind",
+      "Seguir el sistema de diseño TradeShare",
+      "Aplicar glass morphism correctamente",
+      "Usar las variables de color correctas"
+    ],
+    "tester_knowledge": [
+      "Verificar match entre implementación y diseño",
+      "Reportar mismatches al diseñador",
+      "Verificar spacing, colores, tipografía"
+    ],
+    "designer_knowledge": [
+      "Usar Stitch para generar UI",
+      "Exportar HTML/CSS de calidad",
+      "Seguir TradeShare Design System",
+      "Documentar patrones para reutilización"
+    ]
+  },
+  "workflow_chain": {
+    "steps": [
+      {
+        "step": 1,
+        "agent": "any",
+        "action": "Detecta necesidad de UI",
+        "triggers": ["nuevo componente", "rediseño", "diseñar", "design", "ui"]
+      },
+      {
+        "step": 2,
+        "agent": "designer",
+        "action": "Genera diseño con Stitch",
+        "receives": "Descripción del componente",
+        "delivers": "HTML/CSS, screenshot"
+      },
+      {
+        "step": 3,
+        "agent": "coder",
+        "action": "Implementa diseño",
+        "receives": "HTML/CSS del diseñador",
+        "delivers": "Componente React funcional"
+      },
+      {
+        "step": 4,
+        "agent": "tester",
+        "action": "Verifica implementación",
+        "receives": "Componente + Diseño original",
+        "delivers": "Match ✓ o issues report"
+      },
+      {
+        "step": 5,
+        "agent": "designer (loop)",
+        "action": "Ajusta si hay issues",
+        "condition": "Si tester reporta mismatches"
+      }
+    ]
+  },
+  "components_learned": []
+}

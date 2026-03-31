@@ -22,7 +22,12 @@ import { getAvailableExternalAIProviders, getExternalAIProviderById, getExternal
 import logger from "./serverLogger";
 import { initAllSkills, nvidiaAgents } from "./src/skills";
 
-const JWT_SECRET = process.env.JWT_SECRET || 'tradeshare_secret_key_change_me';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+    console.error('⚠️  JWT_SECRET no configurado. Generando secret temporal SOLO PARA DESARROLLO.');
+    console.error('   ⚠️  NUNCA usar esto en producción. Configurar JWT_SECRET en .env.local');
+}
+const JWT_SECRET_EFFECTIVE = JWT_SECRET || `dev_secret_${Date.now()}_${Math.random().toString(36).slice(2)}`;
 const JWT_EXPIRES_IN = '1h';
 
 const MAX_CLICKS = 5000;
@@ -1085,7 +1090,7 @@ async function startServer() {
         try {
             // First try JWT
             try {
-                const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+                const decoded = jwt.verify(token, JWT_SECRET_EFFECTIVE) as { userId: string };
                 if (decoded?.userId) {
                     (req as any).userId = decoded.userId;
                     (req as any).authTime = Date.now();
@@ -1175,7 +1180,7 @@ async function startServer() {
         
         // First try JWT
         try {
-            const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+            const decoded = jwt.verify(token, JWT_SECRET_EFFECTIVE) as { userId: string };
             if (decoded?.userId) {
                 return { valid: true, userId: decoded.userId };
             }

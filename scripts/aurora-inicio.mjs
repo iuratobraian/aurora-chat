@@ -6,15 +6,21 @@
  * O via npm:    npm run inicio
  *
  * Este script:
- * 1. Conecta a Notion (fuente de verdad)
- * 2. Muestra tareas organizadas por dominio y prioridad
- * 3. Indica cuáles están listas para trabajar
- * 4. Sincroniza con TASK_BOARD.md local
+ * 1. Hace git pull para sincronizar con lo último
+ * 2. Conecta a Notion (fuente de verdad)
+ * 3. Muestra tareas organizadas por dominio y prioridad
+ * 4. Indica cuáles están listas para trabajar
+ * 5. Sincroniza con TASK_BOARD.md local
+ *
+ * REGLAS DE ORO:
+ * - AL INICIAR: git pull automático (este script)
+ * - CADA 5 TAREAS: git push para compartir avances
  */
 
 import * as dotenv from 'dotenv';
 import fs from 'node:fs';
 import path from 'node:path';
+import { execSync } from 'node:child_process';
 
 dotenv.config({ path: '.env.local' });
 
@@ -240,7 +246,10 @@ function showNextSteps() {
   console.log(`  ${GREEN}2.${RESET} Marcarla como ${CYAN}"En progreso"${RESET} en Notion`);
   console.log(`  ${GREEN}3.${RESET} Trabajar en la tarea`);
   console.log(`  ${GREEN}4.${RESET} Marcar como ${YELLOW}"Listo"${RESET} en Notion al terminar`);
-  console.log(`  ${GREEN}5.${RESET} Hacer commit y push a Git`);
+  console.log(`  ${GREEN}5.${RESET} Hacer commit a Git`);
+  console.log(`\n${BOLD}${YELLOW}⚠️  REGLA DE ORO: Cada 5 tareas terminadas → git push${RESET}`);
+  console.log(`${DIM}   node scripts/notion-task-action.mjs done "nombre tarea"${RESET}`);
+  console.log(`${DIM}   git add . && git commit -m "fix: descripción" && git push${RESET}`);
   console.log(`\n${DIM}URL de Notion: https://www.notion.so/${NOTION_DATABASE_ID}${RESET}`);
   console.log(`${DIM}Repositorio: https://github.com/iuratobraian/trade-share${RESET}\n`);
 }
@@ -266,6 +275,33 @@ async function syncTaskBoard(tasks) {
 
 async function main() {
   banner();
+
+  // ═══════════════════════════════════════════
+  // PASO 0: Git Pull — Sincronizar con lo último
+  // ═══════════════════════════════════════════
+  console.log(`${DIM}🔄 Sincronizando con Git...${RESET}`);
+  try {
+    const pullOutput = execSync('git pull origin main 2>&1', {
+      cwd: ROOT,
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
+    if (pullOutput.includes('Already up to date')) {
+      console.log(`${GREEN}✓ Repositorio actualizado (ya estaba al día)${RESET}`);
+    } else {
+      const lines = pullOutput.trim().split('\n');
+      const summary = lines.filter(l => l.includes('file') || l.includes('insertion') || l.includes('deletion') || l.includes('changed') || l.includes('From') || l.includes('Updating') || l.includes('Fast')).join(' | ');
+      console.log(`${GREEN}✓ Repositorio sincronizado${RESET} ${DIM}${summary}${RESET}`);
+    }
+  } catch (err) {
+    const msg = err.stderr || err.stdout || err.message || '';
+    if (msg.includes('not a git') || msg.includes('no upstream')) {
+      console.log(`${YELLOW}⚠ Git pull omitido (no hay remote configurado)${RESET}`);
+    } else {
+      console.log(`${YELLOW}⚠ Git pull falló: ${msg.split('\n')[0]}${RESET}`);
+      console.log(`${DIM}   Verificar conexión a internet y acceso al repo${RESET}`);
+    }
+  }
 
   // Check Notion config
   if (!NOTION_API_KEY || !NOTION_DATABASE_ID) {

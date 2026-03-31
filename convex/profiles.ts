@@ -1,6 +1,8 @@
 import { query, mutation, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 import { getLevelFromXp } from "./lib/permissions";
+import { assertOwnershipOrAdmin } from "./lib/auth";
+import bcrypt from "bcryptjs";
 import logger from "./logger";
 
 export const getProfile = query({
@@ -34,8 +36,9 @@ export const getProfileByEmail = query({
 });
 
 export const getNextUserNumber = query({
-  args: {},
-  handler: async (ctx) => {
+  args: { userId: v.string() },
+  handler: async (ctx, args) => {
+    await assertOwnershipOrAdmin(ctx, args.userId);
     const highestUser = await ctx.db
       .query("profiles")
       .withIndex("by_userNumber")
@@ -140,7 +143,7 @@ export const upsertProfile = mutation({
       xp: args.xp ?? 0,
       level: args.level ?? 1,
       email: args.email,
-      password: args.password,
+      password: args.password ? await bcrypt.hash(args.password, 10) : undefined,
       biografia: args.biografia || "",
       instagram: args.instagram || "",
       seguidores: args.seguidores || [],
@@ -196,7 +199,7 @@ export const upsertProfile = mutation({
         xp: args.xp ?? 0,
         level: args.level ?? 1,
         email: args.email,
-        password: args.password,
+        password: args.password ? await bcrypt.hash(args.password, 10) : undefined,
         biografia: args.biografia || "",
         instagram: args.instagram || "",
         seguidores: args.seguidores || [],
@@ -280,7 +283,7 @@ export const registerWithReferral = mutation({
       nombre: args.nombre,
       usuario: args.usuario,
       email: args.email,
-      password: args.password,
+      password: args.password ? await bcrypt.hash(args.password, 10) : undefined,
       avatar: args.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${args.usuario}`,
       esPro: false,
       esVerificado: false,
@@ -485,7 +488,8 @@ export const setNewPassword = mutation({
 
     if (profile.userId !== args.userId && !isAdmin) throw new Error("No tienes permiso para cambiar esta contraseña");
 
-    await ctx.db.patch(profile._id, { password: args.password });
+    const hashedPassword = await bcrypt.hash(args.password, 10);
+    await ctx.db.patch(profile._id, { password: hashedPassword });
   },
 });
 

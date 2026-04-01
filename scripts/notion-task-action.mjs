@@ -25,6 +25,13 @@ const NOTION_API_KEY = process.env.NOTION_API_KEY;
 const NOTION_DATABASE_ID = process.env.NOTION_DATABASE_ID;
 const ROOT = process.cwd();
 
+const RESET = '\x1b[0m';
+const BOLD = '\x1b[1m';
+const DIM = '\x1b[2m';
+const GREEN = '\x1b[32m';
+const CYAN = '\x1b[36m';
+const YELLOW = '\x1b[33m';
+
 const headers = {
   'Authorization': `Bearer ${NOTION_API_KEY}`,
   'Notion-Version': '2022-06-28',
@@ -44,9 +51,6 @@ const COLORS = {
   'Ready': '\x1b[33m',
   'Backlog': '\x1b[2m',
 };
-
-const RESET = '\x1b[0m';
-const BOLD = '\x1b[1m';
 
 async function fetchAllTasks() {
   let allTasks = [];

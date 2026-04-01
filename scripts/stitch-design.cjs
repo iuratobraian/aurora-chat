@@ -1,7 +1,14 @@
 // Stitch Design Generator for Aurora Nexus Portal
+// Requires STITCH_API_KEY environment variable
 const https = require('https');
 
-const API_KEY = 'AQ.Ab8RN6LVlJylZuhwyBC5y_x7t3oOCUqnZt5SXjiM_GxKYGgDJA';
+const API_KEY = process.env.STITCH_API_KEY;
+
+if (!API_KEY) {
+  console.error('❌ STITCH_API_KEY no configurada.');
+  console.error('   Agregá STITCH_API_KEY=tu_key a tu .env.local');
+  process.exit(1);
+}
 
 const prompt = `
 Aurora Nexus - AI Agent Orchestration Portal

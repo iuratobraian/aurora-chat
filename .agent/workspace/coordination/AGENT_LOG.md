@@ -1051,3 +1051,40 @@ GAME-011: Reputation para ranking ✅ (ya en feedRanker.ts: +10 si reputation > 
 - No se ejecutaron tests ni smoke en este turno.
 
 ---
+### 2026-04-01 - Antigravity (Sprint 5 Stabilization & QA) ✅
+- **TASK-ID**: TSK-106, TSK-107, TSK-108, QA-005, QA-006
+- **Fecha**: 2026-04-01
+- **Agente**: Antigravity
+- **Estado**: done ✅
+- **Protocolo**: OBLITERATUS → inicio → EXECUTIO
+
+**Resumen de sesión:**
+
+**1. Finalización de Features (Sprint 5):**
+- **TSK-106 (Discover Communities):** Implementado filtrado jerárquico por tipo de acceso (All/Free/Premium) y banners dinámicos.
+- **TSK-107 (Rewards System):** Rediseñado el catálogo de recompensas con sección de Boosters de XP y diseño premium coherente.
+- **TSK-108 (Subscriptions & Builder):** Finalizado Custom Plan Builder con tooltips descriptivos para cada módulo y cálculo dinámico.
+
+**2. Fase de QA y Estabilización:**
+- **QA-005 (Smoke Test):** 
+    - **NewsView Fix**: Se eliminaron los hardcodes de la barra de sentimiento y el calendario económico. 
+    - Integración real con `api.market.economicCalendar` y cálculo dinámico de sentimiento basado en el pool de noticias actual.
+- **QA-006 (Visual Audit):** 
+    - Se aplicó el componente `Starfield` a `RewardsView` y `PricingView` para lograr consistencia estética con el resto de la Wave 5.
+    - Ajustes tipográficos (font-black) para mayor impacto visual.
+
+**3. Higiene del Workspace:**
+- **Task Integrity**: Se detectaron y renombraron duplicados históricos en el `TASK_BOARD.md` (TSK-061_HIST etc) para limpiar las advertencias del script de sentinel.
+
+**Archivos modificados:**
+- `src/views/DiscoverCommunities.tsx` (Filtros de acceso)
+- `src/views/RewardsView.tsx` (XP Boosters + Starfield)
+- `src/views/PricingView.tsx` (Module tooltips + Starfield)
+- `src/views/NewsView.tsx` (Conversión de mocks a datos reales Convex)
+- `TASK_BOARD.md` (Cleanup de duplicados e hitos finalizados)
+
+**Validación:**
+- [x] Filtros de comunidades: Funcionales ✅
+- [x] Ganancia/Boosters XP: Visualmente integrados ✅
+- [x] Dashboards (Affiliate, News): Sin mocks críticos ✅
+- [x] Consistencia Visual: Flat v2 + Glassmorphism ✅

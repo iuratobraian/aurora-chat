@@ -8,6 +8,7 @@ import { StarRating } from '../components/ui/StarRating';
 import { GoldButton } from '../components/ui/GoldButton';
 import { GlowCard } from '../components/ui/GlowCard';
 import { NeonLoader } from '../components/ui/NeonLoader';
+import { Starfield } from '../components/ui/Starfield';
 
 interface RewardsViewProps {
   usuario: Usuario | null;
@@ -81,7 +82,9 @@ export default function RewardsView({ usuario, onNavigate, onLoginRequest }: Rew
   }
 
   return (
-    <div className="max-w-[1600px] mx-auto space-y-8">
+    <div className="max-w-[1600px] mx-auto space-y-8 animate-in fade-in duration-700 relative">
+      <Starfield count={20} speed="slow" />
+      
       {/* Header */}
       <div className="relative overflow-hidden rounded-2xl">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-violet-500/5 to-transparent" />
@@ -121,20 +124,41 @@ export default function RewardsView({ usuario, onNavigate, onLoginRequest }: Rew
       </div>
 
       {/* Category Filter */}
-      <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setSelectedCategory(cat)}
-            className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${
-              selectedCategory === cat
-                ? 'bg-primary text-white shadow-lg shadow-primary/20'
-                : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/10'
-            }`}
-          >
-            {cat === 'all' ? 'Todas' : cat.charAt(0).toUpperCase() + cat.slice(1)}
-          </button>
-        ))}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 overflow-hidden">
+        <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${
+                selectedCategory === cat
+                  ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                  : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/10'
+              }`}
+            >
+              {cat === 'all' ? 'Todas' : CATEGORY_ICONS[cat] ? (
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-sm">{CATEGORY_ICONS[cat]}</span>
+                  {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                </div>
+              ) : cat.charAt(0).toUpperCase() + cat.slice(1)}
+            </button>
+          ))}
+        </div>
+        
+        {/* Active Boosters */}
+        <div className="flex items-center gap-3">
+          <div className="flex -space-x-2">
+            {[1, 2].map(i => (
+              <div key={i} className="size-8 rounded-full bg-gradient-to-br from-yellow-400 to-amber-600 border-2 border-[#0a0c10] flex items-center justify-center shadow-lg">
+                <span className="material-symbols-outlined text-xs text-white">bolt</span>
+              </div>
+            ))}
+          </div>
+          <p className="text-[10px] font-black text-yellow-400 uppercase tracking-widest animate-pulse">
+            2 Booster Activos (2.5x XP)
+          </p>
+        </div>
       </div>
 
       {/* History */}

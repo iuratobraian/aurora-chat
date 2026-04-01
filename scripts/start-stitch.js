@@ -4,7 +4,13 @@ require('dotenv').config();
 
 const { execSync } = require('child_process');
 
-const apiKey = process.env.STITCH_API_KEY || 'AQ.Ab8RN6LVlJylZuhwyBC5y_x7t3oOCUqnZt5SXjiM_GxKYGgDJA';
+const apiKey = process.env.STITCH_API_KEY;
+
+if (!apiKey) {
+  console.error('❌ STITCH_API_KEY no configurada.');
+  console.error('   Agregá STITCH_API_KEY=tu_key a tu .env.local');
+  process.exit(1);
+}
 
 console.log('Starting Stitch MCP Proxy...');
 console.log('API Key configured:', apiKey.substring(0, 10) + '...');

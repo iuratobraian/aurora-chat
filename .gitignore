@@ -31,6 +31,11 @@ dist-ssr
 .env.*.local
 .env.production
 .env.development
+.env.aurora
+.env.aurora.example
+.env.nvidia
+.env.vercel
+.env.convex
 
 # Convex
 .convex

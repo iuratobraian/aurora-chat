@@ -63,6 +63,7 @@ const DiscoverCommunities: React.FC<DiscoverCommunitiesProps> = ({
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [communities, setCommunities] = useState<Community[]>([]);
+  const [accessFilter, setAccessFilter] = useState<'all' | 'free' | 'paid'>('all');
   const { showToast } = useToast();
 
   const trendingCommunities = useQuery(api.communities.getTrendingCommunities, { limit: 6 }) as Community[] | undefined;
@@ -86,8 +87,13 @@ const DiscoverCommunities: React.FC<DiscoverCommunitiesProps> = ({
   const rankedCommunities = useMemo(() => {
     if (!communities || communities.length === 0) return [];
     
-    const promoted = communities.filter((c: any) => c.isPromoted);
-    const regular = communities.filter((c: any) => !c.isPromoted);
+    let filtered = communities;
+    if (accessFilter !== 'all') {
+      filtered = communities.filter((c: any) => c.accessType === accessFilter);
+    }
+    
+    const promoted = filtered.filter((c: any) => c.isPromoted);
+    const regular = filtered.filter((c: any) => !c.isPromoted);
     
     const sortByTrust = (arr: any[]) => 
       [...arr].sort((a, b) => {
@@ -97,7 +103,7 @@ const DiscoverCommunities: React.FC<DiscoverCommunitiesProps> = ({
       });
     
     return [...sortByTrust(promoted), ...sortByTrust(regular)];
-  }, [communities]);
+  }, [communities, accessFilter]);
 
   const handleVisitCommunity = (slug: string) => {
     window.dispatchEvent(new CustomEvent('navigate', { detail: `/comunidad/${slug}` }));
@@ -423,14 +429,33 @@ const DiscoverCommunities: React.FC<DiscoverCommunitiesProps> = ({
           </div>
         </div>
 
-        {/* Search */}
-        <div className="glass rounded-2xl border border-white/10 backdrop-blur-xl p-4">
-          <CommunitySearch
-            usuario={usuario}
-            onVisitCommunity={handleVisitCommunity}
-            onLoginRequest={onLoginRequest}
-            variant="full"
-          />
+        {/* Search & Filters */}
+        <div className="glass rounded-2xl border border-white/10 backdrop-blur-xl p-4 space-y-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex-1">
+              <CommunitySearch
+                usuario={usuario}
+                onVisitCommunity={handleVisitCommunity}
+                onLoginRequest={onLoginRequest}
+                variant="inline"
+              />
+            </div>
+            <div className="flex items-center gap-2 p-1 bg-white/5 rounded-xl border border-white/10">
+              {(['all', 'free', 'paid'] as const).map((filter) => (
+                <button
+                  key={filter}
+                  onClick={() => setAccessFilter(filter)}
+                  className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+                    accessFilter === filter
+                      ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                      : 'text-gray-500 hover:text-gray-300'
+                  }`}
+                >
+                  {filter === 'all' ? 'Todas' : filter === 'free' ? 'Gratis' : 'Premium'}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {communities && communities.length > 0 ? (

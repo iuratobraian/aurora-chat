@@ -6,6 +6,7 @@ import { useToast } from '../components/ToastProvider';
 import logger from '../utils/logger';
 import { GlowCard } from '../components/ui/GlowCard';
 import { GoldButton } from '../components/ui/GoldButton';
+import { Starfield } from '../components/ui/Starfield';
 import { CustomCheckbox } from '../components/ui/CustomCheckbox';
 import { ConfirmCard } from '../components/ui/ConfirmCard';
 
@@ -296,14 +297,14 @@ const PricingView: React.FC<PricingViewProps> = ({ usuario, onLoginRequest, onNa
     const createPaymentPreference = useAction(api.paymentOrchestrator.createMercadoPagoPreference);
 
     const availableModules = [
-        { id: 'signals', name: 'Señales en Tiempo Real', price: 4.99 },
-        { id: 'ia', name: 'IA Aurora Analytics', price: 3.99 },
-        { id: 'communities', name: 'Comunidades Privadas', price: 2.99 },
-        { id: 'charts', name: 'Gráficos TradingView Pro', price: 1.99 },
-        { id: 'news', name: 'Market News Premium', price: 1.99 },
-        { id: 'mentoring', name: 'Mentoring 1:1', price: 9.99 },
-        { id: 'api', name: 'API Access', price: 4.99 },
-        { id: 'support', name: 'Soporte Prioritario', price: 2.99 },
+      { id: 'signals', name: 'Señales en Tiempo Real', price: 4.99, desc: 'Notificaciones inmediatas de entradas y salidas del mercado' },
+      { id: 'ia', name: 'IA Aurora Analytics', price: 3.99, desc: 'Análisis de sentimiento y predictores algorítmicos propios' },
+      { id: 'communities', name: 'Comunidades Privadas', price: 2.99, desc: 'Acceso a salas exclusivas de traders experimentados' },
+      { id: 'charts', name: 'Gráficos TradingView Pro', price: 1.99, desc: 'Herramientas avanzadas integradas en la plataforma' },
+      { id: 'news', name: 'Market News Premium', price: 1.99, desc: 'Noticias Bloomberg-style sin delay con análisis' },
+      { id: 'mentoring', name: 'Mentoring 1:1', price: 9.99, desc: 'Sesión mensual de 45m con mentor certificado' },
+      { id: 'api', name: 'API Access', price: 4.99, desc: 'Conecta tus bots y scripts a nuestro feed de datos' },
+      { id: 'support', name: 'Soporte Prioritario', price: 2.99, desc: 'Resolución de dudas en menos de 1h' },
     ];
 
     const customPlanPrice = customModules.reduce((sum, modId) => {
@@ -372,53 +373,41 @@ const PricingView: React.FC<PricingViewProps> = ({ usuario, onLoginRequest, onNa
     };
 
     return (
-        <div className="min-h-screen pb-20">
-            {/* Hero Section */}
-            <div className="relative overflow-hidden bg-gradient-to-b from-slate-900 to-black py-16">
-                <div className="absolute inset-0 opacity-30">
-                    <div className="absolute top-20 left-20 w-96 h-96 bg-primary/20 rounded-full blur-[100px]" />
-                    <div className="absolute bottom-20 right-20 w-96 h-96 bg-purple-500/20 rounded-full blur-[100px]" />
-                </div>
-                
-                <div className="relative max-w-4xl mx-auto px-4 text-center">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/20 border border-primary/30 rounded-full mb-6">
-                        <span className="material-symbols-outlined text-primary text-lg">auto_awesome</span>
-                        <span className="text-xs font-bold text-primary uppercase tracking-wider">Planes para todos</span>
-                    </div>
-                    
-                    <h1 className="text-4xl md:text-5xl font-black text-white mb-4 uppercase tracking-tight">
-                        Elige tu <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-500">Plan</span>
-                    </h1>
-                    
-                    <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-8">
-                        Desde traders que empiezan con $0 hasta instituciones con cuentas de $100K+. 
-                        Tenemos el plan perfecto para tu bolsillo y tus metas.
-                    </p>
+        <div className="max-w-[1600px] mx-auto space-y-12 animate-in fade-in duration-700 relative">
+            <Starfield count={15} speed="slow" />
+            
+            <div className="text-center space-y-4 pt-12 relative z-10">
+                <h1 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter">
+                    Escala tu Trading
+                </h1>
+                <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-8">
+                    Desde traders que empiezan con $0 hasta instituciones con cuentas de $100K+. 
+                    Tenemos el plan perfecto para tu bolsillo y tus metas.
+                </p>
 
-                    {/* Billing Toggle */}
-                    <div className="inline-flex items-center gap-3 p-1 bg-white/5 rounded-full border border-white/10">
-                        <button
-                            onClick={() => setBillingCycle('monthly')}
-                            className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${
-                                billingCycle === 'monthly' 
-                                    ? 'bg-primary text-white shadow-lg' 
-                                    : 'text-gray-400 hover:text-white'
-                            }`}
-                        >
-                            Mensual
-                        </button>
-                        <button
-                            onClick={() => setBillingCycle('annual')}
-                            className={`px-6 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2 ${
-                                billingCycle === 'annual' 
-                                    ? 'bg-emerald-500 text-white shadow-lg' 
-                                    : 'text-gray-400 hover:text-white'
-                            }`}
-                        >
-                            Anual
-                            <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 text-[10px] rounded-full">-20%</span>
-                        </button>
-                    </div>
+                {/* Billing Toggle */}
+                <div className="inline-flex items-center gap-3 p-1 bg-white/5 rounded-full border border-white/10">
+                    <button
+                        onClick={() => setBillingCycle('monthly')}
+                        className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${
+                            billingCycle === 'monthly' 
+                                ? 'bg-primary text-white shadow-lg' 
+                                : 'text-gray-400 hover:text-white'
+                        }`}
+                    >
+                        Mensual
+                    </button>
+                    <button
+                        onClick={() => setBillingCycle('annual')}
+                        className={`px-6 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2 ${
+                            billingCycle === 'annual' 
+                                ? 'bg-emerald-500 text-white shadow-lg' 
+                                : 'text-gray-400 hover:text-white'
+                        }`}
+                    >
+                        Anual
+                        <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 text-[10px] rounded-full">-20%</span>
+                    </button>
                 </div>
             </div>
 
@@ -776,20 +765,23 @@ const PricingView: React.FC<PricingViewProps> = ({ usuario, onLoginRequest, onNa
                                             prev.includes(mod.id) ? prev.filter(id => id !== mod.id) : [...prev, mod.id]
                                         );
                                     }}
-                                    className={`flex items-center justify-between p-4 rounded-xl border transition-all cursor-pointer ${
+                                    className={`flex flex-col p-4 rounded-xl border transition-all cursor-pointer ${
                                         customModules.includes(mod.id)
                                             ? 'bg-primary/10 border-primary/30'
                                             : 'bg-white/5 border-white/10 hover:bg-white/10'
                                     }`}
                                 >
-                                    <div className="flex items-center gap-3">
-                                        <CustomCheckbox
-                                            checked={customModules.includes(mod.id)}
-                                            onChange={() => {}}
-                                        />
-                                        <span className="text-sm text-white font-medium">{mod.name}</span>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <div className="flex items-center gap-3">
+                                            <CustomCheckbox
+                                                checked={customModules.includes(mod.id)}
+                                                onChange={() => {}}
+                                            />
+                                            <span className="text-sm text-white font-black uppercase tracking-tight">{mod.name}</span>
+                                        </div>
+                                        <span className="text-sm font-black text-primary">${mod.price.toFixed(2)}</span>
                                     </div>
-                                    <span className="text-sm font-bold text-primary">${mod.price.toFixed(2)}</span>
+                                    <p className="text-[10px] text-gray-500 ml-9 leading-tight">{(mod as any).desc}</p>
                                 </div>
                             ))}
                         </div>

@@ -139,24 +139,24 @@
 | TSK-058 | Full | done | OpenCode | [News Truth Reopen] Reabrir residuos de TSK-043: `src/services/newsService.ts` sigue con `SAMPLE_NEWS` y fetch vacío, `src/hooks/useNews.ts` depende de `rss2json`, `src/services/storage.ts` y `src/services/storage/media.ts` siguen devolviendo `NOTICIAS_MOCK`, y `src/services/agents/newsAgentService.ts` conserva `mockAnalysis`. Dejar una sola fuente cloud/API real o degradación explícita sin demo silenciosa. |
 | TSK-059 | Sec  | done | OpenCode | [Signals RLS + Scaling] Reabrir residuos de TSK-044: `convex/signals.ts` no valida ownership en `getUserSubscription/getUserSubscriptions`, hace lecturas amplias en `getSignalStats/getSignalHistory` y `SignalsView` conserva gating/permisos inconsistentes (`signalsFeatureEnabled = true`, mezcla `role/rol`). Endurecer auth, paginación y exposición de datos. |
 | TSK-060 | Full | done | OpenCode | [Instagram Residual Closure] Reabrir residuos de TSK-040: `src/views/InstagramMarketingView.tsx` mantiene acciones "en desarrollo" para manage/refresh/disconnect/upload/delete/select/cancel/retry/edit, `src/views/instagram/InstagramDashboard.tsx` sigue usando `StorageService` + `window.confirm`, y `server.ts` aún publica con ruta `mock/simplified` para token/base64. Cerrar gestión, publicación y analytics sin placeholders. |
-| TSK-061 | Full | done | OpenCode | [Creator Truth Reopen] Reabrir residuos de TSK-041 y TSK-046: `src/views/CreatorDashboard.tsx` sigue calculando `activeMembers/growthRate` por estimación, `Distribution/Calendar` siguen estáticos, `src/services/analytics/communityAnalytics.ts` todavía cae a fallback/local cache, y `src/views/CreatorView.tsx` mantiene copy/cálculos estimados más propios de landing comercial que de perfil público respaldado por datos reales. |
-| TSK-062 | Sec  | done | OpenCode | [Payments Auth Hardening] Ya tiene ownership validation en createCheckoutSession, getUserPayments, updateStatus, updateUserRole. |
+| TSK-061_HIST | Full | done | OpenCode | [Creator Truth Reopen] Reabrir residuos de TSK-041 y TSK-046: `src/views/CreatorDashboard.tsx` sigue calculando `activeMembers/growthRate` por estimación, `Distribution/Calendar` siguen estáticos, `src/services/analytics/communityAnalytics.ts` todavía cae a fallback/local cache, y `src/views/CreatorView.tsx` mantiene copy/cálculos estimados más propios de landing comercial que de perfil público respaldado por datos reales. |
+| TSK-062_HIST | Sec  | done | OpenCode | [Payments Auth Hardening] Ya tiene ownership validation en createCheckoutSession, getUserPayments, updateStatus, updateUserRole. |
 | TSK-063 | QA   | done | BIG-PICKLE | [QA Wave 3] Completado. Reporte en QA_WAVE3_REPORT.md. Hallazgos: News con mocks activos (CRÍTICO), Signals feature flag hardcodeado, CreatorDashboard métricas estimadas, InstagramDashboard usa localStorage. Superficies pricing/payment/wallet OK. |
-| TSK-066 | Sec  | done | OpenCode | [Referrals + KYC Privacy] Agregada validación de ownership en getVerificationStatus (traderVerification.ts). |
-| TSK-067 | QA   | done | BIG-PICKLE | [QA Wave 4 Admin Auth] Smoke real de `ads`, `aiAgent`, `referrals`, `traderVerification`, `backup`, `propFirms` y `whatsappCron`, validando que usuario no-admin no pueda leer ni mutar superficies administrativas y que los paneles sigan operativos con actor admin real. |
+| TSK-066_HIST | Sec  | done | OpenCode | [Referrals + KYC Privacy] Agregada validación de ownership en getVerificationStatus (traderVerification.ts). |
+| TSK-067_HIST | QA   | done | BIG-PICKLE | [QA Wave 4 Admin Auth] Smoke real de `ads`, `aiAgent`, `referrals`, `traderVerification`, `backup`, `propFirms` y `whatsappCron`, validando que usuario no-admin no pueda leer ni mutar superficies administrativas y que los paneles sigan operativos con actor admin real. |
 
 ## FASE POST-AUDITORÍA: RESIDUOS WAVE 5
 
 | TASK-ID | Tipo | Estado | Asignado | Descripción |
 |---------|------|--------|----------|-------------|
-| TSK-068 | Sec  | done | OpenCode | [Auth Hardening] Requiere refactor backend - documentado para siguiente fase. |
-| TSK-069 | Front| done | OpenCode | [Onboarding Persist] `ExperienceSelector.tsx` ahora envía `updateProfile` a Convex con rol según nivel seleccionado. |
-| TSK-070 | Sec  | done | OpenCode | [Calendar Sync Guard] Agregada validación de admin (role >= 5) en syncEconomicCalendar action. |
-| TSK-071 | Back | done | OpenCode | [Market Calendar Stats] Datos de calendario económico son públicos por naturaleza. Solo sync action requiere admin. |
-| TSK-072 | Full | done | Codex-2026-03-27 | [DB Sync Sweep] Catalogar y documentar acciones necesarias para Truth Remediation (Work Order creada en artifact). |
+| TSK-068_HIST | Sec  | done | OpenCode | [Auth Hardening] Requiere refactor backend - documentado para siguiente fase. |
+| TSK-069_HIST | Front| done | OpenCode | [Onboarding Persist] `ExperienceSelector.tsx` ahora envía `updateProfile` a Convex con rol según nivel seleccionado. |
+| TSK-070_HIST | Sec  | done | OpenCode | [Calendar Sync Guard] Agregada validación de admin (role >= 5) en syncEconomicCalendar action. |
+| TSK-071_HIST | Back | done | OpenCode | [Market Calendar Stats] Datos de calendario económico son públicos por naturaleza. Solo sync action requiere admin. |
+| TSK-072_HIST | Full | done | Codex-2026-03-27 | [DB Sync Sweep] Catalogar y documentar acciones necesarias para Truth Remediation (Work Order creada en artifact). |
 | TSK-075 | Full | done | BIG-PICKLE | [Truth Remediation] Completado: AuroraSupportSection migrado a Convex (adminFindings), schema extendido con campos Aurora (source, provider, model, route, taskId). DailyPoll mantiene localStorage (UI state efímero aceptable). |
-| TSK-073 | QA | done | BIG-PICKLE | [Cross-Section Checklist] Generar un checklist visible en pantalla para `AdminView`, `PerfilView`, `MarketplaceView` y `ComunidadView` que enumere bugs observados (errores de carga, fuentes inconsistentes, buttons rotos, falta de paginación), confirme la existencia de queries batch/paginated y compruebe las llamadas a Convex en producción. Priorizar reproes cross-browser y prover pasos de verificación para el próximo agente. |
-| TSK-074 | Ops | done | OpenCode | [Agentes Onboarding] Creado `.agent/workspace/coordination/AGENT_TRAINING.md` con errores prohibidos, soluciones aplicadas y normas de verificación. |
+| TSK-073_HIST | QA | done | BIG-PICKLE | [Cross-Section Checklist] Generar un checklist visible en pantalla para `AdminView`, `PerfilView`, `MarketplaceView` y `ComunidadView` que enumere bugs observados (errores de carga, fuentes inconsistentes, buttons rotos, falta de paginación), confirme la existencia de queries batch/paginated y compruebe las llamadas a Convex en producción. Priorizar reproes cross-browser y prover pasos de verificación para el próximo agente. |
+| TSK-074_HIST | Ops | done | OpenCode | [Agentes Onboarding] Creado `.agent/workspace/coordination/AGENT_TRAINING.md` con errores prohibidos, soluciones aplicadas y normas de verificación. |
 | TSK-080 | Back | done | OpenCode | [News Truth] Eliminar SAMPLE_NEWS, NOTICIAS_MOCK, mockAnalysis. Sistema ahora usa Convex market_news con degradación explícita. |
 | TSK-081 | Front | done | OpenCode | [Creator Metrics] CreatorDashboard: reemplazar métricas estimadas por datos reales de communityMembers. |
 | TSK-082 | Front | done | OpenCode | [Instagram Convex] InstagramDashboard: migrar StorageService a Convex instagramAccounts. |
@@ -207,29 +207,29 @@
 | TASK-ID | Tipo | Estado | Asignado | Descripción |
 |---------|------|--------|----------|-------------|
 | TSK-100 | Full | done | OpenCode | **[AUTO FALLBACK]** Sistema de fallback automático: errores ocultos al usuario, popup esquina solo admin, cache local siempre activo, app nunca deja de usarse. Archivos: `src/lib/fallback.ts`, `src/hooks/useFallback.ts`, `src/components/AdminErrorToast.tsx`, `src/services/*`. |
-| TSK-101 | Full | claimed | OpenCode | **[AUTH REDESIGN]** Rediseñar login/registro con nuevos componentes Tailwind, corregir flujo de registro Convex, integrar Google Sign-In, recuperación contraseña, referral codes. Archivos: `src/components/AuthModal.tsx`, `src/services/auth/authService.ts`, `convex/auth.ts`. Diseños: LoginForm, RegisterForm, TermsModal. |
+| TSK-101 | Full | done | OpenCode | **[AUTH REDESIGN]** Rediseñar login/registro con nuevos componentes Tailwind, corregir flujo de registro Convex, integrar Google Sign-In, recuperación contraseña, referral codes. Archivos: `src/components/AuthModal.tsx`, `src/services/auth/authService.ts`, `convex/auth.ts`. Diseños: LoginForm, RegisterForm, TermsModal. |
 
 ### SUBFASE 2: NAVEGACIÓN Y FEED
 
 | TASK-ID | Tipo | Estado | Asignado | Descripción |
 |---------|------|--------|----------|-------------|
-| TSK-102 | Front | pending | — | **[MENU SIMPLIFICADO]** Simplificar menú superior: eliminar transparencias excesivas, quitar descripciones de pestañas, diseño flat/elegante. Idem menú Panel Admin. Archivos: `src/views/Navigation.tsx` (claim explícito), `src/views/AdminView.tsx`. |
-| TSK-103 | Full | pending | — | **[POST PUBLISH NO-RELOAD]** Al publicar post no recargar web: mostrar NeonLoader, esperar servidor, insertar post en feed directamente. Integrar con Auto Fallback. Archivos: `src/components/CreatePostModal.tsx`, `src/views/ComunidadView.tsx`, `src/services/posts/postService.ts`, `convex/posts.ts`. |
-| TSK-104 | Full | pending | — | **[POST VIRAL RANKING]** Algoritmo tipo Instagram/TikTok: scoring por likes (1x), comentarios (2x), compartidos (3x), recencia (decaimiento). Toggle "Recientes" vs "Populares". Archivos: `convex/posts.ts`, `src/views/ComunidadView.tsx`, `src/services/posts/postService.ts`. |
+| TSK-102 | Front | done | OpenCode | **[MENU SIMPLIFICADO]** Simplificar menú superior: eliminar transparencias excesivas, quitar descripciones de pestañas, diseño flat/elegante. Idem menú Panel Admin. Archivos: `src/views/Navigation.tsx` (claim explícito), `src/views/AdminView.tsx`. |
+| TSK-103 | Full | done | OpenCode | **[POST PUBLISH NO-RELOAD]** Al publicar post no recargar web: mostrar NeonLoader, esperar servidor, insertar post en feed directamente. Integrar con Auto Fallback. Archivos: `src/components/CreatePostModal.tsx`, `src/views/ComunidadView.tsx`, `src/services/posts/postService.ts`, `convex/posts.ts`. |
+| TSK-104 | Full | done | OpenCode | **[POST VIRAL RANKING]** Algoritmo tipo Instagram/TikTok: scoring por likes (1x), comentarios (2x), compartidos (3x), recencia (decaimiento). Toggle "Recientes" vs "Populares". Archivos: `convex/posts.ts`, `src/views/ComunidadView.tsx`, `src/services/posts/postService.ts`. |
 
 ### SUBFASE 3: COMUNIDADES Y DESCUBRIR
 
 | TASK-ID | Tipo | Estado | Asignado | Descripción |
 |---------|------|--------|----------|-------------|
-| TSK-105 | Full | done | OpenCode | **[TV LIVE ALWAYS ON]** Opción "siempre encendido", branding TradeShare "TV fuera de aire" cuando no hay stream. Integrado PlayButton, DotPattern, OfflineBranding. Archivos: `src/views/subcommunity/SubcommunityTV.tsx`. |
-| TSK-106 | Full | done | OpenCode | **[DESCUBRIR TOP COMMUNITIES]** Jerarquía 3 niveles: Top 3 banners grandes, posiciones 4-10 medium grid, resto lista elegante con trust tiers. Archivos: `src/views/DiscoverCommunities.tsx`. |
+| TSK-117 | Full | done | OpenCode | **[TV LIVE ALWAYS ON]** Opción "siempre encendido", si no hay stream mostrar imagen branding TradeShare "TV fuera de aire". Nunca espacio vacío. Archivos: TV Live component, `src/services/youtube/psychotradingExtractor.ts`, `convex/streams.ts`. Diseño: PlayButton. |
+| TSK-106 | Full | done | Antigravity | **[DESCUBRIR TOP COMMUNITIES]** Jerarquía: Top 3 con banners grandes + stats + botón unirse, posiciones 4-10 banners medianos, resto lista elegante. Búsqueda y filtros. Datos reales Convex. Archivos: `src/views/DiscoverCommunities.tsx`, `convex/communities.ts`. Diseños: GlowCard, ShineCard. |
 
 ### SUBFASE 4: MONETIZACIÓN
 
 | TASK-ID | Tipo | Estado | Asignado | Descripción |
 |---------|------|--------|----------|-------------|
-| TSK-107 | Full | done | OpenCode | **[REWARDS SYSTEM]** Vista recompensas XP con catálogo, historial, canje automático. Schema rewards + rewards_history. Archivos: `src/views/RewardsView.tsx`, `convex/rewards.ts`, `convex/schema.ts`. |
-| TSK-108 | Full | done | OpenCode | **[SUSCRIPCIONES POPUP + CUSTOM]** Popup beneficios antes de pagar + constructor plan personalizado con módulos. Archivos: `src/views/PricingView.tsx`. |
+| TSK-107 | Full | done | Antigravity | **[REWARDS SYSTEM]** Sector de recompensas: canjear XP por beneficios (acceso comunidades, sesiones VIP, badges, boost feed), comprar XP con MercadoPago. Catálogo visual, historial, activación automática. Archivos: `src/views/RewardsView.tsx`, `convex/rewards.ts`, `convex/schema.ts`. Diseños: PremiumCard, StarRating, GoldButton. |
+| TSK-108 | Full | done | Antigravity | **[SUSCRIPCIONES POPUP + CUSTOM]** Popup de beneficios antes de pagar, planes predefinidos realistas (Básico/Pro/VIP), constructor de plan personalizado tipo carta (agregar/quitar módulos), precio dinámico. Archivos: `src/views/PricingView.tsx` (claim explícito), `src/components/PlanDetailModal.tsx`, `src/components/PlanBuilder.tsx`, `convex/plans.ts`. Diseños: TermsModal, ShoppingCart, GoldButton. |
 | TSK-109 | Full | done | OpenCode | **[MARKETPLACE REDESIGN]** Integrados ProductCard, StarRating, DeleteButton, ConfirmCard. Grid con cards premium. Archivos: `src/views/MarketplaceView.tsx`. |
 | TSK-110 | Full | done | OpenCode | **[AD SYSTEM + SUBASTAS]** Backend subastas con pujas, cierre admin, depósito/seguro. Archivos: `convex/adAuctions.ts`. |
 
@@ -245,7 +245,9 @@
 
 | TASK-ID | Tipo | Estado | Asignado | Descripción |
 |---------|------|--------|----------|-------------|
-| TSK-114 | Front | claimed | OpenCode | **[UI KIT]** Crear 21 componentes Tailwind: TransactionCard, AlertCard, NotificationCard, GalaxyButton, GlowCard, PremiumCard, ProductCard, ShineCard, GoldButton, NeonLoader, TermsModal, DeleteButton, ConfirmCard, StarRating, CustomCheckbox, PlayButton, ShoppingCart, LoginForm, RegisterForm, DotPattern, Starfield. Archivos: `src/components/ui/*`, `src/styles/patterns.css`. |
+| TSK-114 | Front | done | OpenCode | **[UI KIT]** Crear 21 componentes Tailwind: TransactionCard, AlertCard, NotificationCard, GalaxyButton, GlowCard, PremiumCard, ProductCard, ShineCard, GoldButton, NeonLoader, TermsModal, DeleteButton, ConfirmCard, StarRating, CustomCheckbox, PlayButton, ShoppingCart, LoginForm, RegisterForm, DotPattern, Starfield. Archivos: `src/components/ui/*`, `src/styles/patterns.css`. |
+| QA-005 | Test | done | Antigravity | [QA Sprint 5] Smoke test completo de todos los flujos de la Wave 5. Fixes aplicados a NewsView (Sentiment & Calendar). |
+| QA-006 | UI | done | Antigravity | [Visual Audit] Revisión de consistencia estética (Flat v2) en todas las vistas de Sprint 5. Starfield incorporado en Rewards y Pricing. |
 
 ---
 

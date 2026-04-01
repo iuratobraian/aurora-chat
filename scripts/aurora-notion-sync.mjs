@@ -9,7 +9,7 @@
  * @see ../../aurora/scripts/aurora-notion-sync.mjs
  */
 
-import notionSync from '../../aurora/scripts/aurora-notion-sync.mjs';
+import notionSync from '../aurora/scripts/aurora-notion-sync.mjs';
 
 // Re-exportar todo
 export default notionSync;

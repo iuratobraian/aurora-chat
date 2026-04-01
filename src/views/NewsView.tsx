@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
 import { NewsArticle, NewsCategory, NewsSource } from '../types/news';
 import { newsService, SOURCE_CONFIG } from '../services/newsService';
 import NewsCard from '../components/news/NewsCard';
@@ -42,8 +44,21 @@ const NewsView: React.FC<NewsViewProps> = ({ usuario }) => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedArticle, setSelectedArticle] = useState<NewsArticle | null>(null);
   const { showToast } = useToast();
+  const calendarEvents = useQuery(api.market.economicCalendar.getUpcomingEvents, { limit: 10 });
 
   const isAdmin = usuario?.rol === 'admin' || usuario?.rol === 'ceo';
+  
+  const marketSentiment = useMemo(() => {
+    if (!news.length) return { label: 'Neutral', score: 50, color: 'text-gray-400' };
+    const bullish = news.filter(n => n.sentiment === 'bullish').length;
+    const bearish = news.filter(n => n.sentiment === 'bearish').length;
+    const total = bullish + bearish || 1;
+    const score = Math.round((bullish / total) * 100);
+    
+    if (score > 60) return { label: 'Bullish', score, color: 'text-green-400', icon: 'trending_up' };
+    if (score < 40) return { label: 'Bearish', score, color: 'text-red-400', icon: 'trending_down' };
+    return { label: 'Neutral', score: 50, color: 'text-gray-400', icon: 'horizontal_rule' };
+  }, [news]);
 
   const fetchNews = useCallback(async () => {
     setLoading(true);
@@ -155,20 +170,28 @@ const NewsView: React.FC<NewsViewProps> = ({ usuario }) => {
       </div>
 
       {/* Market Sentiment Bar */}
-      <GlowCard glowColor="rgba(16, 185, 129, 0.3)" className="mb-6 !p-4">
+      <GlowCard glowColor={marketSentiment.score > 50 ? "rgba(16, 185, 129, 0.3)" : "rgba(239, 68, 68, 0.3)"} className="mb-6 !p-4">
         <div className="flex items-center gap-6 overflow-x-auto no-scrollbar">
           <div className="flex items-center gap-2 shrink-0">
-            <span className="text-xs font-bold text-gray-400 uppercase">Sentimiento:</span>
+            <span className="text-xs font-bold text-gray-400 uppercase">Sentimiento IA:</span>
             <div className="flex items-center gap-1">
-              <span className="text-green-400 text-sm">📈</span>
-              <span className="text-xs font-bold text-green-400">Bullish 62%</span>
+              <span className={`text-sm ${marketSentiment.color}`}>{marketSentiment.icon === 'trending_up' ? '📈' : marketSentiment.icon === 'trending_down' ? '📉' : '➡️'}</span>
+              <span className={`text-xs font-black uppercase tracking-widest ${marketSentiment.color}`}>
+                {marketSentiment.label} {marketSentiment.score}%
+              </span>
             </div>
           </div>
           <div className="h-6 w-px bg-white/10 shrink-0" />
-          <div className="flex items-center gap-4 shrink-0">
-            <span className="text-xs text-gray-400">Forex: <span className="text-white font-bold">Neutral</span></span>
-            <span className="text-xs text-gray-400">Crypto: <span className="text-green-400 font-bold">Bullish</span></span>
-            <span className="text-xs text-gray-400">Índices: <span className="text-red-400 font-bold">Bearish</span></span>
+          <div className="flex items-center gap-4 shrink-0 overflow-hidden">
+            {CATEGORIES.slice(1, 5).map(cat => {
+                const catNews = news.filter(n => n.category === cat.id);
+                const hasBull = catNews.some(n => n.sentiment === 'bullish');
+                return (
+                    <span key={cat.id} className="text-[10px] uppercase font-black tracking-tighter text-gray-400">
+                        {cat.label}: <span className={hasBull ? 'text-green-400' : 'text-red-400'}>{hasBull ? 'Bull' : 'Bear'}</span>
+                    </span>
+                );
+            })}
           </div>
         </div>
       </GlowCard>
@@ -398,21 +421,24 @@ const NewsView: React.FC<NewsViewProps> = ({ usuario }) => {
               Calendario Económico
             </h3>
             <div className="space-y-3">
-              {[
-                { time: '08:30', event: 'NFP', impact: 'high', forecast: '185K', previous: '200K' },
-                { time: '10:00', event: 'ISM Manufacturing', impact: 'high', forecast: '49.5', previous: '49.0' },
-                { time: '14:00', event: 'Fed Rate Decision', impact: 'high', forecast: '5.50%', previous: '5.50%' },
-                { time: '09:00', event: 'EUR GDP', impact: 'medium', forecast: '0.2%', previous: '0.1%' },
-              ].map((item, i) => (
-                <div key={i} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-all">
-                  <span className="text-[10px] text-gray-500 font-mono">{item.time}</span>
-                  <div className={`w-1.5 h-1.5 rounded-full ${item.impact === 'high' ? 'bg-red-500' : 'bg-yellow-500'}`} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-bold text-white truncate">{item.event}</p>
-                    <p className="text-[9px] text-gray-500">Forecast: {item.forecast}</p>
+              {calendarEvents && calendarEvents.length > 0 ? (
+                calendarEvents.map((item: any, i: number) => (
+                  <div key={i} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-all">
+                    <span className="text-[10px] text-gray-500 font-mono">
+                      {new Date(item.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                    <div className={`w-1.5 h-1.5 rounded-full ${item.impact === 'high' ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]' : 'bg-yellow-500'}`} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-bold text-white truncate">{item.event}</p>
+                      <p className="text-[9px] text-gray-500">Forecast: {item.forecast || 'N/A'}</p>
+                    </div>
                   </div>
+                ))
+              ) : (
+                <div className="p-4 text-center">
+                  <p className="text-[10px] text-gray-500 italic">No hay eventos próximos</p>
                 </div>
-              ))}
+              )}
             </div>
           </GlowCard>
         </div>

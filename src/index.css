@@ -51,6 +51,15 @@ body {
   animation: fadeIn 0.25s ease-out;
 }
 
+/* Hide scrollbar utility */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
 /* Input button styles */
 button:not(:disabled):active:has(svg) {
   transform: scale(0.95);

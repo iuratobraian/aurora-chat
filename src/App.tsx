@@ -12,13 +12,15 @@ export default function AuroraChat() {
   const [uploading, setUploading] = useState(false);
   const [showEmoji, setShowEmoji] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentChannel, setCurrentChannel] = useState<string>('global');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isAtBottom = useRef(true);
 
-  const messages = (useQuery(api.chat.getMessages, { limit: 100 }) as ChatMessage[] | undefined) || [];
-  const typingUsers = (useQuery(api.chat.getTypingUsers, { channelId: 'global', excludeUserId: 'aurora-user' }) || []) as string[];
+  const channels = (useQuery(api.chat.getChannels) || []) as { _id: string; name: string; slug: string }[];
+  const messages = (useQuery(api.chat.getMessagesByChannel, { channelId: currentChannel, limit: 100 }) as { messages: ChatMessage[] })?.messages || [];
+  const typingUsers = (useQuery(api.chat.getTypingUsers, { channelId: currentChannel, excludeUserId: 'aurora-user' }) || []) as string[];
   const sendMessage = useMutation(api.chat.sendMessage);
   const setTyping = useMutation(api.chat.setTyping);
 
@@ -45,8 +47,8 @@ export default function AuroraChat() {
   }, []);
 
   const handleTyping = useCallback(() => {
-    setTyping({ channelId: 'global', userId: 'aurora-user', nombre: 'Tú' });
-  }, [setTyping]);
+    setTyping({ channelId: currentChannel, userId: 'aurora-user', nombre: 'Tú' });
+  }, [setTyping, currentChannel]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -67,23 +69,24 @@ export default function AuroraChat() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!text.trim() && !attachedImage) return;
-    const sentText = text.trim();
-    const sentImg = attachedImage;
-    setText('');
-    setAttachedImage(null);
-    setShowEmoji(false);
+    if ((!text.trim() && !attachedImage) || uploading) return;
+    
     try {
       await sendMessage({
         userId: 'aurora-user',
         nombre: 'Tú',
-        avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=aurora&backgroundColor=6c63ff',
-        texto: sentText || (sentImg ? '📷 Imagen' : ''),
-        imagenUrl: sentImg || undefined,
-        channelId: 'global',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=aurora-user',
+        texto: text.trim(),
+        imagenUrl: attachedImage || undefined,
+        channelId: currentChannel,
       });
+      setText('');
+      setAttachedImage(null);
+      setShowEmoji(false);
     } catch (err) {
-      console.error('Error al enviar:', err);
+      console.error('Error sending message:', err);
+      setError('Error al enviar mensaje');
+      setTimeout(() => setError(null), 3000);
     }
   };
 
@@ -113,16 +116,45 @@ export default function AuroraChat() {
       )}
       
       {/* Header */}
-      <div className="px-4 py-3 border-b border-white/10 bg-black/30 flex items-center gap-3 shrink-0">
-        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20">
-          <span className="material-symbols-outlined text-primary text-lg">smart_toy</span>
-        </div>
-        <div>
-          <h3 className="text-xs font-bold text-white tracking-wider">AURORA CHAT</h3>
-          <div className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[9px] text-gray-500 uppercase">En línea</span>
+      <div className="px-4 py-3 border-b border-white/10 bg-black/30 flex flex-col gap-2 shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20">
+            <span className="material-symbols-outlined text-primary text-lg">smart_toy</span>
           </div>
+          <div>
+            <h3 className="text-xs font-bold text-white tracking-wider">AURORA CHAT</h3>
+            <div className="flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[9px] text-gray-500 uppercase">En línea</span>
+            </div>
+          </div>
+        </div>
+        
+        {/* Channel Tabs */}
+        <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-none">
+          <button
+            onClick={() => setCurrentChannel('global')}
+            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
+              currentChannel === 'global'
+                ? 'bg-primary text-white'
+                : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
+            }`}
+          >
+            General
+          </button>
+          {channels.filter(c => c.slug !== 'global').map(channel => (
+            <button
+              key={channel._id}
+              onClick={() => setCurrentChannel(channel.slug)}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
+                currentChannel === channel.slug
+                  ? 'bg-primary text-white'
+                  : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
+              }`}
+            >
+              {channel.name}
+            </button>
+          ))}
         </div>
       </div>
 

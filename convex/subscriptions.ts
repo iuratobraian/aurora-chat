@@ -8,7 +8,7 @@ export const getActivePlans = query({
       .query("subscriptionPlans")
       .withIndex("by_active", (q) => q.eq("isActive", true))
       .order("desc")
-      .collect();
+      .take(50);
   },
 });
 
@@ -38,14 +38,17 @@ export const createSubscription = mutation({
     plan: v.string(),
     provider: v.optional(v.union(v.literal("mercadopago"), v.literal("zenobank"), v.literal("stripe"))),
     externalReference: v.string(),
+    status: v.optional(v.union(v.literal("active"), v.literal("canceled"), v.literal("expired"), v.literal("pending"))),
+    currentPeriodEnd: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const subscriptionId = await ctx.db.insert("subscriptions", {
       userId: args.userId,
       plan: args.plan,
       provider: args.provider || "mercadopago",
-      status: "pending",
+      status: args.status || "pending",
       externalReference: args.externalReference,
+      currentPeriodEnd: args.currentPeriodEnd,
       createdAt: Date.now(),
     });
     return subscriptionId;
@@ -80,6 +83,9 @@ export const cancelSubscription = mutation({
       .first();
 
     if (subscription) {
+      // TODO: Call provider API to cancel recurring billing
+      // For MercadoPago: call mercadopagoProvider.cancelPreapproval(subscription.externalReference)
+      // For Stripe: call stripe.subscriptions.cancel(subscription.externalReference)
       await ctx.db.patch(subscription._id, {
         status: "canceled",
         cancelAtPeriodEnd: true,
@@ -96,6 +102,6 @@ export const getUserSubscriptionHistory = query({
       .query("subscriptions")
       .withIndex("by_userId", (q) => q.eq("userId", args.userId))
       .order("desc")
-      .collect();
+      .take(50);
   },
 });

@@ -218,6 +218,8 @@ async function handleMercadoPagoWebhook(req: express.Request, res: express.Respo
                                 plan: mpData.reason || 'pro',
                                 provider: 'mercadopago',
                                 externalReference: preapprovalId,
+                                status: 'active',
+                                currentPeriodEnd: Date.now() + 30 * 24 * 60 * 60 * 1000,
                             });
                         }
                     }
@@ -263,13 +265,16 @@ async function handleMercadoPagoWebhook(req: express.Request, res: express.Respo
                     } else if (paymentType === 'subscription') {
                         const planId = parts[2] || 'basic';
                         const billingCycle = parts[3] || 'monthly';
+                        const periodDays = billingCycle === 'yearly' ? 365 : 30;
                         await convexClient.mutation(api.subscriptions.createSubscription as any, {
                             userId,
                             plan: planId,
                             provider: 'mercadopago',
                             externalReference: String(eventId),
+                            status: 'active',
+                            currentPeriodEnd: Date.now() + periodDays * 24 * 60 * 60 * 1000,
                         }) as any;
-                        logger.info('[Webhook] Suscripción creada', { userId, planId });
+                        logger.info('[Webhook] Suscripción creada', { userId, planId, billingCycle });
                     } else if (paymentType === 'community') {
                         const communityId = parts[2];
                         if (communityId) {
@@ -278,7 +283,7 @@ async function handleMercadoPagoWebhook(req: express.Request, res: express.Respo
                                 communityId,
                                 paymentReference: String(eventId),
                             }) as any;
-                            logger.info('[Webhook] Acceso a comunidad授予', { userId, communityId });
+                            logger.info('[Webhook] Acceso a comunidad concedido', { userId, communityId });
                         }
                     }
                 }

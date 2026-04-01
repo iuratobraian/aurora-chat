@@ -225,6 +225,38 @@ export const processPaymentWebhook = mutation({
     const { userId, paymentType, paymentAmount, paymentId, planId, billingCycle, communityId } = args;
     const now = Date.now();
     
+    // IDEMPOTENCY: Check if this payment was already processed
+    const existingPayment = await ctx.db
+      .query("payments")
+      .withIndex("by_external_reference", (q) => q.eq("externalReference", String(paymentId)))
+      .first();
+    
+    if (existingPayment && existingPayment.status === "completed") {
+      console.log("[Webhook] Payment already processed (idempotency):", { paymentId });
+      return { success: true, alreadyProcessed: true };
+    }
+    
+    // CREATE/UPDATE payment record
+    if (existingPayment) {
+      await ctx.db.patch(existingPayment._id, {
+        status: "completed",
+        completedAt: now,
+        amount: paymentAmount,
+      });
+    } else {
+      await ctx.db.insert("payments", {
+        userId,
+        amount: paymentAmount,
+        currency: "ARS",
+        status: "completed",
+        provider: "mercadopago",
+        externalReference: String(paymentId),
+        paymentMethod: "mercadopago",
+        createdAt: now,
+        completedAt: now,
+      });
+    }
+    
     if (paymentType === "credits") {
       const existing = await ctx.db
         .query("userCredits")
@@ -258,20 +290,30 @@ export const processPaymentWebhook = mutation({
       const plan = planId || "basic";
       const cycle = billingCycle || "monthly";
 
-      await ctx.db.insert("subscriptions", {
-        userId,
-        plan: plan,
-        provider: "mercadopago",
-        status: "active",
-        externalReference: String(paymentId),
-        currentPeriodEnd: cycle === "yearly" 
-          ? Date.now() + 365 * 24 * 60 * 60 * 1000 
-          : Date.now() + 30 * 24 * 60 * 60 * 1000,
-        createdAt: now,
-        updatedAt: now,
-      });
+      // Check for existing active subscription to avoid duplicates
+      const existingSub = await ctx.db
+        .query("subscriptions")
+        .withIndex("by_user", (q) => q.eq("userId", userId))
+        .filter((q) => q.eq(q.field("status"), "active"))
+        .first();
 
-      console.log("[Webhook] Subscription created:", { userId, plan });
+      if (!existingSub) {
+        await ctx.db.insert("subscriptions", {
+          userId,
+          plan: plan,
+          provider: "mercadopago",
+          status: "active",
+          externalReference: String(paymentId),
+          currentPeriodEnd: cycle === "yearly" 
+            ? Date.now() + 365 * 24 * 60 * 60 * 1000 
+            : Date.now() + 30 * 24 * 60 * 60 * 1000,
+          createdAt: now,
+          updatedAt: now,
+        });
+        console.log("[Webhook] Subscription created:", { userId, plan, cycle });
+      } else {
+        console.log("[Webhook] User already has active subscription:", { userId });
+      }
     } else if (paymentType === "community" && communityId) {
       const existing = await ctx.db
         .query("communityAccess")

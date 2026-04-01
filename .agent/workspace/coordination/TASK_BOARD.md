@@ -170,6 +170,7 @@
 | NTN-021 | Nav  | done | OpenCode | **Top Menu Reconfig** - Remove Aprender, move Psicotrading to Trading, remove Cursos, remove Voz IA. |
 | NTN-022 | UI   | done | OpenCode | **Admin Clean** - Remove floating AI from `AdminView.tsx` and enforce 100% full-width styling. Add web stats. |
 | NTN-023 | UI   | done | OpenCode | **Nav Clean** - Remove floating AI icons from `Navigation.tsx` (top right). |
+| TSK-098 | Ops  | done | Antigravity | **Prod Stabilization** - Fixed 12 lint errors, unified types, and configured GitHub secrets for Convex/NVIDIA. |
 
 ---
 

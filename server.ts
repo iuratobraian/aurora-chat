@@ -1469,6 +1469,23 @@ app.post('/api/ai/generate-caption', requireAuth, async (req, res) => {
     }
 });
 
+// YouTube Psicotrading Extraction — server-side to protect API key
+app.post('/api/youtube/extract', requireAuth, async (req, res) => {
+    const YOUTUBE_API_KEY = process.env.VITE_YOUTUBE_API_KEY || process.env.YOUTUBE_API_KEY;
+    if (!YOUTUBE_API_KEY) {
+        return res.status(503).json({ error: 'YouTube API key not configured' });
+    }
+
+    try {
+        const { extractAllPsychotradingContent } = await import('./services/youtube/psychotradingExtractor');
+        const videos = await extractAllPsychotradingContent(YOUTUBE_API_KEY);
+        res.json({ success: true, videos, count: videos.length });
+    } catch (error: any) {
+        logger.error('YouTube extraction error:', error);
+        res.status(500).json({ error: error.message || 'Extraction failed' });
+    }
+});
+
 // ===========================================
 // AI Relay - Server-side API keys (no client exposure)
 // ===========================================

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { StorageService } from '../services/storage';
-import { YouTubePsychotradingExtractor } from '../services/youtube/psychotradingExtractor';
 import { Usuario } from '../types';
 import { useToast } from '../components/ToastProvider';
 
@@ -16,8 +15,8 @@ interface RecursoEducativo {
     autor: string;
     descripcion: string;
     thumbnail: string;
-    embedUrl: string; // URL del video o del PDF
-    duracion: string; // Duración o Páginas
+    embedUrl: string;
+    duracion: string;
     categoria: 'Libros' | 'Podcast' | 'Psicotrading' | 'Audiolibros';
 }
 
@@ -26,6 +25,7 @@ const PsicotradingView: React.FC<PsicotradingProps> = ({ usuario, onUpdateUser }
     const [selectedResource, setSelectedResource] = useState<RecursoEducativo | null>(null);
     const [isCinemaMode, setIsCinemaMode] = useState(false);
     const [isExtracting, setIsExtracting] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const { showToast } = useToast();
 
     // CRUD State
@@ -37,16 +37,24 @@ const PsicotradingView: React.FC<PsicotradingProps> = ({ usuario, onUpdateUser }
         titulo: '', autor: '', descripcion: '', embedUrl: '', duracion: '', categoria: 'Psicotrading', tipo: 'video', thumbnail: ''
     });
 
-    // Allowed Roles
+    // Allowed Roles — only admin/ceo can delete
     const canEdit = usuario && (['admin', 'ceo', 'programador', 'diseñador'].includes(usuario.rol) || usuario.esPro);
+    const canDelete = usuario && ['admin', 'ceo'].includes(usuario.rol);
 
     useEffect(() => {
         fetchResources();
     }, []);
 
     const fetchResources = async () => {
-        const data = await StorageService.getVideos();
-        setVideoList(data);
+        setIsLoading(true);
+        try {
+            const data = await StorageService.getVideos();
+            setVideoList(data);
+        } catch (err) {
+            showToast('error', 'Error al cargar recursos');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleToggleProgress = async (resourceId: string) => {
@@ -137,12 +145,35 @@ const PsicotradingView: React.FC<PsicotradingProps> = ({ usuario, onUpdateUser }
         showToast('info', 'Extrayendo contenido de YouTube...');
         
         try {
-            const { added, skipped } = await YouTubePsychotradingExtractor.syncWithStorage();
+            // Call server-side endpoint (API key stays on server)
+            const response = await fetch('/api/youtube/extract', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            });
+            
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error || 'Extraction failed');
+            }
+            
+            const data = await response.json();
+            
+            // Save extracted videos to storage
+            let added = 0;
+            const existingIds = new Set(videoList.map(v => v.id));
+            
+            for (const video of data.videos) {
+                if (!existingIds.has(video.id)) {
+                    await StorageService.saveVideo(video);
+                    added++;
+                }
+            }
+            
             await fetchResources();
-            showToast('success', `Extracción completada: ${added} nuevos, ${skipped} existentes`);
-        } catch (error) {
+            showToast('success', `Extracción completada: ${added} nuevos, ${data.count - added} existentes`);
+        } catch (error: any) {
             console.error('Extraction failed:', error);
-            showToast('error', 'Error en la extracción. Revisa la API key de YouTube.');
+            showToast('error', error.message || 'Error en la extracción. Revisa la API key de YouTube.');
         } finally {
             setIsExtracting(false);
         }

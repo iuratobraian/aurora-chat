@@ -224,6 +224,9 @@ export const updateVerificationLevel = mutation({
     ),
   },
   handler: async (ctx, args) => {
+    const isAdmin = await getCallerAdminStatus(ctx);
+    if (!isAdmin) throw new Error("Solo administradores pueden actualizar niveles de verificación");
+    
     const existing = await ctx.db
       .query("trader_verification")
       .withIndex("by_user", (q) => q.eq("oderId", args.oderId))

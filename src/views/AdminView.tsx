@@ -940,6 +940,7 @@ const AdminView: React.FC<{ onVisitProfile?: (id: string) => void; usuario?: Usu
                                 onRefresh={fetchUsers}
                                 showToast={showToast}
                                 onResendEmail={handleResendEmail}
+                                adminUserId={usuario?.id || ''}
                             />
                         </Suspense>
                     )}
@@ -991,6 +992,7 @@ const AdminView: React.FC<{ onVisitProfile?: (id: string) => void; usuario?: Usu
                                 showToast={showToast}
                                 onRemoveMember={handleRemoveCommunityMember}
                                 currentUserId={usuario?.id}
+                                adminUserId={usuario?.id}
                             />
                         </Suspense>
                     )}

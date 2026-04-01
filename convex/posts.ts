@@ -1,6 +1,5 @@
 import { query, mutation, internalMutation } from "./_generated/server";
 import { PaginationOptions } from "convex/server";
-import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 import { calculateXpGain } from "./lib/permissions";
 import { addXpInternal } from "./lib/gamification";
@@ -109,19 +108,23 @@ export const getPosts = query({
 
 
 
-// Obtener posts con paginación - OPTIMIZADO con cursor nativo de Convex
-// Obtener posts con paginación - ESTÁNDAR CONVEX
+// Obtener posts con paginación - API moderna Convex
 export const getPostsPaginated = query({
-  args: { paginationOpts: paginationOptsValidator },
+  args: { 
+    cursor: v.optional(v.string()),
+    numItems: v.optional(v.number()),
+  },
   handler: async (ctx, args) => {
-    // Use cached exclusive community IDs
     const exclusiveCommunityIds = await getExclusiveCommunityIds(ctx);
     
     const result = await ctx.db
       .query("posts")
       .withIndex("by_status_createdAt", (q) => q.eq("status", "active"))
       .order("desc")
-      .paginate(args.paginationOpts);
+      .paginate({
+        cursor: args.cursor ?? null,
+        numItems: args.numItems ?? 20,
+      });
 
     const filteredPage = result.page.filter((post: any) => {
       if (post.subcommunityId && exclusiveCommunityIds.has(post.subcommunityId)) {

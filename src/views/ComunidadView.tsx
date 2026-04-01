@@ -77,15 +77,12 @@ const ComunidadView: React.FC<Props> = ({ usuario, onVisitProfile, onLoginReques
     const creatorCommunities = useQuery(api.communities.getCreatorCommunities, { limit: 3 }) as any[];
     
     const [topUsers, setTopUsers] = useState<any[]>([]);
+    const leaderboard = useQuery(api.profiles.getLeaderboard, { limit: 10, type: 'global' }) as any[];
     useEffect(() => {
-        const fetchTopUsers = async () => {
-            if (usuario?.id && usuario.id !== 'guest') {
-                const leaderboard = await StorageService.getGlobalLeaderboard(10);
-                setTopUsers(leaderboard || []);
-            }
-        };
-        fetchTopUsers();
-    }, [usuario?.id]);
+        if (leaderboard) {
+            setTopUsers(leaderboard || []);
+        }
+    }, [leaderboard]);
 
     const [posts, setPosts] = useState<Publicacion[]>([]);
     const [filterType, setFilterType] = useState<CategoriaPost | 'Todos'>('Todos');
@@ -151,8 +148,8 @@ const ComunidadView: React.FC<Props> = ({ usuario, onVisitProfile, onLoginReques
 
     const loadFallbackPosts = useCallback(async () => {
         setFeedDataSignal('fallback');
-        const [localPosts, adsData] = await Promise.all([StorageService.getPosts(), StorageService.getAds()]);
-        setPosts(injectAds(localPosts, adsData));
+        const localPosts = await api.posts.getPosts();
+        setPosts((localPosts as any[]) || []);
     }, []);
 
     // Effect to update final posts display
@@ -165,15 +162,18 @@ const ComunidadView: React.FC<Props> = ({ usuario, onVisitProfile, onLoginReques
         }
     }, [convexPosts, status, mappedPosts, loadFallbackPosts]);
 
+    const convexAds = useQuery(api.ads.getAds);
     const [ads, setAds] = useState<Ad[]>([]);
 
     useEffect(() => {
-        StorageService.getAds().then(setAds);
+        if (convexAds) {
+            setAds(convexAds.map((ad: any) => ({ ...ad, id: ad._id })));
+        }
         StorageService.getHerramientas().then(setHerramientasData);
         if ('Notification' in window && Notification.permission === 'default') {
             Notification.requestPermission();
         }
-    }, []);
+    }, [convexAds]);
 
     const [prevLiveState, setPrevLiveState] = useState(false);
 
@@ -343,24 +343,25 @@ const ComunidadView: React.FC<Props> = ({ usuario, onVisitProfile, onLoginReques
         const tempPostId = `temp_${Date.now()}`;
         
         try {
-            const result = await StorageService.createPost(data, usuario.id);
-            if (result.error) {
-                showToast('error', result.error);
-            } else if ((result as any).pendingReview) {
-                showToast('warning', `Tu publicación ha sido marcada para revisión.\n\nRazón: ${(result as any).reason || 'Revisión automática'}`);
-            } else if ((result as any).post) {
-                const newPost = (result as any).post as Publicacion;
-                setNewPostId(newPost.id);
-                setPosts(prev => [newPost, ...prev]);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                setTimeout(() => setNewPostId(null), 2000);
-            } else {
+            const createPostMutation = api.posts.createPost;
+            const result = await createPostMutation({
+                userId: usuario.id,
+                titulo: data.titulo || '',
+                contenido: data.contenido || '',
+                categoria: data.categoria || 'general',
+                tags: data.tags || [],
+                imagenUrl: data.imagenUrl || '',
+                videoUrl: data.videoUrl || '',
+                youtubeUrl: data.youtubeUrl || '',
+            } as any);
+            
+            if (result) {
                 setJustPublishedPostId(tempPostId);
                 setIsRefreshing(true);
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error creating post:', error);
-            showToast('error', 'Error al crear el post');
+            showToast('error', error.message || 'Error al crear el post');
         } finally {
             setTimeout(() => {
                 setIsPublishing(false);
@@ -391,7 +392,8 @@ const ComunidadView: React.FC<Props> = ({ usuario, onVisitProfile, onLoginReques
             : [...post.likes, usuario.id];
         setPosts(prev => prev.map(p => p.id === post.id ? { ...p, likes: newLikes } : p));
         try {
-            await StorageService.toggleLikePost(post.id, usuario.id, post.idUsuario);
+            const likePostMutation = api.posts.likePost;
+            await likePostMutation({ postId: post.id, userId: usuario.id } as any);
         } catch (err) {
             logger.error('[ComunidadView] handleLike failed:', err);
             setPosts(prev => prev.map(p => p.id === post.id ? { ...p, likes: originalLikes } : p));
@@ -399,20 +401,28 @@ const ComunidadView: React.FC<Props> = ({ usuario, onVisitProfile, onLoginReques
     }, [usuario, onLoginRequest]);
 
     const handleUpdatePost = useCallback(async (updatedPost: Publicacion) => {
-        await StorageService.updatePost(updatedPost);
-    }, []);
+        const updatePostMutation = api.posts.updatePost;
+        await updatePostMutation({
+            id: updatedPost.id,
+            titulo: updatedPost.titulo,
+            contenido: updatedPost.contenido,
+            categoria: updatedPost.categoria,
+            userId: usuario?.id || ''
+        } as any);
+    }, [usuario]);
 
     const handleDeletePost = useCallback(async (id: string) => {
-        if (!confirm('¿Eliminar publicación?')) return;
-        await StorageService.deletePost(id);
+        const deletePostMutation = api.posts.deletePost;
+        await deletePostMutation({ id, userId: usuario?.id || '' } as any);
         setPosts(prev => prev.filter(p => p.id !== id));
-    }, []);
+    }, [usuario]);
 
     const handleFollow = useCallback(async (authorId: string) => {
         if (!usuario || usuario.id === 'guest') return onLoginRequest();
-        await StorageService.toggleFollowUser(usuario.id, authorId);
-        const updated = await StorageService.getCurrentSession();
-        if (updated && onUpdateUser) onUpdateUser(updated);
+        const toggleFollowMutation = api.profiles.toggleFollow;
+        await toggleFollowMutation({ followerId: usuario.id, targetId: authorId });
+        const updated = await api.profiles.getProfile({ userId: usuario.id });
+        if (updated && onUpdateUser) onUpdateUser(updated as any);
     }, [usuario, onLoginRequest, onUpdateUser]);
 
     const addComment = async (postId: string, text: string, parentId?: string) => {
@@ -449,7 +459,8 @@ const ComunidadView: React.FC<Props> = ({ usuario, onVisitProfile, onLoginReques
 
     const handleLikeComment = useCallback(async (postId: string, commentId: string) => {
         if (!usuario || usuario.id === 'guest') return onLoginRequest();
-        await StorageService.toggleLikeComment(postId, commentId, usuario.id);
+        const likeCommentMutation = api.posts.likeComment;
+        await likeCommentMutation({ postId, commentId, userId: usuario.id } as any);
         setPosts(prev => prev.map(p => {
             if (p.id !== postId) return p;
             const updateC = (comments: Comentario[]): Comentario[] =>
@@ -475,7 +486,8 @@ const ComunidadView: React.FC<Props> = ({ usuario, onVisitProfile, onLoginReques
         setPosts(prev => prev.map(p => p.id === postId ? { ...p, puntos: (p.puntos || 0) + points } : p));
 
         try {
-            await StorageService.givePointsToPost(postId, points, usuario.id);
+            const givePointsMutation = api.posts.givePoints;
+            await givePointsMutation({ postId, points, userId: usuario.id } as any);
         } catch (err) {
             logger.error('[ComunidadView] handleGivePoints failed:', err);
             setPosts(prev => prev.map(p => p.id === postId ? { ...p, puntos: originalPoints } : p));
@@ -489,14 +501,23 @@ const ComunidadView: React.FC<Props> = ({ usuario, onVisitProfile, onLoginReques
     const saveQuickAd = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
         if (!editingAd) return;
-        await StorageService.saveAd(editingAd);
+        const saveAdMutation = api.ads.saveAd;
+        await saveAdMutation({
+            id: (editingAd as any)._id || editingAd.id,
+            titulo: editingAd.titulo,
+            descripcion: editingAd.descripcion,
+            imagenUrl: editingAd.imagenUrl,
+            link: editingAd.link,
+            activo: editingAd.activo,
+        } as any);
         setEditingAd(null);
         loadFallbackPosts();
     }, [editingAd, loadFallbackPosts]);
 
     const handleSaveLive = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
-        await StorageService.updateLiveStatus(liveStatus);
+        const updateConfigMutation = api.config.setConfig;
+        await updateConfigMutation({ key: 'live_status', value: JSON.stringify(liveStatus) });
         setEditingLive(false);
     }, [liveStatus]);
 

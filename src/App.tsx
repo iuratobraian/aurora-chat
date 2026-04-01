@@ -18,6 +18,7 @@ import { FloatingActionsMenu } from './components/FloatingActionsMenu';
 import { AgentOrchestrationProvider } from './hooks/useAgentOrchestration';
 import { AgentStatusBar } from './components/agents/AgentStatusBar';
 import { NewsFeed } from './components/agents/NewsFeed';
+import SubscriptionGate from './components/SubscriptionGate';
 
 const MusicPlayer = lazy(() => import('./components/MusicPlayer'));
 const FloatingBar = lazy(() => import('./components/FloatingBar'));
@@ -547,9 +548,21 @@ const App: React.FC = memo(() => {
                   onUpdateUser={setUsuario}
                 />
               )}
-              {pestañaActiva === 'grafico' && <GraficoView usuario={usuario} />}
-              {pestañaActiva === 'exness' && <ExnessView usuario={usuario} />}
-              {pestañaActiva === 'cursos' && <CursosView usuario={usuario} onVisitProfile={handleVisitProfile} onLoginRequest={() => setModalAuth('login')} />}
+              {pestañaActiva === 'grafico' && (
+                <SubscriptionGate usuario={usuario} minRole={1} featureLabel="Gráfico de Trading" featureDescription="Accede a gráficos profesionales y análisis técnico en tiempo real con un plan Pro.">
+                  <GraficoView usuario={usuario} />
+                </SubscriptionGate>
+              )}
+              {pestañaActiva === 'exness' && (
+                <SubscriptionGate usuario={usuario} minRole={1} featureLabel="Broker Exness" featureDescription="Abre tu cuenta con nuestro broker asociado con un plan Pro.">
+                  <ExnessView usuario={usuario} />
+                </SubscriptionGate>
+              )}
+              {pestañaActiva === 'cursos' && (
+                <SubscriptionGate usuario={usuario} minRole={1} featureLabel="Cursos" featureDescription="Accede a cursos premium de trading con un plan Pro.">
+                  <CursosView usuario={usuario} onVisitProfile={handleVisitProfile} onLoginRequest={() => setModalAuth('login')} />
+                </SubscriptionGate>
+              )}
               {pestañaActiva === 'psicotrading' && usuario && usuario.id !== 'guest' && (
                 <PsicotradingView usuario={usuario} onUpdateUser={setUsuario} />
               )}
@@ -595,10 +608,14 @@ const App: React.FC = memo(() => {
                 <PropFirmsView usuario={usuario} />
               )}
               {pestañaActiva === 'signals' && (
-                <SignalsView usuario={usuario} />
+                <SubscriptionGate usuario={usuario} minRole={1} featureLabel="Señales de Trading" featureDescription="Accede a señales de trading en tiempo real con un plan Pro.">
+                  <SignalsView usuario={usuario} />
+                </SubscriptionGate>
               )}
               {pestañaActiva === 'news' && (
-                <NewsView usuario={usuario} />
+                <SubscriptionGate usuario={usuario} minRole={1} featureLabel="Noticias de Mercado" featureDescription="Accede a noticias y análisis de mercado con un plan Pro.">
+                  <NewsView usuario={usuario} />
+                </SubscriptionGate>
               )}
               {pestañaActiva === 'voz' && (
                 <VoiceAgent />

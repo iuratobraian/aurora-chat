@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { useMutation } from 'convex/react';
+import { api } from '../../../convex/_generated/api';
 import { Usuario } from '../../types';
-import { StorageService } from '../../services/storage';
 
 interface SpamReport {
     _id: any;
@@ -70,6 +71,7 @@ const ModerationPanel: React.FC<ModerationPanelProps> = ({
     onUnsuspendUser,
     showToast,
 }) => {
+    const banUserMutation = useMutation(api.profiles.banUser);
     const [activeTab, setActiveTab] = useState<'reports' | 'spam' | 'users' | 'logs' | 'stats' | 'suspended'>('reports');
     const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'reviewed' | 'dismissed'>('pending');
     const [selectedReports, setSelectedReports] = useState<string[]>([]);
@@ -637,11 +639,18 @@ const ModerationPanel: React.FC<ModerationPanelProps> = ({
                                             </td>
                                             <td className="px-4 py-3">
                                                 <button
-                                                    onClick={() => {
-                                                        const updated = { ...user, isBlocked: false };
-                                                        StorageService.updateUser(updated);
-                                                        showToast('success', 'Usuario desbaneado');
-                                                        window.location.reload();
+                                                    onClick={async () => {
+                                                        try {
+                                                            await banUserMutation({ 
+                                                                userId: user.id, 
+                                                                adminUserId: 'admin',
+                                                                status: 'active'
+                                                            });
+                                                            showToast('success', 'Usuario desbaneado');
+                                                            window.location.reload();
+                                                        } catch (e: any) {
+                                                            showToast('error', e.message || 'Error al desbanear');
+                                                        }
                                                     }}
                                                     className="px-3 py-1.5 bg-signal-green/20 text-signal-green rounded-lg text-[10px] font-bold hover:bg-signal-green/30 transition-colors"
                                                 >

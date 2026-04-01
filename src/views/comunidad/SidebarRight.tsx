@@ -145,7 +145,6 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
                 logo={partner.logo || partner.imagen}
                 url={partner.link || partner.url}
                 benefit={partner.beneficio || partner.metadata?.benefit || partner.descripcion}
-                tag={partner.tag}
               />
             ))}
           </div>

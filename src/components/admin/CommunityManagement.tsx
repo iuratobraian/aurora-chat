@@ -11,6 +11,7 @@ interface CommunityManagementProps {
     showToast: (type: 'success' | 'error' | 'info', message: string) => void;
     onRemoveMember?: (communityId: string, userId: string) => void;
     currentUserId?: string;
+    adminUserId?: string;
 }
 
 const CommunityManagement: React.FC<CommunityManagementProps> = ({
@@ -20,6 +21,7 @@ const CommunityManagement: React.FC<CommunityManagementProps> = ({
     showToast,
     onRemoveMember,
     currentUserId = 'admin',
+    adminUserId,
 }) => {
     const [selectedCommunity, setSelectedCommunity] = useState<any>(null);
     const [isEditing, setIsEditing] = useState(false);
@@ -57,6 +59,7 @@ const CommunityManagement: React.FC<CommunityManagementProps> = ({
         try {
             await updateCommunity({
                 id: editForm.id,
+                userId: adminUserId || currentUserId,
                 name: editForm.name,
                 description: editForm.description,
                 priceMonthly: Number(editForm.priceMonthly) || 0,
@@ -66,8 +69,8 @@ const CommunityManagement: React.FC<CommunityManagementProps> = ({
             showToast('success', 'Comunidad actualizada con éxito');
             setIsEditing(false);
             setEditForm(null);
-        } catch (error) {
-            showToast('error', 'Error actualizando comunidad');
+        } catch (error: any) {
+            showToast('error', error.message || 'Error actualizando comunidad');
         }
     };
 

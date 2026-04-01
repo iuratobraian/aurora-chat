@@ -161,6 +161,30 @@
 | TSK-081 | Front | done | OpenCode | [Creator Metrics] CreatorDashboard: reemplazar métricas estimadas por datos reales de communityMembers. |
 | TSK-082 | Front | done | OpenCode | [Instagram Convex] InstagramDashboard: migrar StorageService a Convex instagramAccounts. |
 
+## FASE BUGFIX: Errores TypeScript
+
+| TASK-ID | Tipo | Estado | Asignado | Descripción |
+|---------|------|--------|----------|-------------|
+| FIX-001 | Bug | done | BIG-PICKLE | Arreglar paginación Convex: migration de `paginationOptsValidator` a API moderna con `cursor/numItems`. |
+
+## FASE ADMIN CRUD: Tareas completadas
+
+| TASK-ID | Tipo | Estado | Asignado | Descripción |
+|---------|------|--------|----------|-------------|
+| TSK-061 | Back | done | OpenCode | [Admin #61] Admin CRUD usuarios — UserManagement migrado de StorageService a Convex (banUser, updateProfile, deleteProfile). |
+| TSK-062 | Front | done | OpenCode | [Admin #62] Admin CRUD comunidades — CommunityManagement usa Convex mutations (create, update, delete). Añadido adminUserId prop. |
+| TSK-064 | Sec | done | OpenCode | [Admin #64] Admin gestión de pagos — Añadida validación requireAdmin a queries de mercadopagoApi.ts (getPaymentStats, getRecentPayments, getRecentSubscriptions, getCreditBalances). |
+| TSK-065 | Feat | done | OpenCode | [Payments #44] Solo Feed gratuito - Signals y News protegidas con SubscriptionGate (minRole=1). |
+| TSK-066 | Feat | done | OpenCode | [Notion #20,#21,#42] Crear comunidad, unirse con verificación suscripción, suscripciones a la carta. |
+| TSK-067 | Feat | done | OpenCode | [Notion #110,#111,#66] Realtime señales (Convex), WebSockets (Convex nativo), Admin dashboard métricas. |
+| TSK-068 | Feat | done | OpenCode | [Notion #60,#63,#65] Admin full-width, CRUD posts, extractor YouTube. |
+| TSK-069 | Feat | done | OpenCode | [Notion #90,#91,#100] Sistema XP, Premios redención, FloatingActionsMenu consolidado. |
+| TSK-070 | Feat | done | OpenCode | [Notion #101-105,#12-14] Styling, Noticias, Subcomunidades completas. |
+| TSK-071 | Feat | done | OpenCode | [Notion #22,#23,#27] Comentarios posts, Likes/Reacciones, Chat privado comunidad. |
+| TSK-072 | Feat | done | OpenCode | [Notion #28,#29,#46] TV Live privada, Academia comunidades, Pagos creadores. |
+| TSK-073 | Sec  | done | OpenCode | [Notion #70,#71,#72] Bitácora conexión directa, extracción automática, validación segura. |
+| TSK-074 | QA   | done | OpenCode | [Notion #83,#84,#130] Tests E2E (bloqueado deps), SEO launch, Skills compartidos. |
+
 ## NOTION TASKS (Sprint Coord -来源 Notion实时同步)
 
 | TASK-ID | Tipo | Estado | Asignado | Descripción |

@@ -27,6 +27,7 @@
 | 2026-03-31 | NOTION-001 | scripts/aurora-ai-agent.mjs | Verified sub-agent delegation (2/agent) configured | None |
 | 2026-03-31 | NOTION-002 | .agent/skills/ | Verified 124+ shared knowledge skills exist | None |
 | 2026-03-31 | NOTION-003 | convex/notifications.ts | Verified push/en-app notifications fully implemented | None |
+| 2026-03-31 | FIX-001 | PartnerCard.tsx | Fixed TypeScript errors: added `tag` prop to PartnerCardProps interface, verified isAdmin prop in SubcommunityView | npm install in progress - node_modules corruption resolved |
 
 ## Summary of Work
 - **Feed Instant Refresh**: Implemented instant post publication with loader animation and fade-in from top. New posts prepend to feed without full reload. "New posts" banner also prepends instead of replacing.

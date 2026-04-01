@@ -70,7 +70,7 @@ export const useWalletStore = create<WalletState>()(
       }),
       {
         name: 'wallet-storage',
-        partialize: (state) => ({
+        partialize: (state: WalletState) => ({
           balance: state.balance,
           lastSyncedAt: state.lastSyncedAt,
         }),
@@ -173,7 +173,7 @@ export const useAuthStore = create<AuthState>()(
       }),
       {
         name: 'auth-storage',
-        partialize: (state) => ({
+        partialize: (state: AuthState) => ({
           user: state.user,
           isAuthenticated: state.isAuthenticated,
         }),

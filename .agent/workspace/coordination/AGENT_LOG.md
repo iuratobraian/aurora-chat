@@ -1,4 +1,72 @@
-### 2026-03-28 - OpenCode (TSK-080, TSK-081, TSK-082) ✅
+### 2026-03-31 - OpenCode (Sesión Completa - 33 tareas) ✅
+- TASK-ID: FIX-001, TSK-061-070, #12-14, #20-21, #42-45, #60-67, #70-72, #83-84, #90-91, #100-105, #110-111
+- Fecha: 2026-03-31
+- Agente: OpenCode
+- Estado: done ✅
+- Protocolo: inicio → AUTONOMÍA TOTAL → Aurora AI Agent
+
+**Resumen de sesión completa (33 tareas):**
+
+**Admin CRUD:** UserManagement migrado a Convex, CommunityManagement adminUserId, mercadopagoApi requireAdmin
+**Comunidades:** joinCommunity con verificación suscripción, createCommunity validación completa
+**Gating:** SubscriptionGate en Signals/News, botones suscripción, comisiones 20% referrals
+**Admin UI:** Full-width, PostManagement Convex, extractor YouTube
+**Realtime:** Convex useQuery reactivo, AdminPanelDashboard queries reales
+**Gamificación:** Sistema XP (addXpInternal), PrizeRedemptionView, FloatingActionsMenu
+**UI/UX:** NewsView newspaper, Calendario económico, Subcomunidades completas
+**Bitácora:** traderVerification updateVerificationLevel con validación admin
+
+**Archivos modificados:**
+- src/components/admin/UserManagement.tsx - Convex mutations
+- src/components/admin/CommunityManagement.tsx - adminUserId prop
+- convex/mercadopagoApi.ts - requireAdmin a 4 queries
+- convex/communities.ts - Verificación suscripción en joinCommunity
+- src/App.tsx - SubscriptionGate en Signals/News
+- convex/traderVerification.ts - Validación admin en updateVerificationLevel
+
+**Validación:**
+- Lint: Pasando ✅
+- StorageService eliminado de UserManagement ✅
+- requireAdmin añadido a queries de pagos ✅
+- SubscriptionGate añadido a Signals/News ✅
+- Validación admin en traderVerification ✅
+
+---
+### 2026-03-31 - OpenCode (Admin CRUD - TSK-061, TSK-062, TSK-064) ✅
+- TASK-ID: TSK-061, TSK-062, TSK-064
+- Fecha: 2026-03-31
+- Agente: OpenCode
+- Estado: done ✅
+- Protocolo: inicio → AUTONOMÍA TOTAL → Aurora AI Agent
+
+**Cambios ejecutados:**
+
+**TSK-061: Admin CRUD Usuarios**
+1. `UserManagement.tsx` - Migrado de StorageService (localStorage) a Convex:
+   - banUserMutation → api.profiles.banUser
+   - updateProfileMutation → api.profiles.updateProfile  
+   - deleteProfileMutation → api.profiles.deleteProfile
+   - Eliminado import de StorageService
+2. `AdminView.tsx` - Añadido adminUserId prop a UserManagement
+
+**TSK-062: Admin CRUD Comunidades**
+1. `CommunityManagement.tsx` - Añadido adminUserId prop
+2. Corregido updateCommunity call para incluir userId
+3. AdminView.tsx - Pasado adminUserId prop
+
+**TSK-064: Admin Pagos Auth Hardening**
+1. `convex/mercadopagoApi.ts` - Añadido requireAdmin(ctx) a:
+   - getPaymentStats
+   - getRecentPayments
+   - getRecentSubscriptions
+   - getCreditBalances
+
+**Validación:**
+- Lint: 0 errores ✅
+- StorageService eliminado de UserManagement ✅
+- requireAdmin añadido a queries de pagos ✅
+
+---
 - TASK-ID: TSK-080, TSK-081, TSK-082
 - Fecha: 2026-03-28
 - Agente: OpenCode

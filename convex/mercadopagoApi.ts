@@ -6,9 +6,11 @@ import {
   resolveMercadoPagoSubscriptionAmount,
 } from "./lib/mercadopago";
 import { api } from "./_generated/api";
+import { requireAdmin } from "./lib/auth";
 
 export const getPaymentStats = query({
   handler: async (ctx) => {
+    await requireAdmin(ctx);
     const now = Date.now();
     const thirtyDaysAgo = now - 30 * 24 * 60 * 60 * 1000;
     
@@ -40,6 +42,7 @@ export const getPaymentStats = query({
 export const getRecentPayments = query({
   args: { limit: v.optional(v.number()) },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const limit = args.limit || 50;
     const payments = await ctx.db.query("payments").collect();
     return payments
@@ -51,6 +54,7 @@ export const getRecentPayments = query({
 export const getRecentSubscriptions = query({
   args: { limit: v.optional(v.number()) },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const limit = args.limit || 50;
     const subscriptions = await ctx.db.query("subscriptions").collect();
     return subscriptions
@@ -62,6 +66,7 @@ export const getRecentSubscriptions = query({
 export const getCreditBalances = query({
   args: { limit: v.optional(v.number()) },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const limit = args.limit || 50;
     const credits = await ctx.db.query("userCredits").collect();
     return credits.sort((a, b) => b.credits - a.credits).slice(0, limit);

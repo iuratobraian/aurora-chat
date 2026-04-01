@@ -158,11 +158,28 @@ export const joinCommunity = mutation({
       return args.communityId;
     }
 
+    // Verificar suscripción para comunidades pagadas
+    if (community.accessType === "paid" && community.priceMonthly && community.priceMonthly > 0) {
+      const activeSubscription = await ctx.db
+        .query("subscriptions")
+        .withIndex("by_userId", (q) => q.eq("userId", args.userId))
+        .collect()
+        .then(subs => subs.find(s => 
+          s.status === "active" && 
+          s.communityId === args.communityId &&
+          (!s.currentPeriodEnd || s.currentPeriodEnd > Date.now())
+        ));
+
+      if (!activeSubscription) {
+        throw new Error(`La comunidad "${community.name}" requiere suscripción activa. Realiza el pago primero.`);
+      }
+    }
+
     await ctx.db.insert("communityMembers", {
       communityId: args.communityId,
       userId: args.userId,
-      role: community.accessType === "free" ? "member" : "pending",
-      subscriptionStatus: community.accessType === "free" ? "active" : undefined,
+      role: community.accessType === "free" ? "member" : "member",
+      subscriptionStatus: "active",
       joinedAt: Date.now(),
     });
 

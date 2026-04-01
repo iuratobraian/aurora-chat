@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { useMutation } from 'convex/react';
+import { api } from '../../../convex/_generated/api';
 import { Usuario } from '../../types';
-import { StorageService } from '../../services/storage';
 import ElectricLoader from '../ElectricLoader';
 
 interface EmailStatus {
@@ -16,6 +17,7 @@ interface UserManagementProps {
     onRefresh: () => void;
     showToast: (type: 'success' | 'error' | 'info', message: string) => void;
     onResendEmail: (userId: string) => void;
+    adminUserId: string;
 }
 
 const ROLES = ['admin', 'ceo', 'vip', 'programador', 'diseñador', 'colaborador', 'trader_experimentado', 'trader_inicial', 'cursante', 'user'];
@@ -27,6 +29,7 @@ const UserManagement: React.FC<UserManagementProps> = ({
     onRefresh,
     showToast,
     onResendEmail,
+    adminUserId,
 }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterRole, setFilterRole] = useState<string>('all');
@@ -38,6 +41,11 @@ const UserManagement: React.FC<UserManagementProps> = ({
     const [communityToJoin, setCommunityToJoin] = useState('');
     const [emailStatus, setEmailStatus] = useState<EmailStatus[]>([]);
     const [isUpdating, setIsUpdating] = useState(false);
+
+    const banUserMutation = useMutation(api.profiles.banUser);
+    const upsertProfileMutation = useMutation(api.profiles.upsertProfile);
+    const deleteProfileMutation = useMutation(api.profiles.deleteProfile);
+    const updateProfileMutation = useMutation(api.profiles.updateProfile);
 
     const filteredUsers = users.filter(user => {
         const matchesSearch = !searchTerm ||
@@ -66,22 +74,35 @@ const UserManagement: React.FC<UserManagementProps> = ({
     };
 
     const handleToggleBlock = async (user: Usuario) => {
-        const updated = { ...user, isBlocked: !user.isBlocked };
-        await StorageService.updateUser(updated);
-        onRefresh();
-        showToast('success', updated.isBlocked ? 'Usuario bloqueado' : 'Usuario desbloqueado');
+        setIsUpdating(true);
+        try {
+            await banUserMutation({ 
+                userId: user.id, 
+                adminUserId, 
+                status: user.isBlocked ? 'active' : 'banned' 
+            });
+            onRefresh();
+            showToast('success', user.isBlocked ? 'Usuario desbloqueado' : 'Usuario bloqueado');
+        } catch (e: any) {
+            showToast('error', `Error: ${e.message}`);
+        } finally {
+            setIsUpdating(false);
+        }
     };
 
     const handleUpdateRole = async (user: Usuario, newRole: string) => {
         setIsUpdating(true);
         try {
-            const updated = { ...user, rol: newRole as Usuario['rol'] };
-            await StorageService.updateUser(updated);
+            await updateProfileMutation({
+                id: user.id as any,
+                userId: adminUserId,
+                rol: newRole
+            });
             setEditingUser(null);
             onRefresh();
             showToast('success', `Rol actualizado a ${newRole}`);
-        } catch (e) {
-            showToast('error', `Error al actualizar rol: ${e}`);
+        } catch (e: any) {
+            showToast('error', `Error al actualizar rol: ${e.message}`);
         } finally {
             setIsUpdating(false);
         }
@@ -100,18 +121,17 @@ const UserManagement: React.FC<UserManagementProps> = ({
         if (!editingUser) return;
         setIsUpdating(true);
         try {
-            const updated = {
-                ...editingUser,
+            await updateProfileMutation({
+                id: editingUser.id as any,
+                userId: adminUserId,
                 nombre: editForm.nombre,
-                email: editForm.email,
                 usuario: editForm.usuario,
-            };
-            await StorageService.updateUser(updated);
+            });
             setEditingUser(null);
             onRefresh();
             showToast('success', 'Usuario actualizado correctamente');
-        } catch (e) {
-            showToast('error', `Error al guardar: ${e}`);
+        } catch (e: any) {
+            showToast('error', `Error al guardar: ${e.message}`);
         } finally {
             setIsUpdating(false);
         }
@@ -121,12 +141,16 @@ const UserManagement: React.FC<UserManagementProps> = ({
         if (!deletingUser) return;
         setIsUpdating(true);
         try {
-            await StorageService.deleteUser(deletingUser.id);
+            await deleteProfileMutation({ 
+                userId: deletingUser.id, 
+                adminUserId,
+                reason: 'Eliminado por administrador desde panel'
+            });
             setDeletingUser(null);
             onRefresh();
             showToast('success', 'Usuario eliminado correctamente');
-        } catch (e) {
-            showToast('error', `Error al eliminar: ${e}`);
+        } catch (e: any) {
+            showToast('error', `Error al eliminar: ${e.message}`);
         } finally {
             setIsUpdating(false);
         }

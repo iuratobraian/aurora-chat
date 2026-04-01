@@ -27,6 +27,7 @@ export const PartnerCard: React.FC<PartnerCardProps> = memo(({ logo, name, benef
                 <h4 className="text-[10px] font-black text-white uppercase truncate">{name}</h4>
             </div>
             <span className="text-[8px] font-bold text-signal-green uppercase">{benefit}</span>
+            {tag && <span className="text-[7px] font-bold text-gray-400 uppercase ml-1">{tag}</span>}
         </div>
         <span className="material-symbols-outlined text-lg text-gray-600">arrow_outward</span>
     </a>

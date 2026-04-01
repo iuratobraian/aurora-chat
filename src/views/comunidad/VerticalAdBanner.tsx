@@ -1,13 +1,15 @@
 import React, { memo } from 'react';
 import { Ad } from '../../types';
 
-interface VerticalAdBannerProps {
+export interface VerticalAdBannerProps {
     ad?: Ad;
     imageUrl?: string;
     link?: string;
     title?: string;
     subtitle?: string;
+    description?: string; // Alias for subtitle
     ctaLabel?: string;
+    label?: string; // Alias for ctaLabel
     theme?: 'default' | 'gradient' | 'minimal';
     isAdmin?: boolean;
     onEdit?: (ad: Ad) => void;
@@ -27,7 +29,9 @@ export const VerticalAdBanner: React.FC<VerticalAdBannerProps> = memo(({
     link,
     title,
     subtitle,
+    description,
     ctaLabel,
+    label,
     theme = 'default',
     isAdmin = false,
     onEdit
@@ -35,8 +39,8 @@ export const VerticalAdBanner: React.FC<VerticalAdBannerProps> = memo(({
     const imgSrc = imageUrl || ad?.imagenUrl || DEFAULT_VALUES.imageUrl;
     const adLink = link || ad?.link || DEFAULT_VALUES.link;
     const adTitle = title || ad?.titulo || DEFAULT_VALUES.title;
-    const adSubtitle = subtitle || ad?.descripcion || DEFAULT_VALUES.subtitle;
-    const adCta = ctaLabel || DEFAULT_VALUES.ctaLabel;
+    const adSubtitle = subtitle || description || ad?.descripcion || DEFAULT_VALUES.subtitle;
+    const adCta = label || ctaLabel || DEFAULT_VALUES.ctaLabel;
 
     if (!imgSrc) return null;
 

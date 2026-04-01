@@ -1,4 +1,4 @@
-﻿# =============================================================================
+# =============================================================================
 # Aurora AI - GitHub Secrets Setup (PowerShell)
 # =============================================================================
 # Este script agrega automáticamente los GitHub Secrets para Aurora AI
@@ -114,6 +114,14 @@ Add-Secret "YOUTUBE_API_KEY" "AIzaSyAOuRFzJ157GdmOctojcYyy3Lwg61pDo0o" "YouTube 
 Add-Secret "NOTION_API_KEY" "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" "Notion API"
 Add-Secret "NOTION_DATABASE_ID" "33142b008df080f8b6b3db69d36e84d5" "Notion Database ID"
 Add-Secret "MERCADOPAGO_ACCESS_TOKEN" "APP_USR-3819445901618978-032605-1548d8d94a4167bdf018f329c532d54f-183552913" "MercadoPago Access Token"
+
+Write-Host ""
+Write-Host "📡 AGREGANDO CONVEX PRODUCTION..." -ForegroundColor Cyan
+
+Add-Secret "CONVEX_URL" "https://diligent-wildcat-523.convex.cloud" "Convex Cloud URL"
+Add-Secret "CONVEX_DEPLOY_KEY" "prod:diligent-wildcat-523|eyJ2MiI6Ijc4NTM5MTU3MGJlNzRmODc4NDZhNjQ4MmZhMDhjZTkxIn0=" "Convex Deployment Key"
+Add-Secret "CONVEX_SITE_URL" "https://diligent-wildcat-523.convex.site" "Convex Site URL"
+Add-Secret "VITE_CONVEX_URL" "https://diligent-wildcat-523.convex.cloud" "Frontend Convex URL"
 
 Write-Host ""
 Write-Host "───────────────────────────────────────────────" -ForegroundColor Gray

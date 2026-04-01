@@ -1,15 +1,16 @@
 import React, { memo } from 'react';
 
-interface PartnerCardProps {
+export interface PartnerCardProps {
     logo: string;
     name: string;
     benefit: string;
-    link: string;
+    link?: string;
+    url?: string;
 }
 
-export const PartnerCard: React.FC<PartnerCardProps> = memo(({ logo, name, benefit, link }) => (
+export const PartnerCard: React.FC<PartnerCardProps> = memo(({ logo, name, benefit, link, url }) => (
     <a
-        href={link}
+        href={link || url}
         target="_blank"
         rel="noopener noreferrer"
         className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5 hover:border-primary/30 transition-all group"

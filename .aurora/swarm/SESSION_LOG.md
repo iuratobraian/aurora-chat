@@ -124,14 +124,51 @@
 
 ### CORRECT-AGENT - AC-003: SelfCorrectLoop
 
+**Start:** 2026-04-01 HH:MM  
+**End:** 2026-04-01 HH:MM  
+**Status:** ✅ COMPLETE
+
+**Checklist:**
+- [x] Read ALL knowledge sources
+- [x] Study Coordinator 4-phase execution
+- [x] Understand verification workers (lint, test, type-check, security)
+- [x] Create: `aurora/core/coordinator/self-correct.mjs`
+- [x] Implement loop:
+  - [x] Execute task
+  - [x] Check verification results
+  - [x] If failed: parse errors
+  - [x] Create fix plan from errors
+  - [x] Re-execute fix plan
+  - [x] Retry (max 3 attempts)
+  - [x] Give up and ask human
+- [x] Add: Error message parser
+- [x] Add: Fix plan generator
+- [x] Test with intentional failures (demo mode)
+- [x] Update AURORA_CHECK.md with [x]
+
+**Notes:**
+```
+✅ SelfCorrectLoop created successfully (650+ lines)
+✅ Error parser for 6 error types
+✅ Fix plan generator with analyze→fix→verify pattern
+✅ Max 3 attempts before human intervention
+✅ Non-correctable error detection
+✅ Demo mode tested successfully
+✅ Committed and pushed to GitHub
+```
+
+---
+
+### DIFF-AGENT - AC-004: DiffTool
+
 **Status:** 🔄 IN PROGRESS  
 **Queue Position:** 1 (ACTIVE)  
 **Start Time:** 2026-04-01 HH:MM
 
 **Notes:**
 ```
-GIT-AGENT complete. CORRECT-AGENT starting now.
-Creating SelfCorrectLoop with auto-correction logic...
+CORRECT-AGENT complete. DIFF-AGENT starting now.
+Creating DiffTool with diff/patch operations...
 ```
 
 ---

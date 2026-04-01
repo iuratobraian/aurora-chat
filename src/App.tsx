@@ -49,11 +49,8 @@ export default function AuroraChat() {
   const sendMessage = useMutation(api.chat.sendMessage);
   const setTyping = useMutation(api.chat.setTyping);
   const createChannel = useMutation(api.chat.createChannel);
-  
-  const verifyPasswordQuery = useQuery(api.chat.verifyChannelPassword, 
-    showPasswordModal && selectedPrivateChannel && passwordInput ? { channelSlug: selectedPrivateChannel, password: passwordInput } : undefined
-  );
-  const verifyPassword = verifyPasswordQuery && typeof verifyPasswordQuery === 'object' ? verifyPasswordQuery : null;
+  const verifyPasswordMutation = useMutation(api.chat.verifyChannelPasswordMutation);
+  const [passwordVerified, setPasswordVerified] = useState(false);
   
   const rawServerStats = useQuery(api.chat.getServerStats);
   const serverStats = rawServerStats && typeof rawServerStats === 'object' 
@@ -115,16 +112,25 @@ export default function AuroraChat() {
     }
   };
 
-  const handlePasswordSubmit = () => {
+  const handlePasswordSubmit = async () => {
     if (!selectedPrivateChannel) return;
-    if (verifyPassword?.valid) {
-      setVerifiedChannels(prev => [...prev, selectedPrivateChannel]);
-      setCurrentChannel(selectedPrivateChannel);
-      setShowPasswordModal(false);
-      setPasswordInput('');
-      setSelectedPrivateChannel(null);
-    } else {
-      setError('Contraseña incorrecta');
+    try {
+      const result = await verifyPasswordMutation({
+        channelSlug: selectedPrivateChannel,
+        password: passwordInput
+      });
+      if (result.valid) {
+        setVerifiedChannels(prev => [...prev, selectedPrivateChannel]);
+        setCurrentChannel(selectedPrivateChannel);
+        setShowPasswordModal(false);
+        setPasswordInput('');
+        setSelectedPrivateChannel(null);
+      } else {
+        setError(result.reason || 'Contraseña incorrecta');
+        setTimeout(() => setError(null), 3000);
+      }
+    } catch (err: any) {
+      setError(err.message || 'Error al verificar contraseña');
       setTimeout(() => setError(null), 3000);
     }
   };

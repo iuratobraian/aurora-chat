@@ -223,11 +223,13 @@ export default defineSchema({
   chatChannels: defineTable({
     name: v.string(),
     slug: v.string(),
-    type: v.union(v.literal("global"), v.literal("community"), v.literal("direct"), v.literal("subcommunity")),
+    type: v.union(v.literal("global"), v.literal("community"), v.literal("direct"), v.literal("subcommunity"), v.literal("private")),
     communityId: v.optional(v.id("communities")),
     participants: v.array(v.string()),
     createdBy: v.string(),
     createdAt: v.number(),
+    password: v.optional(v.string()), // Password for protected channels
+    isPrivate: v.optional(v.boolean()), // Whether channel requires password
   }).index("by_slug", ["slug"]).index("by_type", ["type"]).index("by_community", ["communityId"]),
 
   chatTyping: defineTable({
@@ -2083,6 +2085,33 @@ export default defineSchema({
   }).index("by_community_user", ["communityId", "userId"])
     .index("by_asset", ["asset"])
     .index("by_date", ["votedAt"]),
+
+  rewards: defineTable({
+    name: v.string(),
+    description: v.string(),
+    xpCost: v.number(),
+    category: v.string(),
+    icon: v.string(),
+    type: v.string(),
+    tier: v.string(),
+    expiresInDays: v.optional(v.number()),
+    isActive: v.boolean(),
+    stock: v.optional(v.number()),
+  }).index("by_category", ["category"])
+    .index("by_tier", ["tier"])
+    .index("by_active", ["isActive"]),
+
+  rewards_history: defineTable({
+    userId: v.string(),
+    rewardId: v.id("rewards"),
+    rewardName: v.string(),
+    xpSpent: v.number(),
+    status: v.string(),
+    redeemedAt: v.number(),
+    activatedAt: v.optional(v.number()),
+    expiresAt: v.optional(v.number()),
+  }).index("by_userId", ["userId"])
+    .index("by_status", ["status"]),
 });
 
 /*

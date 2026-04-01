@@ -1,0 +1,107 @@
+/* TradeShare Premium UI Patterns */
+
+@layer base {
+  :root {
+    --primary: #3b82f6;
+    --signal-green: #10b981;
+    --dark: #0f1115;
+    --card: #1a1a2e;
+    --accent-purple: linear-gradient(135deg, #a855f7 0%, #3b82f6 100%);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-bg: rgba(26, 26, 46, 0.6);
+  }
+}
+
+@layer components {
+  .glass {
+    @apply backdrop-blur-xl border border-white/10 bg-card-dark/60;
+  }
+
+  .glow-card {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .glow-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+    pointer-events: none;
+    transition: transform 0.5s ease;
+  }
+
+  .glow-card:hover::before {
+    transform: translate(25%, 25%);
+  }
+
+  /* Galaxy Button Animation */
+  @keyframes galaxy-flow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .btn-galaxy {
+    @apply relative overflow-hidden transition-all duration-300 transform active:scale-95;
+    background: linear-gradient(270deg, #3b82f6, #a855f7, #10b981);
+    background-size: 400% 400%;
+    animation: galaxy-flow 15s ease infinite;
+  }
+
+  .btn-galaxy::after {
+    content: '';
+    @apply absolute inset-0 bg-white/10 opacity-0 transition-opacity duration-300;
+  }
+
+  .btn-galaxy:hover::after {
+    @apply opacity-100;
+  }
+
+  /* Neon Loader */
+  .neon-loader {
+    width: 48px;
+    height: 48px;
+    border: 3px solid transparent;
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: neon-spin 1s linear infinite;
+    filter: drop-shadow(0 0 5px var(--primary));
+  }
+
+  @keyframes neon-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Starfield Background */
+  .starfield {
+    @apply absolute inset-0 pointer-events-none;
+    background-image: radial-gradient(1px 1px at 20px 30px, #eee, rgba(0,0,0,0)),
+                      radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0)),
+                      radial-gradient(1px 1px at 50px 160px, #ddd, rgba(0,0,0,0)),
+                      radial-gradient(1px 1px at 80px 120px, #fff, rgba(0,0,0,0)),
+                      radial-gradient(1px 1px at 110px 210px, #ddd, rgba(0,0,0,0)),
+                      radial-gradient(1px 1px at 100px 30px, #fff, rgba(0,0,0,0)),
+                      radial-gradient(1px 1px at 140px 70px, #fff, rgba(0,0,0,0)),
+                      radial-gradient(1px 1px at 150px 160px, #ddd, rgba(0,0,0,0));
+    background-repeat: repeat;
+    background-size: 200px 200px;
+    animation: starfield-drift 100s linear infinite;
+    opacity: 0.3;
+  }
+
+  @keyframes starfield-drift {
+    from { transform: translateY(0); }
+    to { transform: translateY(-1000px); }
+  }
+
+  /* Dot Pattern */
+  .dot-pattern {
+    mask-image: radial-gradient(circle at center, black, transparent 80%);
+    background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 0);
+    background-size: 20px 20px;
+  }
+}

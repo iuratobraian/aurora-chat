@@ -286,7 +286,8 @@ const DiscoverCommunities: React.FC<DiscoverCommunitiesProps> = ({
   };
 
   const top3Communities = rankedCommunities.slice(0, 3);
-  const otherCommunities = rankedCommunities.slice(3);
+  const mediumCommunities = rankedCommunities.slice(3, 10);
+  const remainingCommunities = rankedCommunities.slice(10);
 
   const handleCreateCommunity = () => {
     window.dispatchEvent(new CustomEvent('navigate', { detail: '/creator-studio' }));
@@ -459,8 +460,39 @@ const DiscoverCommunities: React.FC<DiscoverCommunitiesProps> = ({
               </div>
             )}
 
-            {/* All Communities List */}
-            {otherCommunities.length > 0 && (
+            {/* Positions 4-10: Medium Banners */}
+            {mediumCommunities.length > 0 && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <div className="size-12 rounded-xl bg-gradient-to-br from-violet-500/20 to-purple-600/10 border border-violet-400/20 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-violet-400 text-xl">stars</span>
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-black text-white uppercase tracking-wider">
+                      Comunidades Destacadas
+                    </h2>
+                    <p className="text-xs text-gray-500 font-medium">
+                      Crecimiento rápido y alta actividad
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {mediumCommunities.map((community, index) => (
+                    <div
+                      key={community._id}
+                      className="animate-in fade-in slide-in-from-bottom-4 duration-300"
+                      style={{ animationDelay: `${index * 50}ms` }}
+                    >
+                      <CommunityCard community={community} index={index + 3} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Position 11+: Elegant List */}
+            {remainingCommunities.length > 0 && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
@@ -477,20 +509,60 @@ const DiscoverCommunities: React.FC<DiscoverCommunitiesProps> = ({
                     </div>
                   </div>
                   <span className="px-4 py-2 rounded-xl bg-gradient-to-r from-primary/10 to-violet-600/10 border border-primary/20 text-[10px] font-bold text-primary uppercase tracking-widest">
-                    {otherCommunities.length} comunidades
+                    {remainingCommunities.length} comunidades
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-                  {otherCommunities.map((community, index) => (
-                    <div
-                      key={community._id}
-                      className="animate-in fade-in slide-in-from-bottom-4 duration-300"
-                      style={{ animationDelay: `${index * 50}ms` }}
-                    >
-                      <CommunityCard community={community} index={index + 3} />
-                    </div>
-                  ))}
+                <div className="glass rounded-xl border border-white/10 divide-y divide-white/5">
+                  {remainingCommunities.map((community, index) => {
+                    const isMember = isUserMember(community._id);
+                    const trustScore = getCommunityTrustScore(community);
+                    const trustTier = getCommunityTrustTier(trustScore);
+                    const tierConfig = TRUST_TIER_CONFIG[trustTier];
+                    
+                    return (
+                      <div
+                        key={community._id}
+                        onClick={() => handleVisitCommunity(community.slug)}
+                        className="flex items-center gap-4 p-4 hover:bg-white/5 transition-colors cursor-pointer group animate-in fade-in duration-300"
+                        style={{ animationDelay: `${index * 30}ms` }}
+                      >
+                        <div className="size-10 rounded-lg bg-gradient-to-br from-primary/40 to-violet-600/30 flex items-center justify-center shrink-0">
+                          <span className="text-sm font-black text-white">{community.name.charAt(0).toUpperCase()}</span>
+                        </div>
+                        
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <h4 className="text-sm font-bold text-white group-hover:text-primary transition-colors truncate">
+                              {community.name}
+                            </h4>
+                            <span className={`text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded border ${tierConfig.color}`}>
+                              {tierConfig.label}
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-500 truncate">{community.description}</p>
+                        </div>
+                        
+                        <div className="flex items-center gap-4 shrink-0">
+                          <span className="text-xs text-gray-400 flex items-center gap-1">
+                            <span className="material-symbols-outlined text-sm">group</span>
+                            {formatMembers(community.currentMembers)}
+                          </span>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleJoinCommunity(community._id, e); }}
+                            disabled={isMember}
+                            className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${
+                              isMember
+                                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                : 'bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20'
+                            }`}
+                          >
+                            {isMember ? 'Miembro' : 'Unirse'}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -602,13 +674,13 @@ const DiscoverCommunities: React.FC<DiscoverCommunitiesProps> = ({
               >
                 Crear Comunidad
               </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
 interface FeatureCardProps {
   icon: string;

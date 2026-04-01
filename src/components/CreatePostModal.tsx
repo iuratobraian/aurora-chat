@@ -3,6 +3,7 @@ import React, { useState, useRef, useCallback } from "react";
 import { useConvex } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { getSesion } from "../services/authBase";
+import { NeonLoader } from "./ui/NeonLoader";
 
 // ─────────────────────────────────────────────
 // TIPOS
@@ -221,7 +222,9 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
       } as any);
 
       if (result.success) {
+        // Notify parent component immediately - they'll handle instant feed update
         onSuccess?.(result.postId);
+        // Close modal after successful post (no reload needed)
         handleClose();
       }
     } catch (err: any) {
@@ -231,7 +234,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
       } else if (msg.includes("MEMBERSHIP_PENDING")) {
         setError("Tu membresía está pendiente de aprobación");
       } else if (msg.includes("RATE_LIMIT_EXCEEDED")) {
-        setError("Publicaste demasiado seguido. Esperá un rato");
+        setError("Publicaste demasiado seguido. Esperá un momento");
       } else if (msg.includes("USER_BLOCKED")) {
         setError("Tu cuenta está suspendida");
       } else {
@@ -579,7 +582,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
               >
                 {loading ? (
                   <>
-                    <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <NeonLoader size="sm" color="#ffffff" />
                     Publicando...
                   </>
                 ) : (

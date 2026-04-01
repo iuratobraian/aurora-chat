@@ -7,6 +7,11 @@ import ElectricLoader from '../components/ElectricLoader';
 import { useToast } from '../components/ToastProvider';
 import logger from '../utils/logger';
 import { Avatar } from '../components/Avatar';
+import { ProductCard } from '../components/ui/ProductCard';
+import { StarRating } from '../components/ui/StarRating';
+import { DeleteButton } from '../components/ui/DeleteButton';
+import { CustomCheckbox } from '../components/ui/CustomCheckbox';
+import { ConfirmCard } from '../components/ui/ConfirmCard';
 
 interface Strategy {
   _id?: string;
@@ -203,15 +208,16 @@ export default function MarketplaceView({ usuario, onLoginRequest, onVisitProfil
 
   const handleDeleteStrategy = async (strategyId: string) => {
     if (!usuario) return;
-    if (!confirm('¿Estás seguro de eliminar esta estrategia?')) return;
-    
     try {
       await deleteStrategyMutation({ id: strategyId, authorId: usuario.id });
       showToast('success', 'Estrategia eliminada');
+      setDeleteConfirmId(null);
     } catch (error: any) {
       showToast('error', error.message || 'Error al eliminar la estrategia');
     }
   };
+
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   const handleTogglePublish = async (strategyId: string, currentStatus: boolean) => {
     if (!usuario) return;
@@ -243,20 +249,12 @@ export default function MarketplaceView({ usuario, onLoginRequest, onVisitProfil
 
   const renderStars = (rating: number, interactive = false, onSelect?: (r: number) => void) => {
     return (
-      <div className="flex gap-1">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <button
-            key={star}
-            onClick={() => interactive && onSelect?.(star)}
-            className={`${interactive ? 'cursor-pointer hover:scale-110 transition-transform' : 'cursor-default'}`}
-            disabled={!interactive}
-          >
-            <span className={`text-lg ${star <= rating ? 'text-yellow-400' : 'text-gray-600'}`}>
-              {star <= rating ? '★' : '☆'}
-            </span>
-          </button>
-        ))}
-      </div>
+      <StarRating
+        rating={rating}
+        interactive={interactive}
+        onChange={onSelect}
+        size="sm"
+      />
     );
   };
 
@@ -567,55 +565,20 @@ export default function MarketplaceView({ usuario, onLoginRequest, onVisitProfil
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {strategies.map((strategy) => (
-                  <div
+                  <ProductCard
                     key={strategy.id}
-                    onClick={() => handleOpenStrategy(strategy)}
-                    className="relative bg-dark-200/80 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden hover:border-primary/50 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] transition-all cursor-pointer group"
-                  >
-                    <div className="relative h-28 bg-gradient-to-br from-primary/20 to-purple-600/20 flex items-center justify-center">
-                      {strategy.imageUrl ? (
-                        <img src={strategy.imageUrl} alt={strategy.title} className="w-full h-full object-cover" />
-                      ) : (
-                        <span className="material-symbols-outlined text-5xl text-white/30 group-hover:scale-110 transition-transform">
-                          {getCategoryInfo(strategy.category).icon}
-                        </span>
-                      )}
-                      <div
-                        className="absolute top-2 right-2 px-2 py-1 rounded text-xs font-bold"
-                        style={{ backgroundColor: getCategoryInfo(strategy.category).color }}
-                      >
-                        {getCategoryInfo(strategy.category).name}
-                      </div>
-                    </div>
-                    
-                    <div className="p-4">
-                      <h3 className="text-white font-semibold mb-1 line-clamp-1">{strategy.title}</h3>
-                      <p className="text-gray-400 text-sm mb-3 line-clamp-2">{strategy.description}</p>
-                      
-                      {strategy.author && (
-                        <div className="flex items-center gap-2 mb-3">
-                          <Avatar
-                            src={strategy.author.avatar}
-                            name={strategy.author.nombre}
-                            seed={strategy.author.usuario}
-                            size="xs"
-                            rounded="full"
-                          />
-                          <span className="text-gray-400 text-xs">{strategy.author.usuario}</span>
-                        </div>
-                      )}
-                      
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          {renderStars(Math.round(strategy.rating))}
-                          <span className="text-gray-500 text-xs">({strategy.downloads})</span>
-                        </div>
-                        <p className="text-primary font-bold">
-                          {formatPrice(strategy.price, strategy.currency)}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                    id={strategy.id}
+                    title={strategy.title}
+                    description={strategy.description}
+                    price={strategy.price}
+                    currency={strategy.currency}
+                    image={strategy.imageUrl}
+                    category={getCategoryInfo(strategy.category).name}
+                    rating={strategy.rating}
+                    reviews={strategy.downloads}
+                    onView={() => handleOpenStrategy(strategy)}
+                    onAddToCart={strategy.price > 0 ? () => handleOpenStrategy(strategy) : undefined}
+                  />
                 ))}
               </div>
             )}

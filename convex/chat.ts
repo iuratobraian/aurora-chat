@@ -15,17 +15,21 @@ export const getChannels = query({
 
 export const getOrCreateChannel = mutation({
   args: {
-    type: v.union(v.literal("global"), v.literal("community"), v.literal("direct")),
+    type: v.union(v.literal("global"), v.literal("community"), v.literal("direct"), v.literal("private")),
     communityId: v.optional(v.id("communities")),
     participant1: v.string(),
     participant2: v.optional(v.string()),
+    name: v.optional(v.string()),
+    password: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const slug = args.type === "direct" 
       ? `dm_${[args.participant1, args.participant2].sort().join("_")}`
       : args.type === "community" && args.communityId
         ? `community_${args.communityId}`
-        : "global";
+        : args.type === "private" && args.name
+          ? `private_${args.name.toLowerCase().replace(/\s+/g, "-")}_${Date.now()}`
+          : "global";
 
     const existing = await ctx.db
       .query("chatChannels")
@@ -35,17 +39,153 @@ export const getOrCreateChannel = mutation({
 
     if (existing) return existing._id;
 
+    const channelName = args.type === "global" ? "General" 
+      : args.type === "community" ? "Comunidad" 
+      : args.type === "direct" ? "Chat Privado" 
+      : args.name || "Canal Privado";
+
     const id = await ctx.db.insert("chatChannels", {
-      name: args.type === "global" ? "General" : args.type === "community" ? "Comunidad" : "Chat Privado",
+      name: channelName,
       slug,
       type: args.type,
       communityId: args.communityId,
       participants: [args.participant1, ...(args.participant2 ? [args.participant2] : [])],
       createdBy: args.participant1,
       createdAt: Date.now(),
+      password: args.password || undefined,
+      isPrivate: !!args.password,
     });
 
     return id;
+  },
+});
+
+export const createChannel = mutation({
+  args: {
+    name: v.string(),
+    password: v.optional(v.string()),
+    createdBy: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const slug = `private_${args.name.toLowerCase().replace(/\s+/g, "-")}_${Date.now()}`;
+    
+    // Check if channel with similar name already exists
+    const existing = await ctx.db
+      .query("chatChannels")
+      .withIndex("by_slug")
+      .filter((q) => q.eq(q.field("slug"), slug))
+      .first();
+    
+    if (existing) {
+      throw new Error("Ya existe un canal con ese nombre");
+    }
+
+    const id = await ctx.db.insert("chatChannels", {
+      name: args.name,
+      slug,
+      type: "private",
+      participants: [args.createdBy],
+      createdBy: args.createdBy,
+      createdAt: Date.now(),
+      password: args.password || undefined,
+      isPrivate: !!args.password,
+    });
+
+    return { _id: id, name: args.name, slug, isPrivate: !!args.password };
+  },
+});
+
+export const verifyChannelPassword = query({
+  args: {
+    channelSlug: v.string(),
+    password: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const channel = await ctx.db
+      .query("chatChannels")
+      .withIndex("by_slug")
+      .filter((q) => q.eq(q.field("slug"), args.channelSlug))
+      .first();
+
+    if (!channel) {
+      return { valid: false, reason: "Canal no encontrado" };
+    }
+
+    if (!channel.isPrivate || !channel.password) {
+      return { valid: true, channel };
+    }
+
+    if (channel.password === args.password) {
+      return { valid: true, channel };
+    }
+
+    return { valid: false, reason: "Contraseña incorrecta" };
+  },
+});
+
+export const verifyChannelPasswordMutation = mutation({
+  args: {
+    channelSlug: v.string(),
+    password: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const channel = await ctx.db
+      .query("chatChannels")
+      .withIndex("by_slug")
+      .filter((q) => q.eq(q.field("slug"), args.channelSlug))
+      .first();
+
+    if (!channel) {
+      return { valid: false, reason: "Canal no encontrado" };
+    }
+
+    if (!channel.isPrivate || !channel.password) {
+      return { valid: true, channel };
+    }
+
+    if (channel.password === args.password) {
+      return { valid: true, channel };
+    }
+
+    return { valid: false, reason: "Contraseña incorrecta" };
+  },
+});
+
+export const getServerStats = query({
+  args: {},
+  handler: async (ctx) => {
+    const now = Date.now();
+    const oneDayAgo = now - 24 * 60 * 60 * 1000;
+    const oneWeekAgo = now - 7 * 24 * 60 * 60 * 1000;
+
+    // Get all chat messages
+    const allMessages = await ctx.db.query("chat").collect();
+    
+    // Get today's messages
+    const todayMessages = allMessages.filter(m => m.createdAt >= oneDayAgo);
+    
+    // Get this week's messages
+    const weekMessages = allMessages.filter(m => m.createdAt >= oneWeekAgo);
+
+    // Get channels count
+    const channels = await ctx.db.query("chatChannels").collect();
+
+    // Get unique users in last 24h
+    const uniqueUsers = new Set(todayMessages.map(m => m.userId));
+
+    // Estimate storage (rough estimate based on message count)
+    // Average message ~500 bytes, plus overhead
+    const estimatedStorageKB = allMessages.length * 0.5;
+
+    return {
+      totalMessages: allMessages.length,
+      todayMessages: todayMessages.length,
+      weekMessages: weekMessages.length,
+      totalChannels: channels.length,
+      activeUsers: uniqueUsers.size,
+      estimatedStorageKB: Math.round(estimatedStorageKB),
+      storagePercentage: Math.min(100, Math.round((estimatedStorageKB / 5000) * 100)), // 5MB = 100%
+    };
   },
 });
 

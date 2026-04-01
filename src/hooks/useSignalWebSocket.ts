@@ -7,6 +7,7 @@
  */
 
 import { useEffect, useRef, useCallback, useState } from 'react';
+import { getSession } from '../utils/sessionManager';
 
 interface SignalWebSocketOptions {
   enabled?: boolean;
@@ -65,7 +66,8 @@ export function useSignalWebSocket({
     const wsPort = import.meta.env.VITE_SERVER_PORT || '3000';
     
     // Use token if available for authentication (SEC-010)
-    const token = localStorage.getItem('tradehub_access_token');
+    const session = getSession();
+    const token = session?.token || '';
     const authParam = token ? `?token=${token}` : '';
     
     if (host === 'localhost' || host === '127.0.0.1') {

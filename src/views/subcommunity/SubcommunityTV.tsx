@@ -3,14 +3,8 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { extractYoutubeId } from "../../utils/youtube";
 import { useToast } from '../../components/ToastProvider';
-
-interface Props {
-  subcommunityId: string;
-  userId: string;
-  isOwner: boolean;
-  isAdmin: boolean;
-  isMember: boolean;
-}
+import { PlayButton } from '../../components/ui/PlayButton';
+import { DotPattern } from '../../components/ui/DotPattern';
 
 const LiveBadge: React.FC = memo(() => (
   <div className="absolute top-4 left-4 z-30 px-3 py-1 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest rounded-md flex items-center gap-2 animate-pulse shadow-[0_0_20px_rgba(220,38,38,0.5)]">
@@ -37,20 +31,42 @@ const CinemaOverlay: React.FC<{ videoId: string; onClose: () => void }> = memo((
   </div>
 ));
 
-const WaitingStream: React.FC = memo(() => (
-  <div className="flex items-center justify-center w-full aspect-video bg-[#0f1115]">
-    <div className="flex flex-col items-center gap-6">
-      <div className="size-20 rounded-full border border-primary/20 bg-primary/5 flex items-center justify-center relative">
-        <div className="absolute inset-0 border-2 border-primary/30 border-t-transparent rounded-full animate-spin"></div>
-        <span className="material-symbols-outlined text-4xl text-primary animate-pulse">live_tv</span>
+const OfflineBranding: React.FC<{ onPlay?: () => void }> = memo(({ onPlay }) => (
+  <div className="relative flex items-center justify-center w-full aspect-video bg-[#0f1115] overflow-hidden">
+    <DotPattern opacity={0.05} />
+    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-violet-500/10" />
+    <div className="relative flex flex-col items-center gap-6 z-10">
+      <div className="relative">
+        <div className="size-24 rounded-full border-2 border-primary/30 bg-primary/5 flex items-center justify-center">
+          <span className="material-symbols-outlined text-5xl text-primary/60">live_tv</span>
+        </div>
+        <div className="absolute -inset-2 border border-primary/10 rounded-full animate-ping opacity-20" />
       </div>
       <div className="text-center">
-        <span className="text-white text-base font-black uppercase tracking-widest block mb-1 underline decoration-primary underline-offset-4 decoration-2">Esperando Transmisión</span>
-        <span className="text-gray-500 text-xs font-medium uppercase tracking-[0.2em] block">El stream comenzará pronto</span>
+        <span className="text-white text-lg font-black uppercase tracking-[0.3em] block mb-2">
+          TradeShare TV
+        </span>
+        <span className="text-gray-500 text-xs font-medium uppercase tracking-[0.2em] block mb-1">
+          Fuera de Aire
+        </span>
+        <span className="text-gray-600 text-[10px] font-medium uppercase tracking-wider block">
+          El stream comenzará pronto
+        </span>
       </div>
+      {onPlay && (
+        <PlayButton onClick={onPlay} size="lg" />
+      )}
     </div>
   </div>
 ));
+
+interface Props {
+  subcommunityId: string;
+  userId: string;
+  isOwner: boolean;
+  isAdmin: boolean;
+  isMember: boolean;
+}
 
 const SubcommunityTV: React.FC<Props> = ({ subcommunityId, userId, isOwner, isAdmin, isMember }) => {
   const [streamUrl, setStreamUrl] = useState('');
@@ -58,6 +74,7 @@ const SubcommunityTV: React.FC<Props> = ({ subcommunityId, userId, isOwner, isAd
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [alwaysOn, setAlwaysOn] = useState(true);
   const { showToast } = useToast();
 
   const tvStatus = useQuery(api.subcommunityTV.getTVStatus, {
@@ -182,8 +199,31 @@ const SubcommunityTV: React.FC<Props> = ({ subcommunityId, userId, isOwner, isAd
               </button>
             </div>
           ) : (
-            <WaitingStream />
+            <OfflineBranding onPlay={() => setAlwaysOn(true)} />
           )}
+        </div>
+
+        {/* Always On Toggle */}
+        <div className="px-6 py-3 border-t border-white/5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className={`size-8 rounded-lg flex items-center justify-center border ${tvIsLive ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : 'bg-white/5 border-white/10 text-gray-500'}`}>
+              <span className="material-symbols-outlined text-sm">{tvIsLive ? 'sensors' : 'sensors_off'}</span>
+            </div>
+            <div>
+              <h4 className="text-xs font-black text-white uppercase tracking-widest leading-none mb-0.5">
+                {tvIsLive ? 'Streaming Activo' : 'TV Fuera de Aire'}
+              </h4>
+              <p className="text-[9px] text-gray-500 font-medium uppercase tracking-wider">
+                {tvIsLive ? 'Señal en vivo' : alwaysOn ? 'Branding activo' : 'Offline'}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setAlwaysOn(!alwaysOn)}
+            className={`relative w-12 h-6 rounded-full transition-all duration-300 ${alwaysOn ? 'bg-primary' : 'bg-white/10'}`}
+          >
+            <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all duration-300 ${alwaysOn ? 'left-6' : 'left-0.5'}`} />
+          </button>
         </div>
 
         {/* Controls */}

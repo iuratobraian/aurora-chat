@@ -88,7 +88,7 @@ const ComunidadView: React.FC<Props> = ({ usuario, onVisitProfile, onLoginReques
     const [filterType, setFilterType] = useState<CategoriaPost | 'Todos'>('Todos');
     const [filterTag, setFilterTag] = useState<string | null>(null);
     const [filterFollowing, setFilterFollowing] = useState(false);
-    const [sortBy, setSortBy] = useState<'relevance' | 'recent' | 'popular' | 'top_points'>('relevance');
+    const [sortBy, setSortBy] = useState<'relevance' | 'recent' | 'popular' | 'viral' | 'top_points'>('relevance');
     const [justPublishedPostId, setJustPublishedPostId] = useState<string | null>(null);
 
     const { results: rawConvexPosts, status, loadMore } = usePaginatedQuery(
@@ -131,6 +131,29 @@ const ComunidadView: React.FC<Props> = ({ usuario, onVisitProfile, onLoginReques
     const [showXpToast, setShowXpToast] = useState(false);
     const [xpToastAmount, setXpToastAmount] = useState(50);
     const [feedDataSignal, setFeedDataSignal] = useState<FeedDataSignal>('live');
+
+    // Instant feed update when new post is created
+    useEffect(() => {
+        if (!newPostId || !convexPosts) return;
+        
+        // Find the newly created post in convexPosts
+        const newPost = convexPosts.find((p: any) => p._id === newPostId);
+        if (newPost) {
+            // Map the post and prepend to displayed posts
+            const mapped = mapConvexPost(newPost);
+            setPosts(prev => {
+                // Avoid duplicates
+                if (prev.find(p => p.id === newPostId)) return prev;
+                return [mapped, ...prev];
+            });
+            // Highlight the new post
+            setJustPublishedPostId(newPostId);
+            setPulsingPostId(newPostId);
+            setTimeout(() => setPulsingPostId(null), 4000);
+        }
+        // Clear the newPostId after processing
+        setNewPostId(null);
+    }, [newPostId, convexPosts]);
 
     const mappedPosts = useMemo(() => {
         if (!convexPosts) return [];
@@ -246,6 +269,26 @@ const ComunidadView: React.FC<Props> = ({ usuario, onVisitProfile, onLoginReques
                 const engagementA = (a.likes?.length || 0) + (a.comentarios?.length || 0) * 2;
                 const engagementB = (b.likes?.length || 0) + (b.comentarios?.length || 0) * 2;
                 return engagementB - engagementA;
+            });
+        } else if (sortBy === 'viral') {
+            // Viral scoring: likes (1x) + comments (2x) + shares (3x) with time decay
+            const now = Date.now();
+            sorted = [...filtered].sort((a, b) => {
+                const hoursSinceA = (now - (a.ultimaInteraccion || a.createdAt || 0)) / (1000 * 60 * 60);
+                const hoursSinceB = (now - (b.ultimaInteraccion || b.createdAt || 0)) / (1000 * 60 * 60);
+                
+                // Viral score: weighted engagement
+                const viralScoreA = ((a.likes?.length || 0) * 1 + (a.comentarios?.length || 0) * 2 + (a.compartidos || 0) * 3);
+                const viralScoreB = ((b.likes?.length || 0) * 1 + (b.comentarios?.length || 0) * 2 + (b.compartidos || 0) * 3);
+                
+                // Time decay: exponential with 24h half-life
+                const timeDecayA = Math.exp(-hoursSinceA / 24);
+                const timeDecayB = Math.exp(-hoursSinceB / 24);
+                
+                const finalScoreA = viralScoreA * timeDecayA;
+                const finalScoreB = viralScoreB * timeDecayB;
+                
+                return finalScoreB - finalScoreA;
             });
         } else if (sortBy === 'top_points') {
             sorted = [...filtered].sort((a, b) => {
@@ -741,6 +784,13 @@ const ComunidadView: React.FC<Props> = ({ usuario, onVisitProfile, onLoginReques
                                 >
                                     Populares
                                 </button>
+                                <button
+                                    onClick={() => setSortBy('viral')}
+                                    className={`px-2 py-1 rounded-md text-[8px] font-bold uppercase tracking-wider transition-all flex items-center gap-1 ${sortBy === 'viral' ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white' : 'bg-gray-50 dark:bg-white/5 text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10'}`}
+                                >
+                                    <span className="material-symbols-outlined text-[10px]">local_fire_department</span>
+                                    Viral
+                                </button>
                             </div>
                         </div>
                         <div className="mt-4 pt-4 border-t border-gray-100 dark:border-white/5">
@@ -811,6 +861,17 @@ const ComunidadView: React.FC<Props> = ({ usuario, onVisitProfile, onLoginReques
                                     }`}
                                 >
                                     Populares
+                                </button>
+                                <button
+                                    onClick={() => setSortBy('viral')}
+                                    className={`px-2 py-1 rounded-md text-[8px] font-bold uppercase tracking-wider transition-all flex items-center gap-1 ${
+                                        sortBy === 'viral'
+                                            ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-sm'
+                                            : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                                    }`}
+                                >
+                                    <span className="material-symbols-outlined text-xs">local_fire_department</span>
+                                    Viral
                                 </button>
                                 <button
                                     onClick={() => setSortBy('top_points')}

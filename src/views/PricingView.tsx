@@ -4,6 +4,10 @@ import { api } from '../../convex/_generated/api';
 import { Usuario } from '../types';
 import { useToast } from '../components/ToastProvider';
 import logger from '../utils/logger';
+import { GlowCard } from '../components/ui/GlowCard';
+import { GoldButton } from '../components/ui/GoldButton';
+import { CustomCheckbox } from '../components/ui/CustomCheckbox';
+import { ConfirmCard } from '../components/ui/ConfirmCard';
 
 interface PricingViewProps {
     usuario: Usuario | null;
@@ -283,10 +287,29 @@ const PricingView: React.FC<PricingViewProps> = ({ usuario, onLoginRequest, onNa
     const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
     const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
     const [activeCategory, setActiveCategory] = useState<'trader' | 'creator'>('trader');
+    const [showBenefitsPopup, setShowBenefitsPopup] = useState<string | null>(null);
+    const [showCustomBuilder, setShowCustomBuilder] = useState(false);
+    const [customModules, setCustomModules] = useState<string[]>([]);
     const { showToast } = useToast();
 
     const createCheckout = useMutation(api.payments.createCheckoutSession);
     const createPaymentPreference = useAction(api.paymentOrchestrator.createMercadoPagoPreference);
+
+    const availableModules = [
+        { id: 'signals', name: 'Señales en Tiempo Real', price: 4.99 },
+        { id: 'ia', name: 'IA Aurora Analytics', price: 3.99 },
+        { id: 'communities', name: 'Comunidades Privadas', price: 2.99 },
+        { id: 'charts', name: 'Gráficos TradingView Pro', price: 1.99 },
+        { id: 'news', name: 'Market News Premium', price: 1.99 },
+        { id: 'mentoring', name: 'Mentoring 1:1', price: 9.99 },
+        { id: 'api', name: 'API Access', price: 4.99 },
+        { id: 'support', name: 'Soporte Prioritario', price: 2.99 },
+    ];
+
+    const customPlanPrice = customModules.reduce((sum, modId) => {
+        const mod = availableModules.find(m => m.id === modId);
+        return sum + (mod?.price || 0);
+    }, 0);
 
     const handleSubscribe = async (planId: string, price: number) => {
         if (!usuario || usuario.id === 'guest') {
@@ -514,6 +537,17 @@ const PricingView: React.FC<PricingViewProps> = ({ usuario, onLoginRequest, onNa
                         </div>
 
                         {/* Comparison Table */}
+                        <div className="mt-8 text-center">
+                            <button
+                                onClick={() => setShowCustomBuilder(true)}
+                                className="px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/20 text-white font-bold rounded-xl transition-all flex items-center gap-3 mx-auto"
+                            >
+                                <span className="material-symbols-outlined">build</span>
+                                Crear Plan Personalizado
+                            </button>
+                            <p className="text-xs text-gray-500 mt-2">Elige solo los módulos que necesitas</p>
+                        </div>
+
                         <div className="mt-16">
                             <h2 className="text-2xl font-black text-white text-center mb-8">Comparación Detallada</h2>
                             <div className="overflow-x-auto">
@@ -653,6 +687,132 @@ const PricingView: React.FC<PricingViewProps> = ({ usuario, onLoginRequest, onNa
                     </div>
                 )}
             </div>
+
+            {/* Benefits Popup Modal */}
+            {showBenefitsPopup && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl" onClick={() => setShowBenefitsPopup(null)}>
+                    <GlowCard className="max-w-lg w-full max-h-[80vh] flex flex-col p-0" onClick={(e) => e.stopPropagation()}>
+                        <div className="p-6 border-b border-white/10 flex justify-between items-center">
+                            <div>
+                                <h3 className="text-xl font-black text-white uppercase tracking-widest">Beneficios del Plan</h3>
+                                <p className="text-xs text-gray-400 mt-1">Lo que obtienes con este plan</p>
+                            </div>
+                            <button onClick={() => setShowBenefitsPopup(null)} className="text-gray-400 hover:text-white transition-colors">
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+                            {plans.filter(p => p.id === showBenefitsPopup).map(plan => (
+                                <div key={plan.id} className="space-y-4">
+                                    <div className="flex items-center gap-3 mb-6">
+                                        <div className={`size-12 rounded-xl bg-gradient-to-br ${plan.gradient} border border-white/10 flex items-center justify-center`}>
+                                            <span className={`material-symbols-outlined text-2xl ${plan.color}`}>{plan.icon}</span>
+                                        </div>
+                                        <div>
+                                            <h4 className={`font-black text-lg ${plan.color}`}>{plan.name}</h4>
+                                            <p className="text-xs text-gray-500">{plan.forWho}</p>
+                                        </div>
+                                    </div>
+                                    <div className="p-4 bg-primary/5 border border-primary/20 rounded-xl">
+                                        <h5 className="text-sm font-bold text-primary mb-3">Beneficios Clave</h5>
+                                        <ul className="space-y-2">
+                                            {plan.features.filter(f => f.included).map((f, i) => (
+                                                <li key={i} className="flex items-start gap-2 text-sm text-gray-300">
+                                                    <span className="material-symbols-outlined text-emerald-400 text-lg flex-shrink-0">check_circle</span>
+                                                    {f.text}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                    <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl">
+                                        <span className="text-gray-400">Precio {billingCycle === 'annual' ? 'anual' : 'mensual'}</span>
+                                        <span className="text-2xl font-black text-white">{formatPrice(getPrice(plan))}</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="p-6 border-t border-white/10 flex gap-3">
+                            <button
+                                onClick={() => setShowBenefitsPopup(null)}
+                                className="flex-1 py-3 bg-white/5 hover:bg-white/10 text-gray-300 font-medium rounded-xl transition-colors"
+                            >
+                                Cerrar
+                            </button>
+                            {(() => {
+                                const plan = plans.find(p => p.id === showBenefitsPopup);
+                                return plan ? (
+                                    <GoldButton
+                                        onClick={() => { setShowBenefitsPopup(null); handleSubscribe(plan.id, getPrice(plan)); }}
+                                        className="flex-1"
+                                    >
+                                        Suscribirse
+                                    </GoldButton>
+                                ) : null;
+                            })()}
+                        </div>
+                    </GlowCard>
+                </div>
+            )}
+
+            {/* Custom Plan Builder Modal */}
+            {showCustomBuilder && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl" onClick={() => setShowCustomBuilder(false)}>
+                    <GlowCard className="max-w-lg w-full max-h-[80vh] flex flex-col p-0" onClick={(e) => e.stopPropagation()}>
+                        <div className="p-6 border-b border-white/10 flex justify-between items-center">
+                            <div>
+                                <h3 className="text-xl font-black text-white uppercase tracking-widest">Plan Personalizado</h3>
+                                <p className="text-xs text-gray-400 mt-1">Elige solo lo que necesitas</p>
+                            </div>
+                            <button onClick={() => setShowCustomBuilder(false)} className="text-gray-400 hover:text-white transition-colors">
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-6 custom-scrollbar space-y-3">
+                            {availableModules.map(mod => (
+                                <div
+                                    key={mod.id}
+                                    onClick={() => {
+                                        setCustomModules(prev =>
+                                            prev.includes(mod.id) ? prev.filter(id => id !== mod.id) : [...prev, mod.id]
+                                        );
+                                    }}
+                                    className={`flex items-center justify-between p-4 rounded-xl border transition-all cursor-pointer ${
+                                        customModules.includes(mod.id)
+                                            ? 'bg-primary/10 border-primary/30'
+                                            : 'bg-white/5 border-white/10 hover:bg-white/10'
+                                    }`}
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <CustomCheckbox
+                                            checked={customModules.includes(mod.id)}
+                                            onChange={() => {}}
+                                        />
+                                        <span className="text-sm text-white font-medium">{mod.name}</span>
+                                    </div>
+                                    <span className="text-sm font-bold text-primary">${mod.price.toFixed(2)}</span>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="p-6 border-t border-white/10">
+                            <div className="flex items-center justify-between mb-4">
+                                <span className="text-gray-400">Total mensual</span>
+                                <span className="text-2xl font-black text-white">${customPlanPrice.toFixed(2)}</span>
+                            </div>
+                            <GoldButton
+                                onClick={() => {
+                                    showToast('success', `Plan personalizado creado: $${customPlanPrice.toFixed(2)}/mes`);
+                                    setShowCustomBuilder(false);
+                                    setCustomModules([]);
+                                }}
+                                disabled={customModules.length === 0}
+                                className="w-full"
+                            >
+                                Suscribirse por ${customPlanPrice.toFixed(2)}/mes
+                            </GoldButton>
+                        </div>
+                    </GlowCard>
+                </div>
+            )}
 
             {/* FAQ Section */}
             <div className="max-w-3xl mx-auto px-4 py-16">

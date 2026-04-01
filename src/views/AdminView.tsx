@@ -696,36 +696,31 @@ const AdminView: React.FC<{ onVisitProfile?: (id: string) => void; usuario?: Usu
             <div className="h-screen flex overflow-hidden" style={{ background: 'var(--bg-color)', color: 'var(--text-main)' }}>
             {/* Sidebar - Only show in old mode */}
             {dashboardMode === 'old' && (
-            <aside 
+            <aside
                 className={`${sidebarCollapsed ? 'w-14' : 'w-52'} flex flex-col transition-all duration-300 flex-shrink-0`}
                 style={{
-                    background: 'rgba(15, 17, 21, 0.98)',
-                    backdropFilter: 'blur(20px)',
-                    borderRight: '1px solid rgba(73, 68, 84, 0.15)',
+                    background: '#0a0a0f',
+                    borderRight: '1px solid rgba(255,255,255,0.1)',
                 }}
             >
-                <div 
+                <div
                     className="p-2"
-                    style={{ borderBottom: '1px solid rgba(73, 68, 84, 0.15)' }}
+                    style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}
                 >
                     <div className="flex items-center gap-2">
-                        <div 
+                        <div
                             className="w-8 h-8 rounded-lg flex items-center justify-center"
                             style={{
-                                background: 'linear-gradient(135deg, #d0bcff 0%, #a078ff 100%)',
-                                boxShadow: '0 2px 8px rgba(160, 120, 255, 0.3)',
+                                background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                                boxShadow: '0 2px 8px rgba(59,130,246,0.3)',
                             }}
                         >
                             <span className="material-symbols-outlined text-white text-base">admin_panel_settings</span>
                         </div>
                         {!sidebarCollapsed && (
                             <div>
-                                <h1 
-                                    className="text-xs font-black uppercase tracking-wider"
-                                    style={{ 
-                                        fontFamily: '"Space Grotesk", sans-serif',
-                                        color: '#e5e2e1',
-                                    }}
+                                <h1
+                                    className="text-xs font-bold uppercase tracking-wider text-white"
                                 >
                                     Admin
                                 </h1>
@@ -743,40 +738,37 @@ const AdminView: React.FC<{ onVisitProfile?: (id: string) => void; usuario?: Usu
                                 onClick={() => navigateTo(item.id as AdminSection, item.label)}
                                 className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg text-xs font-medium transition-all relative`}
                                 style={{
-                                    background: isActive 
-                                        ? 'linear-gradient(135deg, #d0bcff 0%, #a078ff 100%)' 
+                                    background: isActive
+                                        ? 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
                                         : 'transparent',
-                                    color: isActive ? 'white' : '#86868B',
-                                    boxShadow: isActive ? '0 2px 8px rgba(160, 120, 255, 0.3)' : 'none',
+                                    color: isActive ? 'white' : '#9ca3af',
+                                    boxShadow: isActive ? '0 2px 8px rgba(59,130,246,0.3)' : 'none',
                                 }}
                             >
-                                <span 
+                                <span
                                     className="material-symbols-outlined text-lg"
-                                    style={{ color: isActive ? 'white' : '#86868B' }}
+                                    style={{ color: isActive ? 'white' : '#9ca3af' }}
                                 >
                                     {item.icon}
                                 </span>
                                 {!sidebarCollapsed && <span>{item.label}</span>}
                                 {item.id === 'aiAgent' && pendingPosts && pendingPosts.length > 0 && (
-                                    <span 
-                                        className={`${sidebarCollapsed ? 'absolute -top-1 -right-1' : 'ml-auto'} w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold`}
-                                        style={{ background: 'rgba(255, 23, 68, 0.9)', color: 'white' }}
+                                    <span
+                                        className={`${sidebarCollapsed ? 'absolute -top-1 -right-1' : 'ml-auto'} w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold bg-red-500 text-white`}
                                     >
                                         {pendingPosts.length}
                                     </span>
                                 )}
                                 {item.id === 'moderation' && spamReports && spamReports.filter((r: any) => r.status === 'pending').length > 0 && (
-                                    <span 
-                                        className={`${sidebarCollapsed ? 'absolute -top-1 -right-1' : 'ml-auto'} w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold`}
-                                        style={{ background: 'rgba(255, 171, 0, 0.9)', color: 'white' }}
+                                    <span
+                                        className={`${sidebarCollapsed ? 'absolute -top-1 -right-1' : 'ml-auto'} w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold bg-amber-500 text-white`}
                                     >
                                         {spamReports.filter((r: any) => r.status === 'pending').length}
                                     </span>
                                 )}
                                 {item.id === 'auroraSupport' && auroraFindings.filter((finding) => finding.status === 'pending').length > 0 && (
-                                    <span 
-                                        className={`${sidebarCollapsed ? 'absolute -top-1 -right-1' : 'ml-auto'} w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold`}
-                                        style={{ background: 'rgba(255, 23, 68, 0.9)', color: 'white' }}
+                                    <span
+                                        className={`${sidebarCollapsed ? 'absolute -top-1 -right-1' : 'ml-auto'} w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold bg-red-500 text-white`}
                                     >
                                         {auroraFindings.filter((finding) => finding.status === 'pending').length}
                                     </span>
@@ -786,11 +778,10 @@ const AdminView: React.FC<{ onVisitProfile?: (id: string) => void; usuario?: Usu
                     })}
                 </nav>
 
-                <div className="p-3" style={{ borderTop: '1px solid rgba(73, 68, 84, 0.15)' }}>
+                <div className="p-3" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
                     <button
                         onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                        className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all"
-                        style={{ color: '#86868B' }}
+                        className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-bold transition-all text-gray-400 hover:text-white hover:bg-white/5"
                     >
                         <span className="material-symbols-outlined text-lg">
                             {sidebarCollapsed ? 'chevron_right' : 'chevron_left'}

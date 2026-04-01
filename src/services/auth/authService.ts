@@ -370,8 +370,10 @@ export const AuthService = {
     resetPassword: async (email: string, newPass: string): Promise<{ success: boolean, error: string | null }> => {
         try {
             if (convex) {
+                const profile = await convex.query(api.profiles.getProfileByEmail, { email });
+                if (!profile) return { success: false, error: 'Correo no registrado.' };
                 const hashedPassword = await hashPassword(newPass);
-                await convex.mutation(api.profiles.setNewPassword, { email, password: hashedPassword });
+                await convex.mutation(api.profiles.setNewPassword, { email, password: hashedPassword, userId: (profile as any).userId });
                 return { success: true, error: null };
             }
         } catch (err) {

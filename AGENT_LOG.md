@@ -24,6 +24,9 @@
 | 2026-03-27 | TEST-FIX | vitest.config.ts, paymentFactory.test.ts | Enabled dotenv in tests, all 396 tests pass | None |
 | 2026-03-31 | NTN-021 | Navigation.tsx | Moved Psicotrading to Trading section, removed Cursos | Pre-existing build issues (Convex) |
 | 2026-03-31 | NTN-019 | CreatorDashboard.tsx | Verified Observatory integration in Creator Admin Panel | None |
+| 2026-03-31 | NOTION-001 | scripts/aurora-ai-agent.mjs | Verified sub-agent delegation (2/agent) configured | None |
+| 2026-03-31 | NOTION-002 | .agent/skills/ | Verified 124+ shared knowledge skills exist | None |
+| 2026-03-31 | NOTION-003 | convex/notifications.ts | Verified push/en-app notifications fully implemented | None |
 
 ## Summary of Work
 - **Feed Instant Refresh**: Implemented instant post publication with loader animation and fade-in from top. New posts prepend to feed without full reload. "New posts" banner also prepends instead of replacing.

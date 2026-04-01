@@ -105,7 +105,7 @@ export const CommunityAdminPanel: React.FC<CommunityAdminPanelProps> = ({ usuari
     }
 
     return (
-        <div className="max-w-6xl mx-auto">
+        <div className="w-full px-4">
             <div className="flex items-center justify-between mb-8">
                 <div>
                     <h1 className="text-2xl font-black text-white">Admin Panel</h1>

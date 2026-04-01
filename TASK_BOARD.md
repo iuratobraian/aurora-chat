@@ -1,6 +1,6 @@
 # 📋 TASK BOARD - TRADESHARE
 
-> Sincronizado desde Notion — 31/3/2026, 11:07:35
+> Sincronizado desde Notion — 31/3/2026, 11:07:54
 > ⚠️  Este archivo se actualiza automáticamente al marcar tareas en Notion.
 
 | ID | Tarea | Estado | Prioridad | Tipo | Dominio | Notas |
@@ -15,7 +15,7 @@
 | TSK-008 | **Feature: Validación segura de datos — no editable manualmente** | ⏳ Pendiente | Medium | - |  |  |
 | TSK-009 | **Feature: Admin gestión de contenido y moderación** | ⏳ Pendiente | Medium | - |  |  |
 | TSK-010 | **Feature: Chat privado de comunidad (solo miembros)** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-011 | **Fix: Admin panel full-width — ocupar todo el ancho de pantalla** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-011 | **Fix: Admin panel full-width — ocupar todo el ancho de pantalla** | 🔧 En progreso | Medium | - |  |  |
 | TSK-012 | **Feature: Sistema de comisiones para la plataforma** | ⏳ Pendiente | Medium | - |  |  |
 | TSK-013 | **Feature: Admin CRUD posts — moderar, editar, eliminar posts** | ⏳ Pendiente | Medium | - |  |  |
 | TSK-014 | **Feature: Admin CRUD comunidades — crear, editar, eliminar comunidades** | ⏳ Pendiente | Medium | - |  |  |

@@ -1762,7 +1762,7 @@ const AdminPanelDashboard: React.FC<AdminPanelDashboardProps> = ({ stats, users,
 
   return (
     <div className="bg-[#0f1115] text-white">
-      <main className="pb-6 px-2 max-w-[1800px] mx-auto">
+      <main className="pb-6 px-4 w-full">
         <nav className="flex flex-wrap gap-1 mb-4 pb-3 border-b border-white/5">
           {tabs.map((tab) => (
             <TabButton

@@ -1,68 +1,48 @@
 # CURRENT FOCUS - OpenCode
 
-## ✅ ALL NOTION TASKS VERIFIED COMPLETE
+## ⚠️ BLOCKER - NOTION-012: Deploy Convex
 
-### Session Summary: 2026-03-31
+### Bloqueo Identificado:
+**Problema:** Falta `CONVEX_DEPLOY_KEY` en .env.local
+**Impacto:** No se pueden generar archivos _generated ni desplegar a Convex
 
-**Tasks Verified Complete:**
+### Configuración Actual:
+```
+CONVEX_URL=https://diligent-wildcat-523.convex.cloud
+VITE_CONVEX_URL=https://diligent-wildcat-523.convex.cloud
+CONVEX_DEPLOY_KEY=❌ NO CONFIGURADA
+```
 
-| TASK-ID | Status | Verification |
-|---------|--------|--------------|
-| NOTION-003 | ✅ done | Push/En-app notifications fully implemented |
-| NOTION-001 | ✅ done | Sub-agent delegation (2/agent) configured |
-| NOTION-002 | ✅ done | 124+ shared knowledge skills exist |
-| NOTION-006 | ✅ done | AdminView full-width (previous agent) |
-| NOTION-007 | ✅ done | Nav AI icons removed (previous agent) |
-| NOTION-008 | ✅ done | Pricing → Suscripciones (previous agent) |
-| NOTION-009 | ✅ done | Top menu reconfig (previous agent) |
-| NOTION-010 | ✅ done | Marketplace → Negocios (previous agent) |
-
----
-
-## Verification Details:
-
-### NOTION-003: Sistema de Notificaciones Push y En-App
-**Status:** ✅ COMPLETE
-- `convex/notifications.ts` - Full Convex backend
-- `convex/pushActions.ts` - Web push with VAPID
-- `src/hooks/usePushNotifications.ts` - React hook
-- `lib/pushNotifications.ts` - Library functions
-- `public/sw.js` - Service worker
-- `src/components/PushAdminPanel.tsx` - Admin UI
-- 11 notification types supported
-- User preferences integration
-
-### NOTION-001: Delegación de Sub-Agentes (2 por agente)
-**Status:** ✅ COMPLETE
-- `scripts/aurora-ai-agent.mjs` - 8 sub-agents defined
-- `scripts/SUBAGENTS_PROTOCOL.md` - Full documentation
-- `.agent/workspace/coordination/AGENT_HIVE.md` - Delegation template
-- Automatic activation based on task classification
-- Multiple sub-agents per task supported
-
-### NOTION-002: Skills de Conocimiento Compartido
-**Status:** ✅ COMPLETE
-- 124+ skill files in `.agent/skills/`
-- Categories: foundations, aurora, design, strategy, products, etc.
-- Mandatory startup readiness skill
-- Agent task division protocols
-- Swarm auto-start protocol
-- TradeShare agent routing
+### Solución Requerida:
+1. Ir a https://dashboard.convex.dev/diligent-wildcat-523
+2. Settings → Deployment → Deploy Key
+3. Copiar clave y agregar a `.env.local`:
+   ```
+   CONVEX_DEPLOY_KEY=xxxxx:xxxxx-xxxxx-xxxxx-xxxxx
+   ```
+4. Ejecutar `npx convex dev` para generar _generated
+5. Ejecutar `npx convex deploy` para desplegar schema
 
 ---
 
-## Remaining Notion Tasks:
+## Alternative: Working Without Convex Generation
 
-| TASK-ID | Type | Priority | Description |
-|---------|------|----------|-------------|
-| NOTION-004 | Infra | High | Feature: WebSockets base — infraestructura de realtime |
-| NOTION-005 | Feature | Critical | Feature: Realtime señales — actualizaciones en tiempo real |
-
----
-
-## Next Actions:
-**2 tasks remaining** - Both related to WebSockets/Realtime infrastructure.
-Recommend tackling NOTION-004 (WebSockets base) first as it's a prerequisite for NOTION-005.
+Mientras se resuelve el bloqueo, se puede:
+1. Usar el modo offline con datos mock
+2. El frontend ya tiene fallback a localStorage
+3. Los servicios detectan automáticamente si Convex está disponible
 
 ---
-*Session complete: 2026-03-31 | 8/10 Notion tasks verified complete*
+
+## Next Available Tasks (Sin Bloqueo Convex):
+
+**NOTION-014: Registro — validar email, password, username** [PENDING]
+- Validaciones en frontend (sin necesidad de Convex)
+- Archivos: `src/views/AuthView.tsx`, `src/services/auth.ts`
+
+**NOTION-015: Login JWT — verificar tokens** [PENDING]
+- Verificación de firma JWT en server.ts
+- Archivos: `server.ts`, `src/services/auth.ts`
+
+---
+*Status: Awaiting user to provide CONVEX_DEPLOY_KEY from Convex dashboard*

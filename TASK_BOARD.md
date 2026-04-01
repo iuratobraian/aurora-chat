@@ -1,6 +1,6 @@
 # 📋 TASK BOARD - TRADESHARE
 
-> Sincronizado desde Notion — 31/3/2026, 09:49:56
+> Sincronizado desde Notion — 31/3/2026, 09:53:19
 > ⚠️  Este archivo se actualiza automáticamente al marcar tareas en Notion.
 
 | ID | Tarea | Estado | Prioridad | Tipo | Dominio | Notas |
@@ -17,7 +17,7 @@
 | TSK-010 | **Feature: Admin dashboard de métricas globales** | ⏳ Pendiente | Medium | - |  |  |
 | TSK-011 | **Feature: Botones de Like y Reacciones en todos los posts** | ⏳ Pendiente | Medium | - |  |  |
 | TSK-012 | **Feature: Validación segura de datos — no editable manualmente** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-013 | **Fix: Integrar MercadoPago — checkout, webhooks, preferencias** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-013 | **Fix: Integrar MercadoPago — checkout, webhooks, preferencias** | 🔧 En progreso | Medium | - |  |  |
 | TSK-014 | **Feature: Admin gestión de contenido y moderación** | ⏳ Pendiente | Medium | - |  |  |
 | TSK-015 | **Feature: Chat privado de comunidad (solo miembros)** | ⏳ Pendiente | Medium | - |  |  |
 | TSK-016 | **Fix: Admin panel full-width — ocupar todo el ancho de pantalla** | ⏳ Pendiente | Medium | - |  |  |

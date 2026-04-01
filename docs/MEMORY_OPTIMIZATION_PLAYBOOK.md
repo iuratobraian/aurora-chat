@@ -312,7 +312,7 @@ const fetchWithGuard = async () => {
 ### Cómo Organizar Optimizaciones
 
 **Batch #1: Critical Memory Leaks (5GB → 500MB)**
-1. Eliminar TurboQuant polling
+1. Eliminar polling de módulo inestable
 2. Reducir PostCard hooks
 3. Fix Navigation polling
 4. ErrorBoundary admin-only

@@ -194,3 +194,15 @@ export default {
   extractThumbnail,
   extractAllPsychotradingContent,
 };
+
+// Named export for backward compatibility
+export const YouTubePsychotradingExtractor = {
+  SEARCH_QUERIES,
+  MIN_VIEWS,
+  MIN_LIKES,
+  MIN_DURATION_SECONDS,
+  parseDuration,
+  formatDuration,
+  extractThumbnail,
+  extractAllPsychotradingContent,
+};

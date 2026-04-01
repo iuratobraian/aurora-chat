@@ -1269,14 +1269,14 @@ export const givePostPoints = mutation({
     }
 
     // Verificar que el post existe
-    const post = await ctx.db.get(postId as any);
+    const post = await ctx.db.get(postId);
     if (!post) {
       throw new Error("Publicación no encontrada");
     }
 
     // Registrar el voto
     await ctx.db.insert("post_points", {
-      postId,
+      postId: postId.toString(),
       userId,
       points,
       givenAt: Date.now(),
@@ -1284,7 +1284,7 @@ export const givePostPoints = mutation({
 
     // Actualizar puntos totales del post
     const currentPuntos = (post as any).puntos || 0;
-    await ctx.db.patch(postId as any, {
+    await ctx.db.patch(postId, {
       puntos: currentPuntos + points,
     });
 

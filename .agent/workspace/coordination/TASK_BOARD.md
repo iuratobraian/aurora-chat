@@ -198,4 +198,60 @@
 
 ---
 
+## FASE SPRINT 5: REDISEÑO TOTAL + NUEVAS FUNCIONALIDADES
+
+> **Diseños integrados:** 21 componentes Tailwind convertidos (TransactionCard, AlertCard, NotificationCard, GalaxyButton, GlowCard, PremiumCard, ProductCard, ShineCard, GoldButton, NeonLoader, TermsModal, DeleteButton, ConfirmCard, StarRating, CustomCheckbox, PlayButton, ShoppingCart, LoginForm, RegisterForm, DotPattern, Starfield)
+
+### SUBFASE 1: RESILIENCIA Y AUTH
+
+| TASK-ID | Tipo | Estado | Asignado | Descripción |
+|---------|------|--------|----------|-------------|
+| TSK-100 | Full | pending | — | **[AUTO FALLBACK]** Sistema de fallback automático: errores ocultos al usuario, popup esquina solo admin, cache local siempre activo, app nunca deja de usarse. Archivos: `src/lib/fallback.ts`, `src/hooks/useFallback.ts`, `src/components/AdminErrorToast.tsx`, `src/services/*`. |
+| TSK-101 | Full | pending | — | **[AUTH REDESIGN]** Rediseñar login/registro con nuevos componentes Tailwind, corregir flujo de registro Convex, integrar Google Sign-In, recuperación contraseña, referral codes. Archivos: `src/components/AuthModal.tsx`, `src/services/auth/authService.ts`, `convex/auth.ts`. Diseños: LoginForm, RegisterForm, TermsModal. |
+
+### SUBFASE 2: NAVEGACIÓN Y FEED
+
+| TASK-ID | Tipo | Estado | Asignado | Descripción |
+|---------|------|--------|----------|-------------|
+| TSK-102 | Front | pending | — | **[MENU SIMPLIFICADO]** Simplificar menú superior: eliminar transparencias excesivas, quitar descripciones de pestañas, diseño flat/elegante. Idem menú Panel Admin. Archivos: `src/views/Navigation.tsx` (claim explícito), `src/views/AdminView.tsx`. |
+| TSK-103 | Full | pending | — | **[POST PUBLISH NO-RELOAD]** Al publicar post no recargar web: mostrar NeonLoader, esperar servidor, insertar post en feed directamente. Integrar con Auto Fallback. Archivos: `src/components/CreatePostModal.tsx`, `src/views/ComunidadView.tsx`, `src/services/posts/postService.ts`, `convex/posts.ts`. |
+| TSK-104 | Full | pending | — | **[POST VIRAL RANKING]** Algoritmo tipo Instagram/TikTok: scoring por likes (1x), comentarios (2x), compartidos (3x), recencia (decaimiento). Toggle "Recientes" vs "Populares". Archivos: `convex/posts.ts`, `src/views/ComunidadView.tsx`, `src/services/posts/postService.ts`. |
+
+### SUBFASE 3: COMUNIDADES Y DESCUBRIR
+
+| TASK-ID | Tipo | Estado | Asignado | Descripción |
+|---------|------|--------|----------|-------------|
+| TSK-105 | Full | pending | — | **[TV LIVE ALWAYS ON]** Opción "siempre encendido", si no hay stream mostrar imagen branding TradeShare "TV fuera de aire". Nunca espacio vacío. Archivos: TV Live component, `src/services/youtube/psychotradingExtractor.ts`, `convex/streams.ts`. Diseño: PlayButton. |
+| TSK-106 | Full | pending | — | **[DESCUBRIR TOP COMMUNITIES]** Jerarquía: Top 3 con banners grandes + stats + botón unirse, posiciones 4-10 banners medianos, resto lista elegante. Búsqueda y filtros. Datos reales Convex. Archivos: `src/views/DiscoverCommunities.tsx`, `convex/communities.ts`. Diseños: GlowCard, ShineCard. |
+
+### SUBFASE 4: MONETIZACIÓN
+
+| TASK-ID | Tipo | Estado | Asignado | Descripción |
+|---------|------|--------|----------|-------------|
+| TSK-107 | Full | pending | — | **[REWARDS SYSTEM]** Sector de recompensas: canjear XP por beneficios (acceso comunidades, sesiones VIP, badges, boost feed), comprar XP con MercadoPago. Catálogo visual, historial, activación automática. Archivos: `src/views/RewardsView.tsx`, `convex/rewards.ts`, `convex/schema.ts`. Diseños: PremiumCard, StarRating, GoldButton. |
+| TSK-108 | Full | pending | — | **[SUSCRIPCIONES POPUP + CUSTOM]** Popup de beneficios antes de pagar, planes predefinidos realistas (Básico/Pro/VIP), constructor de plan personalizado tipo carta (agregar/quitar módulos), precio dinámico. Archivos: `src/views/PricingView.tsx` (claim explícito), `src/components/PlanDetailModal.tsx`, `src/components/PlanBuilder.tsx`, `convex/plans.ts`. Diseños: TermsModal, ShoppingCart, GoldButton. |
+| TSK-109 | Full | pending | — | **[MARKETPLACE REDESIGN]** Diseño simple y lujoso, publicación gratuita, categorías (cursos, mentorías, comunidades, EAs, estrategias, indicadores TradingView, señales), sector publicidad paid con banners destacados. Archivos: `src/views/MarketplaceView.tsx`, `src/components/ProductCard.tsx`, `src/components/AdBanner.tsx`, `convex/marketplace.ts`. Diseños: ProductCard, ShineCard, PremiumCard, ShoppingCart. |
+| TSK-110 | Full | pending | — | **[AD SYSTEM + SUBASTAS]** Sectores de publicidad (9 placements, 7 tamaños), subastas de 15/30 días con depósito/seguro, panel admin completo. Si gana y no paga pierde depósito. Archivos: `src/views/AuctionView.tsx`, `src/components/AuctionCard.tsx`, `src/components/BidModal.tsx`, `convex/auctions.ts`, `src/views/admin/AuctionManagement.tsx`. Diseños: GalaxyButton, ConfirmCard. |
+
+### SUBFASE 5: CONTENIDO Y SOCIAL
+
+| TASK-ID | Tipo | Estado | Asignado | Descripción |
+|---------|------|--------|----------|-------------|
+| TSK-111 | Full | pending | — | **[NOTICIAS DINÁMICAS]** Portal premium estilo Bloomberg: breaking news, destacada, forex/crypto/análisis, calendario económico, sentimiento mercado. Auto-extracción de Investing.com, Myfxbook, CoinDesk. Cron jobs, auto-categorización. Archivos: `src/views/NewsView.tsx`, `convex/market_news.ts`, `convex/agents/newsAgent.ts`. Diseños: ShineCard, GlowCard. |
+| TSK-112 | Front | pending | — | **[MOBILE REDESIGN]** Red social estilo Instagram/Threads/Reddit: bottom tab bar (4-5 items), explorer comprimido, feed vertical, hilos discusión, perfil social, notificaciones, gestos swipe, lazy loading, virtualización. Archivos: nuevos componentes mobile, responsive updates. |
+
+### SUBFASE 6: CRECIMIENTO
+
+| TASK-ID | Tipo | Estado | Asignado | Descripción |
+|---------|------|--------|----------|-------------|
+| TSK-113 | Full | pending | — | **[CAPITALÍZATE]** Renombrar Afiliados → Capitalízate. Dashboard visual premium, niveles (Bronce→Diamante), revenue share, links de referido, botones compartir, leaderboard, templates marketing, landing personal del referido. Diseño aspiracional "bonito y dulce". Archivos: `src/views/CapitalizeView.tsx`, `convex/referrals.ts`. Diseños: GalaxyButton, GlowCard, StarRating. |
+
+### SUBFASE 7: COMPONENTES UI (21 diseños Tailwind)
+
+| TASK-ID | Tipo | Estado | Asignado | Descripción |
+|---------|------|--------|----------|-------------|
+| TSK-114 | Front | pending | — | **[UI KIT]** Crear 21 componentes Tailwind: TransactionCard, AlertCard, NotificationCard, GalaxyButton, GlowCard, PremiumCard, ProductCard, ShineCard, GoldButton, NeonLoader, TermsModal, DeleteButton, ConfirmCard, StarRating, CustomCheckbox, PlayButton, ShoppingCart, LoginForm, RegisterForm, DotPattern, Starfield. Archivos: `src/components/ui/*`, `src/styles/patterns.css`. |
+
+---
+
 **Nota:** ¡Obligatorio reclamar tareas de a 3 y actualizar `CURRENT_FOCUS.md`!

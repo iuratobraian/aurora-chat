@@ -16,11 +16,14 @@
  */
 
 import * as dotenv from 'dotenv';
+import fs from 'node:fs';
+import path from 'node:path';
 
 dotenv.config({ path: '.env.local' });
 
 const NOTION_API_KEY = process.env.NOTION_API_KEY;
 const NOTION_DATABASE_ID = process.env.NOTION_DATABASE_ID;
+const ROOT = process.cwd();
 
 const headers = {
   'Authorization': `Bearer ${NOTION_API_KEY}`,
@@ -168,6 +171,34 @@ async function main() {
   const color = COLORS[targetStatus] || RESET;
   console.log(`\n${color}${BOLD}✓ Tarea "${task.name}" marcada como "${targetStatus}"${RESET}`);
   console.log(`  URL: ${task.url}\n`);
+
+  // ═══════════════════════════════════════════
+  // SINCRONIZAR TASK_BOARD.md LOCAL
+  // ═══════════════════════════════════════════
+  // Actualizar el archivo local para que otros agentes vean el cambio
+  // después de hacer git commit + push
+  await syncLocalBoard();
+}
+
+async function syncLocalBoard() {
+  const boardPath = path.join(ROOT, 'TASK_BOARD.md');
+  const tasks = await fetchAllTasks();
+  const pending = tasks.filter(t => !['Listo', 'Done'].includes(t.status));
+
+  let content = `# 📋 TASK BOARD - TRADESHARE\n\n`;
+  content += `> Sincronizado desde Notion — ${new Date().toLocaleString('es-AR')}\n`;
+  content += `> ⚠️  Este archivo se actualiza automáticamente al marcar tareas en Notion.\n\n`;
+  content += `| ID | Tarea | Estado | Prioridad | Tipo | Dominio | Notas |\n`;
+  content += `|:---|:---|:---:|:---:|:---:|:---|:---|\n`;
+
+  pending.forEach((t, i) => {
+    const id = `TSK-${String(i + 1).padStart(3, '0')}`;
+    const status = t.status === 'Backlog' ? '⏳ Pendiente' : t.status === 'Ready' ? '🚀 Ready' : '🔧 En progreso';
+    content += `| ${id} | **${t.name}** | ${status} | ${t.priority || 'Medium'} | ${t.type || '-'} | ${t.domain || ''} | ${t.blocked ? '🚫 Bloqueada' : ''} |\n`;
+  });
+
+  fs.writeFileSync(boardPath, content, 'utf8');
+  console.log(`${DIM}📄 TASK_BOARD.md actualizado (${pending.length} tareas pendientes)${RESET}`);
 }
 
 main().catch(err => {

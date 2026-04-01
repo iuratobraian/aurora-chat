@@ -254,6 +254,11 @@ function showNextSteps() {
   console.log(`\n${BOLD}${YELLOW}⚠️  REGLA DE ORO: Cada 5 tareas terminadas → git push${RESET}`);
   console.log(`${DIM}   node scripts/notion-task-action.mjs done "nombre tarea"${RESET}`);
   console.log(`${DIM}   git add . && git commit -m "fix: descripción" && git push${RESET}`);
+  console.log(`\n${BOLD}${CYAN}🔄 SINCRONIZACIÓN AUTOMÁTICA:${RESET}`);
+  console.log(`${CYAN}   • Al iniciar → git pull + sync TASK_BOARD.md desde Notion${RESET}`);
+  console.log(`${CYAN}   • Al marcar tarea → TASK_BOARD.md se actualiza automáticamente${RESET}`);
+  console.log(`${CYAN}   • Al hacer commit → push actualiza TASK_BOARD.md para otros agentes${RESET}`);
+  console.log(`${CYAN}   • Segundo agente → git pull → TASK_BOARD.md ya está actualizado${RESET}`);
   console.log(`\n${BOLD}${CYAN}🔄 LOOP AUTOMÁTICO:${RESET}`);
   console.log(`${CYAN}   Terminar tarea → Commit → Volver a Notion → Nueva tarea → Repetir${RESET}`);
   console.log(`${CYAN}   PROHIBIDO detenerse si hay tareas pendientes.${RESET}`);
@@ -329,23 +334,25 @@ async function main() {
   console.log(`${GREEN}✓ Conectado a Notion como: ${conn.user}${RESET}`);
 
   // Fetch tasks
-  console.log(`${DIM}Obteniendo tareas...${RESET}`);
+  console.log(`${DIM}Obteniendo tareas desde Notion...${RESET}`);
   const tasks = await fetchTasks();
   console.log(`${GREEN}✓ ${tasks.length} tareas encontradas${RESET}`);
 
-  // Show summary
+  // ═══════════════════════════════════════════
+  // SINCRONIZACIÓN AUTOMÁTICA LOCAL ↔ NOTION
+  // ═══════════════════════════════════════════
+  // El PRIMER agente que inicia sincroniza TASK_BOARD.md
+  // y hace push para que los demás agentes tengan el archivo actualizado.
+  // Cada agente que inicia después hace pull y lee TASK_BOARD.md local.
+  console.log(`\n${DIM}🔄 Sincronizando TASK_BOARD.md con Notion...${RESET}`);
+  await syncTaskBoard(tasks);
+
+  // Mostrar resumen y tareas por dominio
   divider('TABLERO DE TAREAS');
   showTaskSummary(tasks);
-
-  // Show tasks by domain
   divider('TAREAS POR DOMINIO');
   showTasksByDomain(tasks);
-
-  // Show ready to work
   showReadyToWork(tasks);
-
-  // Sync local board
-  await syncTaskBoard(tasks);
 
   // Next steps
   showNextSteps();

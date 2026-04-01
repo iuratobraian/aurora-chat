@@ -1,7 +1,6 @@
 import { api } from "../../convex/_generated/api";
 import { Ad, Publicacion, Usuario, Curso, Herramienta, Recurso, LiveStatus } from '../types';
 import { PROMOTIONAL_ADS, PromotionalAd } from '../../data/promotionalAds';
-import { EVENTOS_MOCK } from '../constants';
 
 const NEWS_DEGRADATION_WARNING = '⚠️ Sistema de noticias en modo degradado. Configure fuentes de noticias en el panel de administración.';
 import logger from '../../lib/utils/logger';
@@ -70,33 +69,47 @@ export const StorageService = {
         try {
             if (convex) {
                 const data = await convex.query(api.ads.getAds);
-                if (data && data.length > 0) { const mapped = data.map((ad: any) => ({ ...ad, id: ad._id })); setLocalItem('local_ads_db', mapped); return mapped; }
+                if (data && data.length > 0) { 
+                    return data.map((ad: any) => ({ ...ad, id: ad._id })); 
+                }
             }
-        } catch (err) { logger.error("Convex Get Ads Error:", err); }
-        const local = getLocalItem<Ad[]>('local_ads_db', []);
-        if (local.length > 0) return local;
-        try { const { STATIC_ADS } = await import('../data/staticData'); return STATIC_ADS as Ad[]; } catch { return []; }
+        } catch (err) { 
+            logger.error("Convex Get Ads Error:", err); 
+        }
+        return [];
     },
 
     saveAd: async (ad: Ad): Promise<void> => {
-        const ads = getLocalItem<Ad[]>('local_ads_db', []);
-        const index = ads.findIndex(a => a.id === ad.id);
-        if (index !== -1) { ads[index] = ad; } else { ads.push(ad); }
-        setLocalItem('local_ads_db', ads);
         try {
             if (convex) {
                 const isConvexId = ad.id && ad.id.length > 10 && !ad.id.includes('-') && !ad.id.startsWith('ad-') && !ad.id.startsWith('default-');
                 const convexId = isConvexId ? ad.id : undefined;
-                const result = await convex.mutation(api.ads.saveAd, { ...(convexId ? { id: convexId } : {}), titulo: ad.titulo || 'Sin título', descripcion: ad.descripcion || '', imagenUrl: ad.imagenUrl || '', link: ad.link || '', sector: ad.sector || 'sidebar', activo: ad.activo ?? true, subtitle: ad.subtitle, extra: ad.extra });
-                if (!convexId && result) { const currentAds = getLocalItem<Ad[]>('local_ads_db', []); const idx = currentAds.findIndex(a => a.id === ad.id); if (idx !== -1) { currentAds[idx].id = result as string; setLocalItem('local_ads_db', currentAds); } }
+                await convex.mutation(api.ads.saveAd, { 
+                    ...(convexId ? { id: convexId } : {}), 
+                    titulo: ad.titulo || 'Sin título', 
+                    descripcion: ad.descripcion || '', 
+                    imagenUrl: ad.imagenUrl || '', 
+                    link: ad.link || '', 
+                    sector: ad.sector || 'sidebar', 
+                    activo: ad.activo ?? true, 
+                    subtitle: ad.subtitle, 
+                    extra: ad.extra 
+                });
             }
-        } catch (err) { logger.error("Convex Save Ad Error:", err); throw err; }
+        } catch (err) { 
+            logger.error("Convex Save Ad Error:", err); 
+            throw err; 
+        }
     },
 
     deleteAd: async (id: string): Promise<void> => {
-        const ads = getLocalItem<Ad[]>('local_ads_db', []);
-        setLocalItem('local_ads_db', ads.filter(a => a.id !== id));
-        try { if (convex && id && id.length > 10 && !id.startsWith('ad-') && !id.startsWith('default-') && !id.includes('-')) { await convex.mutation(api.ads.deleteAd, { id }); } } catch (err) { logger.error("Convex Delete Ad Error:", err); }
+        try { 
+            if (convex && id && id.length > 10 && !id.startsWith('ad-') && !id.startsWith('default-') && !id.includes('-')) { 
+                await convex.mutation(api.ads.deleteAd, { id }); 
+            } 
+        } catch (err) { 
+            logger.error("Convex Delete Ad Error:", err); 
+        }
     },
 
     updateAd: async (ad: Ad): Promise<void> => { await StorageService.saveAd(ad); },
@@ -156,57 +169,99 @@ export const StorageService = {
     },
 
     getCursos: async (): Promise<Curso[]> => {
-        try { if (convex) { const data = await convex.query(api.config.getConfig, { key: "academia_cursos" }); if (data && data.value) return data.value; } } catch (err) { logger.error("Convex getCursos Error:", err); }
-        const local = getLocalItem<Curso[]>('local_cursos_db', []);
-        if (local.length > 0) return local;
-        try { const { STATIC_CURSOS } = await import('../data/staticData'); return STATIC_CURSOS as Curso[]; } catch { return []; }
+        try { 
+            if (convex) { 
+                const data = await convex.query(api.config.getConfig, { key: "academia_cursos" }); 
+                if (data && data.value) return data.value; 
+            } 
+        } catch (err) { 
+            logger.error("Convex getCursos Error:", err); 
+        }
+        return [];
     },
 
     saveCurso: async (curso: Curso): Promise<void> => {
-        const cursos = await StorageService.getCursos();
-        const index = cursos.findIndex(c => c.id === curso.id);
-        if (index !== -1) { cursos[index] = curso; } else { cursos.push(curso); }
-        setLocalItem('local_cursos_db', cursos);
-        if (convex) { try { await convex.mutation(api.config.setConfig, { key: "academia_cursos", value: cursos }); } catch (err) { logger.error("Convex Save Curso Error:", err); } }
+        if (convex) { 
+            try { 
+                const cursos = await StorageService.getCursos();
+                const index = cursos.findIndex(c => c.id === curso.id);
+                if (index !== -1) { cursos[index] = curso; } else { cursos.push(curso); }
+                await convex.mutation(api.config.setConfig, { key: "academia_cursos", value: cursos }); 
+            } catch (err) { 
+                logger.error("Convex Save Curso Error:", err); 
+            } 
+        }
     },
 
     deleteCurso: async (id: string): Promise<void> => {
-        const cursos = await StorageService.getCursos();
-        const updated = cursos.filter(c => c.id !== id);
-        setLocalItem('local_cursos_db', updated);
-        if (convex) { try { await convex.mutation(api.config.setConfig, { key: "academia_cursos", value: updated }); } catch (err) { logger.error("Convex Delete Curso Error:", err); } }
+        if (convex) { 
+            try { 
+                const cursos = await StorageService.getCursos();
+                const updated = cursos.filter(c => c.id !== id);
+                await convex.mutation(api.config.setConfig, { key: "academia_cursos", value: updated }); 
+            } catch (err) { 
+                logger.error("Convex Delete Curso Error:", err); 
+            } 
+        }
     },
 
     getHerramientas: async (): Promise<Herramienta[]> => {
-        try { if (convex) { const data = await convex.query(api.config.getConfig, { key: "academia_herramientas" }); if (data && data.value) return data.value; } } catch (err) { logger.error("Convex getHerramientas Error:", err); }
-        const local = getLocalItem<Herramienta[]>('local_herramientas_db', []);
-        if (local.length > 0) return local;
-        try { const { STATIC_HERRAMIENTAS } = await import('../data/staticData'); return STATIC_HERRAMIENTAS as Herramienta[]; } catch { return []; }
+        try { 
+            if (convex) { 
+                const data = await convex.query(api.config.getConfig, { key: "academia_herramientas" }); 
+                if (data && data.value) return data.value; 
+            } 
+        } catch (err) { 
+            logger.error("Convex getHerramientas Error:", err); 
+        }
+        return [];
     },
 
     saveHerramienta: async (tool: Herramienta): Promise<void> => {
-        const tools = await StorageService.getHerramientas();
-        const index = tools.findIndex(t => t.id === tool.id);
-        if (index !== -1) { tools[index] = tool; } else { tools.push(tool); }
-        setLocalItem('local_herramientas_db', tools);
-        if (convex) { try { await convex.mutation(api.config.setConfig, { key: "academia_herramientas", value: tools }); } catch (err) { logger.error("Convex Save Herramienta Error:", err); } }
+        if (convex) { 
+            try { 
+                const tools = await StorageService.getHerramientas();
+                const index = tools.findIndex(t => t.id === tool.id);
+                if (index !== -1) { tools[index] = tool; } else { tools.push(tool); }
+                await convex.mutation(api.config.setConfig, { key: "academia_herramientas", value: tools }); 
+            } catch (err) { 
+                logger.error("Convex Save Herramienta Error:", err); 
+            } 
+        }
     },
 
     deleteHerramienta: async (id: string): Promise<void> => {
-        const tools = await StorageService.getHerramientas();
-        const updated = tools.filter(t => t.id !== id);
-        setLocalItem('local_herramientas_db', updated);
-        if (convex) { try { await convex.mutation(api.config.setConfig, { key: "academia_herramientas", value: updated }); } catch (err) { logger.error("Convex Delete Herramienta Error:", err); } }
+        if (convex) { 
+            try { 
+                const tools = await StorageService.getHerramientas();
+                const updated = tools.filter(t => t.id !== id);
+                await convex.mutation(api.config.setConfig, { key: "academia_herramientas", value: updated }); 
+            } catch (err) { 
+                logger.error("Convex Delete Herramienta Error:", err); 
+            } 
+        }
     },
 
     getGraficoConfig: async (): Promise<any> => {
-        try { if (convex) { const data = await convex.query(api.config.getConfig, { key: "grafico_assets" }); if (data && data.value) return { id: data._id, key: "grafico_assets", assets: data.value }; } } catch (err) { logger.error("Convex Get Grafico Config Error:", err); }
-        return getLocalItem('local_grafico_config', null);
+        try { 
+            if (convex) { 
+                const data = await convex.query(api.config.getConfig, { key: "grafico_assets" }); 
+                if (data && data.value) return { id: data._id, key: "grafico_assets", assets: data.value }; 
+            } 
+        } catch (err) { 
+            logger.error("Convex Get Grafico Config Error:", err); 
+        }
+        return null;
     },
 
     saveGraficoConfig: async (config: { assets: any[] }): Promise<void> => {
-        setLocalItem('local_grafico_config', config);
-        if (convex) { try { await convex.mutation(api.config.setConfig, { key: "grafico_assets", value: config.assets }); } catch (err) { logger.error("Convex Save Grafico Config Error:", err); } }
+        if (convex) { 
+            try { 
+                await convex.mutation(api.config.setConfig, { key: "grafico_assets", value: config.assets }); 
+            } catch (err) { 
+                logger.error("Convex Save Grafico Config Error:", err); 
+            } 
+        }
     },
 
     toggleResourceProgress: async (userId: string, resourceId: string) => {
@@ -220,29 +275,53 @@ export const StorageService = {
     },
 
     getVideos: async (): Promise<any[]> => {
-        try { if (convex) { const data = await convex.query(api.videos.getVideos); if (data) return data.map((v: any) => ({ ...v, id: v._id })); } } catch (err) { logger.error("Convex Get Videos Error:", err); }
-        return getLocalItem<any[]>('local_videos_db', []);
+        try { 
+            if (convex) { 
+                const data = await convex.query(api.videos.getVideos); 
+                if (data) return data.map((v: any) => ({ ...v, id: v._id })); 
+            } 
+        } catch (err) { 
+            logger.error("Convex Get Videos Error:", err); 
+        }
+        return [];
     },
 
     saveVideo: async (video: any): Promise<void> => {
-        const videos = getLocalItem<any[]>('local_videos_db', []);
-        const index = videos.findIndex(v => v.id === video.id);
-        if (index !== -1) { videos[index] = video; } else { videos.unshift(video); }
-        setLocalItem('local_videos_db', videos);
-        try { if (convex) { const convexId = video.id && video.id.length > 15 && !video.id.includes('-') ? video.id : undefined; await convex.mutation(api.videos.saveVideo, { ...(convexId ? { id: convexId } : {}), tipo: video.tipo, titulo: video.titulo, autor: video.autor, descripcion: video.descripcion, thumbnail: video.thumbnail, embedUrl: video.embedUrl, duracion: video.duracion, categoria: video.categoria }); } } catch (err) { logger.error("Convex Save Video Error:", err); }
+        try { 
+            if (convex) { 
+                const convexId = video.id && video.id.length > 15 && !video.id.includes('-') ? video.id : undefined; 
+                await convex.mutation(api.videos.saveVideo, { 
+                    ...(convexId ? { id: convexId } : {}), 
+                    tipo: video.tipo, 
+                    titulo: video.titulo, 
+                    autor: video.autor, 
+                    descripcion: video.descripcion, 
+                    thumbnail: video.thumbnail, 
+                    embedUrl: video.embedUrl, 
+                    duracion: video.duracion, 
+                    categoria: video.categoria 
+                }); 
+            } 
+        } catch (err) { 
+            logger.error("Convex Save Video Error:", err); 
+        }
     },
 
     deleteVideo: async (id: string): Promise<void> => {
-        const videos = getLocalItem<any[]>('local_videos_db', []);
-        setLocalItem('local_videos_db', videos.filter(v => v.id !== id));
-        try { if (convex && id && id.length > 15 && !id.includes('-')) { await convex.mutation(api.videos.deleteVideo, { id }); } } catch (err) { logger.error("Convex Delete Video Error:", err); }
+        try { 
+            if (convex && id && id.length > 15 && !id.includes('-')) { 
+                await convex.mutation(api.videos.deleteVideo, { id }); 
+            } 
+        } catch (err) { 
+            logger.error("Convex Delete Video Error:", err); 
+        }
     },
 
-    getResources: async (): Promise<Recurso[]> => { return getLocalItem<Recurso[]>('local_resources_db', []); },
-    saveResource: async (resource: Recurso): Promise<void> => { const resources = getLocalItem<Recurso[]>('local_resources_db', []); const index = resources.findIndex(r => r.id === resource.id); if (index !== -1) { resources[index] = resource; } else { resources.unshift(resource); } setLocalItem('local_resources_db', resources); },
-    deleteResource: async (id: string): Promise<void> => { const resources = getLocalItem<Recurso[]>('local_resources_db', []); setLocalItem('local_resources_db', resources.filter(r => r.id !== id)); },
+    getResources: async (): Promise<Recurso[]> => { return []; },
+    saveResource: async (resource: Recurso): Promise<void> => { },
+    deleteResource: async (id: string): Promise<void> => { },
 
-    getEventos: async () => EVENTOS_MOCK,
+    getEventos: async () => [],
     getNoticias: async () => {
         try {
             if (convex) {
@@ -271,15 +350,7 @@ export const StorageService = {
     },
 
     seedSmartData: async () => {
-        const dummyNames = ['Alex Forex', 'Bullish King', 'Pau Trading', 'Market Maker', 'Crypto Queen'];
-        const dummyUsers = dummyNames.map(name => {
-            const handle = name.toLowerCase().replace(' ', '');
-            return { id: crypto.randomUUID?.() || 'xxx', nombre: name, usuario: handle, email: `${handle}@dummy.com`, avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${handle}`, esPro: Math.random() > 0.5, esVerificado: Math.random() > 0.7, rol: 'trader_experimentado', role: 0, xp: 0, level: 1, biografia: 'Trader profesional.', seguidores: [], siguiendo: [], aportes: Math.floor(Math.random() * 20), accuracy: 60 + Math.random() * 30, watchlist: ['BTC/USD', 'ETH/USD'], estadisticas: { tasaVictoria: 65, factorBeneficio: 1.8, pnlTotal: 5000 }, saldo: 5000, reputation: 0, badges: [], fechaRegistro: new Date().toISOString() } as Usuario;
-        });
-        const localUsers = getLocalItem<Usuario[]>('local_users_db', []);
-        setLocalItem('local_users_db', [...localUsers, ...dummyUsers]);
-        for (const user of dummyUsers) { await PostService.createPost({ titulo: `Análisis de ${user.watchlist[0]}`, contenido: 'Veo una oportunidad clara en este nivel. #trading #analisis', categoria: 'Idea', par: user.watchlist[0], tipo: 'Compra', datosGrafico: [10, 20, 15, 30, 25, 40] }, user.id); }
-        return dummyUsers.length;
+        return 0;
     },
 
     sendBrandEmail: async ({ to, nombre, subject, body }: { to: string; nombre: string; subject: string; body: string }) => {

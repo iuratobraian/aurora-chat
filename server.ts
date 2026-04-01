@@ -821,7 +821,12 @@ async function startServer() {
     const wss = new WebSocketServer({ server });
     const PORT = parseInt(process.env.PORT || '3000', 10);
 
-    app.use(express.json());
+    app.use((req: Request, res: Response, next: NextFunction) => {
+        if (req.path.startsWith('/webhooks/')) {
+            return next();
+        }
+        express.json()(req, res, next);
+    });
     app.use(ipGuard);
 
     // Security headers middleware
@@ -1088,56 +1093,24 @@ async function startServer() {
         }
 
         try {
-            // First try JWT
-            try {
-                const decoded = jwt.verify(token, JWT_SECRET_EFFECTIVE) as { userId: string };
-                if (decoded?.userId) {
-                    (req as any).userId = decoded.userId;
-                    (req as any).authTime = Date.now();
-                    return next();
-                }
-            } catch (err) {
-                // Not a valid JWT, or expired. Fallback for transition if needed, 
-                // but we should aim for JWT only.
-                logger.debug(`[Auth] JWT verification failed: ${err instanceof Error ? err.message : String(err)}`);
+            // JWT verification only — no fallback to userId-as-token
+            const decoded = jwt.verify(token, JWT_SECRET_EFFECTIVE) as { userId: string };
+            if (!decoded?.userId) {
+                logger.warn(`[Auth] JWT sin userId en ${req.path}`);
+                return res.status(401).json({ error: 'Token inválido' });
             }
 
-            // Fallback for transition: verify userId against Convex directly
-            const { valid, userId } = await verifyTokenWithConvex(token);
-            if (!valid || !userId) {
-                logger.warn(`[Auth] Auth fallida (JWT invalid + Convex fallback failed) para ${req.path}`);
-                return res.status(401).json({ error: 'Token inválido o expirado' });
-            }
-
-            (req as any).userId = userId;
+            (req as any).userId = decoded.userId;
             (req as any).authTime = Date.now();
-            logger.debug(`[Auth] Acceso autorizado (vía Convex fallback) en ${req.path} para usuario ${userId.slice?.(0, 8) || 'unknown'}`);
+            logger.debug(`[Auth] Acceso autorizado en ${req.path} para usuario ${decoded.userId.slice?.(0, 8) || 'unknown'}`);
             next();
         } catch (err) {
-            logger.error('[Auth] Error verificando token', err);
-            res.status(500).json({ error: 'Error verificando token' });
-        }
-    }
-
-    
-    // Verify token against Convex (optional enhancement)
-    async function verifyTokenWithConvex(token: string): Promise<{ valid: boolean; userId?: string }> {
-        if (!token) {
-            return { valid: false };
-        }
-
-        try {
-            const profile = await convexClient.query(api.profiles.getProfile as any, { userId: token });
-            if (!profile) {
-                logger.warn('[Auth] Perfil no encontrado para token', { token });
-                return { valid: false };
+            if (err instanceof jwt.TokenExpiredError) {
+                logger.warn(`[Auth] Token expirado en ${req.path}`);
+                return res.status(401).json({ error: 'Token expirado. Inicia sesión nuevamente.' });
             }
-
-            const userId = (profile as any).userId || (profile as any)._id || token;
-            return { valid: true, userId };
-        } catch (err) {
-            logger.warn('[Auth] Error verificando token con Convex', { error: err instanceof Error ? err.message : String(err) });
-            return { valid: false };
+            logger.error('[Auth] Error verificando token', err);
+            res.status(401).json({ error: 'Token inválido o expirado' });
         }
     }
 
@@ -1178,7 +1151,7 @@ async function startServer() {
     async function verifyWSToken(token: string): Promise<{ valid: boolean; userId?: string }> {
         if (!token) return { valid: false };
         
-        // First try JWT
+        // JWT verification only — no fallback to userId-as-token
         try {
             const decoded = jwt.verify(token, JWT_SECRET_EFFECTIVE) as { userId: string };
             if (decoded?.userId) {
@@ -1188,17 +1161,6 @@ async function startServer() {
             logger.debug(`[WS Auth] JWT verification failed: ${err instanceof Error ? err.message : String(err)}`);
         }
 
-        // Fallback to Convex verification
-        try {
-            const profile = await convexClient.query(api.profiles.getProfile as any, { userId: token });
-            if (profile) {
-                const userId = (profile as any).userId || (profile as any)._id || token;
-                return { valid: true, userId };
-            }
-        } catch (err) {
-            logger.warn('[WS Auth] Error verificando token con Convex', { error: err instanceof Error ? err.message : String(err) });
-        }
-        
         return { valid: false };
     }
 

@@ -1,6 +1,7 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { api } from "./_generated/api";
+import { assertOwnershipOrAdmin } from "./lib/auth";
 
 export const getSignalPlans = query({
   args: {},
@@ -102,6 +103,7 @@ export const getSignalById = query({
 export const getUserSubscription = query({
   args: { userId: v.string() },
   handler: async (ctx, { userId }) => {
+    await assertOwnershipOrAdmin(ctx, userId);
     const subs = await ctx.db
       .query("signal_subscriptions")
       .withIndex("by_user", (q) => q.eq("userId", userId))
@@ -114,6 +116,7 @@ export const getUserSubscription = query({
 export const getUserSubscriptions = query({
   args: { userId: v.string() },
   handler: async (ctx, { userId }) => {
+    await assertOwnershipOrAdmin(ctx, userId);
     return await ctx.db
       .query("signal_subscriptions")
       .withIndex("by_user", (q) => q.eq("userId", userId))

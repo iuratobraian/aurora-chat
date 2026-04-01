@@ -1,5 +1,5 @@
-import { query, mutation, internalMutation } from "./_generated/server";
-import { v } from "convex/values";
+import { query, mutation, internalMutation, PaginationOptions } from "./_generated/server";
+import { v, paginationOptsValidator } from "convex/values";
 import { calculateXpGain } from "./lib/permissions";
 import { addXpInternal } from "./lib/gamification";
 import { api } from "./_generated/api";
@@ -108,76 +108,60 @@ export const getPosts = query({
 
 
 // Obtener posts con paginación - OPTIMIZADO con cursor nativo de Convex
+// Obtener posts con paginación - ESTÁNDAR CONVEX
 export const getPostsPaginated = query({
-  args: { 
-    numItems: v.optional(v.number()),
-    cursor: v.optional(v.string()),
-  },
+  args: { paginationOpts: paginationOptsValidator },
   handler: async (ctx, args) => {
-    const numItems = args.numItems ?? 10;
-    
     // Use cached exclusive community IDs
     const exclusiveCommunityIds = await getExclusiveCommunityIds(ctx);
     
-    const cursor: string | null = args.cursor ?? null;
-    const pagination = await ctx.db
+    const result = await ctx.db
       .query("posts")
       .withIndex("by_status_createdAt", (q) => q.eq("status", "active"))
       .order("desc")
-      .paginate({ cursor, numItems });
+      .paginate(args.paginationOpts);
 
-    if (pagination.page.length === 0) {
-      return { page: [], continueCursor: null, isDone: true };
-    }
-
-    // Filter out posts from exclusive communities
-    const filteredPage = pagination.page.filter((post: any) => {
+    const filteredPage = result.page.filter((post: any) => {
       if (post.subcommunityId && exclusiveCommunityIds.has(post.subcommunityId)) {
         return false;
       }
       return true;
     });
 
-    const continueCursor = pagination.continueCursor;
-    const isDone = pagination.isDone || filteredPage.length < numItems;
-
     const userIds = [...new Set(filteredPage.map((p: any) => p.userId))];
-    const profiles = await Promise.all(
-      userIds.map((userId: string) =>
-        ctx.db.query("profiles").withIndex("by_userId", q => q.eq("userId", userId)).first()
-      )
-    );
-    const profileMap = new Map(
-      profiles.filter((p): p is NonNullable<typeof p> => p !== null).map(p => [p.userId, p])
-    );
+    const profileMap = new Map();
+    
+    if (userIds.length > 0) {
+      const profiles = await Promise.all(
+        userIds.map((userId: string) =>
+          ctx.db.query("profiles").withIndex("by_userId", q => q.eq("userId", userId)).first()
+        )
+      );
+      profiles.forEach(p => {
+        if (p) profileMap.set(p.userId, p);
+      });
+    }
 
-    const postsWithUser = filteredPage.map((post: any) => {
-      if (post.userId === "ai_sentiment_agent") {
-        return {
-          ...post,
-          nombreUsuario: "Máximo | Market News",
-          usuarioManejo: "max_news",
-          avatarUsuario: "https://api.dicebear.com/7.x/avataaars/svg?seed=max_news&backgroundColor=c0aede",
-          esPro: true,
-          esVerificado: true,
-          authorFollowers: 12500,
-          accuracyUser: 87,
-        };
-      }
-
+    const page = filteredPage.map((post: any) => {
       const profile = profileMap.get(post.userId);
-
-      const nombreUsuario = profile?.nombre || post.nombreUsuario || "Usuario";
-      const usuarioManejo = profile?.usuario || post.usuarioManejo || "user";
-      const avatarUsuario = profile?.avatar || post.avatarUsuario || `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.userId}`;
+      const postAny = post as any;
 
       return {
         ...post,
-        nombreUsuario,
-        usuarioManejo,
-        avatarUsuario,
-        avatarFrame: profile?.avatarFrame ?? post.avatarFrame,
-        esPro: profile?.esPro ?? post.esPro ?? false,
+        nombreUsuario: profile?.nombre || postAny.nombreUsuario || "Usuario",
+        usuarioManejo: profile?.usuario || postAny.usuarioManejo || "user",
+        avatarUsuario: profile?.avatar || postAny.avatarUsuario || `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.userId}`,
+        avatarFrame: profile?.avatarFrame ?? postAny.avatarFrame,
+        esPro: profile?.esPro ?? postAny.esPro ?? false,
+        esVerificado: profile?.esVerificado ?? postAny.esVerificado ?? false,
+        authorFollowers: (profile?.seguidores || []).length,
+        accuracyUser: profile?.accuracy || 50,
+      };
+    });
+
+    return { ...result, page };
+  },
+});
         esVerificado: profile?.esVerificado ?? post.esVerificado ?? false,
         authorFollowers: profile?.seguidores?.length ?? post.authorFollowers ?? 0,
         accuracyUser: profile?.accuracy ?? post.accuracyUser ?? 50,
@@ -192,6 +176,7 @@ export const getPostsPaginated = query({
 export const getPostsByUser = query({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
+    await assertOwnershipOrAdmin(ctx, args.userId);
     return await ctx.db
       .query("posts")
       .withIndex("by_userId", (q) => q.eq("userId", args.userId))

@@ -1,7 +1,7 @@
 import { Usuario, BadgeType } from '../../types';
   import { api } from "../../../convex/_generated/api";
 import { saveSession, getSession, saveSessionUser, getSessionUser, clearSession as clearSecureSession, isSessionExpired } from '../../utils/sessionManager';
-import { hashPassword, verifyPassword, isHashed, isGooglePassword } from '../../utils/passwordHash';
+import { isGooglePassword } from '../../utils/passwordHash';
 import logger from '../../../lib/utils/logger';
 import { getConvexClient } from '../../../lib/convex/client';
 
@@ -166,11 +166,14 @@ export const AuthService = {
                     
                     if (storedPassword) {
                         if (isGooglePassword(storedPassword)) {
-                            passwordsMatch = storedPassword === 'google_oauth_protected_' + (profile as any).googleSub || storedPassword === password;
+                            passwordsMatch = false;
                         } else if (isHashed(storedPassword)) {
                             passwordsMatch = await verifyPassword(password, storedPassword);
                         } else {
-                            passwordsMatch = storedPassword === password || storedPassword.trim() === password.trim();
+                            passwordsMatch = await verifyPassword(password, storedPassword) || storedPassword === password;
+                            if (passwordsMatch && storedPassword === password) {
+                                logger.warn(`[AUTH] Legacy plaintext password detected for user: ${normalizedId}. Should be re-hashed.`);
+                            }
                         }
                     }
                     
@@ -187,38 +190,6 @@ export const AuthService = {
             }
         } catch (err) {
             logger.error("Convex Login Error:", err);
-        }
-
-        const lowerIdentifier = identifier.trim().toLowerCase();
-        const getLocalItem = <T>(key: string, defaultVal: T): T => {
-            try {
-                const item = localStorage.getItem(key);
-                return item ? JSON.parse(item) : defaultVal;
-            } catch { return defaultVal; }
-        };
-        
-        const localUsers = getLocalItem<Usuario[]>('local_users_db', []);
-        const localUser = localUsers.find(u => 
-            u.email?.toLowerCase() === lowerIdentifier || 
-            u.usuario?.toLowerCase() === lowerIdentifier
-        );
-        
-        let localPasswordsMatch = false;
-        if (localUser?.password) {
-            if (isGooglePassword(localUser.password)) {
-                localPasswordsMatch = localUser.password === 'google_oauth_protected_';
-            } else if (isHashed(localUser.password)) {
-                localPasswordsMatch = await verifyPassword(password, localUser.password);
-            } else {
-                localPasswordsMatch = localUser.password === password || localUser.password.trim() === password.trim();
-            }
-        }
-        
-        if (localUser && localPasswordsMatch) {
-            const token = `session_${localUser.id}_${Date.now()}`;
-            saveSession(token, localUser.id);
-            saveSessionUser(localUser);
-            return { user: localUser, error: null };
         }
 
         return { user: null, error: 'Credenciales inválidas. Si no tienes cuenta, por favor regístrate.' };
@@ -241,21 +212,10 @@ export const AuthService = {
                 }
             }
         } catch (err) {
-            logger.warn("Could not check uniqueness in Convex, falling back to local:", err);
-            const getLocalItem = <T>(key: string, defaultVal: T): T => {
-                try {
-                    const item = localStorage.getItem(key);
-                    return item ? JSON.parse(item) : defaultVal;
-                } catch { return defaultVal; }
-            };
-            const localUsers = getLocalItem<Usuario[]>('local_users_db', []);
-            if (localUsers.find(u => u.usuario?.toLowerCase() === normalizedUsuario)) {
-                const suggestion = `${normalizedUsuario}${Math.floor(Math.random() * 900) + 100}`;
-                return { user: null, error: `El usuario @${normalizedUsuario} ya existe. Prueba @${suggestion}` };
-            }
+            logger.warn("Could not check uniqueness in Convex:", err);
         }
 
-        const hashedPassword = datos.password ? await hashPassword(datos.password) : undefined;
+        const plainPassword = datos.password;
         const calculateReputation = (user: Usuario): Usuario => {
             let score = 50;
             score += (user.aportes || 0) * 5;
@@ -269,12 +229,17 @@ export const AuthService = {
             return { ...user, reputation: Math.min(100, Math.max(0, score)), badges: Array.from(newBadges) };
         };
 
+        let passwordHash: string | null = null;
+        if (plainPassword) {
+            passwordHash = await hashPassword(plainPassword);
+        }
+
         const userForUI: Usuario = calculateReputation({
             id: userId,
             nombre: datos.nombre,
             usuario: normalizedUsuario,
             email: datos.email?.toLowerCase()?.trim(),
-            password: hashedPassword,
+            password: passwordHash || plainPassword,
             avatar: datos.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${normalizedUsuario}`,
             esPro: datos.esPro || false,
             esVerificado: datos.esVerificado === true,
@@ -333,20 +298,7 @@ export const AuthService = {
             }
         }
 
-        const setLocalItem = (key: string, data: any) => localStorage.setItem(key, JSON.stringify(data));
-        const getLocalItem = <T>(key: string, defaultVal: T): T => {
-            try {
-                const item = localStorage.getItem(key);
-                return item ? JSON.parse(item) : defaultVal;
-            } catch { return defaultVal; }
-        };
-
-        if (syncSuccess || !convex) {
-            const localUsers = getLocalItem<Usuario[]>('local_users_db', []);
-            if (!localUsers.find(u => u.email === userForUI.email)) {
-                localUsers.push(userForUI);
-                setLocalItem('local_users_db', localUsers);
-            }
+        if (syncSuccess) {
             const token = `session_${userForUI.id}_${Date.now()}`;
             saveSession(token, userForUI.id);
             saveSessionUser(userForUI);
@@ -370,25 +322,7 @@ export const AuthService = {
                 return { user: null, error: 'El token de Google no contiene los datos mínimos requeridos.' };
             }
 
-            const getLocalItem = <T>(key: string, defaultVal: T): T => {
-                try {
-                    const item = localStorage.getItem(key);
-                    return item ? JSON.parse(item) : defaultVal;
-                } catch { return defaultVal; }
-            };
-            
-            // 1. Check if user already exists in local DB (legacy/transient fallback)
-            const localUsers = getLocalItem<Usuario[]>('local_users_db', []);
-            const existingInLocal = localUsers.find(u => normalizeEmail(u.email) === normalizedEmail);
-
-            if (existingInLocal) {
-                const token = `session_${existingInLocal.id}_${Date.now()}`;
-                saveSession(token, existingInLocal.id);
-                saveSessionUser(existingInLocal);
-                return { user: existingInLocal, error: null };
-            }
-
-            // 2. Check if user exists in Convex (Remote DB)
+            // User profile must exist in Convex (Remote DB)
             try {
                 const profile = await convex.query(api.profiles.getProfileByEmail, { 
                     email: normalizedEmail

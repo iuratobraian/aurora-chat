@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef, memo } from 'react';
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, usePaginatedQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { StorageService } from '../services/storage';
 import { Publicacion, Usuario, Comentario, CategoriaPost, Ad, LiveStatus, Herramienta, ConvexPost } from '../types';
@@ -88,20 +87,22 @@ const ComunidadView: React.FC<Props> = ({ usuario, onVisitProfile, onLoginReques
     }, [usuario?.id]);
 
     const [posts, setPosts] = useState<Publicacion[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [filterType, setFilterType] = useState<CategoriaPost | 'Todos'>('Todos');
     const [filterTag, setFilterTag] = useState<string | null>(null);
     const [filterFollowing, setFilterFollowing] = useState(false);
     const [sortBy, setSortBy] = useState<'relevance' | 'recent' | 'popular' | 'top_points'>('relevance');
-    const [cursor, setCursor] = useState<string | null>(null);
-    const [hasMore, setHasMore] = useState(true);
     const [justPublishedPostId, setJustPublishedPostId] = useState<string | null>(null);
 
-    const paginatedResult = useQuery(api.posts.getPostsPaginated, { 
-        numItems: PAGE_SIZE, 
-        cursor: cursor !== null ? cursor : undefined 
-    }) as { page: ConvexPost[]; continueCursor: string | null; isDone: boolean } | undefined;
+    const { results: rawConvexPosts, status, loadMore } = usePaginatedQuery(
+        api.posts.getPostsPaginated, 
+        {}, 
+        { initialNumItems: PAGE_SIZE }
+    );
+
+    const convexPosts = rawConvexPosts as ConvexPost[];
+    const loading = status === "LoadingFirstPage";
+    const isLoadingMore = status === "LoadingMore";
+    const hasMore = status !== "Exhausted";
 
     const convexPosts = paginatedResult?.page;
     
@@ -134,75 +135,26 @@ const ComunidadView: React.FC<Props> = ({ usuario, onVisitProfile, onLoginReques
     const [xpToastAmount, setXpToastAmount] = useState(50);
     const [feedDataSignal, setFeedDataSignal] = useState<FeedDataSignal>('live');
 
+    const mappedPosts = useMemo(() => {
+        if (!convexPosts) return [];
+        return convexPosts.map(mapConvexPost);
+    }, [convexPosts]);
+
     const loadFallbackPosts = useCallback(async () => {
-        setLoading(true);
         setFeedDataSignal('fallback');
         const [localPosts, adsData] = await Promise.all([StorageService.getPosts(), StorageService.getAds()]);
         setPosts(injectAds(localPosts, adsData));
-        setLoading(false);
     }, []);
 
-    const openCommunityChat = (communityId: string, communityName: string) => {
-        setActiveCommunityChat({ id: communityId, name: communityName });
-        window.dispatchEvent(new CustomEvent('open-community-chat', {
-            detail: { channelId: communityId, communityName }
-        }));
-    };
-
-    const { ref: loadMoreRef, inView } = useInView();
-
-    const mappedPosts = useMemo(() => {
-        if (!convexPosts) return [];
-        return (convexPosts as ConvexPost[]).map(mapConvexPost);
-    }, [convexPosts]);
-
-    // Handle new page data - append posts when new data arrives
+    // Effect to update final posts display
     useEffect(() => {
-        if (!paginatedResult) return;
-        
-        if (cursor === null && convexPosts) {
-            if (convexPosts.length > 0) {
-                setPosts(mappedPosts);
-                setFeedDataSignal('live');
-            } else if (posts.length === 0) {
-                loadFallbackPosts();
-            }
-        } else if (convexPosts && cursor !== null) {
-            setPosts(prev => {
-                const existingIds = new Set(prev.map(p => p.id));
-                const newPosts = mappedPosts.filter(p => !existingIds.has(p.id));
-                return [...prev, ...newPosts];
-            });
+        if (convexPosts && convexPosts.length > 0) {
+            setPosts(mappedPosts);
+            setFeedDataSignal('live');
+        } else if (status === 'Exhausted' && posts.length === 0) {
+            loadFallbackPosts();
         }
-        
-        setHasMore(!paginatedResult.isDone);
-        setIsLoadingMore(false);
-    }, [paginatedResult, convexPosts, cursor, mappedPosts, posts.length, loadFallbackPosts]);
-
-    // Fallback: if Convex doesn't respond within 5s, load from local storage
-    useEffect(() => {
-        if (paginatedResult !== undefined) return; // Convex already responded
-        const timeout = setTimeout(() => {
-            if (paginatedResult === undefined && posts.length === 0) {
-                loadFallbackPosts();
-            }
-        }, 5000);
-        return () => clearTimeout(timeout);
-    }, [paginatedResult, posts.length, loadFallbackPosts]);
-
-    // Initial load state
-    useEffect(() => {
-        if (paginatedResult !== undefined) {
-            setLoading(false);
-        }
-    }, [paginatedResult]);
-
-    // Update cursor when new page data arrives (but only for next page)
-    useEffect(() => {
-        if (paginatedResult && paginatedResult.continueCursor && cursor !== null) {
-            setCursor(paginatedResult.continueCursor);
-        }
-    }, [paginatedResult?.continueCursor]);
+    }, [convexPosts, status, mappedPosts, loadFallbackPosts]);
 
     const [ads, setAds] = useState<Ad[]>([]);
 
@@ -305,27 +257,16 @@ const ComunidadView: React.FC<Props> = ({ usuario, onVisitProfile, onLoginReques
 
     // Infinite scroll with Intersection Observer
     useEffect(() => {
-        if (inView && hasMore && !isLoadingMore && paginatedResult) {
-            setIsLoadingMore(true);
+        if (inView && hasMore && status === "CanLoadMore") {
+            loadMore(PAGE_SIZE);
         }
-    }, [inView, hasMore, isLoadingMore, paginatedResult]);
+    }, [inView, hasMore, status, loadMore]);
 
-    // Load next page when loading flag is set
+    // Reset filters
     useEffect(() => {
-        if (isLoadingMore && paginatedResult && paginatedResult.continueCursor) {
-            setCursor(paginatedResult.continueCursor);
-        } else if (isLoadingMore && paginatedResult && paginatedResult.isDone) {
-            setHasMore(false);
-            setIsLoadingMore(false);
-        }
-    }, [isLoadingMore, paginatedResult]);
-
-    // Reset pagination when filters change
-    useEffect(() => {
-        setPosts([]);
-        setCursor(null);
-        setHasMore(true);
-        setIsLoadingMore(false);
+        // usePaginatedQuery handles reset automatically if the query args change, 
+        // but here we are filtering locally for now to keep it simple.
+        // If we want server-side filtering, we'd add it to query args.
     }, [filterType, filterTag, filterFollowing, sortBy]);
 
     const coursesAd = useMemo(() => {

@@ -420,30 +420,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ type: initialType, onClose, onSuc
 
                   {(view === 'login' || view === 'register') && (
                     <div className="w-full flex flex-col items-center gap-3">
-                      {view === 'login' && (
-                        <button
-                          type="button"
-                          onClick={async () => {
-                            setLoading(true);
-                            setError('');
-                            try {
-                              await StorageService.seedAdmin();
-                              const { user, error: loginError } = await StorageService.login('brai', 'admin123');
-                              if (user) {
-                                onSuccess(user);
-                              } else {
-                                setError(loginError || 'Dev login failed');
-                              }
-                            } catch (err: any) {
-                              setError(err?.message || 'Error en dev login');
-                            }
-                            setLoading(false);
-                          }}
-                          className="text-[10px] font-bold text-purple-400 hover:text-purple-300 underline"
-                        >
-                          🔧 Dev Login (Admin)
-                        </button>
-                      )}
                       <div className="flex items-center gap-3 w-full opacity-30">
                         <div className="h-[1px] flex-1 bg-white/20"></div>
                         <span className="text-[10px] uppercase font-black tracking-widest text-white/50">o continuar con</span>

@@ -19,6 +19,7 @@ import { AgentOrchestrationProvider } from './hooks/useAgentOrchestration';
 import { AgentStatusBar } from './components/agents/AgentStatusBar';
 import { NewsFeed } from './components/agents/NewsFeed';
 import SubscriptionGate from './components/SubscriptionGate';
+import { AdminErrorToast } from './components/AdminErrorToast';
 
 const MusicPlayer = lazy(() => import('./components/MusicPlayer'));
 const FloatingBar = lazy(() => import('./components/FloatingBar'));
@@ -865,6 +866,8 @@ const App: React.FC = memo(() => {
               usuario={usuario}
             />
           </Suspense>
+
+          <AdminErrorToast userRole={usuario?.role} userRol={usuario?.rol} />
         </ErrorBoundary>
       </div>
       </GlobalErrorHandler>

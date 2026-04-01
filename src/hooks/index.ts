@@ -45,3 +45,7 @@ export { useHabitTracker } from './useHabitTracker';
 
 // Payments
 export { usePayment } from './usePayment';
+
+// Fallback & Resilience (TSK-100)
+export { useFallback, useServiceStatus } from './useFallback';
+export type { UseFallbackResult, ServiceError } from './useFallback';

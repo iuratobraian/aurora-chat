@@ -206,8 +206,8 @@
 
 | TASK-ID | Tipo | Estado | Asignado | Descripción |
 |---------|------|--------|----------|-------------|
-| TSK-100 | Full | pending | — | **[AUTO FALLBACK]** Sistema de fallback automático: errores ocultos al usuario, popup esquina solo admin, cache local siempre activo, app nunca deja de usarse. Archivos: `src/lib/fallback.ts`, `src/hooks/useFallback.ts`, `src/components/AdminErrorToast.tsx`, `src/services/*`. |
-| TSK-101 | Full | pending | — | **[AUTH REDESIGN]** Rediseñar login/registro con nuevos componentes Tailwind, corregir flujo de registro Convex, integrar Google Sign-In, recuperación contraseña, referral codes. Archivos: `src/components/AuthModal.tsx`, `src/services/auth/authService.ts`, `convex/auth.ts`. Diseños: LoginForm, RegisterForm, TermsModal. |
+| TSK-100 | Full | done | OpenCode | **[AUTO FALLBACK]** Sistema de fallback automático: errores ocultos al usuario, popup esquina solo admin, cache local siempre activo, app nunca deja de usarse. Archivos: `src/lib/fallback.ts`, `src/hooks/useFallback.ts`, `src/components/AdminErrorToast.tsx`, `src/services/*`. |
+| TSK-101 | Full | claimed | OpenCode | **[AUTH REDESIGN]** Rediseñar login/registro con nuevos componentes Tailwind, corregir flujo de registro Convex, integrar Google Sign-In, recuperación contraseña, referral codes. Archivos: `src/components/AuthModal.tsx`, `src/services/auth/authService.ts`, `convex/auth.ts`. Diseños: LoginForm, RegisterForm, TermsModal. |
 
 ### SUBFASE 2: NAVEGACIÓN Y FEED
 
@@ -250,7 +250,7 @@
 
 | TASK-ID | Tipo | Estado | Asignado | Descripción |
 |---------|------|--------|----------|-------------|
-| TSK-114 | Front | pending | — | **[UI KIT]** Crear 21 componentes Tailwind: TransactionCard, AlertCard, NotificationCard, GalaxyButton, GlowCard, PremiumCard, ProductCard, ShineCard, GoldButton, NeonLoader, TermsModal, DeleteButton, ConfirmCard, StarRating, CustomCheckbox, PlayButton, ShoppingCart, LoginForm, RegisterForm, DotPattern, Starfield. Archivos: `src/components/ui/*`, `src/styles/patterns.css`. |
+| TSK-114 | Front | claimed | OpenCode | **[UI KIT]** Crear 21 componentes Tailwind: TransactionCard, AlertCard, NotificationCard, GalaxyButton, GlowCard, PremiumCard, ProductCard, ShineCard, GoldButton, NeonLoader, TermsModal, DeleteButton, ConfirmCard, StarRating, CustomCheckbox, PlayButton, ShoppingCart, LoginForm, RegisterForm, DotPattern, Starfield. Archivos: `src/components/ui/*`, `src/styles/patterns.css`. |
 
 ---
 

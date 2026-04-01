@@ -1,77 +1,56 @@
-# CURRENT FOCUS - Aurora Separation Agent
+# CURRENT FOCUS - OpenCode Agent
 
-## 🎯 MISSION: Separate Aurora from TradeShare
+## 🎯 MISSION: Sprint 5 - Resilience & UI Foundation
 
-### Session Start: 2026-04-01 01:15:00
+### Session Start: 2026-04-01 13:27:00
 
-**Progress:** Phase 1 COMPLETE, Phase 2 IN PROGRESS
-
----
-
-## Completed Tasks:
-
-### ✅ Phase 1: Research (COMPLETE)
-- [x] Investigated Claude Code leak
-- [x] Extracted KAIROS pattern (always-on assistant)
-- [x] Extracted Buddy pattern (companion system)
-- [x] Extracted Coordinator Mode (multi-agent)
-- [x] Extracted Dream System (memory consolidation)
-- [x] Created `docs/CLAUDE_CODE_LEAK_ANALYSIS.md`
-
-### ✅ Phase 2: Architecture (COMPLETE)
-- [x] Created `aurora/` directory structure
-- [x] Created `aurora/package.json`
-- [x] Created `aurora/README.md`
-- [x] Created `aurora/ARCHITECTURE.md`
-- [x] Created `AURORA_SEPARATION_PLAN.md`
-- [x] Updated TASK_BOARD.md with Aurora tasks
+**Progress:** TSK-100 COMPLETE, TSK-101 IN PROGRESS
 
 ---
 
-## Current Focus: Phase 3 - Migration
+## Active Tasks:
 
-### Files Created in aurora/:
-```
-aurora/
-├── package.json ✅
-├── README.md ✅
-├── ARCHITECTURE.md ✅
-├── core/
-│   ├── daemon/aurora-always-on.mjs ✅ (copied)
-│   ├── providers/ (empty)
-│   ├── memory/ (empty)
-│   └── commands/ (empty)
-├── cli/
-│   ├── aurora-inicio.mjs ✅ (copied)
-│   ├── aurora-cli.mjs ✅ (copied)
-│   └── commands/ (empty)
-├── mcp/
-│   └── connectors.json ✅ (copied)
-├── agents/ (empty)
-├── skills/ (empty)
-├── api/ (empty)
-└── scripts/ (empty)
-```
+### ✅ TSK-100 - AUTO FALLBACK (COMPLETE)
+- **Owner:** OpenCode
+- **Status:** done
+- **Delivered:**
+  - `src/lib/fallback.ts` - Core fallback orchestration with circuit breaker + retry + cache
+  - `src/hooks/useFallback.ts` - React hooks for fallback state and per-service status
+  - `src/components/AdminErrorToast.tsx` - Admin-only corner error notification
+  - `src/services/fallbackWrappers.ts` - High-order service wrappers
+  - `src/lib/eventBus.ts` - Added SERVICE_ERROR and FALLBACK_STATE_CHANGE events
+  - `src/hooks/index.ts` - Exported new hooks
+  - `src/App.tsx` - Integrated AdminErrorToast at root level
 
-### Next Files to Copy:
-1. `scripts/aurora-api.mjs` → `aurora/api/aurora-api.mjs`
-2. `scripts/aurora-shell.mjs` → `aurora/cli/aurora-shell.mjs`
-3. `lib/aurora/memory-backend.mjs` → `aurora/core/memory/memory-backend.mjs`
-4. `scripts/aurora-notion-sync.mjs` → `aurora/scripts/sync/aurora-notion-sync.mjs`
-5. All `scripts/aurora-*.mjs` files (70+)
+### 🔄 TSK-101 - AUTH REDESIGN (IN PROGRESS)
+- **Owner:** OpenCode
+- **Status:** in_progress
+- **Objective:** Redesign login/register with Tailwind components, fix Convex registration flow, integrate Google Sign-In, password recovery, referral codes
+- **Files to touch:**
+  - `src/components/AuthModal.tsx`
+  - `src/services/auth/authService.ts`
+  - `convex/auth.ts`
+- **Forbidden files:**
+  - `src/App.tsx` (read-only for auth context)
+  - `src/views/Navigation.tsx`
+- **Exit criteria:** Premium auth UI, working Convex registration, Google Sign-In functional, password recovery flow, referral code support
+
+### ⏳ TSK-114 - UI KIT (CLAIMED - QUEUE)
+- **Owner:** OpenCode
+- **Status:** claimed
+- **Objective:** Create 21 Tailwind components for the design system
+- **Files to touch:**
+  - `src/components/ui/*` (create all 21 components)
+  - `src/styles/patterns.css` (create)
 
 ---
 
 ## Files Being Modified:
 
-### Creating:
-- `aurora/core/daemon/aurora-daemon.mjs` (new daemon entry point)
-- `aurora/api/routes/` (API route handlers)
-- `aurora/lib/utils/` (utility functions)
-
-### Updating:
-- `AGENT_LOG.md` - Log migration progress
-- `AURORA_MIGRATION_PLAN.md` - Detailed migration plan (pending)
+### Analyzing:
+- `src/components/AuthModal.tsx` - Current auth modal structure
+- `src/services/auth/authService.ts` - Auth service implementation
+- `convex/auth.ts` - Convex auth functions
 
 ---
 
@@ -79,7 +58,6 @@ aurora/
 
 | File | Reason |
 |------|--------|
-| `src/App.tsx` | Core TradeShare UI |
 | `src/views/Navigation.tsx` | Core TradeShare navigation |
 | `convex/schema.ts` | Database schema |
 | `.env.local` | Shared config (read-only) |
@@ -104,4 +82,4 @@ npm run aurora:notion
 
 ---
 
-*Last updated: 2026-04-01 01:15:00*
+*Last updated: 2026-04-01 13:35:00*

@@ -77,7 +77,7 @@ const ComunidadView: React.FC<Props> = ({ usuario, onVisitProfile, onLoginReques
     const creatorCommunities = useQuery(api.communities.getCreatorCommunities, { limit: 3 }) as any[];
     
     const [topUsers, setTopUsers] = useState<any[]>([]);
-    const leaderboard = useQuery(api.profiles.getLeaderboard, { limit: 10, type: 'global' }) as any[];
+    const leaderboard = useQuery(api.gamification.getLeaderboard, { limit: 10 }) as any[];
     useEffect(() => {
         if (leaderboard) {
             setTopUsers(leaderboard || []);

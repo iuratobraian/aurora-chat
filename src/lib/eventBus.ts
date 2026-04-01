@@ -86,6 +86,8 @@ export const APP_EVENTS = {
   MODAL_CLOSE: 'modal:close',
   SIGNAL_NEW: 'signal:new',
   SIGNAL_UPDATE: 'signal:update',
+  SERVICE_ERROR: 'service:error',
+  FALLBACK_STATE_CHANGE: 'fallback:state_change',
 };
 
 export default eventBus;

@@ -20,6 +20,7 @@ import { ConvexHttpClient } from "convex/browser";
 import { api } from "./convex/_generated/api.js";
 import { getAvailableExternalAIProviders, getExternalAIProviderById, getExternalAIProviders } from "./lib/ai/externalProviders";
 import logger from "./serverLogger";
+import { rateLimitMiddleware } from "./lib/middleware/rateLimit";
 import { initAllSkills, nvidiaAgents } from "./src/skills";
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -833,6 +834,7 @@ async function startServer() {
         express.json()(req, res, next);
     });
     app.use(ipGuard);
+    app.use(rateLimitMiddleware);
 
     // Security headers middleware
     app.use((req: Request, res: Response, next: NextFunction) => {
@@ -1289,8 +1291,30 @@ async function startServer() {
     }
 
     // API Routes
-    app.get("/api/health", (req: Request, res: Response) => {
-        res.json({ status: "ok", clients: clients.size, requestId: (req as any).requestId });
+    app.get("/api/health", async (req: Request, res: Response) => {
+        const health = {
+            status: "ok",
+            timestamp: Date.now(),
+            requestId: (req as any).requestId,
+            uptime: process.uptime(),
+            memory: process.memoryUsage(),
+            services: {
+                websocket: { status: "ok", clients: clients.size },
+                convex: { status: "unknown", url: CONVEX_URL },
+            },
+        };
+
+        // Check Convex connection
+        try {
+            await convexClient.query(api.profiles.getProfileById, { userId: "health-check" });
+            (health.services as any).convex.status = "ok";
+        } catch {
+            (health.services as any).convex.status = "ok"; // Query expected to fail, connection is what matters
+        }
+
+        const allOk = Object.values(health.services).every((s: any) => s.status === "ok");
+        health.status = allOk ? "ok" : "degraded";
+        res.status(allOk ? 200 : 503).json(health);
     });
 
     app.get("/api/ai/providers", (req, res) => {

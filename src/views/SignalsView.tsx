@@ -74,9 +74,7 @@ interface SignalPlan {
 }
 
 const SignalsView: React.FC<SignalsViewProps> = ({ usuario }) => {
-  // Signals are enabled by default - remove the flag check for production
-  // const signalsFeatureEnabled = import.meta.env.VITE_FEATURE_SIGNALS === 'on';
-  const signalsFeatureEnabled = true;
+  const signalsFeatureEnabled = import.meta.env.VITE_FEATURE_SIGNALS === 'on';
   const [selectedTab, setSelectedTab] = useState<'signals' | 'plans' | 'providers' | 'create' | 'history'>('signals');
   const [selectedType, setSelectedType] = useState<string>('all');
   const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);

@@ -1,69 +1,132 @@
 {
   "apis": [
     {
-      "id": "brave_search",
-      "tipo": "busqueda_web",
-      "estadoEnv": "BRAVE_SEARCH_API_KEY",
-      "prioridad": "alta",
-      "uso": "investigacion rapida, noticias, documentacion publica"
+      "id": "gemini",
+      "tipo": "modelos_externos",
+      "estadoEnv": "GEMINI_API_KEY",
+      "prioridad": "critica",
+      "uso": "MEJOR CALIDAD GRATIS - 2M tokens contexto, razonamiento complejo",
+      "endpoint": "https://generativelanguage.googleapis.com/v1beta",
+      "modelos": ["gemini-2.5-pro", "gemini-2.0-flash"],
+      "gratis": true,
+      "requiereTarjeta": false
     },
     {
-      "id": "tavily",
-      "tipo": "busqueda_web",
-      "estadoEnv": "TAVILY_API_KEY",
-      "prioridad": "alta",
-      "uso": "research orientado a IA y sintetizacion"
+      "id": "groq",
+      "tipo": "modelos_externos",
+      "estadoEnv": "GROQ_API_KEY",
+      "prioridad": "critica",
+      "uso": "MÁS RÁPIDO - 70B en ~0.7s, coding rápido",
+      "endpoint": "https://api.groq.com/openai/v1",
+      "modelos": ["llama-3.3-70b-versatile", "mixtral-8x7b"],
+      "gratis": true,
+      "requiereTarjeta": false
     },
     {
-      "id": "serpapi",
-      "tipo": "busqueda_web",
-      "estadoEnv": "SERPAPI_API_KEY",
-      "prioridad": "media",
-      "uso": "busqueda general y resultados enriquecidos"
+      "id": "nvidia_kimi",
+      "tipo": "modelos_externos",
+      "estadoEnv": "NVIDIA_API_KEY",
+      "prioridad": "critica",
+      "uso": "CALIDAD OPUS - Kimi K2.5, análisis profundo",
+      "endpoint": "https://integrate.api.nvidia.com/v1",
+      "modelos": ["moonshotai/kimi-k2-instruct", "z-ai/glm-4.7"],
+      "gratis": true,
+      "requiereTarjeta": false
+    },
+    {
+      "id": "deepseek",
+      "tipo": "modelos_externos",
+      "estadoEnv": "DEEPSEEK_API_KEY",
+      "prioridad": "alta",
+      "uso": "CALIDAD OPUS GRATIS - Beta gratuita, 128K contexto",
+      "endpoint": "https://api.deepseek.com/v1",
+      "modelos": ["deepseek-chat-v3"],
+      "gratis": true,
+      "requiereTarjeta": false
     },
     {
       "id": "openrouter",
       "tipo": "modelos_externos",
       "estadoEnv": "OPENROUTER_API_KEY",
       "prioridad": "alta",
-      "uso": "ruteo de modelos externos sin cargar el servidor principal"
+      "uso": "50+ MODELOS - Backup con múltiples opciones",
+      "endpoint": "https://openrouter.ai/api/v1",
+      "modelos": ["qwen-2.5-coder-32b", "llama-3.3-70b"],
+      "gratis": true,
+      "requiereTarjeta": false,
+      "creditInicial": "$1"
     },
     {
-      "id": "groq",
+      "id": "fireworks",
       "tipo": "modelos_externos",
-      "estadoEnv": "GROQ_API_KEY",
-      "prioridad": "alta",
-      "uso": "respuestas rapidas y baratas para apoyo operativo"
+      "estadoEnv": "FIREWORKS_API_KEY",
+      "prioridad": "media",
+      "uso": "1M tokens/month gratis - Llama 3.1 70B",
+      "endpoint": "https://api.fireworks.ai/inference/v1",
+      "modelos": ["accounts/fireworks/models/llama-v3p1-70b-instruct"],
+      "gratis": true,
+      "requiereTarjeta": false,
+      "limiteGratis": "1M tokens/month"
+    },
+    {
+      "id": "together",
+      "tipo": "modelos_externos",
+      "estadoEnv": "TOGETHER_API_KEY",
+      "prioridad": "media",
+      "uso": "$25 credit gratis - Qwen 72B",
+      "endpoint": "https://api.together.xyz/v1",
+      "modelos": ["Qwen/Qwen2.5-Coder-32B-Instruct"],
+      "gratis": true,
+      "requiereTarjeta": false,
+      "creditInicial": "$25"
+    },
+    {
+      "id": "cohere",
+      "tipo": "modelos_externos",
+      "estadoEnv": "COHERE_API_KEY",
+      "prioridad": "media",
+      "uso": "100 calls/day - Command R+",
+      "endpoint": "https://api.cohere.ai/v1",
+      "modelos": ["command-r-plus"],
+      "gratis": true,
+      "requiereTarjeta": false,
+      "limiteGratis": "100 calls/day"
     },
     {
       "id": "ollama_local",
       "tipo": "modelo_local",
       "estadoEnv": "OLLAMA_BASE_URL",
       "prioridad": "alta",
-      "uso": "modelo local para ayuda diaria desde terminal y chat Aurora"
+      "uso": "100% local sin límites - Qwen 2.5 7B",
+      "endpoint": "http://127.0.0.1:11434/api/generate",
+      "modelos": ["qwen-2.5-7b", "llama-3.2-3b"],
+      "gratis": true,
+      "requiereTarjeta": false,
+      "requiereInstalacion": true
     },
     {
-      "id": "opencode_local",
-      "tipo": "agente_local",
-      "estadoEnv": "OPENCODE_PATH",
-      "prioridad": "media",
-      "uso": "agente local externo para apoyo en desarrollo desde terminal"
-    },
-    {
-      "id": "codex_local",
-      "tipo": "agente_local",
-      "estadoEnv": "CODEX_PATH",
+      "id": "brave_search",
+      "tipo": "busqueda_web",
+      "estadoEnv": "BRAVE_SEARCH_API_KEY",
       "prioridad": "alta",
-      "uso": "agente de codificacion no interactivo desde terminal y repo activo"
+      "uso": "búsqueda web para research en tiempo real"
     },
     {
-      "id": "codex_cloud",
-      "tipo": "agente_cloud",
-      "estadoEnv": "CODEX_CLOUD_ENABLED",
+      "id": "tavily",
+      "tipo": "busqueda_web",
+      "estadoEnv": "TAVILY_API_KEY",
       "prioridad": "alta",
-      "uso": "trabajo en la nube con apply local desde la CLI de Codex"
+      "uso": "research orientado a IA y sintetización"
     }
   ],
+  "providerRouter": {
+    "enabled": true,
+    "fallbackChain": ["gemini", "groq", "nvidia_kimi", "deepseek", "openrouter", "fireworks", "ollama_local"],
+    "selectionStrategy": "quality_first",
+    "autoFallback": true,
+    "cacheResponses": true
+  }
+},
   "mcp": [
     {
       "id": "datadog_mcp",

@@ -355,7 +355,6 @@ const ComunidadView: React.FC<Props> = ({ usuario, onVisitProfile, onLoginReques
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 setTimeout(() => setNewPostId(null), 2000);
             } else {
-                setCursor(null);
                 setJustPublishedPostId(tempPostId);
                 setIsRefreshing(true);
             }

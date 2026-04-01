@@ -8,9 +8,11 @@
 
 ## 📚 LECCIONES APRENDIDAS
 
-### 1. TurboQuant Memory Leak (2GB → 0)
+### 1. ~~TurboQuant Memory Leak~~ [ELIMINADO - PROHIBIDO]
 
-**Problema:**
+> 🚫 **TurboQuant ha sido eliminado permanentemente del proyecto.** Está **ESTRICTAMENTE PROHIBIDO** reimportar, referenciar o intentar reinstalar TurboQuant en cualquier forma.
+
+**Problema original:**
 ```typescript
 // ❌ MAL: Polling múltiple creando arrays infinitos
 useEffect(() => {

@@ -1,7 +1,7 @@
 import { Usuario, BadgeType } from '../../types';
   import { api } from "../../../convex/_generated/api";
 import { saveSession, getSession, saveSessionUser, getSessionUser, clearSession as clearSecureSession, isSessionExpired } from '../../utils/sessionManager';
-import { isGooglePassword } from '../../utils/passwordHash';
+import { isGooglePassword, hashPassword } from '../../utils/passwordHash';
 import logger from '../../../lib/utils/logger';
 import { getConvexClient } from '../../../lib/convex/client';
 
@@ -207,7 +207,7 @@ export const AuthService = {
                     return { user: null, error: 'Ya existe una cuenta con ese correo electrónico.' };
                 }
             }
-        } catch (err) {
+        } catch (err: any) {
             logger.warn("Could not check uniqueness in Convex:", err);
         }
 

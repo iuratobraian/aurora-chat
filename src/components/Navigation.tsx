@@ -151,6 +151,7 @@ const Navigation: React.FC<NavProps> = memo(({
           { id: 'news', label: 'Noticias', icon: 'newspaper', description: 'Noticias del mercado' },
           { id: 'grafico', label: 'Gráfico', icon: 'candlestick_chart', description: 'Análisis técnico en vivo' },
           { id: 'signals', label: 'Ideas de Trading', icon: 'signal_cellular_alt', description: 'Señales de trading' },
+          { id: 'psicotrading', label: 'Psicotrading', icon: 'psychology', description: 'Mentalidad del trader' },
           { id: 'propfirms', label: 'Prop Firms', icon: 'account_balance', description: 'Trading con capital' },
           { id: 'exness', label: 'Broker', icon: 'account_balance_wallet', description: 'Abre tu cuenta' },
           { id: 'bitacora', label: 'Bitácora', icon: 'menu_book', description: 'Registro de operaciones' },
@@ -162,10 +163,7 @@ const Navigation: React.FC<NavProps> = memo(({
       label: 'Educación',
       dropdown: {
         title: 'Educación',
-        items: [
-          { id: 'psicotrading', label: 'Psicotrading', icon: 'psychology', description: 'Mentalidad del trader' },
-          { id: 'academia', label: 'Cursos', icon: 'school', description: 'Aprende trading paso a paso' },
-        ]
+        items: []
       }
     },
     {

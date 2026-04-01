@@ -49,6 +49,8 @@ function banner() {
   console.log(`${BOLD}${CYAN}║   Fuente de verdad: Notion                           ║${RESET}`);
   console.log(`${BOLD}${CYAN}╚══════════════════════════════════════════════════════╝${RESET}\n`);
   console.log(`${DIM}Fecha: ${new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' })}${RESET}\n`);
+  console.log(`${BOLD}${RED}🚫 PROHIBIDO: TurboQuant eliminado permanentemente. No referenciar.${RESET}`);
+  console.log(`${DIM}────────────────────────────────────────────────────────${RESET}\n`);
 }
 
 function divider(label = '') {

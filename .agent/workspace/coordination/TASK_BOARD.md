@@ -122,6 +122,16 @@
 | TSK-056 | Full | done | OpenCode | [Payments Surface Consistency] Unificar `PricingView`, `PaymentModal` y `UserWallet` con `paymentOrchestrator`, soportar billing cycle real (monthly/annual), quitar flujos legacy por `fetch` directo y resolver CTA de retiro placeholder. |
 | TSK-057 | QA   | done | BIG-PICKLE | [QA Wave 2] Smoke específico de `admin`, `perfil`, `marketplace`, `comunidad`, `community-detail`, `discover`, `pricing` y `wallet` verificando guest flow, permisos, sync cloud y navegación real. |
 
+## FASE POST-AUDITORÍA: NOTION TASKS WAVE 6
+
+| TASK-ID | Tipo | Estado | Asignado | Descripción |
+|---------|------|--------|----------|-------------|
+| NTN-019 | Nav  | done | OpenCode | **Mi Comunidad/Observatory** - Integrate natively inside Creator Admin Panel. |
+| NTN-020 | Nav  | done | OpenCode | **Marketplace → Negocios** - Rename Marketplace to Negocios and move Publicidad inside it. |
+| NTN-021 | Nav  | done | OpenCode | **Top Menu Reconfig** - Remove Aprender, move Psicotrading to Trading, remove Cursos, remove Voz IA. |
+| NTN-022 | UI   | done | OpenCode | **Admin Clean** - Remove floating AI from `AdminView.tsx` and enforce 100% full-width styling. Add web stats. |
+| NTN-023 | UI   | done | OpenCode | **Nav Clean** - Remove floating AI icons from `Navigation.tsx` (top right). |
+
 ## FASE POST-AUDITORÍA: RESIDUOS WAVE 3
 
 | TASK-ID | Tipo | Estado | Asignado | Descripción |
@@ -155,11 +165,11 @@
 
 | TASK-ID | Tipo | Estado | Asignado | Descripción |
 |---------|------|--------|----------|-------------|
-| NTN-019 | Nav  | pending | - | **Mi Comunidad/Observatory** - Integrate natively inside Creator Admin Panel. |
-| NTN-020 | Nav  | pending | - | **Marketplace → Negocios** - Rename Marketplace to Negocios and move Publicidad inside it. |
-| NTN-021 | Nav  | pending | - | **Top Menu Reconfig** - Remove Aprender, move Psicotrading to Trading, remove Cursos, remove Voz IA. |
-| NTN-022 | UI   | pending | - | **Admin Clean** - Remove floating AI from `AdminView.tsx` and enforce 100% full-width styling. Add web stats. |
-| NTN-023 | UI   | pending | - | **Nav Clean** - Remove floating AI icons from `Navigation.tsx` (top right). |
+| NTN-019 | Nav  | done | OpenCode | **Mi Comunidad/Observatory** - Integrate natively inside Creator Admin Panel. |
+| NTN-020 | Nav  | done | OpenCode | **Marketplace → Negocios** - Rename Marketplace to Negocios and move Publicidad inside it. |
+| NTN-021 | Nav  | done | OpenCode | **Top Menu Reconfig** - Remove Aprender, move Psicotrading to Trading, remove Cursos, remove Voz IA. |
+| NTN-022 | UI   | done | OpenCode | **Admin Clean** - Remove floating AI from `AdminView.tsx` and enforce 100% full-width styling. Add web stats. |
+| NTN-023 | UI   | done | OpenCode | **Nav Clean** - Remove floating AI icons from `Navigation.tsx` (top right). |
 
 ---
 

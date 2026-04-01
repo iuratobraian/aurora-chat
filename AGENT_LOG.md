@@ -22,6 +22,8 @@
 | 2026-03-27 | OBLITERATUS | AGENTS.md, TASK_BOARD.md, App.tsx | Integrated Liberation Protocol for agents; removed UI banner | None |
 | 2026-03-27 | TSK-039 | deploy.ps1, Vercel | Validated prod envs point to notable-sandpiper-279; smoke test OK | None |
 | 2026-03-27 | TEST-FIX | vitest.config.ts, paymentFactory.test.ts | Enabled dotenv in tests, all 396 tests pass | None |
+| 2026-03-31 | NTN-021 | Navigation.tsx | Moved Psicotrading to Trading section, removed Cursos | Pre-existing build issues (Convex) |
+| 2026-03-31 | NTN-019 | CreatorDashboard.tsx | Verified Observatory integration in Creator Admin Panel | None |
 
 ## Summary of Work
 - **Feed Instant Refresh**: Implemented instant post publication with loader animation and fade-in from top. New posts prepend to feed without full reload. "New posts" banner also prepends instead of replacing.

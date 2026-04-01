@@ -19,9 +19,8 @@ Este documento detalla propuestas estratégicas para elevar la plataforma TradeS
 - **Concepto**: Convertir los logros del Leaderboard en Badges NFT dinámicos.
 - **Mecánica**: El "Trader del Mes" recibe un NFT que otorga beneficios exclusivos en la plataforma (menos comisiones, acceso a signals VIP).
 
-## 5. ⚡ TurboQuant v2.0
-- **Concepto**: Visualización en tiempo real de flujos de órdenes (Order Flow) y mapas de calor (Heatmaps) directamente en el panel de administración y para usuarios Premium.
-- **Optimización**: Uso de WebSockets y Convex Action para procesamiento ultra-rápido.
+## 5. ⚡ ~~TurboQuant v2.0~~ [ELIMINADO - PROHIBIDO]
+> 🚫 **TurboQuant ha sido eliminado permanentemente del proyecto.** Está **ESTRICTAMENTE PROHIBIDO** reimportar, referenciar o intentar reinstalar TurboQuant en cualquier forma. No crear tareas, issues ni PRs relacionados con TurboQuant.
 
 ## 6. 📱 App Móvil Nativa (Expo/React Native)
 - **Concepto**: Migrar la experiencia de la web a una Super App nativa.

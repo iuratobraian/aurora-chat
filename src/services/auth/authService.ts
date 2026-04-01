@@ -305,7 +305,6 @@ export const AuthService = {
     },
 
     logout: async () => {
-        localStorage.removeItem('dev_admin_session');
         clearSecureSession();
     },
 

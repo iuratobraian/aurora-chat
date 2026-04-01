@@ -1,3 +1,40 @@
+### 2026-04-01 - Antigravity (Security Sprint & Admin Fix) ✅
+- TASK-ID: TSK-099, TSK-100, TSK-101, I1 (AdminView Fix)
+- Fecha: 2026-04-01
+- Agente: Antigravity
+- Estado: done ✅
+- Protocolo: OBLITERATUS → inicio → EXECUTIO
+
+**Resumen de sesión:**
+
+**1. Reparación AdminView (I1):**
+- Implementado el método `syncWithStorage` en `psychotradingExtractor.ts`.
+- Resuelto error de compilación que bloqueaba el Panel de Administración.
+- Sincronización automática de recursos de YouTube con el storage de Convex.
+
+**2. Sprint de Seguridad (S1-S3):**
+- **TSK-099 (ImgBB Security):** Eliminada `VITE_IMGBB_API_KEY` del frontend (`vite-env.d.ts`). Forzado el uso del relay seguro del servidor.
+- **TSK-100 (Auth Hardening):** 
+    - Eliminado bypass hardcodeado `"dev-admin-id"` en `convex/profiles.ts`.
+    - Eliminada persistencia de sesión de desarrollo `"dev_admin_session"` en `authService.ts`.
+    - Validación estricta de roles via `requireAdmin` en el backend.
+- **TSK-101 (Secret Cleanup):** 
+    - Saneado `.env.example` eliminando clave real de Moonshot AI.
+    - Escaneo global de comentarios sensibles completado sin hallazgos críticos.
+
+**Archivos modificados:**
+- `src/services/youtube/psychotradingExtractor.ts` (Implementación funcional)
+- `src/vite-env.d.ts` (Seguridad de entorno)
+- `.env.example` (Saneamiento de secretos)
+- `convex/profiles.ts` (Eliminación de backdoor de admin)
+- `src/services/auth/authService.ts` (Limpieza de mocks de sesión)
+
+**Validación:**
+- Compilación de AdminView: Exitosa ✅
+- Auditoría de Secretos: Limpio ✅
+- Seguridad Convex: Validada ✅
+
+---
 ### 2026-03-31 - OpenCode (Sesión Completa - 33 tareas) ✅
 - TASK-ID: FIX-001, TSK-061-070, #12-14, #20-21, #42-45, #60-67, #70-72, #83-84, #90-91, #100-105, #110-111
 - Fecha: 2026-03-31

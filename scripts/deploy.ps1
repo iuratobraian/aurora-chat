@@ -117,7 +117,7 @@ Write-Ok "Pushed a GitHub (Vercel se despliega automáticamente desde ahí)"
 # Step 4: Deploy Convex a Production
 # ──────────────────────────────────────────
 if (-not $skipConvex) {
-    Write-Step 4 $totalSteps "Desplegando funciones a Convex Production (notable-sandpiper)..."
+    Write-Step 4 $totalSteps "Desplegando funciones a Convex Production (diligent-wildcat-523)..."
     npx convex deploy --cmd "echo skip"
 
     if ($LASTEXITCODE -ne 0) {
@@ -155,5 +155,5 @@ Write-Host "  ╚═════════════════════
 Write-Host ""
 Write-Host "  ⏱️  Tiempo total: ${minutes}m ${seconds}s" -ForegroundColor Yellow
 Write-Host "  🌐 Vercel: https://tradeportal-2025-platinum.vercel.app/" -ForegroundColor Cyan
-Write-Host "  📦 Convex: https://dashboard.convex.dev/d/notable-sandpiper-279" -ForegroundColor Cyan
+Write-Host "  📦 Convex: https://dashboard.convex.dev/d/diligent-wildcat-523" -ForegroundColor Cyan
 Write-Host ""

@@ -1,7 +1,7 @@
 const VITE_APP_URL = import.meta.env.VITE_APP_URL || "https://tradeportal-2025-platinum.vercel.app";
 const VITE_API_URL = import.meta.env.VITE_API_URL;
-const CONVEX_URL = import.meta.env.VITE_CONVEX_URL || "https://notable-sandpiper-279.convex.cloud";
-const CONVEX_SITE_URL = import.meta.env.VITE_CONVEX_SITE_URL || "https://notable-sandpiper-279.convex.site";
+const CONVEX_URL = import.meta.env.VITE_CONVEX_URL || "https://diligent-wildcat-523.convex.cloud";
+const CONVEX_SITE_URL = import.meta.env.VITE_CONVEX_SITE_URL || "https://diligent-wildcat-523.convex.site";
 
 // Sync Check: 2026-03-20 - Triad Infrastructure Synchronization
 

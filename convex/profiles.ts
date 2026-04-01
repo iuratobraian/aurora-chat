@@ -753,8 +753,7 @@ export const deleteProfile = mutation({
       .withIndex("by_userId", q => q.eq("userId", args.adminUserId))
       .unique();
     
-    const isAdmin = args.adminUserId === "dev-admin-id" || 
-      (profile?.rol === "admin" || profile?.role === 5);
+    const isAdmin = profile && (profile.rol === "admin" || (profile.role || 0) >= 5);
     
     if (!isAdmin) {
       throw new Error("Solo administradores pueden eliminar perfiles");

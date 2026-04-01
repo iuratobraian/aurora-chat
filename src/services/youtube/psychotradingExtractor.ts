@@ -193,6 +193,22 @@ export default {
   formatDuration,
   extractThumbnail,
   extractAllPsychotradingContent,
+  syncWithStorage: async (apiKey?: string) => {
+    const key = apiKey || (import.meta as any).env?.VITE_YOUTUBE_API_KEY;
+    if (!key) throw new Error("YouTube API Key not found");
+    const { StorageService } = await import('../storage');
+    const recursos = await extractAllPsychotradingContent(key);
+    const existing = await StorageService.getVideos();
+    const existingUrls = new Set(existing.map((v: any) => v.embedUrl));
+    let added = 0; let skipped = 0;
+    for (const r of recursos) {
+        if (!existingUrls.has(r.embedUrl)) {
+            await StorageService.saveVideo(r);
+            added++;
+        } else { skipped++; }
+    }
+    return { added, skipped };
+  }
 };
 
 // Named export for backward compatibility
@@ -205,4 +221,20 @@ export const YouTubePsychotradingExtractor = {
   formatDuration,
   extractThumbnail,
   extractAllPsychotradingContent,
+  syncWithStorage: async (apiKey?: string) => {
+    const key = apiKey || (import.meta as any).env?.VITE_YOUTUBE_API_KEY;
+    if (!key) throw new Error("YouTube API Key not found");
+    const { StorageService } = await import('../storage');
+    const recursos = await extractAllPsychotradingContent(key);
+    const existing = await StorageService.getVideos();
+    const existingUrls = new Set(existing.map((v: any) => v.embedUrl));
+    let added = 0; let skipped = 0;
+    for (const r of recursos) {
+        if (!existingUrls.has(r.embedUrl)) {
+            await StorageService.saveVideo(r);
+            added++;
+        } else { skipped++; }
+    }
+    return { added, skipped };
+  }
 };

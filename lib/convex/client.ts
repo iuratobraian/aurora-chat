@@ -1,6 +1,6 @@
 import { ConvexHttpClient } from 'convex/browser';
 
-const CONVEX_URL = import.meta.env.VITE_CONVEX_URL || 'https://notable-sandpiper-279.convex.cloud';
+const CONVEX_URL = import.meta.env.VITE_CONVEX_URL || 'https://diligent-wildcat-523.convex.cloud';
 
 let convexClient: ConvexHttpClient | null = null;
 

@@ -35,7 +35,7 @@ const MAX_CLICKS = 5000;
 const CLICK_TTL_MS = 30 * 60 * 1000;
 const MAX_WEBHOOKS = 10000;
 const WEBHOOK_TTL_MS = 60 * 60 * 1000;
-const CONVEX_URL = process.env.CONVEX_URL || process.env.VITE_CONVEX_URL || "https://notable-sandpiper-279.convex.cloud";
+const CONVEX_URL = process.env.CONVEX_URL || process.env.VITE_CONVEX_URL || "https://diligent-wildcat-523.convex.cloud";
 const convexClient = new ConvexHttpClient(CONVEX_URL);
 
 const notificationClicks: Map<string, { action: string; timestamp: number }[]> = new Map();

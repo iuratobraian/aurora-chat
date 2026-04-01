@@ -6,6 +6,16 @@ import { Send, ImagePlus, X, Smile, AlertCircle, Plus, Lock, Server, Users, Mess
 
 const EMOJIS = ['🚀', '📈', '📉', '🔥', '🧠', '💰', '❤️', '👍', '🎯', '⚡'];
 
+const DEFAULT_SERVER_STATS = {
+  totalMessages: 0,
+  todayMessages: 0,
+  weekMessages: 0,
+  totalChannels: 0,
+  activeUsers: 0,
+  estimatedStorageKB: 0,
+  storagePercentage: 0
+};
+
 export default function AuroraChat() {
   const [text, setText] = useState('');
   const [attachedImage, setAttachedImage] = useState<string | null>(null);
@@ -26,17 +36,29 @@ export default function AuroraChat() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isAtBottom = useRef(true);
 
-  const channels = (useQuery(api.chat.getChannels) || []) as { _id: string; name: string; slug: string; isPrivate?: boolean }[];
-  const messagesData = useQuery(api.chat.getMessagesByChannel, { channelId: currentChannel, limit: 100 });
-  const messages = messagesData?.messages || [];
-  const typingUsers = (useQuery(api.chat.getTypingUsers, { channelId: currentChannel, excludeUserId: 'aurora-user' }) || []) as string[];
+  // Safe Convex queries with proper null checks
+  const rawChannels = useQuery(api.chat.getChannels);
+  const channels = Array.isArray(rawChannels) ? rawChannels as { _id: string; name: string; slug: string; isPrivate?: boolean }[] : [];
+  
+  const rawMessagesData = useQuery(api.chat.getMessagesByChannel, { channelId: currentChannel, limit: 100 });
+  const messages = (rawMessagesData?.messages && Array.isArray(rawMessagesData.messages)) ? rawMessagesData.messages as ChatMessage[] : [];
+  
+  const rawTypingUsers = useQuery(api.chat.getTypingUsers, { channelId: currentChannel, excludeUserId: 'aurora-user' });
+  const typingUsers = Array.isArray(rawTypingUsers) ? rawTypingUsers : [];
+  
   const sendMessage = useMutation(api.chat.sendMessage);
   const setTyping = useMutation(api.chat.setTyping);
   const createChannel = useMutation(api.chat.createChannel);
-  const verifyPassword = useQuery(api.chat.verifyChannelPassword, 
-    showPasswordModal && selectedPrivateChannel ? { channelSlug: selectedPrivateChannel, password: passwordInput } : null as any
+  
+  const verifyPasswordQuery = useQuery(api.chat.verifyChannelPassword, 
+    showPasswordModal && selectedPrivateChannel ? { channelSlug: selectedPrivateChannel, password: passwordInput } : undefined
   );
-  const serverStats = useQuery(api.chat.getServerStats) as { totalMessages: number; todayMessages: number; weekMessages: number; totalChannels: number; activeUsers: number; estimatedStorageKB: number; storagePercentage: number } | undefined;
+  const verifyPassword = verifyPasswordQuery && typeof verifyPasswordQuery === 'object' ? verifyPasswordQuery : null;
+  
+  const rawServerStats = useQuery(api.chat.getServerStats);
+  const serverStats = rawServerStats && typeof rawServerStats === 'object' 
+    ? { ...DEFAULT_SERVER_STATS, ...rawServerStats }
+    : DEFAULT_SERVER_STATS;
 
   // Error handling
   useEffect(() => {

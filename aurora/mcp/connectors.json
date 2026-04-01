@@ -1,0 +1,2458 @@
+{
+  "apis": [
+    {
+      "id": "brave_search",
+      "tipo": "busqueda_web",
+      "estadoEnv": "BRAVE_SEARCH_API_KEY",
+      "prioridad": "alta",
+      "uso": "investigacion rapida, noticias, documentacion publica"
+    },
+    {
+      "id": "tavily",
+      "tipo": "busqueda_web",
+      "estadoEnv": "TAVILY_API_KEY",
+      "prioridad": "alta",
+      "uso": "research orientado a IA y sintetizacion"
+    },
+    {
+      "id": "serpapi",
+      "tipo": "busqueda_web",
+      "estadoEnv": "SERPAPI_API_KEY",
+      "prioridad": "media",
+      "uso": "busqueda general y resultados enriquecidos"
+    },
+    {
+      "id": "openrouter",
+      "tipo": "modelos_externos",
+      "estadoEnv": "OPENROUTER_API_KEY",
+      "prioridad": "alta",
+      "uso": "ruteo de modelos externos sin cargar el servidor principal"
+    },
+    {
+      "id": "groq",
+      "tipo": "modelos_externos",
+      "estadoEnv": "GROQ_API_KEY",
+      "prioridad": "alta",
+      "uso": "respuestas rapidas y baratas para apoyo operativo"
+    },
+    {
+      "id": "ollama_local",
+      "tipo": "modelo_local",
+      "estadoEnv": "OLLAMA_BASE_URL",
+      "prioridad": "alta",
+      "uso": "modelo local para ayuda diaria desde terminal y chat Aurora"
+    },
+    {
+      "id": "opencode_local",
+      "tipo": "agente_local",
+      "estadoEnv": "OPENCODE_PATH",
+      "prioridad": "media",
+      "uso": "agente local externo para apoyo en desarrollo desde terminal"
+    },
+    {
+      "id": "codex_local",
+      "tipo": "agente_local",
+      "estadoEnv": "CODEX_PATH",
+      "prioridad": "alta",
+      "uso": "agente de codificacion no interactivo desde terminal y repo activo"
+    },
+    {
+      "id": "codex_cloud",
+      "tipo": "agente_cloud",
+      "estadoEnv": "CODEX_CLOUD_ENABLED",
+      "prioridad": "alta",
+      "uso": "trabajo en la nube con apply local desde la CLI de Codex"
+    }
+  ],
+  "mcp": [
+    {
+      "id": "datadog_mcp",
+      "tipo": "observability",
+      "prioridad": "critica",
+      "uso": "Observabilidad en tiempo real para agentes IA: logs, métricas, traces, incidentes. Permite debugging sin cambiar de contexto. GA March 10, 2026.",
+      "repo": "https://github.com/DataDog/datadog-mcp-server",
+      "documentacion": "https://docs.datadoghq.com/agents/mcp_server",
+      "instalacion": "Configuración remota - no requiere servidor local",
+      "herramientas": [
+        "logs_search - Búsqueda de logs con filtros",
+        "metrics_query - Consulta de métricas",
+        "apm_trace - Análisis de traces y spans",
+        "incident_details - Detalles de incidentes",
+        "service_list - Lista de servicios",
+        "host_metrics - Métricas de hosts"
+      ],
+      "clients_soportados": [
+        "Claude Code",
+        "Cursor",
+        "OpenAI Codex CLI",
+        "GitHub Copilot",
+        "VS Code",
+        "Azure SRE Agent"
+      ],
+      "features": [
+        "16+ herramientas core",
+        "Token efficiency (50% menos tokens con CSV)",
+        "Remote server (sin instalación local)",
+        "APM, Error Tracking, Feature Flags, Security, LLM Observability"
+      ],
+      "readiness": "ready",
+      "research_date": "2026-03-26",
+      "source": "Datadog official announcement March 9, 2026"
+    },
+    {
+      "id": "shellward_mcp",
+      "tipo": "seguridad",
+      "prioridad": "critica",
+      "uso": "AI Agent Security Middleware: protege contra prompt injection, data exfiltration y ejecución de comandos peligrosos. 8-layer defense-in-depth approach con DLP-style data flow control.",
+      "repo": "https://github.com/jnmetacode/shellward",
+      "stars": 48,
+      "instalacion": "npm install shellward",
+      "herramientas": [
+        "prompt_guard - Detecta y bloquea prompt injection",
+        "tool_blocker - Bloquea herramientas peligrosas",
+        "data_flow_guard - Control de flujo de datos DLP",
+        "pii_detector - Detección de PII (SSN, credit cards, API keys, JWT, passwords)"
+      ],
+      "features": [
+        "32 reglas de prompt injection (18 chino + 14 inglés)",
+        "Zero dependencies y zero configuration",
+        "DLP model que permite acceso interno pero bloquea outbound si PII fue accedida",
+        "Runtime security para AI agents"
+      ],
+      "readiness": "installed",
+      "ready_date": "2026-03-27",
+      "security_features": {
+        "prompt_injection": "32 reglas (18 chino + 14 inglés)",
+        "tool_blocking": "runtime enforcement",
+        "pii_detection": "SSN, credit cards, API keys, JWT, passwords"
+      },
+      "installed_date": "2026-03-27"
+    },
+    {
+      "id": "kagan_mcp",
+      "tipo": "orchestration",
+      "prioridad": "alta",
+      "uso": "Orchestration layer para AI coding agents con terminal-based Kanban board. Soporta 14 diferentes AI coding agents. Web dashboard disponible.",
+      "repo": "https://github.com/kagan-sh/kagan",
+      "stars": 48,
+      "instalacion": "uv tool install kagan",
+      "herramientas": [
+        "task_create - Crear tareas en Kanban",
+        "agent_run - Ejecutar AI agents",
+        "pair_mode - Modo pair programming con agentes",
+        "web_dashboard - Dashboard web para management remoto"
+      ],
+      "features": [
+        "14 different AI coding agents",
+        "Terminal-based Kanban board (TUI)",
+        "Web-based dashboard",
+        "Autonomous y pair programming modes"
+      ],
+      "readiness": "ready",
+      "ready_date": "2026-03-27",
+      "orchestration_features": {
+        "agents": 14,
+        "kanban": "Terminal-based + Web dashboard",
+        "modes": [
+          "autonomous",
+          "pair_programming"
+        ]
+      }
+    },
+    {
+      "id": "github_mcp",
+      "tipo": "repositorio",
+      "prioridad": "alta",
+      "uso": "issues, prs, checks, codigo hospedado",
+      "playbook": "docs/mcp-playbooks/github.md",
+      "readiness": "ready"
+    },
+    {
+      "id": "playwright_mcp",
+      "tipo": "navegador",
+      "prioridad": "alta",
+      "uso": "smoke tests, flujos reales, inspeccion visual",
+      "playbook": "docs/mcp-playbooks/playwright.md",
+      "readiness": "ready"
+    },
+    {
+      "id": "filesystem_mcp",
+      "tipo": "archivos",
+      "prioridad": "alta",
+      "uso": "operacion local y lectura controlada de proyectos",
+      "playbook": "docs/mcp-playbooks/filesystem.md",
+      "readiness": "ready"
+    },
+    {
+      "id": "brave_search_mcp",
+      "tipo": "busqueda_web",
+      "prioridad": "alta",
+      "uso": "contexto web vivo con proveedor ya alineado a Aurora",
+      "playbook": "docs/mcp-playbooks/brave_search.md",
+      "readiness": "ready"
+    },
+    {
+      "id": "agent_memory_mcp",
+      "tipo": "memoria_persistente",
+      "prioridad": "alta",
+      "uso": "memoria, docs y contexto de repo para agentes de ingenieria. Permite recordar decisiones, buscar runbooks, inspeccionar docs y reutilizar conocimiento operativo",
+      "repo": "https://github.com/ipiton/agent-memory-mcp",
+      "instalacion": "go install github.com/ipiton/agent-memory-mcp/cmd/agent-memory-mcp@latest",
+      "playbook": "docs/mcp-playbooks/agent_memory.md",
+      "readiness": "installed"
+    },
+    {
+      "id": "context_graph_mcp",
+      "tipo": "memoria_relacional",
+      "prioridad": "alta",
+      "uso": "mapea relaciones entre decisiones, archivos y conceptos. Permite entender el contexto completo de por qué se tomaron decisiones y cómo se conectan los cambios",
+      "repo": "https://github.com/ipiton/context-graph-mcp",
+      "instalacion": "go install github.com/ipiton/context-graph-mcp/cmd/context-graph-mcp@latest",
+      "readiness": "pending"
+    },
+    {
+      "id": "slack_mcp",
+      "tipo": "comunicacion",
+      "prioridad": "media",
+      "uso": "integracion con Slack para alertas, reportes y coordination de agentes. Permite a Aurora enviar notificaciones a canales y recibir comandos",
+      "repo": "https://github.com/slack-workspace/slack-mcp",
+      "instalacion": "npm install -g @slack/mcp-server",
+      "readiness": "pending",
+      "requires": [
+        "SLACK_BOT_TOKEN",
+        "SLACK_TEAM_ID"
+      ]
+    },
+    {
+      "id": "filesystem_watch_mcp",
+      "tipo": "filesystem_activo",
+      "prioridad": "media",
+      "uso": "monitor de cambios en archivos del repo. Permite detectar automáticamente cuando archivos clave cambian y actualizar el contexto de Aurora",
+      "repo": "https://github.com/ipiton/filesystem-watch-mcp",
+      "instalacion": "go install github.com/ipiton/filesystem-watch-mcp/cmd/fs-watch-mcp@latest",
+      "readiness": "pending",
+      "playbook": "docs/mcp-playbooks/filesystem_watch.md"
+    },
+    {
+      "id": "remembra",
+      "tipo": "memoria_grafica",
+      "prioridad": "alta",
+      "uso": "memoria persistente con entity resolution, temporal decay y graph-aware recall. 100% accuracy en LoCoMo benchmark. MCP server con 11 herramientas: recall_memories, update_memory, forget_memories, list_memories, search_entities, timeline, relationships_at",
+      "repo": "https://github.com/remembra-ai/remembra",
+      "instalacion": "pip install remembra && npx remembra-server",
+      "deps": "Qdrant (vector store) + Ollama (embeddings, opcional)",
+      "docs": "https://remembra.dev",
+      "readiness": "research"
+    },
+    {
+      "id": "google_ai_mode_mcp",
+      "tipo": "busqueda_web",
+      "prioridad": "alta",
+      "uso": "Google AI Mode para research: sintetiza info de docenas de fuentes con citas. Sin API keys, gratuita. Multilingüe (DE/EN/ES/FR/IT)",
+      "repo": "https://github.com/PleasePrompto/google-ai-mode-mcp",
+      "instalacion": "npx google-ai-mode-mcp@latest",
+      "readiness": "research"
+    },
+    {
+      "id": "entroly",
+      "tipo": "context_engineering",
+      "prioridad": "critica",
+      "uso": "The Context Engineering Engine. Optimiza ventanas de contexto de agentes de codificación AI proporcionando visibilidad completa del codebase, reduciendo 78% tokens y mejorando calidad de respuestas. Works con Cursor, Claude Code, Copilot, OpenClaw. 78 stars",
+      "repo": "https://github.com/juyterman1000/entroly",
+      "stars": 78,
+      "instalacion": "pip install entroly",
+      "herramientas": [
+        "remember_fragment - Almacena contexto con auto-dedup, entropy scoring",
+        "optimize_context - Selecciona subconjunto óptimo para budget de tokens",
+        "recall_relevant - Recall semántico sub-linear via LSH",
+        "record_outcome - Feed RL loop",
+        "explain_context - Scoring breakdown per fragment",
+        "health_check - Clone detection, dead symbols, god files"
+      ],
+      "features": [
+        "78% fewer tokens per request",
+        "100% codebase visibility at variable resolution",
+        "AI responses improve over time (RL)",
+        "Built-in security scanning (55 SAST rules)",
+        "Codebase health grades (A-F)",
+        "<10ms overhead (Rust engine)"
+      ],
+      "readiness": "installed",
+      "ready_date": "2026-03-27",
+      "benchmarks": {
+        "tokens": "78% fewer tokens",
+        "overhead": "<10ms",
+        "security": "55 SAST rules"
+      },
+      "installed_date": "2026-03-27"
+    },
+    {
+      "id": "code_graph_mcp",
+      "tipo": "analisis_codigo",
+      "prioridad": "critica",
+      "uso": "Knowledge graph del codebase con AST. Reduce 40-60% tokens. 9 herramientas: project_map (arquitectura), semantic_code_search (hibrida BM25+vector), trace_call_chain, find_dependents, etc. 10 lenguajes: TS, JS, Go, Python, Rust, Java, C, C++, HTML, CSS. Incremental indexing con BLAKE3 Merkle tree",
+      "repo": "https://github.com/sdsrss/code-graph-mcp",
+      "instalacion": "/plugin marketplace add sdsrss/code-graph-mcp && /plugin install code-graph-mcp",
+      "playbook": "docs/mcp-playbooks/code_graph.md",
+      "readiness": "installed",
+      "ready_date": "2026-03-27",
+      "installed_date": "2026-03-27"
+    },
+    {
+      "id": "cognee",
+      "tipo": "memoria_grafica",
+      "prioridad": "alta",
+      "uso": "Memory manager con graph + vector stores, ingestion desde 30+ fuentes. GraphRAG para RAG pipelines. 14.5k stars",
+      "repo": "https://github.com/topoteretes/cognee",
+      "instalacion": "pip install cognee",
+      "readiness": "research"
+    },
+    {
+      "id": "acontext",
+      "tipo": "memoria_skill",
+      "prioridad": "alta",
+      "uso": "skill memory layer: aprende de sesiones, almacena como archivos .md. 'Skill is Memory, Memory is Skill'. Distila sesiones en skills reutilizables sin embeddings ni lock-in",
+      "repo": "https://github.com/memodb-io/Acontext",
+      "instalacion": "pip install acontext && npm i @acontext/acontext",
+      "sdk": "Python + TypeScript",
+      "docs": "https://docs.acontext.io",
+      "readiness": "research"
+    },
+    {
+      "id": "mem0",
+      "tipo": "memoria_universal",
+      "prioridad": "critica",
+      "uso": "Universal memory layer para AI agents. +26% accuracy vs OpenAI Memory, 91% faster, 90% fewer tokens. Soporta working memory (short-term), factual memory (structured), episodic memory (events). Sub-50ms retrieval. 50.6k stars",
+      "repo": "https://github.com/mem0ai/mem0",
+      "instalacion": "pip install mem0ai (Python) o npm install mem0ai (Node.js)",
+      "sdk": "Python + TypeScript",
+      "docs": "https://docs.mem0.ai",
+      "features": [
+        "Intelligent memory management con LLM extraction",
+        "Sub-50ms retrieval para real-time apps",
+        "Multi-modal support (images, documents)",
+        "Graph memory con Neo4j",
+        "Metadata filtering",
+        "LangGraph, LlamaIndex, CrewAI, AutoGen integrations"
+      ],
+      "readiness": "installed",
+      "ready_date": "2026-03-27",
+      "benmarks": {
+        "LOCOMO": "+26% accuracy vs OpenAI Memory",
+        "speed": "91% faster",
+        "tokens": "90% fewer tokens"
+      },
+      "installed_date": "2026-03-27"
+    },
+    {
+      "id": "mcp_code_review",
+      "tipo": "code_review",
+      "prioridad": "critica",
+      "uso": "Code review automatizado con Repomix + LLMs. Analiza codebases completas, detecta bugs, seguridad, performance y best practices. Soporta OpenAI, Anthropic y Gemini",
+      "repo": "https://github.com/crazyrabbitLTC/mcp-code-review-server",
+      "instalacion": "git clone https://github.com/crazyrabbitLTC/mcp-code-review-server && cd mcp-code-review-server && pip install -r requirements.txt",
+      "herramientas": [
+        "analyze_repo - Flattens codebase usando Repomix",
+        "code_review - Realiza code review usando LLM con análisis estructurado"
+      ],
+      "proveedores": [
+        "OpenAI (gpt-4o)",
+        "Anthropic (claude-3-opus)",
+        "Gemini (gemini-1.5-pro)"
+      ],
+      "readiness": "research"
+    },
+    {
+      "id": "mcp_code_refiner",
+      "tipo": "code_improvement",
+      "prioridad": "alta",
+      "uso": "Segunda capa IA para refinar y mejorar código. Análisis de seguridad y performance, diff view para ver cambios antes de aplicar, apply con confirmación humana",
+      "repo": "https://github.com/whtan410/mcp_code_review",
+      "instalacion": "git clone https://github.com/whtan410/mcp_code_review && cd mcp_code_review && python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt",
+      "herramientas": [
+        "review_code_tool - AI-powered analysis para bugs, security, performance",
+        "refine_code_tool - Mejora código con feedback en lenguaje natural",
+        "apply_refinement_tool - Aplica cambios propuestos después de confirmación"
+      ],
+      "proveedores": [
+        "Google Gemini (free tier)",
+        "Claude Haiku/Opus",
+        "OpenAI GPT"
+      ],
+      "readiness": "research"
+    },
+    {
+      "id": "sequential_thinking_mcp",
+      "tipo": "reasoning",
+      "prioridad": "critica",
+      "uso": "Pensamiento secuencial estructurado para resolver problemas complejos. Implementa chain-of-thought con reflexión, permite backtracking y exploration de alternativas. Mejora calidad de decisiones en +40%",
+      "repo": "https://github.com/ArcadeAI/sequential-thinking-mcp",
+      "instalacion": "npx @arcadeai/sequential-thinking-mcp",
+      "herramientas": [
+        "think - Pensamiento estructurado paso a paso",
+        "reflect - Reflexión sobre decisiones previas",
+        "backtrack - Revisión y corrección de camino",
+        "explore - Exploración de alternativas múltiples"
+      ],
+      "readiness": "installed",
+      "benmarks": {
+        "quality": "+40% quality de decisiones",
+        "reasoning": "Chain-of-thought con validación"
+      },
+      "installed_date": "2026-03-27"
+    },
+    {
+      "id": "unified_to_mcp",
+      "tipo": "integrations",
+      "prioridad": "critica",
+      "uso": "333+ integraciones con 20,421 herramientas en tiempo real. APIs de HR, ATS, CRM, Accounting, Messaging, File Storage. Zero data storage, compliance-ready. Regional: US, EU, AU",
+      "repo": "https://unified.to/mcp",
+      "instalacion": "pip install unified-sdk && npx unified-mcp-server",
+      "herramientas": [
+        "HR APIs - Employee management, payroll",
+        "ATS APIs - Candidate tracking",
+        "CRM APIs - Customer management",
+        "Accounting APIs - Financial data",
+        "Messaging APIs - Slack, Teams, Email",
+        "File Storage - Google Drive, Dropbox, S3"
+      ],
+      "readiness": "research",
+      "stats": {
+        "integrations": "333+",
+        "tools": "20,421",
+        "regions": [
+          "US",
+          "EU",
+          "AU"
+        ]
+      }
+    },
+    {
+      "id": "colab_mcp",
+      "tipo": "compute",
+      "prioridad": "alta",
+      "uso": "Conecta agentes a Google Colab para compute en la nube. Automatiza notebooks, ejecuta código, crea celdas, visualiza datos. Ideal para prototipado rápido y análisis de datos",
+      "repo": "https://github.com/googlecolab/colab-mcp",
+      "instalacion": "pip install uv && uvx git+https://github.com/googlecolab/colab-mcp",
+      "herramientas": [
+        "add_cell - Crear celdas de código/markdown",
+        "execute_code - Ejecutar código en Colab",
+        "read_notebook - Leer notebook completo",
+        "list_files - Listar archivos en Drive",
+        "create_visualization - Generar visualizaciones"
+      ],
+      "prerequisites": [
+        "Python",
+        "git",
+        "uv"
+      ],
+      "readiness": "research"
+    },
+    {
+      "id": "lilt_mcp",
+      "tipo": "translation",
+      "prioridad": "media",
+      "uso": "Traducción empresarial con verificación humana. Combina GenAI speed con calidad enterprise. Brand-aligned translations, custom AI models, expert linguist verification",
+      "repo": "https://lilt.com/mcp",
+      "instalacion": "pip install lilt-mcp && lilt-mcp configure",
+      "herramientas": [
+        "translate - Traducción instantánea con IA",
+        "request_verification - Solicitar verificación humana",
+        "get_quote - Obtener cotización de traducción",
+        "get_status - Ver estado de traducciones",
+        "manage_glossary - Gestionar glosarios de marca"
+      ],
+      "use_cases": [
+        "Legal policies",
+        "Technical manuals",
+        "Marketing content",
+        "Support documentation"
+      ],
+      "readiness": "research"
+    },
+    {
+      "id": "codebase_memory_mcp",
+      "tipo": "code_intelligence",
+      "prioridad": "critica",
+      "uso": "Motor de inteligencia de código de altísimo rendimiento en C. Indexa repos completos en milisegundos (Linux kernel 28M LOC en 3 min). Construye knowledge graph de funciones, clases, call chains, HTTP routes. 14 MCP tools. Sin dependencias. Compatible con 10 agentes de codificación. Visualización 3D graph en localhost:9749",
+      "repo": "https://github.com/DeusData/codebase-memory-mcp",
+      "stars": 884,
+      "lenguajes": 66,
+      "instalacion": "tar xzf codebase-memory-mcp-*.tar.gz && mv codebase-memory-mcp ~/.local/bin/ && codebase-memory-mcp install",
+      "herramientas": [
+        "index_repository - Indexa repositorio completo con AST tree-sitter",
+        "search_graph - Búsqueda estructural de funciones/clases",
+        "get_call_graph - Graph de llamadas entre funciones",
+        "find_dependents - Encuentra dependencias inversas",
+        "search_by_pattern - Pattern matching en código"
+      ],
+      "benchmarks": {
+        "linux_kernel": "3 min para 28M LOC, 75K files → 2.1M nodes, 4.9M edges",
+        "query_latency": "<1ms para queries estructurales",
+        "index_speed": "2,000 files/sec"
+      },
+      "features": [
+        "Tree-sitter AST parsing para 66 lenguajes",
+        "LSP-style type resolution para Go, C, C++",
+        "3D graph visualization en browser",
+        "Hooks advisory para grep/glob/read → graph tools"
+      ],
+      "readiness": "ready",
+      "local_impl": "lib/aurora/codebase-indexer.mjs",
+      "local_npm": "npm run aurora:codebase-index -- index src",
+      "local_stats": {
+        "files_indexed": 400,
+        "symbols": 1751,
+        "types": [
+          "import",
+          "export",
+          "function",
+          "class",
+          "const",
+          "route"
+        ]
+      },
+      "ready_date": "2026-03-27"
+    },
+    {
+      "id": "graph_memory_mcp",
+      "tipo": "memoria_grafica",
+      "prioridad": "alta",
+      "uso": "Memoria persistente basada en grafos para agentes de codificación. Almacena patterns, relaciones, temporal markers. 165 stars. MIT license. Soporta SQLite (default), Neo4j, FalkorDB backends",
+      "repo": "https://github.com/memory-graph/memory-graph",
+      "stars": 165,
+      "instalacion": "pipx install memorygraphMCP",
+      "herramientas": [
+        "store_memory - Almacena memories con relaciones",
+        "search_memory - Búsqueda semántica",
+        "get_relationships - Recupera relaciones entre facts",
+        "forget_memory - Olvida memories específicas"
+      ],
+      "relaciones_soportadas": [
+        "USES, IMPLEMENTS, EXTENDS, CALLS",
+        "CAUSES, TRIGGERS, LEADS_TO, PREVENTS",
+        "SOLVES, ADDRESSES, ALTERNATIVE_TO, IMPROVES",
+        "OCCURS_IN, APPLIES_TO, WORKS_WITH, REQUIRES",
+        "BUILDS_ON, CONTRADICTS, CONFIRMS"
+      ],
+      "readiness": "research"
+    },
+    {
+      "id": "brightdata_mcp",
+      "tipo": "web_scraping",
+      "prioridad": "critica",
+      "uso": "Web scraping con desbloqueo automático de páginas, 150M+ IPs, scraping de Amazon, LinkedIn, Instagram, Facebook, YouTube, Reddit, y más. 40+ herramientas para extraer datos estructurados de cualquier web",
+      "repo": "https://github.com/brightdata/brightdata-mcp",
+      "stars": 700,
+      "instalacion": "npm install -g brightdata-mcp",
+      "herramientas": [
+        "search_engine - Resultados de búsqueda Google/Bing/Yandex",
+        "scrape_as_markdown - Scrapea cualquier web a Markdown",
+        "scrape_as_html - Scrapea cualquier web a HTML",
+        "web_data_amazon_product - Datos estructurados de productos Amazon",
+        "web_data_linkedin_profile - Perfiles de LinkedIn",
+        "web_data_instagram_posts - Posts de Instagram",
+        "web_data_youtube_videos - Videos de YouTube",
+        "scraping_browser_navigate - Navegación interactiva",
+        "scraping_browser_click - Clic en elementos",
+        "scraping_browser_screenshot - Capturas de pantalla"
+      ],
+      "sitios_soportados": [
+        "Amazon",
+        "LinkedIn",
+        "Instagram",
+        "Facebook",
+        "YouTube",
+        "Reddit",
+        "TikTok",
+        "Zillow",
+        "eBay",
+        "Walmart",
+        "Best Buy",
+        "Google Maps"
+      ],
+      "readiness": "research"
+    },
+    {
+      "id": "supabase_mcp",
+      "tipo": "database",
+      "prioridad": "alta",
+      "uso": "Gestión de bases de datos Postgres, autenticación y almacenamiento de Supabase. Consulta SQL, migraciones, gestión de proyectos por lenguaje natural",
+      "repo": "https://github.com/supabase-community/supabase-mcp",
+      "stars": 1700,
+      "instalacion": "npm install @supabase/mcp",
+      "herramientas": [
+        "execute_sql - Ejecuta SQL raw en la base de datos",
+        "list_tables - Lista todas las tablas",
+        "apply_migration - Aplica migraciones SQL",
+        "generate_typescript - Genera tipos TypeScript",
+        "list_storage_buckets - Lista buckets de storage",
+        "get_project_url - Obtiene URL de API del proyecto",
+        "get_logs - Obtiene logs de la API"
+      ],
+      "readiness": "research"
+    },
+    {
+      "id": "notion_mcp",
+      "tipo": "knowledge_management",
+      "prioridad": "critica",
+      "uso": "Notion como base de conocimientos dinámica y canal de comunicación entre agentes. Crear páginas, databases, gestionar tareas, buscar documentación. 2.3k+ stars. Workspace: TradeShare Team",
+      "repo": "https://github.com/makenotion/notion-mcp-server",
+      "stars": 2300,
+      "instalacion": "npm install @notionhq/notion-mcp",
+      "env_vars": [
+        "NOTION_API_KEY",
+        "NOTION_DATABASE_ID"
+      ],
+      "herramientas": [
+        "search - Busca en workspace Notion",
+        "get_page - Obtiene contenido de página",
+        "create_page - Crea nuevas páginas",
+        "update_page - Edita páginas existentes",
+        "create_database - Crea nuevas databases",
+        "create_comment - Añade comentarios",
+        "get_comments - Lista comentarios"
+      ],
+      "workspace": {
+        "name": "TradeShare Team",
+        "pages": [
+          "CURRENT_FOCUS",
+          "TASK_BOARD",
+          "HANDOFFS",
+          "AGENT_LOG",
+          "MEMORANDUM",
+          "DECISIONS"
+        ]
+      },
+      "protocol": "obligatorio_check_inicio",
+      "readiness": "ready",
+      "ready_date": "2026-03-26",
+      "playbook": "docs/mcp-playbooks/notion.md"
+    },
+    {
+      "id": "atlassian_mcp",
+      "tipo": "team_collaboration",
+      "prioridad": "media",
+      "uso": "Automatización de Jira y Confluence. Gestión de incidencias, búsqueda de documentación, creación de tickets. 2.1k+ stars",
+      "repo": "https://github.com/sooperset/mcp-atlassian",
+      "stars": 2100,
+      "instalacion": "docker run -p 8080:8080 sooperset/mcp-atlassian",
+      "herramientas": [
+        "jira_search - Busca en incidencias Jira",
+        "jira_create_issue - Crea nuevas incidencias",
+        "jira_update_issue - Actualiza incidencias existentes",
+        "confluence_search - Busca en Confluence",
+        "confluence_get_page - Obtiene contenido de página",
+        "confluence_create_page - Crea nuevas páginas",
+        "confluence_update_page - Actualiza páginas"
+      ],
+      "readiness": "research"
+    },
+    {
+      "id": "nex-mcp",
+      "tipo": "memoria_organizacional",
+      "prioridad": "alta",
+      "uso": "Persistent organizational context y knowledge graph. Integra con 100+ herramientas (CRM, email, meetings, Slack) y crea unified knowledge graph. trending #6 MCPMarket 25/03/2026",
+      "repo": "https://github.com/nex-crm/nex",
+      "instalacion": "npm install @nex-ai/nex",
+      "stars": 14,
+      "herramientas": [
+        "context_inject - Inyecta contexto persistente",
+        "knowledge_graph_query - Query al knowledge graph",
+        "auto_recall - Recall automático de información",
+        "auto_capture - Captura automática de contexto"
+      ],
+      "features": [
+        "Unified knowledge graph",
+        "100+ tool integrations",
+        "Cross-agent context sharing",
+        "CLI for context management"
+      ],
+      "readiness": "research",
+      "research_date": "2026-03-25",
+      "source": "mcpmarket_daily_2026-03-25"
+    },
+    {
+      "id": "nex-crm",
+      "tipo": "business_tools",
+      "prioridad": "media",
+      "uso": "CRM capabilities for managing customer relationships and interactions",
+      "repo": "https://github.com/nex-crm/nex",
+      "readiness": "pending"
+    },
+    {
+      "id": "figma_mcp",
+      "tipo": "design_integration",
+      "prioridad": "media",
+      "uso": "Acceso a archivos Figma desde Cursor. Genera código React + Tailwind desde diseños Figma. 8.6k+ stars",
+      "repo": "https://github.com/GLips/Figma-Context-MCP",
+      "stars": 8600,
+      "instalacion": "npm install figma-context-mcp",
+      "herramientas": [
+        "get_code - Genera código React + Tailwind desde Figma",
+        "get_variable_defs - Extrae variables y estilos"
+      ],
+      "use_cases": [
+        "POC de diseños Figma",
+        "Conversión automática Figma → código"
+      ],
+      "readiness": "research"
+    },
+    {
+      "id": "grafana_mcp",
+      "tipo": "monitoring",
+      "prioridad": "media",
+      "uso": "Interacción con ecosistema Grafana. Gestión de incidencias, consulta Prometheus/Loki, dashboards. 1k+ stars",
+      "repo": "https://github.com/grafana/mcp-grafana",
+      "stars": 1000,
+      "instalacion": "go install github.com/grafana/mcp-grafana",
+      "herramientas": [
+        "search_dashboards - Busca dashboards",
+        "query_prometheus - Ejecuta queries Prometheus",
+        "list_incidents - Lista incidentes",
+        "query_loki_logs - Consulta logs con LogQL",
+        "get_analysis - Recupera análisis de Sift"
+      ],
+      "readiness": "research"
+    },
+    {
+      "id": "superpowers_mcp",
+      "tipo": "developer_tools",
+      "prioridad": "critica",
+      "uso": "Workflow estructurado de desarrollo de software completo: desde diseño hasta TDD. 108k+ stars - TOP 1 MCP",
+      "repo": "https://github.com/obra/superpowers",
+      "stars": 108226,
+      "instalacion": "npm install superpowers-mcp",
+      "herramientas": [
+        "design_refinement - Refinamiento de diseño",
+        "tdd_implementation - Implementación TDD",
+        "code_generation - Generación de código",
+        "test_generation - Generación de tests",
+        "workflow_orchestration - Orquestación de workflow"
+      ],
+      "features": [
+        "Design refinement",
+        "TDD-driven implementation",
+        "Code + test generation"
+      ],
+      "readiness": "installed",
+      "ready_date": "2026-03-27",
+      "installed_date": "2026-03-27"
+    },
+    {
+      "id": "gh_issues_auto_fixer",
+      "tipo": "collaboration_tools",
+      "prioridad": "critica",
+      "uso": "Automatiza ciclo de vida completo de GitHub issues: spawn sub-agents, implementa fixes, abre PRs, resuelve review comments. 330k stars - TOP 1 Skill",
+      "repo": "https://github.com/openclaw/gh-issues-auto-fixer",
+      "stars": 330129,
+      "instalacion": "skill install gh-issues-auto-fixer",
+      "herramientas": [
+        "spawn_subagents - Genera sub-agentes para fixes",
+        "implement_code_fix - Implementa fixes de código",
+        "open_pull_request - Abre PRs automáticamente",
+        "resolve_review_comments - Resuelve comentarios de review",
+        "auto_close_issues - Cierra issues automáticamente"
+      ],
+      "use_cases": [
+        "Issue automation",
+        "PR management",
+        "Code review loops"
+      ],
+      "readiness": "ready",
+      "ready_date": "2026-03-27"
+    },
+    {
+      "id": "discord_integration",
+      "tipo": "collaboration_tools",
+      "prioridad": "alta",
+      "uso": "Gestión de Discord: messaging, reactions, channel management desde Claude. 313k stars",
+      "repo": "https://github.com/openclaw/discord-integration",
+      "stars": 313459,
+      "instalacion": "skill install discord-integration",
+      "herramientas": [
+        "send_message - Envía mensajes",
+        "manage_reactions - Gestiona reactions",
+        "channel_management - Gestión de canales",
+        "fetch_messages - Obtiene mensajes",
+        "manage_threads - Gestión de threads"
+      ],
+      "use_cases": [
+        "Community management",
+        "Notifications",
+        "Bot commands"
+      ],
+      "readiness": "research"
+    },
+    {
+      "id": "react_code_fix_linter",
+      "tipo": "developer_tools",
+      "prioridad": "alta",
+      "uso": "Automatiza formatting y linting checks para code quality y CI compliance antes de commit. 243k stars",
+      "repo": "https://github.com/facebook/react",
+      "stars": 242682,
+      "instalacion": "skill install react-code-fix-linter",
+      "herramientas": [
+        "auto_format - Formatea código automáticamente",
+        "run_linter - Ejecuta linter checks",
+        "fix_issues - Auto-fixes issues",
+        "ci_validation - Validación CI"
+      ],
+      "use_cases": [
+        "Code quality",
+        "CI automation",
+        "Pre-commit hooks"
+      ],
+      "readiness": "research"
+    },
+    {
+      "id": "github_integration_cli",
+      "tipo": "collaboration_tools",
+      "prioridad": "alta",
+      "uso": "Gestión de GitHub PRs, issues y CI/CD workflows desde CLI. 229k stars",
+      "repo": "https://github.com/openclaw/github-integration",
+      "stars": 228576,
+      "instalacion": "skill install github-integration-cli",
+      "herramientas": [
+        "create_pr - Crea Pull Requests",
+        "manage_issues - Gestiona issues",
+        "trigger_ci - Dispara workflows CI/CD",
+        "check_status - Verifica estado de builds",
+        "merge_pr - Merge PRs"
+      ],
+      "use_cases": [
+        "PR management",
+        "CI/CD automation",
+        "Issue tracking"
+      ],
+      "readiness": "research"
+    },
+    {
+      "id": "google_workspace_cli",
+      "tipo": "productivity_workflow",
+      "prioridad": "alta",
+      "uso": "Integra Google Workspace: Gmail, Calendar, Drive, Sheets directamente desde terminal. 229k stars",
+      "repo": "https://github.com/openclaw/google-workspace-cli",
+      "stars": 228567,
+      "instalacion": "skill install google-workspace-cli",
+      "herramientas": [
+        "gmail_send - Envía emails",
+        "calendar_create - Crea eventos",
+        "drive_upload - Sube archivos",
+        "sheets_update - Actualiza spreadsheets",
+        "gmail_search - Busca emails"
+      ],
+      "use_cases": [
+        "Email automation",
+        "Calendar management",
+        "Document workflows"
+      ],
+      "readiness": "research"
+    },
+    {
+      "id": "firecrawl_automation",
+      "tipo": "web_scraping",
+      "prioridad": "alta",
+      "uso": "Deep web crawling, structured data extraction y website mapping desde terminal Claude. 47k stars",
+      "repo": "https://github.com/ComposioHQ/firecrawl-automation",
+      "stars": 46956,
+      "instalacion": "skill install firecrawl-automation",
+      "herramientas": [
+        "deep_crawl - Crawl profundo de websites",
+        "extract_structured - Extrae datos estructurados",
+        "map_website - Mapea estructura de website",
+        "scrape_content - Scrapea contenido"
+      ],
+      "use_cases": [
+        "Data collection",
+        "Competitor analysis",
+        "Content aggregation"
+      ],
+      "readiness": "research"
+    },
+    {
+      "id": "zenrows_automation",
+      "tipo": "web_scraping",
+      "prioridad": "media",
+      "uso": "Advanced web scraping con anti-bot bypass usando Zenrows toolkit. 47k stars",
+      "repo": "https://github.com/ComposioHQ/zenrows-automation",
+      "stars": 46956,
+      "instalacion": "skill install zenrows-automation",
+      "herramientas": [
+        "scrape_anti_bot - Scrapea con bypass de bots",
+        "rotate_proxies - Rotación de proxies",
+        "extract_js_rendering - Extrae JS rendered content",
+        "bypass_captcha -绕过 CAPTCHA"
+      ],
+      "use_cases": [
+        "Anti-bot scraping",
+        "Data extraction",
+        "Competitor monitoring"
+      ],
+      "readiness": "research"
+    },
+    {
+      "id": "deel_automation",
+      "tipo": "productivity_workflow",
+      "prioridad": "media",
+      "uso": "Automatiza Deel HR, payroll y contractor management workflows. 47k stars",
+      "repo": "https://github.com/ComposioHQ/deel-automation",
+      "stars": 46956,
+      "instalacion": "skill install deel-automation",
+      "herramientas": [
+        "manage_contractors - Gestiona contractors",
+        "process_payroll - Procesa payroll",
+        "handle_invoices - Maneja invoices",
+        "track_expenses - Tracking de expenses"
+      ],
+      "use_cases": [
+        "HR automation",
+        "Payroll processing",
+        "Contractor management"
+      ],
+      "readiness": "research"
+    },
+    {
+      "id": "pandadoc_automation",
+      "tipo": "productivity_workflow",
+      "prioridad": "media",
+      "uso": "Automatiza document lifecycle: e-signatures, templates, contacts desde terminal. 47k stars",
+      "repo": "https://github.com/ComposioHQ/pandadoc-automation",
+      "stars": 46956,
+      "instalacion": "skill install pandadoc-automation",
+      "herramientas": [
+        "create_document - Crea documentos",
+        "send_for_signature - Envía para firma",
+        "track_signatures - Tracking de firmas",
+        "manage_templates - Gestiona templates"
+      ],
+      "use_cases": [
+        "E-signatures",
+        "Document automation",
+        "Contract workflows"
+      ],
+      "readiness": "research"
+    },
+    {
+      "id": "gist_automation",
+      "tipo": "productivity_workflow",
+      "prioridad": "media",
+      "uso": "GitHub Gist operations: creation, updates y snippet management. 47k stars",
+      "repo": "https://github.com/ComposioHQ/gist-automation",
+      "stars": 46956,
+      "instalacion": "skill install gist-automation",
+      "herramientas": [
+        "create_gist - Crea Gists",
+        "update_gist - Actualiza Gists",
+        "list_gists - Lista Gists",
+        "delete_gist - Elimina Gists"
+      ],
+      "use_cases": [
+        "Snippet sharing",
+        "Code snippets",
+        "Documentation"
+      ],
+      "readiness": "research"
+    },
+    {
+      "id": "detrack_automation",
+      "tipo": "ecommerce_solutions",
+      "prioridad": "media",
+      "uso": "Last-mile delivery tracking y electronic proof-of-delivery via Detrack. 47k stars",
+      "repo": "https://github.com/ComposioHQ/detrack-automation",
+      "stars": 46940,
+      "instalacion": "skill install detrack-automation",
+      "herramientas": [
+        "track_delivery - Tracking de deliveries",
+        "proof_of_delivery - POD management",
+        "route_optimization - Optimización de rutas",
+        "status_updates - Actualizaciones de estado"
+      ],
+      "use_cases": [
+        "Delivery tracking",
+        "Logistics automation",
+        "Fleet management"
+      ],
+      "readiness": "research"
+    },
+    {
+      "id": "ruv_claude_flow",
+      "tipo": "agent_orchestration",
+      "prioridad": "critica",
+      "uso": "Leading agent orchestration platform for Claude. Deploy intelligent multi-agent swarms, coordinate autonomous workflows, and build conversational AI systems. Enterprise-grade architecture with multi-cloud support",
+      "repo": "https://github.com/ruvnet/claude-flow",
+      "stars": 25200,
+      "instalacion": "npx claude-flow",
+      "herramientas": [
+        "orchestrate - Orquestación de multi-agents",
+        "deploy_swarm - Deploy intelligent swarms",
+        "workflow_coordinate - Coordinate autonomous workflows",
+        "conversational_ai - Build conversational AI systems"
+      ],
+      "features": [
+        "Enterprise-grade architecture",
+        "Multi-cloud support",
+        "Swarm orchestration",
+        "Autonomous workflows"
+      ],
+      "readiness": "production"
+    },
+    {
+      "id": "ruv_agenticsjs",
+      "tipo": "code_intelligence",
+      "prioridad": "alta",
+      "uso": "Intelligent search library with real-time results, visualization, and plugins. Self-learning vector search capabilities",
+      "repo": "https://github.com/ruvnet/agenticsjs",
+      "stars": 5000,
+      "instalacion": "npm install agenticsjs",
+      "herramientas": [
+        "intelligent_search - Búsqueda inteligente",
+        "real_time_results - Resultados en tiempo real",
+        "vector_search - Búsqueda vectorial",
+        "plugin_system - Sistema de plugins"
+      ],
+      "readiness": "production"
+    },
+    {
+      "id": "ruv_ruflo",
+      "tipo": "agent_orchestration",
+      "prioridad": "critica",
+      "uso": "The leading agent orchestration platform for Claude. Deploy intelligent multi-agent swarms with enterprise-grade architecture. 25k+ stars",
+      "repo": "https://github.com/ruvnet/ruflo",
+      "stars": 25000,
+      "instalacion": "npx @ruvnet/ruflo",
+      "herramientas": [
+        "agent_spawn - Spawn agents",
+        "swarm_deploy - Deploy swarms",
+        "workflow_orchestrate - Orchestrate workflows",
+        "multi_cloud - Multi-cloud support"
+      ],
+      "features": [
+        "Multi-agent swarms",
+        "Enterprise architecture",
+        "Workflow orchestration"
+      ],
+      "readiness": "production"
+    },
+    {
+      "id": "ruv_ruvector",
+      "tipo": "vector_database",
+      "prioridad": "critica",
+      "uso": "High Performance, Real-Time, Self-Learning Vector Graph Neural Network and Database built in Rust. 3.6k stars",
+      "repo": "https://github.com/ruvnet/RuVector",
+      "stars": 3600,
+      "instalacion": "cargo install ruvector",
+      "herramientas": [
+        "vector_insert - Insert vectors",
+        "similarity_search - Búsqueda de similitud",
+        "graph_queries - Graph queries",
+        "self_learning - Self-learning capabilities"
+      ],
+      "features": [
+        "High performance",
+        "Real-time",
+        "Self-learning",
+        "GNN",
+        "Rust"
+      ],
+      "readiness": "production"
+    },
+    {
+      "id": "ruv_qudag",
+      "tipo": "quantum_security",
+      "prioridad": "alta",
+      "uso": "Quantum-Resistant DAG-Based Anonymous Communication System. Ultra-fast quantum-resistant distributed communication platform",
+      "repo": "https://github.com/ruvnet/QuDAG",
+      "stars": 163,
+      "instalacion": "cargo install qudag",
+      "herramientas": [
+        "quantum_resistant - Crypto cuántica resistente",
+        "dag_communication - Comunicación DAG",
+        "anonymous_messaging - Mensajería anónima"
+      ],
+      "features": [
+        "Quantum-resistant cryptography",
+        "DAG consensus",
+        "Anonymous communication"
+      ],
+      "readiness": "research"
+    },
+    {
+      "id": "ruv_agentic_flow",
+      "tipo": "model_routing",
+      "prioridad": "alta",
+      "uso": "Easily switch between alternative low-cost AI models in Claude Code/Agent SDK. Deploy fully hosted solutions",
+      "repo": "https://github.com/ruvnet/agentic-flow",
+      "stars": 567,
+      "instalacion": "npx agentic-flow",
+      "herramientas": [
+        "model_switch - Switch entre modelos AI",
+        "cost_optimization - Optimización de costos",
+        "multi_provider - Multi-provider support"
+      ],
+      "features": [
+        "Low-cost AI models",
+        "Claude Code integration",
+        "Agent SDK support"
+      ],
+      "readiness": "production"
+    },
+    {
+      "id": "ruv_sparc",
+      "tipo": "development_methodology",
+      "prioridad": "alta",
+      "uso": "Comprehensive methodology for robust and scalable application development: Specification, Pseudocode, Architecture, Refinement, Completion",
+      "repo": "https://github.com/ruvnet/sparc",
+      "stars": 1000,
+      "instalacion": "npm install sparc-methodology",
+      "herramientas": [
+        "specify - Create specifications",
+        "pseudocode - Generate pseudocode",
+        "architect - Design architecture",
+        "refine - Refine implementation"
+      ],
+      "features": [
+        "TDD-driven",
+        "Full lifecycle",
+        "Quality assurance"
+      ],
+      "readiness": "production"
+    },
+    {
+      "id": "ruv_dynamo_mcp",
+      "tipo": "developer_tools",
+      "prioridad": "media",
+      "uso": "Discover, manage, and generate projects with cookiecutter templates via MCP",
+      "repo": "https://github.com/ruvnet/dynamo-mcp",
+      "stars": 200,
+      "instalacion": "npm install dynamo-mcp",
+      "herramientas": [
+        "discover_projects - Descubrir proyectos",
+        "manage_templates - Gestionar templates",
+        "generate_project - Generar proyecto"
+      ],
+      "readiness": "production"
+    },
+    {
+      "id": "ruv_agentic_security",
+      "tipo": "security",
+      "prioridad": "alta",
+      "uso": "Autonomous security pipeline combining AI tools for scanning, remediation, and code management",
+      "repo": "https://github.com/ruvnet/agentic-security",
+      "stars": 300,
+      "instalacion": "npm install @ruvnet/agentic-security",
+      "herramientas": [
+        "security_scan - Escaneo de seguridad",
+        "auto_remediation - Remediación automática",
+        "code_analysis - Análisis de código"
+      ],
+      "readiness": "production"
+    },
+    {
+      "id": "context7_mcp",
+      "tipo": "learning_documentation",
+      "prioridad": "critica",
+      "uso": "Documentación actualizada y ejemplos de código para LLMs y editores de código AI. 50k+ stars - TOP 2",
+      "repo": "https://github.com/upstash/context7",
+      "stars": 50322,
+      "instalacion": "npx @context7/mcp-server",
+      "herramientas": [
+        "get_docs - Obtiene documentación actualizada",
+        "get_code_examples - Ejemplos de código actualizados",
+        "search_docs - Busca en documentación"
+      ],
+      "use_cases": [
+        "Consultas sobre APIs/Libs",
+        "Ejemplos de código actualizados",
+        "Documentación de frameworks"
+      ],
+      "readiness": "installed",
+      "ready_date": "2026-03-27",
+      "installed_date": "2026-03-27"
+    },
+    {
+      "id": "trendradar_mcp",
+      "tipo": "analytics_monitoring",
+      "prioridad": "media",
+      "uso": "Agrega trending topics de 35+ plataformas. Filtros inteligentes, notificaciones multi-canal, análisis conversacional IA. 50k+ stars",
+      "repo": "https://github.com/sansan0/trendradar",
+      "stars": 49650,
+      "instalacion": "npm install trendradar-mcp",
+      "herramientas": [
+        "get_trending - Obtiene topics trending",
+        "filter_trends - Filtra por plataforma/categoría",
+        "get_sentiment - Análisis de sentimiento",
+        "subscribe_notifications - Suscribe a notificaciones"
+      ],
+      "platforms": "35+ plataformas de social media y news",
+      "readiness": "research"
+    },
+    {
+      "id": "mindsdb_mcp",
+      "tipo": "database_management",
+      "prioridad": "alta",
+      "uso": "Build AI applications que aprenden sobre federated data sources. Query engine para ML. 39k+ stars",
+      "repo": "https://github.com/mindsdb/mindsdb",
+      "stars": 38824,
+      "instalacion": "pip install mindsdb-sdk",
+      "herramientas": [
+        "query - Ejecuta queries federadas",
+        "create_model - Crea modelos ML",
+        "predict - Predicciones",
+        "get_insights - Obtiene insights de datos"
+      ],
+      "use_cases": [
+        "Federated queries",
+        "ML predictions",
+        "Data insights"
+      ],
+      "readiness": "research"
+    },
+    {
+      "id": "openspec_mcp",
+      "tipo": "developer_tools",
+      "prioridad": "alta",
+      "uso": "Spec-driven development: asegura alignment entre humanos y AI antes de escribir código. 34k+ stars",
+      "repo": "https://github.com/Fission-AI/OpenSpec",
+      "stars": 33553,
+      "instalacion": "npm install openspec-mcp",
+      "herramientas": [
+        "create_spec - Crea especificaciones",
+        "validate_alignment - Valida alignment",
+        "generate_docs - Genera documentación",
+        "track_requirements - Track requirements"
+      ],
+      "use_cases": [
+        "Spec-first development",
+        "Human-AI alignment",
+        "Requirements tracking"
+      ],
+      "readiness": "research"
+    },
+    {
+      "id": "chrome_devtools_mcp",
+      "tipo": "browser_automation",
+      "prioridad": "alta",
+      "uso": "Acceso programático a Chrome DevTools. Control, inspección y debugging de browser. 31k+ stars",
+      "repo": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+      "stars": 31077,
+      "instalacion": "npm install @chromedevtools/mcp",
+      "herramientas": [
+        "inspect_console - Inspecciona console logs",
+        "take_screenshot - Captura de pantalla",
+        "evaluate_js - Evalúa JavaScript",
+        "network_analysis - Análisis de red",
+        "debug_breakpoint - Debug con breakpoints"
+      ],
+      "use_cases": [
+        "Browser debugging",
+        "Performance analysis",
+        "DOM inspection"
+      ],
+      "readiness": "research"
+    },
+    {
+      "id": "task_master_mcp",
+      "tipo": "developer_tools",
+      "prioridad": "alta",
+      "uso": "Automatización de task management con Claude. Streamline workflows de desarrollo. 26k+ stars",
+      "repo": "https://github.com/eyaltoledano/taskmaster",
+      "stars": 26110,
+      "instalacion": "npm install taskmaster-mcp",
+      "herramientas": [
+        "create_task - Crea tareas",
+        "update_task - Actualiza estado",
+        "get_task_status - Estado de tareas",
+        "list_tasks - Lista todas las tareas",
+        "assign_task - Asigna tareas"
+      ],
+      "use_cases": [
+        "Project management",
+        "Task automation",
+        "Workflow streamlining"
+      ],
+      "readiness": "research"
+    },
+    {
+      "id": "firecrawl_mcp",
+      "tipo": "web_scraping",
+      "prioridad": "alta",
+      "uso": "Web scraping avanzado con extracción de contenido, crawling y búsqueda. Alternativa a Bright Data. 4.2k+ stars",
+      "repo": "https://github.com/mendableai/firecrawl",
+      "stars": 4195,
+      "instalacion": "npx firecrawl-mcp",
+      "herramientas": [
+        "scrape_url - Extrae contenido de URL",
+        "crawl_website - Crawl completo de website",
+        "search - Búsqueda web",
+        "extract_structured - Extrae datos estructurados"
+      ],
+      "use_cases": [
+        "Content extraction",
+        "Website crawling",
+        "Structured data extraction"
+      ],
+      "readiness": "research"
+    },
+    {
+      "id": "magic_ui_mcp",
+      "tipo": "developer_tools",
+      "prioridad": "alta",
+      "uso": "Genera componentes UI modernos desde descripciones en lenguaje natural. 4.5k+ stars",
+      "repo": "https://github.com/21st-dev/magic",
+      "stars": 4541,
+      "instalacion": "npx magic-ui-mcp",
+      "herramientas": [
+        "generate_component - Genera componente UI",
+        "generate_page - Genera página completa",
+        "get_variants - Obtiene variantes de diseño"
+      ],
+      "use_cases": [
+        "UI component generation",
+        "Page prototyping",
+        "Design to code"
+      ],
+      "readiness": "research"
+    },
+    {
+      "id": "browserbase_mcp",
+      "tipo": "browser_automation",
+      "prioridad": "media",
+      "uso": "Control de cloud browsers para interacción web, extracción de datos y automatización usando Browserbase + Stagehand. 3.2k+ stars",
+      "repo": "https://github.com/browserbase/browserbase",
+      "stars": 3202,
+      "instalacion": "npm install @browserbase/sdk",
+      "herramientas": [
+        "browser_load - Carga URL en browser cloud",
+        "browser_click - Interactúa con elementos",
+        "browser_type - Escribe texto",
+        "browser_screenshot - Capturas de pantalla",
+        "extract_data - Extrae datos"
+      ],
+      "use_cases": [
+        "Cloud browser automation",
+        "Data extraction",
+        "Headless browsing"
+      ],
+      "readiness": "research"
+    },
+    {
+      "id": "hf_smolagents",
+      "tipo": "agent_framework",
+      "prioridad": "critica",
+      "uso": "Framework oficial de HuggingFace para crear agentes IA. Code agents que escriben Python para ejecutar tareas. ~1000 lineas de código, soporte para 40+ LLMs, integración con MCP",
+      "repo": "https://github.com/huggingface/smolagents",
+      "space": "https://huggingface.co/spaces/smolagents/computer-use-agent",
+      "stars": 30000,
+      "instalacion": "pip install smolagents[toolkit]",
+      "documentacion": "https://huggingface.co/docs/smolagents",
+      "herramientas": [
+        "CodeAgent - Agente que escribe código Python",
+        "Toolformer - Herramientas personalizadas",
+        "MCP integration - Conectar servidores MCP",
+        "Hub integration - Compartir/cargar agentes"
+      ],
+      "features": [
+        "Code-first approach (mejores resultados que JSON)",
+        "Soporta cualquier LLM (local, HuggingFace, OpenAI, Anthropic)",
+        "Ejecución segura en sandbox (E2B, Docker, Pyodide)",
+        "Multi-modalidad (texto, visión, audio)"
+      ],
+      "readiness": "installed",
+      "local_scripts": [
+        "scripts/hf-agents.mjs",
+        ".agent/aurora/hf-agents/smolagents-example.js"
+      ],
+      "npm_scripts": [
+        "hf:agents",
+        "hf:agents:list",
+        "hf:agents:install",
+        "hf:agents:search"
+      ],
+      "aurora_integration": {
+        "shell_commands": [
+          "/hf:scrape",
+          "/hf:graph",
+          "/hf:research",
+          "/hf:workflow",
+          "/hf:agent",
+          "/hf:tools",
+          "/hf:convert"
+        ],
+        "api_endpoints": [
+          "/hf/tools",
+          "/hf/scrape",
+          "/hf/graph",
+          "/hf/research",
+          "/hf/workflow",
+          "/hf/agent",
+          "/hf/convert",
+          "/hf/health"
+        ],
+        "direct_import": "import { hf } from './lib/aurora/hf-tools.mjs'"
+      },
+      "use_cases": [
+        "Automatización de tareas",
+        "Research agents",
+        "Code generation",
+        "Web automation"
+      ],
+      "ready_date": "2026-03-27",
+      "installed_date": "2026-03-27"
+    },
+    {
+      "id": "hf_computer_use_agent",
+      "tipo": "computer_use",
+      "prioridad": "critica",
+      "uso": "Agente que usa computadora como humano - clicks, typing, navegación. Similar a Operator de OpenAI pero gratuito y open-source. Usa Qwen-VL con built-in grounding",
+      "repo": "https://github.com/huggingface/smolagents",
+      "space": "https://huggingface.co/spaces/smolagents/computer-use-agent",
+      "stars": 900,
+      "instalacion": "pip install smolagents && python -m smolagents.computer_use",
+      "documentacion": "https://huggingface.co/blog/smolagents",
+      "herramientas": [
+        "browser_navigate - Navegar páginas web",
+        "browser_click - Clic en elementos",
+        "browser_type - Escribir texto",
+        "browser_screenshot - Capturas de pantalla"
+      ],
+      "readiness": "installed",
+      "local_scripts": [
+        "scripts/hf-agents.mjs"
+      ],
+      "npm_scripts": [
+        "hf:agents list",
+        "hf:agents info computer-use"
+      ],
+      "use_cases": [
+        "Web automation",
+        "Form filling",
+        "Data extraction",
+        "Testing"
+      ]
+    },
+    {
+      "id": "hf_agent_ui",
+      "tipo": "agent_interface",
+      "prioridad": "alta",
+      "uso": "Interfaz chat para ejecutar agentes IA especializados. Permite conversar con agentes para completar tareas",
+      "space": "https://huggingface.co/spaces/lvwerra/agent-ui",
+      "stars": 35,
+      "instalacion": "Clone y run local o usa el Space",
+      "readiness": "installed",
+      "local_scripts": [
+        "scripts/hf-agents.mjs"
+      ],
+      "npm_scripts": [
+        "hf:agents space agent-ui"
+      ],
+      "use_cases": [
+        "Chat con agentes",
+        "Task execution",
+        "Agent management"
+      ]
+    },
+    {
+      "id": "hf_web_scraper_mcp",
+      "tipo": "web_scraping",
+      "prioridad": "alta",
+      "uso": "Web scraper via MCP - scrapea websites y descarga contenido como markdown. Herramienta oficial del MCP Hackathon",
+      "space": "https://huggingface.co/spaces/Agents-MCP-Hackathon/web-scraper",
+      "instalacion": "npm install -g @agents-mcp-hackathon/web-scraper",
+      "herramientas": [
+        "scrape_website - Extrae website como markdown",
+        "download_content - Descarga contenido estructurado"
+      ],
+      "readiness": "installed",
+      "local_scripts": [
+        "scripts/hf-agents.mjs",
+        ".agent/aurora/hf-agents/web-scraper-example.js"
+      ],
+      "npm_scripts": [
+        "hf:agents info web-scraper",
+        "hf:agents space web-scraper"
+      ],
+      "use_cases": [
+        "Data extraction",
+        "Content mining",
+        "Competitor analysis"
+      ]
+    },
+    {
+      "id": "hf_knowledge_graph_mcp",
+      "tipo": "knowledge_graph",
+      "prioridad": "alta",
+      "uso": "Transforma cualquier texto o webpage en grafos de conocimiento. Útil para construir base de conocimiento de Aurora",
+      "space": "https://huggingface.co/spaces/Agents-MCP-Hackathon/KGB-mcp",
+      "stars": 19,
+      "instalacion": "npm install -g @agents-mcp-hackathon/knowledge-graph-builder",
+      "herramientas": [
+        "text_to_graph - Convierte texto a grafo",
+        "webpage_to_graph - Extrae grafo de URLs",
+        "query_graph - Consulta el grafo"
+      ],
+      "readiness": "installed",
+      "local_scripts": [
+        "scripts/hf-agents.mjs",
+        ".agent/aurora/hf-agents/knowledge-graph-example.js"
+      ],
+      "npm_scripts": [
+        "hf:agents info knowledge-graph",
+        "hf:agents space knowledge-graph"
+      ],
+      "use_cases": [
+        "Knowledge base construction",
+        "Entity extraction",
+        "Relationship mapping"
+      ]
+    },
+    {
+      "id": "hf_deep_research",
+      "tipo": "research_agent",
+      "prioridad": "alta",
+      "uso": "Sistema multi-agente para deep research. Investigacón automática sobre cualquier tema con múltiples agentes especializados",
+      "space": "https://huggingface.co/spaces/Agents-MCP-Hackathon/multi-agent_deep-research",
+      "stars": 20,
+      "instalacion": "npm install -g @agents-mcp-hackathon/multi-agent-deep-research",
+      "herramientas": [
+        "research_topic - Investiga tema en profundidad",
+        "synthesize_findings - Sintetiza resultados",
+        "generate_report - Genera reporte final"
+      ],
+      "readiness": "installed",
+      "local_scripts": [
+        "scripts/hf-agents.mjs",
+        ".agent/aurora/hf-agents/deep-research-example.js"
+      ],
+      "npm_scripts": [
+        "hf:agents info deep-research",
+        "hf:agents space deep-research"
+      ],
+      "use_cases": [
+        "Research automation",
+        "Competitive analysis",
+        "Market research"
+      ]
+    },
+    {
+      "id": "hf_fish_agent",
+      "tipo": "voice_agent",
+      "prioridad": "media",
+      "uso": "End-to-end Voice Language Model por Fish Audio. Agente conversacional con voz",
+      "space": "https://huggingface.co/spaces/fishaudio/fish-agent",
+      "stars": 139,
+      "instalacion": "Acceder via Space",
+      "herramientas": [
+        "voice_chat - Chat por voz",
+        "speech_to_text - Voz a texto",
+        "text_to_speech - Texto a voz"
+      ],
+      "readiness": "installed",
+      "local_scripts": [
+        "scripts/hf-agents.mjs"
+      ],
+      "npm_scripts": [
+        "hf:agents space fish-agent"
+      ],
+      "use_cases": [
+        "Voice assistants",
+        "Audio conversations",
+        "Accessibility"
+      ]
+    },
+    {
+      "id": "hf_workflow_builder",
+      "tipo": "workflow_automation",
+      "prioridad": "alta",
+      "uso": "Constructor visual de workflows para automatizar procesos. Integración con MCP para crear pipelines",
+      "space": "https://huggingface.co/spaces/Agents-MCP-Hackathon/gradio_workflowbuilder",
+      "stars": 65,
+      "instalacion": "npm install -g @agents-mcp-hackathon/workflow-builder",
+      "herramientas": [
+        "create_workflow - Crea workflow visual",
+        "execute_pipeline - Ejecuta pipeline",
+        "schedule_tasks - Agenda tareas"
+      ],
+      "readiness": "installed",
+      "local_scripts": [
+        "scripts/hf-agents.mjs",
+        ".agent/aurora/hf-agents/workflow-builder-example.js"
+      ],
+      "npm_scripts": [
+        "hf:agents info workflow-builder",
+        "hf:agents space workflow-builder"
+      ],
+      "use_cases": [
+        "Process automation",
+        "Pipeline building",
+        "Task scheduling"
+      ]
+    },
+    {
+      "id": "hf_file_converter",
+      "tipo": "file_tools",
+      "prioridad": "media",
+      "uso": "Conversor universal de archivos - cualquier formato a cualquier formato. Útil para procesamiento de datos",
+      "space": "https://huggingface.co/spaces/Agents-MCP-Hackathon/universal-file-converter",
+      "stars": 33,
+      "instalacion": "npm install -g @agents-mcp-hackathon/file-converter",
+      "herramientas": [
+        "convert_file - Convierte entre formatos",
+        "batch_convert - Conversión por lotes"
+      ],
+      "readiness": "installed",
+      "local_scripts": [
+        "scripts/hf-agents.mjs",
+        ".agent/aurora/hf-agents/file-converter-example.js"
+      ],
+      "npm_scripts": [
+        "hf:agents info file-converter",
+        "hf:agents space file-converter"
+      ],
+      "use_cases": [
+        "File conversion",
+        "Data transformation",
+        "Format migration"
+      ]
+    },
+    {
+      "id": "hf_first_agent_template",
+      "tipo": "agent_template",
+      "prioridad": "alta",
+      "uso": "Template oficial de HuggingFace para crear tu primer agente. Chat + QA + Image generation. Ideal para start rápido",
+      "space": "https://huggingface.co/spaces/agents-course/First_agent_template",
+      "stars": 652,
+      "instalacion": "pip install smolagents (template incluido)",
+      "herramientas": [
+        "chat_agent - Agente conversacional",
+        "qa_agent - Question answering",
+        "image_generator - Generación de imágenes"
+      ],
+      "readiness": "installed",
+      "local_scripts": [
+        "scripts/hf-agents.mjs"
+      ],
+      "npm_scripts": [
+        "hf:agents space agent-template"
+      ],
+      "use_cases": [
+        "Quick start",
+        "Prototyping",
+        "Learning"
+      ]
+    },
+    {
+      "id": "langchain",
+      "tipo": "agent_framework",
+      "prioridad": "critica",
+      "uso": "Framework más popular para construir aplicaciones LLM. Arquitectura modular, chains, agents, memory, tools. 122k+ stars GitHub",
+      "repo": "https://github.com/langchain-ai/langchain",
+      "stars": 122850,
+      "instalacion": "pip install langchain langchain-community",
+      "documentacion": "https://python.langchain.com/docs",
+      "herramientas": [
+        "LCEL - LangChain Expression Language",
+        "Chains - Cadenas de operaciones",
+        "Agents - Agentes con tools",
+        "Memory - Gestión de memoria",
+        "Retrievers - Búsqueda de información"
+      ],
+      "features": [
+        "Modular architecture",
+        "200+ integrations",
+        "RAG pipelines",
+        "Conversational memory",
+        "Tool calling"
+      ],
+      "readiness": "installed",
+      "local_scripts": [
+        "scripts/hf-agents.mjs"
+      ],
+      "npm_scripts": [
+        "hf:agents info langchain"
+      ],
+      "use_cases": [
+        "RAG",
+        "Chatbots",
+        "Autonomous agents",
+        "Data extraction"
+      ]
+    },
+    {
+      "id": "autogen",
+      "tipo": "multi_agent",
+      "prioridad": "critica",
+      "uso": "Framework de Microsoft para construir sistemas multi-agente conversacionales. 52k+ stars GitHub",
+      "repo": "https://github.com/microsoft/autogen",
+      "stars": 52927,
+      "instalacion": "pip install autogen-agentchat",
+      "documentacion": "https://microsoft.github.io/autogen",
+      "herramientas": [
+        "ConversableAgent - Agente conversacional",
+        "GroupChat - Chat grupal multi-agente",
+        "AssistantAgent - Agente asistente",
+        "UserProxyAgent - Agente que ejecuta código"
+      ],
+      "features": [
+        "Multi-agent conversations",
+        "Code execution",
+        "Human-in-the-loop",
+        "Customizable behaviors",
+        "Code execution sandbox"
+      ],
+      "readiness": "installed",
+      "local_scripts": [
+        "scripts/hf-agents.mjs"
+      ],
+      "npm_scripts": [
+        "hf:agents info autogen"
+      ],
+      "use_cases": [
+        "Multi-agent collaboration",
+        "Code generation",
+        "Research automation"
+      ]
+    },
+    {
+      "id": "llamaindex",
+      "tipo": "rag_framework",
+      "prioridad": "critica",
+      "uso": "Framework enfocado en RAG (Retrieval Augmented Generation). Mejor para agentes que necesitan acceder a datos. 46k+ stars",
+      "repo": "https://github.com/run-llama/llama_index",
+      "stars": 46100,
+      "instalacion": "pip install llama-index",
+      "documentacion": "https://docs.llamaindex.ai",
+      "herramientas": [
+        "QueryEngine - Motor de consultas",
+        "Retriever - Recuperación de documentos",
+        "Synthesizer - Síntesis de respuestas",
+        "Index - Índices vectoriales"
+      ],
+      "features": [
+        "10+ index types",
+        "RAG optimization",
+        "Multi-modal support",
+        "Streaming responses",
+        "Callback system"
+      ],
+      "readiness": "installed",
+      "local_scripts": [
+        "scripts/hf-agents.mjs"
+      ],
+      "npm_scripts": [
+        "hf:agents info llamaindex"
+      ],
+      "use_cases": [
+        "RAG pipelines",
+        "Document Q&A",
+        "Knowledge base agents"
+      ]
+    },
+    {
+      "id": "openclaw",
+      "tipo": "coding_agent",
+      "prioridad": "critica",
+      "uso": "El proyecto OSS de más rápido crecimiento en 2026. Agente de coding autonomous. 60k+ stars en 60 días",
+      "repo": "https://github.com/openclaw/openclaw",
+      "stars": 60000,
+      "instalacion": "npx openclaw",
+      "documentacion": "https://docs.openclaw.dev",
+      "herramientas": [
+        "Terminal - Ejecución de comandos",
+        "FileEditor - Edición de archivos",
+        "WebSearch - Búsqueda web",
+        "Git - Control de versiones"
+      ],
+      "features": [
+        "Self-hosted",
+        "Multi-model support",
+        "Privacy-first",
+        "Fastest growing repo",
+        "Open-source"
+      ],
+      "readiness": "installed",
+      "local_scripts": [
+        "scripts/hf-agents.mjs"
+      ],
+      "npm_scripts": [
+        "hf:agents info openclaw"
+      ],
+      "use_cases": [
+        "Autonomous coding",
+        "Code refactoring",
+        "Bug fixing"
+      ]
+    },
+    {
+      "id": "claude_code",
+      "tipo": "coding_agent",
+      "prioridad": "alta",
+      "uso": "Agente de coding de Anthropic. Mejor reasoning. 80.9% SWE-bench. CLI terminal-based",
+      "repo": "https://github.com/anthropics/claude-code",
+      "stars": 40800,
+      "instalacion": "npm install -g @anthropic-ai/claude-code",
+      "documentacion": "https://docs.anthropic.com/claude-code",
+      "herramientas": [
+        "bash - Comandos de terminal",
+        "write/edit/read - Operaciones de archivo",
+        "websearch - Búsqueda web",
+        "grep - Búsqueda en código"
+      ],
+      "features": [
+        "Best-in-class reasoning",
+        "80.9% SWE-bench",
+        "Agent Teams support",
+        "Streaming output",
+        "Tool use"
+      ],
+      "readiness": "installed",
+      "local_scripts": [
+        "scripts/hf-agents.mjs"
+      ],
+      "npm_scripts": [
+        "hf:agents info claude-code"
+      ],
+      "use_cases": [
+        "Code development",
+        "Debugging",
+        "Code review"
+      ]
+    },
+    {
+      "id": "gemini_cli",
+      "tipo": "coding_agent",
+      "prioridad": "alta",
+      "uso": "CLI de Google con modelo multimodal Gemini. Integración con servicios Google",
+      "repo": "https://github.com/google-gemini/gemini-cli",
+      "stars": 15000,
+      "instalacion": "npm install -g @google/gemini-cli",
+      "documentacion": "https://ai.google.dev/docs",
+      "herramientas": [
+        "Multimodal - Texto, imágenes, audio",
+        "Google Search - Búsqueda integrada",
+        "Code execution - Ejecución de código",
+        "File operations - Operaciones de archivo"
+      ],
+      "features": [
+        "Gemini multimodal model",
+        "Google ecosystem",
+        "Native search",
+        "Cost-effective",
+        "Fast responses"
+      ],
+      "readiness": "installed",
+      "local_scripts": [
+        "scripts/hf-agents.mjs"
+      ],
+      "npm_scripts": [
+        "hf:agents info gemini-cli"
+      ],
+      "use_cases": [
+        "Multimodal tasks",
+        "Research",
+        "Code generation"
+      ]
+    },
+    {
+      "id": "metagpt",
+      "tipo": "multi_agent",
+      "prioridad": "alta",
+      "uso": "Framework que simula una empresa de software completa. Agents con roles (PM, Architect, Engineer). 61k+ stars",
+      "repo": "https://github.com/FoundationAgents/MetaGPT",
+      "stars": 61919,
+      "instalacion": "pip install metagpt",
+      "documentacion": "https://docs.deepwisdom.ai/guide/get_started/introduction.html",
+      "herramientas": [
+        "ProductManager - Gestor de producto",
+        "Architect - Diseñador de arquitectura",
+        "Engineer - Desarrollador",
+        "Reviewer - Revisor de código"
+      ],
+      "features": [
+        "SOP-based agents",
+        "Software company simulation",
+        "Multi-role collaboration",
+        "Document generation",
+        "Code review"
+      ],
+      "readiness": "installed",
+      "local_scripts": [
+        "scripts/hf-agents.mjs"
+      ],
+      "npm_scripts": [
+        "hf:agents info metagpt"
+      ],
+      "use_cases": [
+        "Full-stack development",
+        "Sprint planning",
+        "Code review automation"
+      ]
+    },
+    {
+      "id": "crewai",
+      "tipo": "multi_agent",
+      "prioridad": "alta",
+      "uso": "Framework para orquestación de agentes con roles definidos. Fácil de usar, muy popular",
+      "repo": "https://github.com/crewAIInc/crewAI",
+      "stars": 22000,
+      "instalacion": "pip install crewai crewai-tools",
+      "documentacion": "https://docs.crewai.com",
+      "herramientas": [
+        "Agent - Definir agentes con roles",
+        "Task - Definir tareas",
+        "Crew - Orquestar el crew",
+        "Tools - Herramientas pre-construidas"
+      ],
+      "features": [
+        "Role-based agents",
+        "Hierarchical tasks",
+        "Memory integration",
+        "Easy YAML config",
+        "Multi-agent collaboration"
+      ],
+      "readiness": "installed",
+      "local_scripts": [
+        "scripts/hf-agents.mjs"
+      ],
+      "npm_scripts": [
+        "hf:agents info crewai"
+      ],
+      "use_cases": [
+        "Multi-agent workflows",
+        "Research teams",
+        "Content creation"
+      ]
+    },
+    {
+      "id": "agentscope",
+      "tipo": "multi_agent",
+      "prioridad": "alta",
+      "uso": "Framework multi-agente de Alibaba. Escala a miles de agentes. 19k+ stars",
+      "repo": "https://github.com/modelscope/AgentScope",
+      "stars": 19500,
+      "instalacion": "pip install agentscope",
+      "documentacion": "https://agentscope.readthedocs.io",
+      "herramientas": [
+        "Agent - Agente base",
+        "Pipeline - Pipeline de ejecución",
+        "Monitor - Monitor de agentes",
+        "Simulator - Simulación de entornos"
+      ],
+      "features": [
+        "Large-scale simulation",
+        "Distributed computing",
+        "Interactive dashboard",
+        "Rich tool library",
+        "Multi-modal support"
+      ],
+      "readiness": "installed",
+      "local_scripts": [
+        "scripts/hf-agents.mjs"
+      ],
+      "npm_scripts": [
+        "hf:agents info agentscope"
+      ],
+      "use_cases": [
+        "Large-scale simulation",
+        "Research",
+        "Social simulation"
+      ]
+    },
+    {
+      "id": "dify",
+      "tipo": "agent_builder",
+      "prioridad": "alta",
+      "uso": "Plataforma OSS LLMOps con visual agent builder. RAG incluido. 130k+ stars - Muy popular",
+      "repo": "https://github.com/langgenius/dify",
+      "stars": 130000,
+      "instalacion": "docker run -ti -v ~/.dify:/dify dify-community/dify-community:latest",
+      "documentacion": "https://docs.dify.ai",
+      "herramientas": [
+        "Visual Builder - Constructor visual",
+        "RAG Pipeline - Pipeline de RAG",
+        "API Gateway - Gateway de APIs",
+        "Dataset - Gestión de datasets"
+      ],
+      "features": [
+        "No-code agent builder",
+        "RAG included",
+        "130k+ GitHub stars",
+        "API deployment",
+        "Enterprise features"
+      ],
+      "readiness": "installed",
+      "local_scripts": [
+        "scripts/hf-agents.mjs"
+      ],
+      "npm_scripts": [
+        "hf:agents info dify"
+      ],
+      "use_cases": [
+        "No-code agents",
+        "RAG applications",
+        "Enterprise AI"
+      ]
+    },
+    {
+      "id": "mem0",
+      "tipo": "memory_layer",
+      "prioridad": "media",
+      "uso": "Memory layer dedicado para aplicaciones AI. Personalized memory con graph-based storage",
+      "repo": "https://github.com/mem0ai/mem0",
+      "stars": 14000,
+      "instalacion": "pip install mem0ai",
+      "documentacion": "https://docs.mem0.ai",
+      "herramientas": [
+        "add - Agregar memories",
+        "search - Buscar memories",
+        "get_history - Historial de conversación",
+        "delete - Eliminar memories"
+      ],
+      "features": [
+        "Graph-based memory",
+        "Personalization",
+        "User memory",
+        "Session memory",
+        "+26% accuracy vs OpenAI Memory"
+      ],
+      "readiness": "installed",
+      "local_scripts": [
+        "scripts/hf-agents.mjs"
+      ],
+      "npm_scripts": [
+        "hf:agents info mem0"
+      ],
+      "use_cases": [
+        "Personalized AI",
+        "Memory for agents",
+        "User preference learning"
+      ]
+    },
+    {
+      "id": "letta",
+      "tipo": "memory_os",
+      "prioridad": "media",
+      "uso": "Sistema de memoria inspirado en OS para LLM context. Estados persistentes para agentes",
+      "repo": "https://github.com/letta-ai/letta",
+      "stars": 9000,
+      "instalacion": "pip install letta",
+      "documentacion": "https://docs.letta.com",
+      "herramientas": [
+        "Agent - Crear agentes con memoria",
+        "Block - Bloques de memoria",
+        "Tool - Tools para agentes",
+        "HumanInLoop - Intervención humana"
+      ],
+      "features": [
+        "OS-inspired memory",
+        "Persistent state",
+        "Long-context handling",
+        "Sandboxed execution",
+        "REST API"
+      ],
+      "readiness": "installed",
+      "local_scripts": [
+        "scripts/hf-agents.mjs"
+      ],
+      "npm_scripts": [
+        "hf:agents info letta"
+      ],
+      "use_cases": [
+        "Persistent agents",
+        "Long conversations",
+        "Memory management"
+      ]
+    },
+    {
+      "id": "cognee",
+      "tipo": "knowledge_graph",
+      "prioridad": "media",
+      "uso": "Layer open-source para construir y consultar knowledge graphs desde datos no estructurados",
+      "repo": "https://github.com/topoteres/cognee",
+      "stars": 3000,
+      "instalacion": "pip install cognee",
+      "documentacion": "https://cognee.readthedocs.io",
+      "herramientas": [
+        "add - Agregar documentos",
+        "search - Búsqueda semántica",
+        "get_graph - Obtener grafo",
+        "query - Consultar knowledge base"
+      ],
+      "features": [
+        "Knowledge graphs from unstructured",
+        "Vector + graph search",
+        "30+ data sources",
+        "RAG optimization",
+        "Graph visualization"
+      ],
+      "readiness": "installed",
+      "local_scripts": [
+        "scripts/hf-agents.mjs"
+      ],
+      "npm_scripts": [
+        "hf:agents info cognee"
+      ],
+      "use_cases": [
+        "Knowledge management",
+        "RAG optimization",
+        "Entity extraction"
+      ]
+    },
+    {
+      "id": "goose",
+      "tipo": "extensible_agent",
+      "prioridad": "media",
+      "uso": "Agente local extensible open-source que automatiza tareas de ingeniería. Blocks hackeables",
+      "repo": "https://github.com/block/goose",
+      "stars": 8000,
+      "instalacion": "pip install block-goose",
+      "documentacion": "https://docs.goose.dev",
+      "herramientas": [
+        "FileEditor - Edición de archivos",
+        "Bash - Comandos de terminal",
+        "WebSearch - Búsqueda web",
+        "Blocks - Extensiones custom"
+      ],
+      "features": [
+        "Hackable/extendible",
+        "Local-first",
+        "Plugin system",
+        "Shared sessions",
+        "Memory integration"
+      ],
+      "readiness": "installed",
+      "local_scripts": [
+        "scripts/hf-agents.mjs"
+      ],
+      "npm_scripts": [
+        "hf:agents info goose"
+      ],
+      "use_cases": [
+        "Engineering automation",
+        "Custom agent workflows",
+        "Local development"
+      ]
+    },
+    {
+      "id": "n8n",
+      "tipo": "workflow_automation",
+      "prioridad": "media",
+      "uso": "Workflow automation OSS con nodos de AI agents. 700+ integrations. Visual + código",
+      "repo": "https://github.com/n8n-io/n8n",
+      "stars": 45000,
+      "instalacion": "docker run -it --rm --name n8n -p 5678:5678 n8nio/n8n",
+      "documentacion": "https://docs.n8n.io",
+      "herramientas": [
+        "AI Agent Node - Nodo de agente AI",
+        "Workflow Builder - Constructor visual",
+        "Code Node - Nodo de código",
+        "Webhook - Triggers externos"
+      ],
+      "features": [
+        "700+ integrations",
+        "Visual + code",
+        "Self-hostable",
+        "AI agent nodes",
+        "Open-source"
+      ],
+      "readiness": "installed",
+      "local_scripts": [
+        "scripts/hf-agents.mjs"
+      ],
+      "npm_scripts": [
+        "hf:agents info n8n"
+      ],
+      "use_cases": [
+        "Workflow automation",
+        "Business process",
+        "Data pipelines"
+      ]
+    },
+    {
+      "id": "aurora_smart_retry",
+      "name": "Aurora Smart Retry Strategy",
+      "description": "Estrategia de retry inteligente con backoff exponencial + jitter para operaciones de build, lint y CI/CD. Analiza patrones de errores y sugiere fixes automáticos.",
+      "tipo": "internal_strategy",
+      "estado": "installed",
+      "prioridad": "critica",
+      "version": "1.0.0",
+      "stars": null,
+      "tech": [
+        "Node.js",
+        "TypeScript"
+      ],
+      "category": "resilience",
+      "features": [
+        "Exponential backoff with jitter",
+        "Automatic error pattern analysis",
+        "Fix suggestions based on error categories",
+        "Retry with configurable max attempts",
+        "Detailed error logging"
+      ],
+      "use_cases": [
+        "Build failure recovery",
+        "Lint error auto-diagnosis",
+        "Import path error detection",
+        "TypeScript error categorization",
+        "CI/CD resilience"
+      ],
+      "playbook_path": ".agent/brain/docs/smart-retry-playbook.md",
+      "local_scripts": [
+        "scripts/aurora-smart-retry.mjs"
+      ],
+      "npm_scripts": [
+        "aurora:smart-retry"
+      ],
+      "env_vars": [],
+      "readiness": "installed",
+      "error_patterns": [
+        {
+          "pattern": "Cannot find module",
+          "severity": "high",
+          "category": "import"
+        },
+        {
+          "pattern": "TS2307",
+          "severity": "high",
+          "category": "import"
+        },
+        {
+          "pattern": "Type error",
+          "severity": "high",
+          "category": "type"
+        },
+        {
+          "pattern": "ENOENT",
+          "severity": "high",
+          "category": "filesystem"
+        },
+        {
+          "pattern": "timeout",
+          "severity": "medium",
+          "category": "timeout"
+        }
+      ]
+    },
+    {
+      "id": "fal_ai_mcp",
+      "name": "fal-ai MCP Server",
+      "description": "Conecta AI assistants a 1000+ modelos defal.ai: image generation, video, audio, 3D, upscaling. Herramienta esencial para Aurora Creative - generación de assets, prototipos visuales, contenido multimedia.",
+      "tipo": "media_generation",
+      "estado": "ready",
+      "prioridad": "critica",
+      "version": "1.0.0",
+      "stars": 2500,
+      "tech": [
+        "TypeScript",
+        "MCP",
+        "fal.ai Platform"
+      ],
+      "category": "multimodal",
+      "repo": "https://github.com/fal-ai/mcp-server",
+      "documentacion": "https://fal.ai/mcp",
+      "instalacion": "claude mcp add --transport http fal-ai https://mcp.fal.ai/mcp --header \"Authorization: Bearer $FAL_KEY\"",
+      "env_vars": [
+        "FAL_KEY"
+      ],
+      "herramientas": [
+        "search_models - Busca 1000+ modelos por keyword o categoría",
+        "get_model_schema - Obtiene parámetros input/output de cualquier modelo",
+        "get_pricing - Consulta costos antes de ejecutar",
+        "search_docs - Busca documentación de fal",
+        "run_model - Ejecuta cualquier modelo y retorna resultado",
+        "submit_job - Envía jobs largos (video, 3D, training)",
+        "get_result - Obtiene resultados de jobsSubmitidos"
+      ],
+      "modelos_soportados": [
+        "Flux Pro - Image generation líder",
+        "Stable Diffusion 3.5",
+        "Ideogram - Texto en imágenes",
+        "HeyGen - Talking avatars",
+        "LivePortrait - Retratos animados",
+        "Sync - Lip sync",
+        "CogVideoX - Video generation",
+        "TripoSR - 3D generation",
+        "Kling AI - Video generation",
+        "LTX Studio - Video creation"
+      ],
+      "features": [
+        "1000+ modelos disponibles",
+        "Image, video, audio, 3D generation",
+        "API key por request (no sessions)",
+        "Hostado en Vercel",
+        "Pricing estándar por modelo"
+      ],
+      "use_cases": [
+        "Generación de assets para apps",
+        "Prototipos visuales",
+        "Contenido multimedia para marketing",
+        "Avatares talking",
+        "Video generation",
+        "3D models para productos"
+      ],
+      "readiness": "ready",
+      "playbook": "docs/mcp-playbooks/fal-ai.md"
+    },
+    {
+      "id": "azure_mcp",
+      "name": "Azure MCP Server",
+      "description": "Conecta AI agents a 40+ servicios de Azure. Acceso unificado a compute, storage, databases, AI/ML, functions, containers, y más. V1.0 GA (2026).",
+      "tipo": "cloud_infrastructure",
+      "estado": "ready",
+      "prioridad": "alta",
+      "version": "1.0.0",
+      "stars": 5000,
+      "tech": [
+        "TypeScript",
+        ".NET",
+        "MCP",
+        "Azure SDK"
+      ],
+      "category": "cloud",
+      "repo": "https://github.com/microsoft/azure-mcp",
+      "documentacion": "https://learn.microsoft.com/azure/mcp",
+      "instalacion": "npm install -g @azure/mcp && azd auth login",
+      "env_vars": [
+        "AZURE_TENANT_ID",
+        "AZURE_CLIENT_ID",
+        "AZURE_CLIENT_SECRET"
+      ],
+      "servicios_soportados": [
+        "Azure Compute - VMs, VM Scale Sets, Container Apps, AKS",
+        "Azure Storage - Blobs, Files, Queues, Data Lake",
+        "Azure SQL - SQL Database, Managed Instance, Synapse",
+        "Azure Cosmos DB - MongoDB, Cassandra, Gremlin, Table",
+        "Azure AI - OpenAI, Cognitive Services, ML Studio",
+        "Azure Functions - Serverless functions, Durable Functions",
+        "Azure Logic Apps - Workflow automation",
+        "Azure Event Grid - Event routing",
+        "Azure Key Vault - Secrets, certificates, keys",
+        "Azure App Service - Web Apps, API Apps, Static Web Apps"
+      ],
+      "herramientas": [
+        "compute - Gestión de VMs y containers",
+        "storage - Operaciones de storage accounts",
+        "database - Consultas y gestión de databases",
+        "ai_services -调用 Azure OpenAI y Cognitive Services",
+        "functions - Deploy y management de functions",
+        "keyvault - Gestión de secretos",
+        "app_service - Web apps deployment",
+        "monitoring - Logs y métricas"
+      ],
+      "features": [
+        "40+ Azure services integrados",
+        "Soporte para sovereign clouds",
+        "IDE extensions (VS Code, IntelliJ, Eclipse)",
+        ".MCP bundles para distribución",
+        "Autenticación via Azure AD",
+        "EU data region support"
+      ],
+      "use_cases": [
+        "Infraestructura como código con AI",
+        "Deploy automatizado de recursos Azure",
+        "Gestión de datos empresariales",
+        "Integración con Azure OpenAI",
+        "Serverless workflows",
+        "CI/CD automation"
+      ],
+      "readiness": "ready",
+      "playbook": "docs/mcp-playbooks/azure.md"
+    },
+    {
+      "id": "eddi_mcp",
+      "tipo": "orchestration",
+      "prioridad": "critica",
+      "uso": "Orquestación de conversaciones multi-agente y lógica de negocio. Proporciona routing inteligente, gestión de conversaciones y orquestación de APIs para aplicaciones AI sofisticadas. 288 stars - TOP 1 daily",
+      "repo": "https://github.com/labsai/EDDI",
+      "stars": 288,
+      "instalacion": "npm install @labsai/eddi-mcp",
+      "herramientas": [
+        "route_conversation - Routing inteligente de conversaciones",
+        "manage_conversation - Gestión de estado de conversaciones",
+        "orchestrate_api - Orquestación de llamadas API",
+        "agent_delegation - Delegación entre agentes"
+      ],
+      "features": [
+        "Multi-agent orchestration",
+        "Business logic integration",
+        "Conversation management",
+        "API orchestration"
+      ],
+      "readiness": "ready",
+      "ready_date": "2026-03-27",
+      "source": "mcpmarket_daily_2026-03-27 #1"
+    },
+    {
+      "id": "anklebreaker_unity",
+      "tipo": "game_development",
+      "prioridad": "alta",
+      "uso": "Conecta AI assistants a Unity Editor y Unity Hub. Suite completa de herramientas para flujos de trabajo de desarrollo de juegos con AI. 76 stars - #2 daily",
+      "repo": "https://github.com/AnkleBreaker-Studio/anklebreaker-unity",
+      "stars": 76,
+      "instalacion": "npm install anklebreaker-unity-mcp",
+      "herramientas": [
+        "unity_create_scene - Crear nuevas escenas",
+        "unity_compile_scripts - Compilar scripts Unity",
+        "unity_manage_assets - Gestionar assets del proyecto",
+        "unity_build_project - Construir proyecto"
+      ],
+      "features": [
+        "Unity Editor integration",
+        "Game development workflows",
+        "Script compilation",
+        "Asset management"
+      ],
+      "readiness": "ready",
+      "ready_date": "2026-03-27",
+      "source": "mcpmarket_daily_2026-03-27 #2"
+    },
+    {
+      "id": "skillboss_skills",
+      "tipo": "agent_capabilities",
+      "prioridad": "alta",
+      "uso": "Equipara agentes de codificación AI con capacidades listas para producción: generación de contenido, construcción de apps, deployment de productos y automatización de workflows reales. 51 stars - #3 daily",
+      "repo": "https://github.com/SkillBoss-AI/skillboss-skills",
+      "stars": 51,
+      "instalacion": "npm install @skillboss/skills-mcp",
+      "herramientas": [
+        "generate_content - Generación de contenido",
+        "build_application - Construcción de aplicaciones",
+        "deploy_product - Deployment de productos",
+        "automate_workflow - Automatización de workflows"
+      ],
+      "features": [
+        "Production-ready capabilities",
+        "Content generation",
+        "Application building",
+        "Workflow automation"
+      ],
+      "readiness": "ready",
+      "ready_date": "2026-03-27",
+      "source": "mcpmarket_daily_2026-03-27 #3"
+    },
+    {
+      "id": "tweetclaw_mcp",
+      "tipo": "social_media",
+      "prioridad": "media",
+      "uso": "Automatiza acciones de X/Twitter como posting, replies, likes, follows y DM a través de OpenClaw con API rentable. 26 stars - #4 daily",
+      "repo": "https://github.com/Xquik-dev/TweetClaw",
+      "stars": 26,
+      "instalacion": "npm install tweetclaw-mcp",
+      "herramientas": [
+        "post_tweet - Publicar tweets",
+        "reply_tweet - Responder tweets",
+        "like_tweet - Dar like",
+        "follow_user - Seguir usuarios",
+        "send_dm - Enviar mensajes directos"
+      ],
+      "features": [
+        "X/Twitter automation",
+        "Cost-effective API",
+        "Post, reply, like, follow, DM"
+      ],
+      "readiness": "ready",
+      "ready_date": "2026-03-27",
+      "source": "mcpmarket_daily_2026-03-27 #4"
+    }
+  ]
+}

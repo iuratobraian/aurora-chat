@@ -1,0 +1,46 @@
+[
+  {
+    "name": "glm-4.7-flash",
+    "provider": "Ollama Local",
+    "type": "local_llm",
+    "capabilities": ["planning", "teams", "code"],
+    "status": "available",
+    "gpuCapable": false
+  },
+  {
+    "name": "codex-o3",
+    "provider": "Codex CLI",
+    "type": "local_agent",
+    "capabilities": ["code_review", "apply", "cloud"],
+    "status": "active",
+    "gpuCapable": false
+  },
+  {
+    "name": "openrouter-gpt",
+    "provider": "OpenRouter Proxy",
+    "type": "remote_llm",
+    "capabilities": ["knowledge", "summaries"],
+    "status": "standby",
+    "gpuCapable": false
+  },
+  {
+    "name": "deepseek-v3-code",
+    "provider": "DeepSeek OSS",
+    "type": "remote_llm",
+    "capabilities": ["coding", "reasoning", "planning"],
+    "status": "standby",
+    "gitHub": "https://github.com/deepseek-ai/deepseek-v3",
+    "gpu": true,
+    "gpuCapable": true
+  },
+  {
+    "name": "qwen-3b",
+    "provider": "Qwen Agent",
+    "type": "remote_llm",
+    "capabilities": ["coding", "multi-turn"],
+    "status": "standby",
+    "gitHub": "https://github.com/InternLM/qwen",
+    "gpu": true,
+    "gpuCapable": true
+  }
+]

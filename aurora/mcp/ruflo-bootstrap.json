@@ -1,0 +1,36 @@
+{
+  "generatedAt": "2026-03-24T22:23:37.5909126-03:00",
+  "available": true,
+  "maxAgents": 20,
+  "objective": "aurora-ruflo-startup",
+  "init": {
+    "output": "[INFO] Initializing swarm...\n  Creating coordination topology...\n  Initializing memory namespace...\n  Setting up communication channels...\n\n+------------+----------------------------+\n| Property   | Value                      |\n+------------+----------------------------+\n| Swarm ID   | swarm-1774401818848-2rtjv4 |\n| Topology   | hierarchical               |\n| Max Agents | 20                         |\n| Auto Scale | Enabled                    |\n| Protocol   | message-bus                |\n| V3 Mode    | Disabled                   |\n+------------+----------------------------+\n\n[OK] Swarm initialized successfully\n\n[AgentDB Patch] Controller index not found: C:\\Users\\iurato\\Downloads\\tradeportal-2025-platinum\\node_modules\\agentdb\\dist\\controllers\\index.js",
+    "ok": true
+  },
+  "start": {
+    "output": "[INFO] Starting swarm with objective: aurora-ruflo-startup\n\nAgent Deployment Plan\n+-------------+-------------+-------+----------------------+\n| Role        | Type        | Count | Purpose              |\n+-------------+-------------+-------+----------------------+\n| Coordinator | coordinator |     1 | Orchestrate workflow |\n| Architect   | architect   |     1 | System design        |\n| Coder       | coder       |     3 | Implementation       |\n| Tester      | tester      |     2 | Quality assurance    |\n| Reviewer    | reviewer    |     1 | Code review          |\n+-------------+-------------+-------+----------------------+\n\n[INFO] Deploying agents...\n\r... Initializing agents...\r... Initializing agents...\r..: Initializing agents...\r.:: Initializing agents...\r::: Initializing agents...\r                                \rAll agents deployed\n\n[OK] Swarm execution started\n  Monitor: claude-flow swarm status swarm-mn5d13cp\n\n[AgentDB Patch] Controller index not found: C:\\Users\\iurato\\Downloads\\tradeportal-2025-platinum\\node_modules\\agentdb\\dist\\controllers\\index.js",
+    "ok": true
+  },
+  "status": {
+    "output": "Swarm Status: swarm-1774401818848-2rtjv4\n\nOverall Progress: [##--------------------------------------] 5.0%\n\nAgents\n+-----------+-------+\n| Status    | Count |\n+-----------+-------+\n| Active    |     0 |\n| Idle      |     0 |\n| Completed |     0 |\n| Total     |     0 |\n+-----------+-------+\n\nTasks\n+-------------+-------+\n| Status      | Count |\n+-------------+-------+\n| Completed   |     0 |\n| In Progress |     0 |\n| Pending     |     0 |\n| Total       |     0 |\n+-------------+-------+\n\nPerformance Metrics\n  - Tokens Used: 0\n  - Avg Response Time: --\n  - Success Rate: --\n  - Elapsed Time: --\n\nCoordination\n  - Consensus Rounds: 0\n  - Messages Sent: 0\n  - Conflicts Resolved: 0\n\n[AgentDB Patch] Controller index not found: C:\\Users\\iurato\\Downloads\\tradeportal-2025-platinum\\node_modules\\agentdb\\dist\\controllers\\index.js",
+    "ok": true
+  },
+  "swarmId": "swarm-1774401818848-2rtjv4",
+  "auroraTerminal": {
+    "launched": false,
+    "reused": true,
+    "pid": 25848,
+    "script": "C:\\Users\\iurato\\Downloads\\tradeportal-2025-platinum\\scripts\\aurora-inicio-aurora-terminal.ps1",
+    "statusFile": "C:\\Users\\iurato\\Downloads\\tradeportal-2025-platinum\\.agent\\aurora\\aurora-terminal-status.json",
+    "note": "Refresh Aurora scorecard"
+  },
+  "auroraApiTerminal": {
+    "launched": false,
+    "reused": true,
+    "pid": 22792,
+    "script": "C:\\Users\\iurato\\Downloads\\tradeportal-2025-platinum\\scripts\\aurora-api-terminal.ps1",
+    "statusFile": "C:\\Users\\iurato\\Downloads\\tradeportal-2025-platinum\\.agent\\aurora\\aurora-api-terminal-status.json",
+    "url": "http://127.0.0.1:4310/app",
+    "note": "Aurora API corriendo en terminal dedicada."
+  }
+}

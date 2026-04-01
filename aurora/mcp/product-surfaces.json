@@ -1,0 +1,125 @@
+{
+  "version": 2,
+  "product": "TradePortal",
+  "category": "community trading platform",
+  "prioritySurfaces": [
+    {
+      "id": "community_feed",
+      "label": "Feed y comunidad",
+      "domain": "community_product",
+      "goal": "retencion de calidad, utilidad inmediata y conversacion",
+      "signals": ["likes", "comentarios", "guardados", "tiempo de lectura", "feedback negativo"],
+      "files": ["views/ComunidadView.tsx", "services/feed/feedRanker.ts", "components/PostCard.tsx"]
+    },
+    {
+      "id": "onboarding_activation",
+      "label": "Onboarding y activacion",
+      "domain": "community_product",
+      "goal": "llevar al usuario al primer valor en minutos",
+      "signals": ["registro", "completo onboarding", "entra a comunidad", "primera interaccion"],
+      "files": ["components/OnboardingFlow.tsx", "services/storage.ts", "views/DashboardView.tsx"]
+    },
+    {
+      "id": "trust_reputation",
+      "label": "Perfil, reputacion y confianza",
+      "domain": "community_product",
+      "goal": "hacer visible quien aporta valor y quien genera confianza",
+      "signals": ["seguidores", "likes recibidos", "consistencia", "verificacion", "reportes"],
+      "files": ["views/PerfilView.tsx", "convex/achievements.ts", "types.ts"]
+    },
+    {
+      "id": "creator_monetization",
+      "label": "Creators y monetizacion",
+      "domain": "growth",
+      "goal": "activar creators, comunidades y monetizacion sana",
+      "signals": ["miembros", "conversion", "retencion", "ingresos", "engagement"],
+      "files": ["views/CreatorDashboard.tsx", "services/analytics/communityAnalytics.ts", "views/CreatorView.tsx"]
+    },
+    {
+      "id": "moderation_safety",
+      "label": "Moderacion y seguridad",
+      "domain": "security",
+      "goal": "proteger la comunidad sin matar la conversacion util",
+      "signals": ["reportes", "spam", "acciones de moderacion", "falsos positivos"],
+      "files": ["views/AdminView.tsx", "convex/moderation.ts", "server.ts"]
+    },
+    {
+      "id": "aurora_utility",
+      "label": "IA y utilidad transversal",
+      "domain": "aurora_ops",
+      "goal": "resolver dudas, apoyar onboarding y acelerar trabajo del equipo",
+      "signals": ["consultas resueltas", "latencia", "reuso de conocimiento", "errores evitados"],
+      "files": ["scripts/aurora-api.mjs", "scripts/aurora-shell.mjs", "lib/ai/*"]
+    },
+    {
+      "id": "viral_growth",
+      "label": "Referidos y premios",
+      "domain": "growth",
+      "goal": "incentivar crecimiento viral con recompensas por referido",
+      "signals": ["registros referidos", "compras referidas", "20% comision", "milestone rewards"],
+      "files": ["convex/referrals.ts", "views/LeaderboardView.tsx", "components/ReferralPanel.tsx"]
+    },
+    {
+      "id": "signals_trading",
+      "label": "Signals y trading",
+      "domain": "trading_product",
+      "goal": "proveer señales de trading precisas y oportunas",
+      "signals": ["suscriptores", "winrate", "pips generados", "precision"],
+      "files": ["views/SignalsView.tsx", "convex/signals.ts", "services/analytics/userSignals.ts"]
+    },
+    {
+      "id": "leaderboard_gamification",
+      "label": "Gamificacion y leaderboard",
+      "domain": "engagement",
+      "goal": "mantener engagement con XP, niveles, logros y competencias",
+      "signals": ["xp ganado", "nivel", "referidos", "streak", "competencias"],
+      "files": ["views/LeaderboardView.tsx", "convex/gamification.ts", "convex/achievements.ts"]
+    },
+    {
+      "id": "ai_agent",
+      "label": "AI Agent interno",
+      "domain": "ai_platform",
+      "goal": "IA que aprende del usuario y proporciona insights personalizados",
+      "signals": ["conversaciones", "aprendizaje", "insights generados", "accuracy"],
+      "files": ["lib/ai/*", "convex/aiAgent.ts", "views/AdminView.tsx"]
+    }
+  ],
+  "creationModes": [
+    "community platforms",
+    "creator tools",
+    "support assistants",
+    "prompt-driven builders",
+    "website creator app",
+    "word-to-product superapp"
+  ],
+  "domains": {
+    "community_product": {
+      "color": "blue",
+      "priority": 1
+    },
+    "growth": {
+      "color": "green",
+      "priority": 2
+    },
+    "security": {
+      "color": "red",
+      "priority": 1
+    },
+    "aurora_ops": {
+      "color": "purple",
+      "priority": 1
+    },
+    "trading_product": {
+      "color": "orange",
+      "priority": 3
+    },
+    "engagement": {
+      "color": "yellow",
+      "priority": 2
+    },
+    "ai_platform": {
+      "color": "cyan",
+      "priority": 1
+    }
+  }
+}

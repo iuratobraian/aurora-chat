@@ -1,0 +1,13 @@
+{
+  "artifact": "aurora_scorecard_daily",
+  "version": 1,
+  "requiredFields": [
+    "generatedAt",
+    "utilityScore",
+    "reuseScore",
+    "driftCount",
+    "contextReadiness",
+    "connectorReadiness",
+    "functionCoverage"
+  ]
+}

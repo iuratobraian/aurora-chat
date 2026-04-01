@@ -1,0 +1,12 @@
+{
+  "artifact": "aurora_handoff_brief",
+  "version": 1,
+  "requiredFields": [
+    "taskId",
+    "summary",
+    "touchedFiles",
+    "validation",
+    "remainingRisk",
+    "nextOwner"
+  ]
+}

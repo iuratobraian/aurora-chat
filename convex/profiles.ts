@@ -8,30 +8,39 @@ import logger from "./logger";
 export const getProfile = query({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.db
+    const profile = await ctx.db
       .query("profiles")
       .withIndex("by_userId", (q) => q.eq("userId", args.userId))
       .unique();
+    if (!profile) return null;
+    const { password: _, ...safeProfile } = profile;
+    return safeProfile;
   },
 });
 
 export const getProfileByUsuario = query({
   args: { usuario: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.db
+    const profile = await ctx.db
       .query("profiles")
       .withIndex("by_usuario", (q) => q.eq("usuario", args.usuario))
       .unique();
+    if (!profile) return null;
+    const { password: _, ...safeProfile } = profile;
+    return safeProfile;
   },
 });
 
 export const getProfileByEmail = query({
   args: { email: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.db
+    const profile = await ctx.db
       .query("profiles")
       .withIndex("by_email", (q) => q.eq("email", args.email))
       .unique();
+    if (!profile) return null;
+    const { password: _, ...safeProfile } = profile;
+    return safeProfile;
   },
 });
 
@@ -46,6 +55,45 @@ export const getNextUserNumber = query({
       .first();
     
     return (highestUser?.userNumber ?? 0) + 1;
+  },
+});
+
+export const validateLogin = query({
+  args: { identifier: v.string(), password: v.string() },
+  handler: async (ctx, args) => {
+    const identifier = args.identifier.trim().toLowerCase();
+    let profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_usuario", (q) => q.eq("usuario", identifier))
+      .unique();
+    
+    if (!profile && identifier.includes("@")) {
+      profile = await ctx.db
+        .query("profiles")
+        .withIndex("by_email", (q) => q.eq("email", identifier))
+        .unique();
+    }
+
+    if (!profile) return { success: false, error: "Usuario no encontrado" };
+    if (profile.isBlocked) return { success: false, error: "Cuenta bloqueada" };
+    
+    if (!profile.password) {
+       // Check if it's a social account attempting password login
+       return { success: false, error: "Esta cuenta requiere inicio de sesión con Google" };
+    }
+
+    const match = await bcrypt.compare(args.password, profile.password);
+    if (!match && args.password === profile.password) {
+        // Legacy plaintext check (should be rare/none now)
+        return { success: true, user: profile };
+    }
+
+    if (match) {
+      const { password: _, ...safeProfile } = profile;
+      return { success: true, user: safeProfile };
+    }
+
+    return { success: false, error: "Contraseña incorrecta" };
   },
 });
 

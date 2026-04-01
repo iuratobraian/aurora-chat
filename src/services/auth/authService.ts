@@ -151,51 +151,47 @@ export const AuthService = {
     login: async (identifier: string, password: string): Promise<{ user: Usuario | null, error: string | null }> => {
         try {
             if (convex) {
-                const normalizedId = identifier.trim().toLowerCase();
-                let profile = await convex.query(api.profiles.getProfileByUsuario, { usuario: normalizedId });
-                if (!profile && normalizedId.includes('@')) {
-                    profile = await convex.query(api.profiles.getProfileByEmail, { email: normalizedId });
-                }
-
-                if (profile) {
-                    if ((profile as any).isBlocked) {
-                        return { user: null, error: 'Tu cuenta ha sido bloqueada por violar los términos de servicio.' };
-                    }
-                    const storedPassword = profile.password;
-                    let passwordsMatch = false;
-                    
-                    if (storedPassword) {
-                        if (isGooglePassword(storedPassword)) {
-                            passwordsMatch = false;
-                        } else if (isHashed(storedPassword)) {
-                            passwordsMatch = await verifyPassword(password, storedPassword);
-                        } else {
-                            passwordsMatch = await verifyPassword(password, storedPassword) || storedPassword === password;
-                            if (passwordsMatch && storedPassword === password) {
-                                logger.warn(`[AUTH] Legacy plaintext password detected for user: ${normalizedId}. Should be re-hashed.`);
-                            }
-                        }
-                    }
-                    
-                    if (passwordsMatch) {
-                        const user = mapConvexProfileToUsuario(profile);
-                        const token = `session_${user.id}_${Date.now()}`;
-                        saveSession(token, user.id);
-                        saveSessionUser(user);
-                        return { user, error: null };
-                    } else {
-                        return { user: null, error: 'Contraseña incorrecta.' };
-                    }
+                const result = await convex.query(api.profiles.validateLogin, { identifier, password });
+                
+                if (result.success && result.user) {
+                    const user = mapConvexProfileToUsuario(result.user);
+                    const token = `session_${user.id}_${Date.now()}`;
+                    saveSession(token, user.id);
+                    saveSessionUser(user);
+                    return { user, error: null };
+                } else {
+                    return { user: null, error: result.error || 'Credenciales inválidas.' };
                 }
             }
-        } catch (err) {
+        } catch (err: any) {
             logger.error("Convex Login Error:", err);
+            return { user: null, error: err.message || 'Error al iniciar sesión.' };
         }
 
         return { user: null, error: 'Credenciales inválidas. Si no tienes cuenta, por favor regístrate.' };
     },
 
     register: async (datos: any, referralCode?: string | null): Promise<{ user: Usuario | null, error: string | null }> => {
+        // Validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const email = datos.email?.toLowerCase()?.trim();
+        if (!email || !emailRegex.test(email)) {
+            return { user: null, error: 'El correo electrónico no es válido.' };
+        }
+        if (!datos.nombre || datos.nombre.trim().length < 2) {
+            return { user: null, error: 'El nombre debe tener al menos 2 caracteres.' };
+        }
+        if (!datos.usuario || datos.usuario.trim().length < 3) {
+            return { user: null, error: 'El nombre de usuario debe tener al menos 3 caracteres.' };
+        }
+        const usernameRegex = /^[a-zA-Z0-9_]+$/;
+        if (!usernameRegex.test(datos.usuario.trim())) {
+            return { user: null, error: 'El usuario solo puede contener letras, números y guiones bajos.' };
+        }
+        if (!datos.password || datos.password.length < 6) {
+            return { user: null, error: 'La contraseña debe tener al menos 6 caracteres.' };
+        }
+
         const userId = generateUUID();
         const normalizedUsuario = (datos.usuario || '').trim().toLowerCase();
 

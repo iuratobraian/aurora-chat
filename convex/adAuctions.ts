@@ -18,8 +18,8 @@ export const getUserBids = query({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
     const bids = await ctx.db
-      .query("auction_bids")
-      .withIndex("by_userId", (q) => q.eq("userId", args.userId))
+      .query("ad_bids")
+      .withIndex("by_bidder", (q) => q.eq("bidderId", args.userId))
       .order("desc")
       .collect();
     return bids;
@@ -31,25 +31,14 @@ export const placeBid = mutation({
     userId: v.string(),
     auctionId: v.id("ad_auctions"),
     amount: v.number(),
-    duration: v.number(),
+    campaignId: v.optional(v.id("ad_campaigns")),
   },
   handler: async (ctx, args) => {
     const auction = await ctx.db.get(args.auctionId);
     if (!auction) throw new Error("Subasta no encontrada");
     if (auction.status !== "active") throw new Error("Subasta no está activa");
-    if (args.amount < auction.minBid) throw new Error(`Puja mínima: $${auction.minBid}`);
-
-    const existingBids = await ctx.db
-      .query("auction_bids")
-      .withIndex("by_auctionId", (q) => q.eq("auctionId", args.auctionId))
-      .collect();
-
-    const highestBid = existingBids.length > 0
-      ? Math.max(...existingBids.map(b => b.amount))
-      : auction.startingPrice;
-
-    if (args.amount <= highestBid) {
-      throw new Error(`La puja debe ser mayor a $${highestBid.toFixed(2)}`);
+    if (args.amount <= auction.currentBid) {
+      throw new Error(`La puja debe ser mayor a $${auction.currentBid.toFixed(2)}`);
     }
 
     const profile = await ctx.db
@@ -60,33 +49,38 @@ export const placeBid = mutation({
     if (!profile) throw new Error("Perfil no encontrado");
 
     const currentSaldo = (profile as any).saldo || 0;
-    if (currentSaldo < args.amount) {
-      throw new Error(`Saldo insuficiente. Necesitas $${args.amount.toFixed(2)}, tienes $${currentSaldo.toFixed(2)}`);
+    const deposit = args.amount - auction.currentBid;
+    if (currentSaldo < deposit) {
+      throw new Error(`Saldo insuficiente. Necesitas $${deposit.toFixed(2)}`);
     }
 
     await ctx.db.patch(profile._id, {
-      saldo: currentSaldo - args.amount,
+      saldo: currentSaldo - deposit,
     });
 
-    const bidId = await ctx.db.insert("auction_bids", {
-      userId: args.userId,
+    await ctx.db.insert("ad_bids", {
       auctionId: args.auctionId,
+      bidderId: args.userId,
+      campaignId: args.campaignId || "_j2k3l4m5n6p7q8r9s0t1" as any,
       amount: args.amount,
-      duration: args.duration,
-      placedAt: Date.now(),
-      status: "pending",
+      bidType: "fixed",
+      createdAt: Date.now(),
+    });
+
+    await ctx.db.patch(args.auctionId, {
+      currentBid: args.amount,
     });
 
     await ctx.db.insert("notifications", {
       userId: args.userId,
       type: "system",
       title: "🎯 Puja Realizada",
-      body: `Has pujado $${args.amount.toFixed(2)} en la subasta`,
+      body: `Has pujado $${args.amount.toFixed(2)}`,
       read: false,
       createdAt: Date.now(),
     });
 
-    return { success: true, bidId, newBalance: currentSaldo - args.amount };
+    return { success: true, newBalance: currentSaldo - deposit };
   },
 });
 
@@ -109,41 +103,23 @@ export const closeAuction = mutation({
     if (!auction) throw new Error("Subasta no encontrada");
 
     const bids = await ctx.db
-      .query("auction_bids")
-      .withIndex("by_auctionId", (q) => q.eq("auctionId", args.auctionId))
+      .query("ad_bids")
+      .withIndex("by_auction", (q) => q.eq("auctionId", args.auctionId))
       .collect();
 
     if (bids.length === 0) {
-      await ctx.db.patch(args.auctionId, { status: "closed" });
+      await ctx.db.patch(args.auctionId, { status: "completed" as any });
       return { success: true, winner: null };
     }
 
     const winningBid = bids.reduce((max, bid) => bid.amount > max.amount ? bid : max, bids[0]);
 
     await ctx.db.patch(args.auctionId, {
-      status: "closed",
-      winnerId: winningBid.userId,
-      winningAmount: winningBid.amount,
-      closedAt: Date.now(),
+      status: "completed" as any,
+      winnerId: winningBid.bidderId,
+      winnerBid: winningBid.amount,
     });
 
-    await ctx.db.patch(winningBid._id, { status: "won" });
-
-    for (const bid of bids) {
-      if (bid._id !== winningBid._id) {
-        await ctx.db.patch(bid._id, { status: "lost" });
-        const bidder = await ctx.db
-          .query("profiles")
-          .withIndex("by_userId", (q) => q.eq("userId", bid.userId))
-          .unique();
-        if (bidder) {
-          await ctx.db.patch(bidder._id, {
-            saldo: (bidder as any).saldo + bid.amount,
-          });
-        }
-      }
-    }
-
-    return { success: true, winner: winningBid.userId, amount: winningBid.amount };
+    return { success: true, winner: winningBid.bidderId, amount: winningBid.amount };
   },
 });

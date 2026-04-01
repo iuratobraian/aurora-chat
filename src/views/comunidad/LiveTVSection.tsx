@@ -46,7 +46,7 @@ const CloseCinemaButton: React.FC<{ onClick: () => void }> = memo(({ onClick }) 
 const VideoIframe: React.FC<{ url: string; isAdmin: boolean }> = memo(({ url, isAdmin }) => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
     const videoId = extractYoutubeId(url);
-    
+
     return (
         <iframe
             ref={iframeRef}
@@ -66,11 +66,11 @@ const LockOverlay: React.FC<{ isGuest: boolean; hasAccess: boolean; onCta: () =>
         </div>
         <h3 className="text-2xl md:text-3xl font-black uppercase text-white tracking-widest mb-3">Transmisión Restringida</h3>
         <p className="text-sm text-gray-400 font-bold max-w-md mx-auto mb-8">
-            {isGuest 
+            {isGuest
                 ? "Actualmente estamos transmitiendo en vivo. Para ingresar debes ser parte de nuestra academia y comunidad. Regístrate y explora los planes de acceso."
                 : "Estamos transmitiendo en vivo. Tu rango actual no te permite acceder a esta sesión formativa. Adquiere una membresía cursante para desbloquear la señal."}
         </p>
-        <button 
+        <button
             onClick={onCta}
             className="px-8 py-4 bg-primary hover:bg-blue-600 border border-primary/50 text-white rounded-xl font-black uppercase tracking-widest transition-all shadow-lg flex items-center gap-2"
         >
@@ -117,10 +117,27 @@ const LiveSidebar: React.FC<{ onOpenChat: () => void; onCinemaMode: () => void }
     </div>
 ));
 
-const TVOffMessage: React.FC = memo(() => (
-    <div className="p-8 text-center bg-[#0a0000]">
-        <span className="material-symbols-outlined text-4xl text-gray-600 mb-2">tv_off</span>
-        <h3 className="text-sm font-black text-gray-500 uppercase tracking-widest">TV Fuera del Aire</h3>
+const TVOffMessage: React.FC<{ alwaysOnMode?: boolean }> = memo(({ alwaysOnMode }) => (
+    <div className={`flex flex-col items-center justify-center ${alwaysOnMode ? 'min-h-[400px]' : 'p-8 text-center bg-[#0a0000]'}`}>
+        {alwaysOnMode ? (
+            <>
+                <div className="relative w-32 h-32 mb-6">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-purple-500/20 rounded-full animate-pulse" />
+                    <div className="absolute inset-4 bg-[#0a000f] rounded-full flex items-center justify-center border-2 border-primary/30 shadow-[0_0_30px_rgba(59,130,246,0.3)]">
+                        <span className="material-symbols-outlined text-5xl text-gray-600">tv_off</span>
+                    </div>
+                </div>
+                <h3 className="text-lg font-black text-gray-400 uppercase tracking-widest mb-2">TV Fuera de Aire</h3>
+                <p className="text-xs text-gray-600 font-bold max-w-xs text-center px-4">
+                    La transmisión está offline actualmente. Vuelve más tarde para contenido en vivo.
+                </p>
+            </>
+        ) : (
+            <>
+                <span className="material-symbols-outlined text-4xl text-gray-600 mb-2">tv_off</span>
+                <h3 className="text-sm font-black text-gray-500 uppercase tracking-widest">TV Fuera de Aire</h3>
+            </>
+        )}
     </div>
 ));
 
@@ -139,7 +156,7 @@ const LiveTVSection: React.FC<LiveTVSectionProps> = ({
     const isLive = liveStatus.isLive;
     const isGuest = !usuario || usuario.id === 'guest';
     const showPreview = isAdmin || isLive;
-    
+
     if (!showPreview) return null;
 
     const videoUrl = extractYoutubeId(liveStatus.url);
@@ -153,11 +170,11 @@ const LiveTVSection: React.FC<LiveTVSectionProps> = ({
                     <div className="absolute inset-[-50%] animate-[spin_5s_linear_infinite_reverse] bg-[conic-gradient(from_0deg,transparent_0_220deg,#06b6d4_360deg)] z-0" />
                 </>
             )}
-            
+
             <div className="relative z-10 w-full h-full bg-[#0a0000] rounded-[11px] overflow-hidden">
                 {isAdmin && <EditLiveButton isLive={isLive} onClick={onEditLive} />}
                 {isLiveCinemaMode && !isAdmin && <CloseCinemaButton onClick={onExitCinemaMode} />}
-                
+
                 {isLive ? (
                     <div className={`grid grid-cols-1 ${isLiveCinemaMode ? 'lg:grid-cols-1' : 'lg:grid-cols-3'} gap-0 h-full`}>
                         <div className={`${isLiveCinemaMode ? 'h-full' : 'lg:col-span-2 aspect-video'} bg-black relative`}>
@@ -167,9 +184,9 @@ const LiveTVSection: React.FC<LiveTVSectionProps> = ({
                                     {hasTvAccess ? (
                                         <VideoIframe url={liveStatus.url} isAdmin={isAdmin} />
                                     ) : (
-                                        <LockOverlay 
-                                            isGuest={isGuest} 
-                                            hasAccess={hasTvAccess} 
+                                        <LockOverlay
+                                            isGuest={isGuest}
+                                            hasAccess={hasTvAccess}
                                             onCta={onOpenSalesChat}
                                         />
                                     )}
@@ -178,7 +195,7 @@ const LiveTVSection: React.FC<LiveTVSectionProps> = ({
                                 <AwaitingSignal />
                             )}
                             <LiveBadge />
-                            
+
                             {/* Ad Overlay - Solo cuando hay ads y está en vivo */}
                             {isLive && ads.length > 0 && (
                                 <LiveTVAdOverlay
@@ -190,14 +207,14 @@ const LiveTVSection: React.FC<LiveTVSectionProps> = ({
                             )}
                         </div>
                         {!isLiveCinemaMode && (
-                            <LiveSidebar 
+                            <LiveSidebar
                                 onOpenChat={() => window.dispatchEvent(new CustomEvent('open-live-chat'))}
                                 onCinemaMode={onCinemaMode}
                             />
                         )}
                     </div>
                 ) : (
-                    <TVOffMessage />
+                    <TVOffMessage alwaysOnMode={true} />
                 )}
             </div>
         </div>

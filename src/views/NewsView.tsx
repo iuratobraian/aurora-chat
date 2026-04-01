@@ -3,6 +3,8 @@ import { NewsArticle, NewsCategory, NewsSource } from '../types/news';
 import { newsService, SOURCE_CONFIG } from '../services/newsService';
 import NewsCard from '../components/news/NewsCard';
 import { useToast } from '../components/ToastProvider';
+import { ShineCard } from '../components/ui/ShineCard';
+import { GlowCard } from '../components/ui/GlowCard';
 
 interface NewsViewProps {
   usuario?: any;
@@ -100,6 +102,26 @@ const NewsView: React.FC<NewsViewProps> = ({ usuario }) => {
 
   return (
     <div className="max-w-[1600px] mx-auto px-4 pt-16 pb-20 animate-in fade-in duration-700">
+      {/* Breaking News Ticker */}
+      {news.length > 0 && (
+        <div className="mb-6 overflow-hidden rounded-xl bg-red-500/10 border border-red-500/20">
+          <div className="flex items-center gap-3 px-4 py-2 border-b border-red-500/20">
+            <span className="px-2 py-0.5 bg-red-500 text-white text-[9px] font-black uppercase tracking-widest rounded animate-pulse">
+              Breaking
+            </span>
+            <div className="flex-1 overflow-hidden">
+              <div className="whitespace-nowrap animate-marquee">
+                {news.slice(0, 5).map((article, i) => (
+                  <span key={i} className="inline-block mr-12 text-xs text-white/80 font-medium">
+                    {article.title}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
@@ -131,6 +153,25 @@ const NewsView: React.FC<NewsViewProps> = ({ usuario }) => {
           </button>
         </div>
       </div>
+
+      {/* Market Sentiment Bar */}
+      <GlowCard glowColor="rgba(16, 185, 129, 0.3)" className="mb-6 !p-4">
+        <div className="flex items-center gap-6 overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-xs font-bold text-gray-400 uppercase">Sentimiento:</span>
+            <div className="flex items-center gap-1">
+              <span className="text-green-400 text-sm">📈</span>
+              <span className="text-xs font-bold text-green-400">Bullish 62%</span>
+            </div>
+          </div>
+          <div className="h-6 w-px bg-white/10 shrink-0" />
+          <div className="flex items-center gap-4 shrink-0">
+            <span className="text-xs text-gray-400">Forex: <span className="text-white font-bold">Neutral</span></span>
+            <span className="text-xs text-gray-400">Crypto: <span className="text-green-400 font-bold">Bullish</span></span>
+            <span className="text-xs text-gray-400">Índices: <span className="text-red-400 font-bold">Bearish</span></span>
+          </div>
+        </div>
+      </GlowCard>
 
       {/* Filters */}
       <div className="glass rounded-2xl p-4 mb-6 border border-white/10">
@@ -208,12 +249,14 @@ const NewsView: React.FC<NewsViewProps> = ({ usuario }) => {
         <div className="lg:col-span-3 space-y-6">
           {/* Featured News */}
           {featuredNews && (
-            <NewsCard
-              news={featuredNews}
-              variant="featured"
-              onReadMore={handleReadMore}
-              onShare={handleShare}
-            />
+            <ShineCard intensity="high" className="mb-2">
+              <NewsCard
+                news={featuredNews}
+                variant="featured"
+                onReadMore={handleReadMore}
+                onShare={handleShare}
+              />
+            </ShineCard>
           )}
 
           {/* News Grid */}
@@ -347,6 +390,31 @@ const NewsView: React.FC<NewsViewProps> = ({ usuario }) => {
               })}
             </div>
           </div>
+
+          {/* Economic Calendar */}
+          <GlowCard glowColor="rgba(59, 130, 246, 0.3)" className="!p-4">
+            <h3 className="text-xs font-black uppercase tracking-widest text-primary mb-4 flex items-center gap-2">
+              <span className="material-symbols-outlined text-sm">calendar_month</span>
+              Calendario Económico
+            </h3>
+            <div className="space-y-3">
+              {[
+                { time: '08:30', event: 'NFP', impact: 'high', forecast: '185K', previous: '200K' },
+                { time: '10:00', event: 'ISM Manufacturing', impact: 'high', forecast: '49.5', previous: '49.0' },
+                { time: '14:00', event: 'Fed Rate Decision', impact: 'high', forecast: '5.50%', previous: '5.50%' },
+                { time: '09:00', event: 'EUR GDP', impact: 'medium', forecast: '0.2%', previous: '0.1%' },
+              ].map((item, i) => (
+                <div key={i} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-all">
+                  <span className="text-[10px] text-gray-500 font-mono">{item.time}</span>
+                  <div className={`w-1.5 h-1.5 rounded-full ${item.impact === 'high' ? 'bg-red-500' : 'bg-yellow-500'}`} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-bold text-white truncate">{item.event}</p>
+                    <p className="text-[9px] text-gray-500">Forecast: {item.forecast}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </GlowCard>
         </div>
       </div>
     </div>

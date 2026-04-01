@@ -3,8 +3,43 @@
 **Created:** 2026-04-01  
 **Status:** READY TO START  
 **Goal:** 100% Parity with Claude Code  
-**Estimated Time:** 34 hours (4-5 days)  
+**Estimated Time:** 54 hours (4-5 days)  
 **Sub-Agents:** 10 (Swarm Colony)
+
+---
+
+## 📚 KNOWLEDGE SOURCES - READ BEFORE STARTING
+
+### **CORE KNOWLEDGE (ALL AGENTS MUST READ)**
+
+| Document | Location | Purpose |
+|----------|----------|---------|
+| **AURORA PRO KNOWLEDGE** | `.agent/aurora/AURORA_PRO_KNOWLEDGE.md` | Architecture patterns, integration, security, best practices |
+| **GROWTH REPORT** | `AURORA_GROWTH_REPORT.md` | Capabilities assessment, metrics, roadmap |
+| **AWAKENING PROTOCOL** | `aurora/AURORA_AWAKENING_PROTOCOL.md` | Identity, startup sequence, commands |
+| **CLAUDE CODE ANALYSIS** | `docs/CLAUDE_CODE_LEAK_ANALYSIS.md` | Extracted patterns from Claude Code leak |
+| **SEPARATION DOCS** | `AURORA_SEPARATION_*.md` (3 files) | Migration strategy, integration methods |
+
+### **EXISTING CODE (REFERENCE FOR IMPLEMENTATION)**
+
+| System | Location | Agents Should Study |
+|--------|----------|---------------------|
+| **KAIROS** | `aurora/core/kairos/aurora-kairos.mjs` | Tick-based monitoring, proactive detection |
+| **Dream** | `aurora/core/dream/aurora-dream.mjs` | 4-phase consolidation, memory gates |
+| **Coordinator** | `aurora/core/coordinator/aurora-coordinator.mjs` | Multi-agent orchestration, worker spawning |
+| **Worker** | `aurora/core/coordinator/worker.mjs` | Worker role implementation |
+| **Tool Registry** | `aurora/core/tools/aurora-tool-registry.mjs` | Tool registration, schema caching |
+| **Permissions** | `aurora/core/permissions/aurora-permissions.mjs` | Risk classification, protected files |
+
+### **EXISTING TOOLS (TEMPLATES FOR NEW TOOLS)**
+
+| Tool | Location | Use as Template For |
+|------|----------|---------------------|
+| CodeReviewTool | `aurora/core/tools/aurora-tool-registry.mjs` | All new tools |
+| FileReadTool | `aurora/core/tools/aurora-tool-registry.mjs` | BashTool, SearchTool |
+| FileWriteTool | `aurora/core/tools/aurora-tool-registry.mjs` | DiffTool, GitTool |
+| GitStatusTool | `aurora/core/tools/aurora-tool-registry.mjs` | GitTool (extend) |
+| TaskCreateTool | `aurora/core/tools/aurora-tool-registry.mjs` | PlanMode, ResumeContext |
 
 ---
 
@@ -121,306 +156,489 @@
 
 ### **AC-001: BashTool** (2 hours)
 
-**Files to Create:**
-- `aurora/core/tools/bash-tool.mjs`
+**Agent:** BASH-AGENT
 
-**Implementation:**
-```javascript
-class BashTool {
-  async execute(command, options = {}) {
-    // - Validate command (block dangerous)
-    // - Execute via child_process
-    // - Capture stdout/stderr
-    // - Return { output, exitCode, error }
-  }
-}
-```
+**📚 KNOWLEDGE SOURCES:**
+- `docs/CLAUDE_CODE_LEAK_ANALYSIS.md` → Section: "Tool Registry Pattern"
+- `aurora/core/tools/aurora-tool-registry.mjs` → Template: FileReadTool, FileWriteTool
+- `aurora/core/permissions/aurora-permissions.mjs` → Command sandboxing, protected files
+- `.agent/aurora/AURORA_PRO_KNOWLEDGE.md` → Section: "Security Patterns"
 
-**Safety Checks:**
-- [ ] Block: `rm -rf /`, `sudo`, `curl | bash`
-- [ ] Validate: file paths, command whitelist
-- [ ] Log: all commands before execution
-- [ ] Timeout: 5 min max per command
+**📋 IMPLEMENTATION CHECKLIST:**
+- [ ] Read ALL knowledge sources above
+- [ ] Study FileReadTool pattern in tool-registry.mjs
+- [ ] Understand permission system for command validation
+- [ ] Review protected files list in permissions.mjs
+- [ ] Create: `aurora/core/tools/bash-tool.mjs`
+- [ ] Implement: execute(), validate(), sanitize()
+- [ ] Add: Command whitelist, path validation
+- [ ] Test: ls, cat, grep, npm, git (safe commands)
+- [ ] Block: rm -rf /, sudo, curl | bash (dangerous)
+- [ ] Register in Tool Registry
+- [ ] Update AURORA_CHECK.md with [x]
 
-**Acceptance Criteria:**
-- [ ] Can execute `ls`, `cat`, `grep`, `npm`, `git`
-- [ ] Returns stdout/stderr correctly
-- [ ] Handles errors gracefully
-- [ ] Respects permission system
+**⚠️ SAFETY REQUIREMENTS:**
+- ALL commands logged before execution
+- Block dangerous patterns (rm -rf, sudo, etc.)
+- Validate file paths (no path traversal)
+- Timeout: 5 min max per command
+- Respect permission system (checkPermission before execute)
 
 ---
 
 ### **AC-002: GitTool** (3 hours)
 
-**Files to Create:**
-- `aurora/core/tools/git-tool.mjs`
+**Agent:** GIT-AGENT
 
-**Operations:**
-- [ ] `git status` (existing)
-- [ ] `git add` / `git reset`
-- [ ] `git commit -m`
-- [ ] `git push` / `git pull`
-- [ ] `git checkout -b` (create branch)
-- [ ] `git diff` / `git diff HEAD`
-- [ ] `git log --oneline -n`
-- [ ] `git stash` / `git stash pop`
-- [ ] `git merge`
-- [ ] `git rebase`
+**📚 KNOWLEDGE SOURCES:**
+- `docs/CLAUDE_CODE_LEAK_ANALYSIS.md` → Section: "Tool Registry Pattern"
+- `aurora/core/tools/aurora-tool-registry.mjs` → Template: GitStatusTool (existing)
+- `aurora/core/permissions/aurora-permissions.mjs` → Protected files
+- `AURORA_GROWTH_REPORT.md` → Section: "Git Operations" (current capabilities)
 
-**Safety Checks:**
-- [ ] Preview changes before commit
-- [ ] Require commit message
-- [ ] Confirm before push
-- [ ] Block force push without approval
+**📋 IMPLEMENTATION CHECKLIST:**
+- [ ] Read ALL knowledge sources above
+- [ ] Study existing GitStatusTool implementation
+- [ ] Review protected files in permissions.mjs
+- [ ] Create: `aurora/core/tools/git-tool.mjs`
+- [ ] Implement 10 operations:
+  - [ ] git status (extend existing)
+  - [ ] git add / git reset
+  - [ ] git commit -m
+  - [ ] git push / git pull
+  - [ ] git checkout -b (create branch)
+  - [ ] git diff / git diff HEAD
+  - [ ] git log --oneline -n
+  - [ ] git stash / git stash pop
+  - [ ] git merge
+  - [ ] git rebase (advanced)
+- [ ] Add safety: Preview before commit, confirm before push
+- [ ] Block: force push without approval
+- [ ] Register in Tool Registry
+- [ ] Update AURORA_CHECK.md with [x]
 
 ---
 
 ### **AC-003: SelfCorrectLoop** (4 hours)
 
-**Files to Create:**
-- `aurora/core/coordinator/self-correct.mjs`
+**Agent:** CORRECT-AGENT
 
-**Implementation:**
-```javascript
-class SelfCorrectLoop {
-  async execute(task) {
-    let attempts = 0;
-    const maxAttempts = 3;
-    
-    while (attempts < maxAttempts) {
-      const result = await coordinator.execute(task);
-      
-      if (result.verification.passed) {
-        return result;
-      }
-      
-      // Auto-correct
-      const errors = result.verification.errors;
-      const fixPlan = await this.createFixPlan(errors);
-      await coordinator.execute(fixPlan);
-      
-      attempts++;
-    }
-    
-    throw new Error('Max correction attempts reached');
-  }
-}
-```
+**📚 KNOWLEDGE SOURCES:**
+- `docs/CLAUDE_CODE_LEAK_ANALYSIS.md` → Section: "Coordinator Mode Pattern"
+- `aurora/core/coordinator/aurora-coordinator.mjs` → 4-phase execution
+- `aurora/core/coordinator/worker.mjs` → Verification workers
+- `AURORA_GROWTH_REPORT.md` → Section: "Self-Correction" (current: 40% parity)
 
-**Acceptance Criteria:**
-- [ ] Detects test failures automatically
-- [ ] Creates fix plan from error messages
-- [ ] Re-runs verification after fix
-- [ ] Gives up after 3 attempts (asks human)
+**📋 IMPLEMENTATION CHECKLIST:**
+- [ ] Read ALL knowledge sources above
+- [ ] Study Coordinator 4-phase execution
+- [ ] Understand verification workers (lint, test, type-check, security)
+- [ ] Create: `aurora/core/coordinator/self-correct.mjs`
+- [ ] Implement loop:
+  - [ ] Execute task
+  - [ ] Check verification results
+  - [ ] If failed: parse errors
+  - [ ] Create fix plan from errors
+  - [ ] Re-execute fix plan
+  - [ ] Retry (max 3 attempts)
+  - [ ] Give up and ask human
+- [ ] Add: Error message parser
+- [ ] Add: Fix plan generator
+- [ ] Test with intentional failures
+- [ ] Update AURORA_CHECK.md with [x]
 
 ---
 
 ### **AC-004: DiffTool** (2 hours)
 
-**Files to Create:**
-- `aurora/core/tools/diff-tool.mjs`
+**Agent:** DIFF-AGENT
 
-**Operations:**
-- [ ] Generate diff between files
-- [ ] Apply diff/patch
-- [ ] Show inline diff (unified format)
-- [ ] Create diff from git staging
-- [ ] Reverse diff
+**📚 KNOWLEDGE SOURCES:**
+- `docs/CLAUDE_CODE_LEAK_ANALYSIS.md` → Section: "Tool Registry Pattern"
+- `aurora/core/tools/aurora-tool-registry.mjs` → Template: FileReadTool, FileWriteTool
+- `AURORA_GROWTH_REPORT.md` → Section: "Tools" (current: 10 tools)
+
+**📋 IMPLEMENTATION CHECKLIST:**
+- [ ] Read ALL knowledge sources above
+- [ ] Study FileReadTool/FileWriteTool patterns
+- [ ] Create: `aurora/core/tools/diff-tool.mjs`
+- [ ] Implement operations:
+  - [ ] Generate diff between files
+  - [ ] Apply diff/patch
+  - [ ] Show inline diff (unified format)
+  - [ ] Create diff from git staging
+  - [ ] Reverse diff
+- [ ] Add: Unified diff format parser
+- [ ] Add: Patch file handler
+- [ ] Register in Tool Registry
+- [ ] Update AURORA_CHECK.md with [x]
 
 ---
 
 ### **AC-005: SearchTool** (2 hours)
 
-**Files to Create:**
-- `aurora/core/tools/search-tool.mjs`
+**Agent:** SEARCH-AGENT
 
-**Operations:**
-- [ ] Grep search (content)
-- [ ] File search (by name)
-- [ ] Symbol search (functions, classes)
-- [ ] Reference search (usages)
-- [ ] Regex search
+**📚 KNOWLEDGE SOURCES:**
+- `docs/CLAUDE_CODE_LEAK_ANALYSIS.md` → Section: "Tool Registry Pattern"
+- `aurora/core/tools/aurora-tool-registry.mjs` → Template: FileReadTool
+- `aurora/core/coordinator/worker.mjs` → Reference: exploreCodebase(), walkDirectory()
+- `.agent/aurora/AURORA_PRO_KNOWLEDGE.md` → Section: "Performance Patterns"
+
+**📋 IMPLEMENTATION CHECKLIST:**
+- [ ] Read ALL knowledge sources above
+- [ ] Study walkDirectory() in worker.mjs (reuse!)
+- [ ] Create: `aurora/core/tools/search-tool.mjs`
+- [ ] Implement operations:
+  - [ ] Grep search (content)
+  - [ ] File search (by name)
+  - [ ] Symbol search (functions, classes)
+  - [ ] Reference search (usages)
+  - [ ] Regex search
+- [ ] Add: Caching for repeated searches
+- [ ] Add: Result ranking by relevance
+- [ ] Register in Tool Registry
+- [ ] Update AURORA_CHECK.md with [x]
 
 ---
 
 ### **AC-006: PlanMode** (2 hours)
 
-**Files to Create:**
-- `aurora/core/modes/plan-mode.mjs`
+**Agent:** PLAN-AGENT
 
-**Implementation:**
-```javascript
-class PlanMode {
-  async create(task) {
-    // - Analyze requirements
-    // - Create step-by-step plan
-    // - Estimate time per step
-    // - Identify risks
-    // - Wait for user approval
-  }
-}
-```
+**📚 KNOWLEDGE SOURCES:**
+- `docs/CLAUDE_CODE_LEAK_ANALYSIS.md` → Section: "Coordinator Mode Pattern", "ULTRAPLAN"
+- `aurora/core/coordinator/aurora-coordinator.mjs` → Synthesis phase
+- `aurora/core/coordinator/worker.mjs` → Research workers
+- `AURORA_GROWTH_REPORT.md` → Section: "Coordinator Pattern"
+
+**📋 IMPLEMENTATION CHECKLIST:**
+- [ ] Read ALL knowledge sources above
+- [ ] Study Coordinator Synthesis phase
+- [ ] Understand ULTRAPLAN pattern (remote planning)
+- [ ] Create: `aurora/core/modes/plan-mode.mjs`
+- [ ] Implement:
+  - [ ] Analyze requirements
+  - [ ] Create step-by-step plan
+  - [ ] Estimate time per step
+  - [ ] Identify risks
+  - [ ] Wait for user approval
+- [ ] Add: Plan visualization (text-based)
+- [ ] Add: Approval/rejection flow
+- [ ] Integrate with Coordinator
+- [ ] Update AURORA_CHECK.md with [x]
 
 ---
 
 ### **AC-007: ResumeContext** (3 hours)
 
-**Files to Create:**
-- `aurora/core/context/resume.mjs`
+**Agent:** RESUME-AGENT
 
-**Features:**
-- [ ] Save task state to disk
-- [ ] Restore from interrupted task
-- [ ] Replay last N actions
-- [ ] Continue from checkpoint
+**📚 KNOWLEDGE SOURCES:**
+- `docs/CLAUDE_CODE_LEAK_ANALYSIS.md` → Section: "Memory Patterns"
+- `aurora/core/dream/aurora-dream.mjs` → Session tracking, state persistence
+- `aurora/core/memory/memory-backend.mjs` → Memory storage
+- `scripts/aurora-save-session.mjs` → Existing session save logic
+- `scripts/aurora-load-session.mjs` → Existing session load logic
+
+**📋 IMPLEMENTATION CHECKLIST:**
+- [ ] Read ALL knowledge sources above
+- [ ] Study Dream session tracking
+- [ ] Review existing save/load session scripts
+- [ ] Create: `aurora/core/context/resume.mjs`
+- [ ] Implement:
+  - [ ] Save task state to disk
+  - [ ] Restore from interrupted task
+  - [ ] Replay last N actions
+  - [ ] Continue from checkpoint
+- [ ] Add: State serialization
+- [ ] Add: Action replay mechanism
+- [ ] Integrate with Dream memory
+- [ ] Update AURORA_CHECK.md with [x]
 
 ---
 
 ### **AC-008: PromptCaching** (2 hours)
 
-**Files to Create:**
-- `aurora/core/prompt/prompt-cache.mjs`
+**Agent:** CACHE-AGENT
 
-**Implementation:**
-```javascript
-const STATIC_PROMPT = cache(`
-  You are Aurora AI Framework...
-  [Static content - cached]
-`);
+**📚 KNOWLEDGE SOURCES:**
+- `docs/CLAUDE_CODE_LEAK_ANALYSIS.md` → Section: "Prompt Caching Pattern", "Token Efficient Tools"
+- `aurora/core/tools/aurora-tool-registry.mjs` → Schema caching (existing)
+- `.agent/aurora/AURORA_PRO_KNOWLEDGE.md` → Section: "Performance Patterns"
+- `AURORA_GROWTH_REPORT.md` → Section: "Performance Metrics"
 
-const DYNAMIC_PROMPT = `
-  Current task: ${task.name}
-  [Dynamic content - fresh]
-`;
-```
+**📋 IMPLEMENTATION CHECKLIST:**
+- [ ] Read ALL knowledge sources above
+- [ ] Study existing schema caching in tool-registry.mjs
+- [ ] Understand static vs dynamic prompt split
+- [ ] Create: `aurora/core/prompt/prompt-cache.mjs`
+- [ ] Implement:
+  - [ ] STATIC_PROMPT cache (system identity, capabilities)
+  - [ ] DYNAMIC_PROMPT (task-specific, fresh)
+  - [ ] Cache invalidation
+  - [ ] Token count reduction tracking
+- [ ] Add: SYSTEM_PROMPT_DYNAMIC_BOUNDARY marker
+- [ ] Add: Cache hit/miss statistics
+- [ ] Target: 40-60% token reduction
+- [ ] Update AURORA_CHECK.md with [x]
 
 ---
 
 ### **AC-009: ULTRAPLAN** (3 hours)
 
-**Files to Create:**
-- `aurora/core/ultraplan/aurora-ultraplan.mjs`
+**Agent:** ULTRA-AGENT
 
-**Features:**
-- [ ] 30-min remote planning
-- [ ] Parallel research workers
-- [ ] Strategy synthesis
-- [ ] User approval (web/CLI)
-- [ ] Teleport result back
+**📚 KNOWLEDGE SOURCES:**
+- `docs/CLAUDE_CODE_LEAK_ANALYSIS.md` → Section: "ULTRAPLAN", "Coordinator Mode"
+- `aurora/core/coordinator/aurora-coordinator.mjs` → Research phase
+- `aurora/core/coordinator/worker.mjs` → Parallel workers
+- `AURORA_GROWTH_REPORT.md` → Section: "Coordinator Pattern"
+
+**📋 IMPLEMENTATION CHECKLIST:**
+- [ ] Read ALL knowledge sources above
+- [ ] Study ULTRAPLAN pattern in leak analysis
+- [ ] Understand 30-min remote planning concept
+- [ ] Create: `aurora/core/ultraplan/aurora-ultraplan.mjs`
+- [ ] Implement:
+  - [ ] Parallel research workers
+  - [ ] Strategy synthesis (use Kimi/OpenRouter)
+  - [ ] User approval (CLI or web UI)
+  - [ ] Teleport result back to Coordinator
+- [ ] Add: Progress polling (every 3 sec)
+- [ ] Add: Approval flow
+- [ ] Integrate with Coordinator
+- [ ] Update AURORA_CHECK.md with [x]
 
 ---
 
 ### **AC-010: BridgeMode** (4 hours)
 
-**Files to Create:**
-- `aurora/core/bridge/aurora-bridge.mjs`
+**Agent:** BRIDGE-AGENT
 
-**Features:**
-- [ ] JWT authentication
-- [ ] External AI connection (Kimi/OpenRouter)
-- [ ] Session sync
-- [ ] Work modes (single-session, worktree)
+**📚 KNOWLEDGE SOURCES:**
+- `docs/CLAUDE_CODE_LEAK_ANALYSIS.md` → Section: "Bridge Mode"
+- `aurora/core/providers/` → Existing provider implementations
+- `.agent/aurora/connectors.json` → MCP connector configurations
+- `.agent/aurora/AURORA_PRO_KNOWLEDGE.md` → Section: "Integration Patterns"
+
+**📋 IMPLEMENTATION CHECKLIST:**
+- [ ] Read ALL knowledge sources above
+- [ ] Study Bridge Mode pattern in leak analysis
+- [ ] Review existing providers (Groq, Kimi, OpenRouter)
+- [ ] Check connectors.json for MCP configs
+- [ ] Create: `aurora/core/bridge/aurora-bridge.mjs`
+- [ ] Implement:
+  - [ ] JWT authentication
+  - [ ] External AI connection (Kimi/OpenRouter)
+  - [ ] Session sync
+  - [ ] Work modes (single-session, worktree, same-dir)
+- [ ] Add: Trusted device tokens
+- [ ] Add: Session state serialization
+- [ ] Integrate with existing providers
+- [ ] Update AURORA_CHECK.md with [x]
 
 ---
 
 ### **AC-011: ComputerUse** (5 hours)
 
-**Files to Create:**
-- `aurora/core/computer/aurora-computer.mjs`
+**Agent:** COMPUTER-AGENT
 
-**Features:**
-- [ ] Screenshot capture
-- [ ] Click at coordinates
-- [ ] Type text
-- [ ] Browser navigation
-- [ ] Coordinate transformation
+**📚 KNOWLEDGE SOURCES:**
+- `docs/CLAUDE_CODE_LEAK_ANALYSIS.md` → Section: "Computer Use (Chicago)"
+- `aurora/core/tools/aurora-tool-registry.mjs` → Tool template
+- `AURORA_GROWTH_REPORT.md` → Section: "Comparison with Claude Code" (0% parity)
+- `.agent/aurora/AURORA_PRO_KNOWLEDGE.md` → Section: "Security Patterns"
+
+**📋 IMPLEMENTATION CHECKLIST:**
+- [ ] Read ALL knowledge sources above
+- [ ] Study Computer Use pattern in leak analysis
+- [ ] Understand screenshot/click/type/coordinate concepts
+- [ ] Create: `aurora/core/computer/aurora-computer.mjs`
+- [ ] Implement:
+  - [ ] Screenshot capture
+  - [ ] Click at coordinates (x, y)
+  - [ ] Type text
+  - [ ] Browser navigation
+  - [ ] Coordinate transformation
+- [ ] Add: Safety (confirm before click/type)
+- [ ] Add: Screenshot preview
+- [ ] Add: Browser automation (Playwright integration?)
+- [ ] Register in Tool Registry
+- [ ] Update AURORA_CHECK.md with [x]
 
 ---
 
 ### **AC-012: TokenEfficient** (2 hours)
 
-**Files to Modify:**
-- `aurora/core/tools/aurora-tool-registry.mjs`
+**Agent:** TOKEN-AGENT
 
-**Implementation:**
-```javascript
-// Compressed schema format
-["file_write", ["path:str!", "content:str!"]]
-// Instead of full JSON schema
-```
+**📚 KNOWLEDGE SOURCES:**
+- `docs/CLAUDE_CODE_LEAK_ANALYSIS.md` → Section: "Token Efficient Tools"
+- `aurora/core/tools/aurora-tool-registry.mjs` → Current schema format (full JSON)
+- `.agent/aurora/AURORA_PRO_KNOWLEDGE.md` → Section: "Performance Patterns"
+
+**📋 IMPLEMENTATION CHECKLIST:**
+- [ ] Read ALL knowledge sources above
+- [ ] Study Token Efficient pattern in leak analysis
+- [ ] Review current schema format in tool-registry.mjs
+- [ ] Modify: `aurora/core/tools/aurora-tool-registry.mjs`
+- [ ] Implement compressed format:
+  - BEFORE: `{"name":"file_write","parameters":{"path":{"type":"string",...}}}`
+  - AFTER: `["file_write",["path:str!","content:str!"]]`
+- [ ] Add: Schema compressor
+- [ ] Add: Schema decompressor (for execution)
+- [ ] Target: 30-50% token reduction per tool call
+- [ ] Test: All existing tools still work
+- [ ] Update AURORA_CHECK.md with [x]
 
 ---
 
 ### **AC-013: Buddy Companion** (3 hours)
 
-**Files to Create:**
-- `aurora/core/companion/aurora-buddy.mjs`
+**Agent:** BUDDY-AGENT
 
-**Features:**
-- [ ] 18 species with rarity
-- [ ] Gacha system (deterministic)
-- [ ] ASCII art animations
-- [ ] Personality stats
-- [ ] Reaction to user actions
+**📚 KNOWLEDGE SOURCES:**
+- `docs/CLAUDE_CODE_LEAK_ANALYSIS.md` → Section: "Buddy Pattern (Engagement Companion)"
+- `AURORA_GROWTH_REPORT.md` → Section: "Comparison with Claude Code" (0% parity)
+- `.agent/aurora/AURORA_PRO_KNOWLEDGE.md` → Section: "Architecture Patterns"
+
+**📋 IMPLEMENTATION CHECKLIST:**
+- [ ] Read ALL knowledge sources above
+- [ ] Study Buddy pattern in leak analysis (18 species, gacha, ASCII art)
+- [ ] Create: `aurora/core/companion/aurora-buddy.mjs`
+- [ ] Implement:
+  - [ ] 18 species with rarity (Common → Legendary)
+  - [ ] Gacha system (Mulberry32 PRNG, deterministic per user)
+  - [ ] ASCII art animations (5-line × 12-char)
+  - [ ] Personality stats (DEBUGGING, PATIENCE, CHAOS, WISDOM, SNARK)
+  - [ ] Reaction to user actions
+- [ ] Add: Species selection/reveal
+  - [ ] Add: Mood system (happy, sad, excited)
+  - [ ] Add: Level up based on user activity
+- [ ] Integrate with KAIROS (proactive buddy comments)
+- [ ] Update AURORA_CHECK.md with [x]
 
 ---
 
 ### **AC-014: Undercover Mode** (2 hours)
 
-**Files to Create:**
-- `aurora/core/security/undercover.mjs`
+**Agent:** UNDERCOVER-AGENT
 
-**Features:**
-- [ ] Auto-detect public repos
-- [ ] Hide internal codenames
-- [ ] Hide "Aurora AI" mentions
-- [ ] Block sensitive info in commits
+**📚 KNOWLEDGE SOURCES:**
+- `docs/CLAUDE_CODE_LEAK_ANALYSIS.md` → Section: "Undercover Mode"
+- `aurora/core/permissions/aurora-permissions.mjs` → Protected files, security
+- `.agent/aurora/AURORA_PRO_KNOWLEDGE.md` → Section: "Security Patterns"
+
+**📋 IMPLEMENTATION CHECKLIST:**
+- [ ] Read ALL knowledge sources above
+- [ ] Study Undercover Mode pattern in leak analysis
+- [ ] Understand auto-detect public repos
+- [ ] Create: `aurora/core/security/undercover.mjs`
+- [ ] Implement:
+  - [ ] Auto-detect public repos (git remote check)
+  - [ ] Hide internal codenames (Tengu, Fennec, Capybara)
+  - [ ] Hide "Aurora AI" mentions (use "assistant" instead)
+  - [ ] Block sensitive info in commits
+  - [ ] Inject system prompt restrictions
+- [ ] Add: Git remote parser
+  - [ ] Add: Internal allowlist (github.com/iuratobraian/*)
+  - [ ] Add: System prompt injector
+- [ ] Integrate with Permissions system
+- [ ] Update AURORA_CHECK.md with [x]
 
 ---
 
 ### **AC-015: +10 Tools** (5 hours)
 
-**Files to Create:**
-- `aurora/core/tools/api-test-tool.mjs`
-- `aurora/core/tools/db-query-tool.mjs`
-- `aurora/core/tools/browser-tool.mjs`
-- `aurora/core/tools/image-tool.mjs`
-- `aurora/core/tools/video-tool.mjs`
-- `aurora/core/tools/audio-tool.mjs`
-- `aurora/core/tools/zip-tool.mjs`
-- `aurora/core/tools/crypto-tool.mjs`
-- `aurora/core/tools/http-server-tool.mjs`
-- `aurora/core/tools/webhook-tool.mjs`
+**Agent:** TOOLS-AGENT
+
+**📚 KNOWLEDGE SOURCES:**
+- `docs/CLAUDE_CODE_LEAK_ANALYSIS.md` → Section: "Tool Registry Pattern"
+- `aurora/core/tools/aurora-tool-registry.mjs` → Current 10 tools
+- `.agent/aurora/AURORA_PRO_KNOWLEDGE.md` → Section: "Architecture Patterns"
+
+**📋 IMPLEMENTATION CHECKLIST:**
+- [ ] Read ALL knowledge sources above
+- [ ] Study Tool Registry pattern
+- [ ] Review existing 10 tools as templates
+- [ ] Create 10 new tools:
+  - [ ] `aurora/core/tools/api-test-tool.mjs` (HTTP API testing)
+  - [ ] `aurora/core/tools/db-query-tool.mjs` (Database queries)
+  - [ ] `aurora/core/tools/browser-tool.mjs` (Browser automation)
+  - [ ] `aurora/core/tools/image-tool.mjs` (Image processing)
+  - [ ] `aurora/core/tools/video-tool.mjs` (Video processing)
+  - [ ] `aurora/core/tools/audio-tool.mjs` (Audio processing)
+  - [ ] `aurora/core/tools/zip-tool.mjs` (Archive handling)
+  - [ ] `aurora/core/tools/crypto-tool.mjs` (Encryption/hash)
+  - [ ] `aurora/core/tools/http-server-tool.mjs` (Start local server)
+  - [ ] `aurora/core/tools/webhook-tool.mjs` (Webhook handling)
+- [ ] Register ALL in Tool Registry
+- [ ] Test: Each tool works independently
+- [ ] Update AURORA_CHECK.md with [x]
 
 ---
 
 ### **AC-016: Web Dashboard** (4 hours)
 
-**Files to Create:**
-- `aurora/dashboard/server.mjs`
-- `aurora/dashboard/client/index.html`
+**Agent:** DASHBOARD-AGENT
 
-**Features:**
-- [ ] Real-time KAIROS ticks
-- [ ] Worker activity monitoring
-- [ ] Memory consolidation status
-- [ ] Health metrics
-- [ ] Task progress visualization
+**📚 KNOWLEDGE SOURCES:**
+- `docs/CLAUDE_CODE_LEAK_ANALYSIS.md` → Section: "Web Dashboard" (mentioned in roadmap)
+- `aurora/api/aurora-api.mjs` → Existing Express API server
+- `AURORA_GROWTH_REPORT.md` → Section: "Performance Metrics"
+- `.agent/aurora/AURORA_PRO_KNOWLEDGE.md` → Section: "Integration Patterns"
+
+**📋 IMPLEMENTATION CHECKLIST:**
+- [ ] Read ALL knowledge sources above
+- [ ] Study existing API server implementation
+- [ ] Review performance metrics to display
+- [ ] Create:
+  - `aurora/dashboard/server.mjs` (Express API for dashboard)
+  - `aurora/dashboard/client/index.html` (Frontend)
+- [ ] Implement features:
+  - [ ] Real-time KAIROS ticks display
+  - [ ] Worker activity monitoring
+  - [ ] Memory consolidation status
+  - [ ] Health metrics (memory, CPU, response times)
+  - [ ] Task progress visualization
+- [ ] Add: WebSocket for real-time updates
+  - [ ] Add: Charts/graphs (Chart.js or similar)
+  - [ ] Add: Agent status indicators
+- [ ] Integrate with existing API server
+- [ ] Update AURORA_CHECK.md with [x]
 
 ---
 
 ### **AC-017: VS Code Extension** (5 hours)
 
-**Files to Create:**
-- `aurora/vscode-extension/`
-- `aurora/vscode-extension/package.json`
-- `aurora/vscode-extension/extension.ts`
+**Agent:** VSCODE-AGENT
 
-**Features:**
-- [ ] @aurora commands in editor
-- [ ] Inline code review
-- [ ] Quick actions (context menu)
-- [ ] Terminal integration
+**📚 KNOWLEDGE SOURCES:**
+- `docs/CLAUDE_CODE_LEAK_ANALYSIS.md` → Section: "VS Code Extension" (mentioned in roadmap)
+- `aurora/api/aurora-api.mjs` → API to call from extension
+- `AURORA_GROWTH_REPORT.md` → Section: "Next Evolution Stage"
+- `.agent/aurora/AURORA_PRO_KNOWLEDGE.md` → Section: "Integration Patterns"
+
+**📋 IMPLEMENTATION CHECKLIST:**
+- [ ] Read ALL knowledge sources above
+- [ ] Study VS Code extension documentation
+- [ ] Review existing API endpoints
+- [ ] Create:
+  - `aurora/vscode-extension/package.json` (Extension manifest)
+  - `aurora/vscode-extension/extension.ts` (Main extension)
+  - `aurora/vscode-extension/README.md` (Extension docs)
+- [ ] Implement features:
+  - [ ] @aurora commands in editor (command palette)
+  - [ ] Inline code review (decorations)
+  - [ ] Quick actions (context menu)
+  - [ ] Terminal integration
+  - [ ] Status bar indicator
+- [ ] Add: Configuration (settings.json)
+  - [ ] Add: API connection (localhost:4310)
+  - [ ] Add: Authentication (API key)
+- [ ] Test: Extension loads in VS Code
+- [ ] Update AURORA_CHECK.md with [x]
 
 ---
 

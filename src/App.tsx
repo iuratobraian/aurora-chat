@@ -51,7 +51,7 @@ export default function AuroraChat() {
   const createChannel = useMutation(api.chat.createChannel);
   
   const verifyPasswordQuery = useQuery(api.chat.verifyChannelPassword, 
-    showPasswordModal && selectedPrivateChannel ? { channelSlug: selectedPrivateChannel, password: passwordInput } : undefined
+    showPasswordModal && selectedPrivateChannel && passwordInput ? { channelSlug: selectedPrivateChannel, password: passwordInput } : undefined
   );
   const verifyPassword = verifyPasswordQuery && typeof verifyPasswordQuery === 'object' ? verifyPasswordQuery : null;
   

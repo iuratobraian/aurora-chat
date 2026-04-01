@@ -58,6 +58,43 @@ export class AuroraToolRegistry {
   }
 
   /**
+   * Get compressed schema (token-efficient format)
+   * Format: ["name", ["param1:type!", "param2:type"]]
+   */
+  getCompressedSchema(name) {
+    const tool = this.tools.get(name);
+    if (!tool || !tool.getSchema) return null;
+
+    const schema = tool.getSchema();
+    const compressed = [
+      schema.name,
+      []
+    ];
+
+    // Compress parameters
+    if (schema.parameters) {
+      for (const [paramName, paramDef] of Object.entries(schema.parameters)) {
+        let paramStr = `${paramName}:${paramDef.type}`;
+        if (paramDef.required) paramStr += '!';
+        compressed[1].push(paramStr);
+      }
+    }
+
+    return compressed;
+  }
+
+  /**
+   * Get all compressed schemas
+   */
+  getAllCompressedSchemas() {
+    const schemas = {};
+    for (const name of this.tools.keys()) {
+      schemas[name] = this.getCompressedSchema(name);
+    }
+    return schemas;
+  }
+
+  /**
    * Get tool schema (cached)
    */
   getSchema(name) {

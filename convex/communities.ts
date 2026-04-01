@@ -15,11 +15,31 @@ export const createCommunity = mutation({
     priceMonthly: v.optional(v.number()),
     maxMembers: v.optional(v.number()),
     plan: v.union(v.literal("free"), v.literal("starter"), v.literal("growth"), v.literal("scale"), v.literal("enterprise")),
+    coverImage: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const identity = await requireUser(ctx);
+    
+    // Validate caller is the owner
     if (identity.subject !== args.ownerId) {
-      await assertOwnershipOrAdmin(ctx, args.ownerId);
+      throw new Error("No tienes permiso para crear esta comunidad");
+    }
+
+    // Input validation
+    if (args.name.length < 2 || args.name.length > 60) {
+      throw new Error("El nombre debe tener entre 2 y 60 caracteres");
+    }
+    if (args.description.length > 500) {
+      throw new Error("La descripción no puede exceder 500 caracteres");
+    }
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(args.slug)) {
+      throw new Error("El slug solo puede contener letras minúsculas, números y guiones");
+    }
+    if (args.priceMonthly !== undefined && args.priceMonthly < 0) {
+      throw new Error("El precio no puede ser negativo");
+    }
+    if (args.maxMembers !== undefined && args.maxMembers < 1) {
+      throw new Error("El máximo de miembros debe ser al menos 1");
     }
 
     const existing = await ctx.db
@@ -43,6 +63,7 @@ export const createCommunity = mutation({
       currentMembers: 1,
       plan: args.plan,
       totalRevenue: 0,
+      coverImage: args.coverImage,
       status: "active",
       createdAt: Date.now(),
     });
@@ -102,7 +123,10 @@ export const joinCommunity = mutation({
     userId: v.string(),
   },
   handler: async (ctx, args) => {
-    await assertOwnershipOrAdmin(ctx, args.userId);
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.userId) {
+      throw new Error("No puedes unirte a una comunidad en nombre de otro usuario");
+    }
 
     const allowed = await checkRateLimit(ctx, args.userId, "joinCommunity");
     if (!allowed) {
@@ -113,6 +137,10 @@ export const joinCommunity = mutation({
     
     if (!community || community.status !== "active") {
       throw new Error("La comunidad no existe o está inactiva");
+    }
+
+    if (community.visibility === "private") {
+      throw new Error("Esta comunidad es privada. Necesitas una invitación.");
     }
 
     if (community.currentMembers >= community.maxMembers) {
@@ -152,7 +180,10 @@ export const leaveCommunity = mutation({
     userId: v.string(),
   },
   handler: async (ctx, args) => {
-    await assertOwnershipOrAdmin(ctx, args.userId);
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.userId) {
+      throw new Error("No puedes abandonar una comunidad en nombre de otro usuario");
+    }
 
     const membership = await ctx.db
       .query("communityMembers")
@@ -964,6 +995,17 @@ export const updateCommunity = mutation({
   handler: async (ctx, args) => {
     if (!args.userId) throw new Error("userId requerido");
 
+    const community = await ctx.db.get(args.id);
+    if (!community) throw new Error("Comunidad no encontrada");
+
+    // Verify ownership or admin
+    if (community.ownerId !== args.userId) {
+      const identity = await requireUser(ctx);
+      if (identity.subject !== args.userId) {
+        throw new Error("No tienes permiso para editar esta comunidad");
+      }
+    }
+
     const { id, userId, ...updates } = args;
     await ctx.db.patch(id, updates);
     return { success: true };
@@ -977,6 +1019,14 @@ export const deleteCommunity = mutation({
 
     const community = await ctx.db.get(args.id);
     if (!community) throw new Error("Comunidad no encontrada");
+
+    // Verify ownership
+    if (community.ownerId !== args.userId) {
+      const identity = await requireUser(ctx);
+      if (identity.subject !== args.userId) {
+        throw new Error("No tienes permiso para eliminar esta comunidad");
+      }
+    }
 
     // Soft delete con auditoría
     await ctx.db.patch(args.id, { 
@@ -995,6 +1045,14 @@ export const restoreCommunity = mutation({
     const community = await ctx.db.get(args.id);
     if (!community) throw new Error("Comunidad no encontrada");
     if (community.status !== "deleted") throw new Error("La comunidad no está eliminada");
+
+    // Verify ownership or admin
+    if (community.ownerId !== args.userId) {
+      const identity = await requireUser(ctx);
+      if (identity.subject !== args.userId) {
+        throw new Error("No tienes permiso para restaurar esta comunidad");
+      }
+    }
 
     await ctx.db.patch(args.id, { 
       status: "active",

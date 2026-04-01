@@ -136,15 +136,7 @@ export default defineConfig(({ mode }) => {
     ],
     resolve: {
       alias: {
-        '@': path.resolve('.'),
-        '../../lib': path.resolve(__dirname, './lib'),
-        '../../../lib': path.resolve(__dirname, './lib'),
-        '../../../../lib': path.resolve(__dirname, './lib'),
-        '../lib': path.resolve(__dirname, './lib'),
-        '../../lib/utils/logger': path.resolve(__dirname, './lib/utils/logger'),
-        '../../lib/convex/client': path.resolve(__dirname, './lib/convex/client'),
-        '../../../lib/utils/logger': path.resolve(__dirname, './lib/utils/logger'),
-        '../../../lib/convex/client': path.resolve(__dirname, './lib/convex/client'),
+        '@': path.resolve(__dirname, './src'),
         '../../convex/_generated/api': path.resolve(__dirname, './convex/_generated/api.js'),
         '../../../convex/_generated/api': path.resolve(__dirname, './convex/_generated/api.js'),
         '../../../../convex/_generated/api': path.resolve(__dirname, './convex/_generated/api.js'),

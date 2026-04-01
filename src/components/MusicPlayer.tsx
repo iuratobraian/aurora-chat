@@ -13,12 +13,14 @@ const MusicPlayer: React.FC = () => {
   }
   
   const playlistConfig = useQuery(api.config.getConfig, { key: "music_playlist" }) as MusicPlaylistConfig | null;
-  const playlist = playlistConfig?.value || [
+  const playlist = (playlistConfig?.value && playlistConfig.value.length > 0) ? playlistConfig.value : [
     { name: "TradeShare Mix", url: "https://soundcloud.com/krismidj" },
     { name: "Deep Focus", url: "https://soundcloud.com/chillhopdotcom/sets/lofi-hip-hop-radio" }
   ];
 
   const currentTrack = playlist[currentTrackIndex] || playlist[0];
+
+  if (!currentTrack?.url) return null;
 
   const handleNext = () => {
     setCurrentTrackIndex((prev) => (prev + 1) % playlist.length);

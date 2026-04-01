@@ -19,14 +19,11 @@ Este documento detalla propuestas estratégicas para elevar la plataforma TradeS
 - **Concepto**: Convertir los logros del Leaderboard en Badges NFT dinámicos.
 - **Mecánica**: El "Trader del Mes" recibe un NFT que otorga beneficios exclusivos en la plataforma (menos comisiones, acceso a signals VIP).
 
-## 5. ⚡ ~~TurboQuant v2.0~~ [ELIMINADO - PROHIBIDO]
-> 🚫 **TurboQuant ha sido eliminado permanentemente del proyecto.** Está **ESTRICTAMENTE PROHIBIDO** reimportar, referenciar o intentar reinstalar TurboQuant en cualquier forma. No crear tareas, issues ni PRs relacionados con TurboQuant.
-
-## 6. 📱 App Móvil Nativa (Expo/React Native)
+## 5. 📱 App Móvil Nativa (Expo/React Native)
 - **Concepto**: Migrar la experiencia de la web a una Super App nativa.
 - **Foco**: Notificaciones Push críticas para señales y alertas de precio instantáneas.
 
-## 7. 🛡️ Auditoría Automatizada de Seguridad
+## 6. 🛡️ Auditoría Automatizada de Seguridad
 - **Concepto**: Integrar Aurora con herramientas de escaneo estático (SAST) para detectar vulnerabilidades en tiempo real cada vez que un agente sube código.
 
 ---

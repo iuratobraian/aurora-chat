@@ -8,9 +8,9 @@
 
 ## 📚 LECCIONES APRENDIDAS
 
-### 1. ~~TurboQuant Memory Leak~~ [ELIMINADO - PROHIBIDO]
+### 1. ~~Legacy Module Memory Leak~~ [ELIMINADO - PROHIBIDO]
 
-> 🚫 **TurboQuant ha sido eliminado permanentemente del proyecto.** Está **ESTRICTAMENTE PROHIBIDO** reimportar, referenciar o intentar reinstalar TurboQuant en cualquier forma.
+> 🚫 **El módulo inestable ha sido eliminado permanentemente del proyecto.** Está **ESTRICTAMENTE PROHIBIDO** reimportar, referenciar o intentar reinstalar componentes no autorizados en cualquier forma.
 
 **Problema original:**
 ```typescript

@@ -1,6 +1,6 @@
 # 📋 TASK BOARD - TRADESHARE
 
-> Sincronizado desde Notion — 31/3/2026, 10:00:33
+> Sincronizado desde Notion — 31/3/2026, 10:36:43
 > ⚠️  Este archivo se actualiza automáticamente al marcar tareas en Notion.
 
 | ID | Tarea | Estado | Prioridad | Tipo | Dominio | Notas |
@@ -12,7 +12,7 @@
 | TSK-005 | **Feature: Organizar pagos y cobros a creadores** | ⏳ Pendiente | Medium | - |  |  |
 | TSK-006 | **Feature: Publicar posts en subcomunidades (solo miembros)** | ⏳ Pendiente | Medium | - |  |  |
 | TSK-007 | **Feature: TV Live privada para comunidades** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-008 | **Fix: Sistema de publicación de posts — texto, imágenes, tags** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-008 | **Fix: Sistema de publicación de posts — texto, imágenes, tags** | 🔧 En progreso | Medium | - |  |  |
 | TSK-009 | **Fix: Reconfigurar secciones del menú superior** | ⏳ Pendiente | Medium | - |  |  |
 | TSK-010 | **Feature: Admin dashboard de métricas globales** | ⏳ Pendiente | Medium | - |  |  |
 | TSK-011 | **Feature: Botones de Like y Reacciones en todos los posts** | ⏳ Pendiente | Medium | - |  |  |

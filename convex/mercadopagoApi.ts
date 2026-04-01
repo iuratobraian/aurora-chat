@@ -228,7 +228,7 @@ export const processPaymentWebhook = mutation({
     // IDEMPOTENCY: Check if this payment was already processed
     const existingPayment = await ctx.db
       .query("payments")
-      .withIndex("by_external_reference", (q) => q.eq("externalReference", String(paymentId)))
+      .withIndex("by_externalReference", (q) => q.eq("externalReference", String(paymentId)))
       .first();
     
     if (existingPayment && existingPayment.status === "completed") {
@@ -240,7 +240,7 @@ export const processPaymentWebhook = mutation({
     if (existingPayment) {
       await ctx.db.patch(existingPayment._id, {
         status: "completed",
-        completedAt: now,
+        updatedAt: now,
         amount: paymentAmount,
       });
     } else {
@@ -251,9 +251,8 @@ export const processPaymentWebhook = mutation({
         status: "completed",
         provider: "mercadopago",
         externalReference: String(paymentId),
-        paymentMethod: "mercadopago",
         createdAt: now,
-        completedAt: now,
+        updatedAt: now,
       });
     }
     

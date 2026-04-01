@@ -208,23 +208,17 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
         zonaOperativa: zonaOperativa.trim() || undefined,
         sentiment,
         encuesta,
+        esAnuncio: false,
       };
 
       let result: { success: boolean; postId: string };
 
-      if (!target || target.type === "public") {
-        result = await convex.mutation(api.posts.createPublicPost, baseArgs);
-      } else if (target.type === "community") {
-        result = await convex.mutation(api.posts.createCommunityPost, {
-          ...baseArgs,
-          communityId: target.communityId as any,
-        });
-      } else {
-        result = await convex.mutation(api.posts.createSubcommunityPost, {
-          ...baseArgs,
-          subcommunityId: target.subcommunityId as any,
-        });
-      }
+      // All post types use the same createPost mutation
+      result = await convex.mutation(api.posts.createPost, {
+        ...baseArgs,
+        communityId: target?.type === "community" ? target.communityId : undefined,
+        subcommunityId: target?.type === "subcommunity" ? target.subcommunityId : undefined,
+      } as any);
 
       if (result.success) {
         onSuccess?.(result.postId);

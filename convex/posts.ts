@@ -1,5 +1,6 @@
 import { query, mutation, internalMutation, PaginationOptions } from "./_generated/server";
-import { v, paginationOptsValidator } from "convex/values";
+import { paginationOptsValidator } from "convex/server";
+import { v } from "convex/values";
 import { calculateXpGain } from "./lib/permissions";
 import { addXpInternal } from "./lib/gamification";
 import { api } from "./_generated/api";
@@ -162,15 +163,6 @@ export const getPostsPaginated = query({
     return { ...result, page };
   },
 });
-        esVerificado: profile?.esVerificado ?? post.esVerificado ?? false,
-        authorFollowers: profile?.seguidores?.length ?? post.authorFollowers ?? 0,
-        accuracyUser: profile?.accuracy ?? post.accuracyUser ?? 50,
-      };
-    });
-
-    return { page: postsWithUser, continueCursor, isDone };
-  },
-});
 
 // Obtener posts de un usuario
 export const getPostsByUser = query({
@@ -194,7 +186,7 @@ export const createPost = mutation({
     tipo: v.optional(v.string()),
     contenido: v.string(),
     categoria: v.string(),
-    esAnuncio: v.boolean(),
+    esAnuncio: v.optional(v.boolean()),
     datosGrafico: v.optional(v.array(v.number())),
     tradingViewUrl: v.optional(v.string()),
     imagenUrl: v.optional(v.string()),
@@ -205,6 +197,9 @@ export const createPost = mutation({
     comentariosCerrados: v.optional(v.boolean()),
     isAiAgent: v.optional(v.boolean()),
     sentiment: v.optional(v.string()),
+    encuesta: v.optional(v.any()),
+    communityId: v.optional(v.string()),
+    subcommunityId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     await assertOwnershipOrAdmin(ctx, args.userId);
@@ -221,6 +216,7 @@ export const createPost = mutation({
       const now = Date.now();
       const postId = await ctx.db.insert("posts", {
         ...args,
+        esAnuncio: args.esAnuncio || false,
         likes: [],
         comentarios: [],
         compartidos: 0,
@@ -253,6 +249,7 @@ export const createPost = mutation({
 
     const postId = await ctx.db.insert("posts", {
       ...args,
+      esAnuncio: args.esAnuncio || false,
       likes: [],
       comentarios: [],
       compartidos: 0,
@@ -1254,7 +1251,7 @@ export const seedCommunityPosts = internalMutation({
 // Dar puntos a un post (estilo Taringa)
 export const givePostPoints = mutation({
   args: {
-    postId: v.string(),
+    postId: v.id("posts"),
     userId: v.string(),
     points: v.number(),
   },
@@ -1272,8 +1269,7 @@ export const givePostPoints = mutation({
     }
 
     // Verificar que el post existe
-    const post = await ctx.db.query("posts").collect()
-      .then(posts => posts.find(p => (p as any)._id.toString() === postId));
+    const post = await ctx.db.get(postId as any);
     if (!post) {
       throw new Error("Publicación no encontrada");
     }
@@ -1346,7 +1342,8 @@ export const getTopPointsPosts = query({
     const posts = await ctx.db
       .query("posts")
       .withIndex("by_status", (q) => q.eq("status", "active"))
-      .collect();
+      .order("desc")
+      .take(100);
 
     // Ordenar por puntos
     const sortedPosts = posts

@@ -119,7 +119,7 @@ Write-Host ""
 Write-Host "📡 AGREGANDO CONVEX PRODUCTION..." -ForegroundColor Cyan
 
 Add-Secret "CONVEX_URL" "https://diligent-wildcat-523.convex.cloud" "Convex Cloud URL"
-Add-Secret "CONVEX_DEPLOY_KEY" "prod:diligent-wildcat-523|eyJ2MiI6Ijc4NTM5MTU3MGJlNzRmODc4NDZhNjQ4MmZhMDhjZTkxIn0=" "Convex Deployment Key"
+Add-Secret "CONVEX_DEPLOY_KEY" "prod:diligent-wildcat-523|eyJ2MiI6IjlkYzE1Y2Y4M2RkNzRiMWZiMjFkYzA5OGE1ODUzODlhIn0=" "Convex Deployment Key"
 Add-Secret "CONVEX_SITE_URL" "https://diligent-wildcat-523.convex.site" "Convex Site URL"
 Add-Secret "VITE_CONVEX_URL" "https://diligent-wildcat-523.convex.cloud" "Frontend Convex URL"
 

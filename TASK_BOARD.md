@@ -1,6 +1,6 @@
 # 📋 TASK BOARD - TRADESHARE
 
-> Sincronizado desde Notion — 31/3/2026, 09:57:35
+> Sincronizado desde Notion — 31/3/2026, 10:00:33
 > ⚠️  Este archivo se actualiza automáticamente al marcar tareas en Notion.
 
 | ID | Tarea | Estado | Prioridad | Tipo | Dominio | Notas |
@@ -20,43 +20,39 @@
 | TSK-013 | **Feature: Admin gestión de contenido y moderación** | ⏳ Pendiente | Medium | - |  |  |
 | TSK-014 | **Feature: Chat privado de comunidad (solo miembros)** | ⏳ Pendiente | Medium | - |  |  |
 | TSK-015 | **Fix: Admin panel full-width — ocupar todo el ancho de pantalla** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-016 | **Fix: Sector Suscripciones — planes, pricing, beneficios visibles** | 🔧 En progreso | Medium | - |  |  |
-| TSK-017 | **Feature: Sistema de comisiones para la plataforma** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-018 | **Fix: Eliminar iconos flotantes de AI en Navigation.tsx** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-019 | **Feature: Comentarios en posts de comunidades** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-020 | **Feature: Admin CRUD posts — moderar, editar, eliminar posts** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-021 | **Feature: Admin CRUD comunidades — crear, editar, eliminar comunidades** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-022 | **Feature: Admin CRUD usuarios — crear, editar, banear, eliminar** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-023 | **Fix: AdminView full-width, eliminar floating AI, mostrar stats** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-024 | **Feature: Crear subcomunidades dentro de comunidades** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-025 | **Feature: Preparar launch — SEO, meta tags, analytics** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-026 | **Fix: Ocultar Pricing del nav, renombrar a Suscripciones, integrar** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-027 | **Fix: Global Styling — icons, avatars, light/dark modes, Negocios cards** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-028 | **Feature: Botones de suscripción en todos los lugares necesarios** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-029 | **Feature: Comentarios en posts de subcomunidades** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-030 | **Feature: Configurar delegación de sub-agentes (2 por agente)** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-031 | **Feature: Conexión directa a bitácora de trading** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-032 | **Feature: Perfiles premium con datos verificados de bitácora** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-033 | **Feature: Tests end-to-end de flujos críticos** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-034 | **Feature: Admin gestión de extractor YouTube** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-035 | **Feature: Sistema de notificaciones push y en-app** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-036 | **Feature: Solo Feed gratuito — todo lo demás requiere suscripción** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-037 | **Feature: Estilo Shorts en sección Psicotrading** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-038 | **Fix: Señales & Trading — dynamic background, neon loaders, VIP style** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-039 | **Feature: Sistema de mentorías para creadores** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-040 | **Fix: Noticias — estilo newspaper y calendario económico** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-041 | **Feature: Crear skills de conocimiento compartido para agentes** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-042 | **Fix: Mover Mi Comunidad/Observatory al Creator Admin Panel** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-043 | **Feature: Publicar posts en comunidades (solo miembros)** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-044 | **Feature: Premios — redención de tokens por recompensas** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-045 | **Feature: Suscripciones a la carta — elegir servicios individualmente** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-046 | **Fix: Resolver vulnerabilidades npm audit restantes** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-047 | **Fix: Crear comunidad — formulario completo con nombre, descripción, precio** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-048 | **Feature: Admin gestión de pagos y suscripciones** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-049 | **Feature: Sección Academia dentro de comunidades (cursos y mentorías)** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-050 | **Feature: Unirse a comunidad — verificar suscripción antes de entrar** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-051 | **Feature: WebSockets base — infraestructura de realtime** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-052 | **Fix: Renombrar Marketplace a Negocios, mover Publicidad dentro** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-053 | **Feature: Perfiles estilo Landing Page con bio, stats y links compartibles** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-054 | **Fix: Consolidar controles bottom a UN solo botón de menú flotante** | ⏳ Pendiente | Medium | - |  |  |
-| TSK-055 | **Feature: Sistema de Follow/Seguir usuarios** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-016 | **Feature: Sistema de comisiones para la plataforma** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-017 | **Feature: Comentarios en posts de comunidades** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-018 | **Feature: Admin CRUD posts — moderar, editar, eliminar posts** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-019 | **Feature: Admin CRUD comunidades — crear, editar, eliminar comunidades** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-020 | **Feature: Admin CRUD usuarios — crear, editar, banear, eliminar** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-021 | **Feature: Crear subcomunidades dentro de comunidades** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-022 | **Feature: Preparar launch — SEO, meta tags, analytics** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-023 | **Fix: Ocultar Pricing del nav, renombrar a Suscripciones, integrar** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-024 | **Fix: Global Styling — icons, avatars, light/dark modes, Negocios cards** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-025 | **Feature: Botones de suscripción en todos los lugares necesarios** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-026 | **Feature: Comentarios en posts de subcomunidades** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-027 | **Feature: Configurar delegación de sub-agentes (2 por agente)** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-028 | **Feature: Conexión directa a bitácora de trading** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-029 | **Feature: Perfiles premium con datos verificados de bitácora** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-030 | **Feature: Tests end-to-end de flujos críticos** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-031 | **Feature: Admin gestión de extractor YouTube** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-032 | **Feature: Sistema de notificaciones push y en-app** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-033 | **Feature: Solo Feed gratuito — todo lo demás requiere suscripción** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-034 | **Feature: Estilo Shorts en sección Psicotrading** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-035 | **Fix: Señales & Trading — dynamic background, neon loaders, VIP style** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-036 | **Feature: Sistema de mentorías para creadores** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-037 | **Fix: Noticias — estilo newspaper y calendario económico** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-038 | **Feature: Crear skills de conocimiento compartido para agentes** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-039 | **Fix: Mover Mi Comunidad/Observatory al Creator Admin Panel** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-040 | **Feature: Publicar posts en comunidades (solo miembros)** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-041 | **Feature: Premios — redención de tokens por recompensas** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-042 | **Feature: Suscripciones a la carta — elegir servicios individualmente** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-043 | **Fix: Crear comunidad — formulario completo con nombre, descripción, precio** | 🔧 En progreso | Medium | - |  |  |
+| TSK-044 | **Feature: Admin gestión de pagos y suscripciones** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-045 | **Feature: Sección Academia dentro de comunidades (cursos y mentorías)** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-046 | **Feature: Unirse a comunidad — verificar suscripción antes de entrar** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-047 | **Feature: WebSockets base — infraestructura de realtime** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-048 | **Fix: Renombrar Marketplace a Negocios, mover Publicidad dentro** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-049 | **Feature: Perfiles estilo Landing Page con bio, stats y links compartibles** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-050 | **Fix: Consolidar controles bottom a UN solo botón de menú flotante** | ⏳ Pendiente | Medium | - |  |  |
+| TSK-051 | **Feature: Sistema de Follow/Seguir usuarios** | ⏳ Pendiente | Medium | - |  |  |

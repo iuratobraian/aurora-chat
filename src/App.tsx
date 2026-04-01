@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from './api';
 import { ChatMessage } from './types';
-import { Send, ImagePlus, X, Smile, AlertCircle, Plus, Lock, Unlock, Server, Users, MessageSquare, HardDrive } from 'lucide-react';
+import { Send, ImagePlus, X, Smile, AlertCircle, Plus, Lock, Server, Users, MessageSquare, HardDrive } from 'lucide-react';
 
 const EMOJIS = ['🚀', '📈', '📉', '🔥', '🧠', '💰', '❤️', '👍', '🎯', '⚡'];
 
@@ -19,7 +19,7 @@ export default function AuroraChat() {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
   const [selectedPrivateChannel, setSelectedPrivateChannel] = useState<string | null>(null);
-  const [verifiedChannels, setVerifiedChannels] = useState<Set<string>>(new Set(['global']));
+  const [verifiedChannels, setVerifiedChannels] = useState<string[]>(['global']);
   const [showStats, setShowStats] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -27,7 +27,8 @@ export default function AuroraChat() {
   const isAtBottom = useRef(true);
 
   const channels = (useQuery(api.chat.getChannels) || []) as { _id: string; name: string; slug: string; isPrivate?: boolean }[];
-  const messages = (useQuery(api.chat.getMessagesByChannel, { channelId: currentChannel, limit: 100 }) as { messages: ChatMessage[] })?.messages || [];
+  const messagesData = useQuery(api.chat.getMessagesByChannel, { channelId: currentChannel, limit: 100 });
+  const messages = messagesData?.messages || [];
   const typingUsers = (useQuery(api.chat.getTypingUsers, { channelId: currentChannel, excludeUserId: 'aurora-user' }) || []) as string[];
   const sendMessage = useMutation(api.chat.sendMessage);
   const setTyping = useMutation(api.chat.setTyping);
@@ -75,7 +76,7 @@ export default function AuroraChat() {
       setNewChannelName('');
       setNewChannelPassword('');
       setCurrentChannel(result.slug);
-      setVerifiedChannels(prev => new Set([...prev, result.slug]));
+      setVerifiedChannels(prev => [...prev, result.slug]);
     } catch (err: any) {
       setError(err.message || 'Error al crear canal');
       setTimeout(() => setError(null), 3000);
@@ -83,7 +84,7 @@ export default function AuroraChat() {
   };
 
   const handleChannelSelect = (channel: { slug: string; isPrivate?: boolean }) => {
-    if (channel.isPrivate && !verifiedChannels.has(channel.slug)) {
+    if (channel.isPrivate && !verifiedChannels.includes(channel.slug)) {
       setSelectedPrivateChannel(channel.slug);
       setShowPasswordModal(true);
       setPasswordInput('');
@@ -95,7 +96,7 @@ export default function AuroraChat() {
   const handlePasswordSubmit = () => {
     if (!selectedPrivateChannel) return;
     if (verifyPassword?.valid) {
-      setVerifiedChannels(prev => new Set([...prev, selectedPrivateChannel]));
+      setVerifiedChannels(prev => [...prev, selectedPrivateChannel]);
       setCurrentChannel(selectedPrivateChannel);
       setShowPasswordModal(false);
       setPasswordInput('');
@@ -186,45 +187,51 @@ export default function AuroraChat() {
           </div>
         </div>
         
-        {/* Channel Tabs */}
-        <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-none items-center">
-          <button
-            onClick={() => handleChannelSelect({ slug: 'global', isPrivate: false })}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
-              currentChannel === 'global'
-                ? 'bg-primary text-white'
-                : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
-            }`}
-          >
-            General
-          </button>
-          {channels.filter(c => c.slug !== 'global').map(channel => (
+        {/* Channel Selector - Simple Dropdown */}
+        <div className="px-4 py-2 bg-black/20 border-b border-white/5">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] text-gray-500 uppercase font-bold">Sala:</span>
+            <div className="flex-1 flex flex-wrap gap-1">
+              <button
+                onClick={() => handleChannelSelect({ slug: 'global', isPrivate: false })}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                  currentChannel === 'global'
+                    ? 'bg-primary text-white'
+                    : 'bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white'
+                }`}
+              >
+                General
+              </button>
+              {channels.filter(c => c.slug !== 'global').map(channel => (
+                <button
+                  key={channel._id}
+                  onClick={() => handleChannelSelect(channel)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1 ${
+                    currentChannel === channel.slug
+                      ? 'bg-primary text-white'
+                      : 'bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white'
+                  }`}
+                >
+                  {channel.isPrivate ? <Lock size={10} /> : null}
+                  {channel.name}
+                </button>
+              ))}
+              <button
+                onClick={() => setShowCreateChannel(true)}
+                className="px-3 py-1.5 rounded-full text-xs font-medium bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white transition-all flex items-center gap-1"
+              >
+                <Plus size={10} />
+                Nueva
+              </button>
+            </div>
             <button
-              key={channel._id}
-              onClick={() => handleChannelSelect(channel)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap flex items-center gap-1 ${
-                currentChannel === channel.slug
-                  ? 'bg-primary text-white'
-                  : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
-              }`}
+              onClick={() => setShowStats(!showStats)}
+              className={`p-2 rounded-lg text-xs transition-all ${showStats ? 'bg-primary text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'}`}
+              title="Estadísticas"
             >
-              {channel.isPrivate ? <Lock size={10} /> : <Unlock size={10} />}
-              {channel.name}
+              <Server size={14} />
             </button>
-          ))}
-          <button
-            onClick={() => setShowCreateChannel(true)}
-            className="px-2 py-1.5 rounded-full text-xs font-medium bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white transition-all flex items-center gap-1"
-          >
-            <Plus size={12} />
-          </button>
-          <button
-            onClick={() => setShowStats(!showStats)}
-            className={`px-2 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1 ${showStats ? 'bg-primary text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'}`}
-            title="Estadísticas del servidor"
-          >
-            <Server size={12} />
-          </button>
+          </div>
         </div>
         
         {/* Server Stats Panel */}
@@ -294,7 +301,7 @@ export default function AuroraChat() {
             <p className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Sin mensajes aún</p>
           </div>
         ) : (
-          messages.map((m, idx) => {
+          messages.map((m: ChatMessage, idx: number) => {
             const isMe = m.userId === 'aurora-user';
             return (
               <div key={m._id || idx} className={`flex items-end gap-2 ${isMe ? 'flex-row-reverse' : 'flex-row'} message-enter`}>

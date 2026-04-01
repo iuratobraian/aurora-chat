@@ -1,6 +1,6 @@
 # 📋 TASK BOARD - TRADESHARE
 
-> Sincronizado desde Notion — 31/3/2026, 10:57:12
+> Sincronizado desde Notion — 31/3/2026, 10:59:26
 > ⚠️  Este archivo se actualiza automáticamente al marcar tareas en Notion.
 
 | ID | Tarea | Estado | Prioridad | Tipo | Dominio | Notas |

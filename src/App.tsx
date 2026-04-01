@@ -588,6 +588,9 @@ const App: React.FC = memo(() => {
               {pestañaActiva === 'pricing' && (
                 <PricingView usuario={usuario} onLoginRequest={() => setModalAuth('login')} onNavigate={setPestañaActiva} />
               )}
+              {pestañaActiva === 'suscripciones' && (
+                <PricingView usuario={usuario} onLoginRequest={() => setModalAuth('login')} onNavigate={setPestañaActiva} />
+              )}
               {pestañaActiva === 'propfirms' && (
                 <PropFirmsView usuario={usuario} />
               )}

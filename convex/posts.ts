@@ -1,4 +1,5 @@
-import { query, mutation, internalMutation, PaginationOptions } from "./_generated/server";
+import { query, mutation, internalMutation } from "./_generated/server";
+import { PaginationOptions } from "convex/server";
 import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 import { calculateXpGain } from "./lib/permissions";

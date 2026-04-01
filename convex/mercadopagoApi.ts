@@ -292,7 +292,7 @@ export const processPaymentWebhook = mutation({
       // Check for existing active subscription to avoid duplicates
       const existingSub = await ctx.db
         .query("subscriptions")
-        .withIndex("by_user", (q) => q.eq("userId", userId))
+        .withIndex("by_userId", (q) => q.eq("userId", userId))
         .filter((q) => q.eq(q.field("status"), "active"))
         .first();
 

@@ -188,7 +188,17 @@ const Navigation: React.FC<NavProps> = memo(({
           { id: 'creator', label: 'Creator Studio', icon: 'storefront', description: 'Monetiza tu contenido' },
           { id: 'marketing', label: 'Marketing Pro', icon: 'campaign', description: 'Crea contenido con IA' },
           { id: 'community-admin', label: 'Mi Comunidad', icon: 'groups', description: 'Administra tu comunidad' },
-          { id: 'pricing', label: 'Precios', icon: 'workspace_premium', description: 'Planes y membresías' },
+        ]
+      }
+    },
+    {
+      id: 'suscripciones',
+      label: 'Suscripciones',
+      dropdown: {
+        title: 'Suscripciones',
+        items: [
+          { id: 'pricing', label: 'Planes', icon: 'workspace_premium', description: 'Planes y membresías' },
+          { id: 'creator', label: 'Creator Studio', icon: 'storefront', description: 'Monetiza tu contenido' },
         ]
       }
     },

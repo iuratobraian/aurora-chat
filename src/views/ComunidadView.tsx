@@ -1,3 +1,4 @@
+import React, { useState, useEffect, useCallback, useMemo, useRef, memo } from 'react';
 import { useQuery, useMutation, usePaginatedQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { StorageService } from '../services/storage';
@@ -104,7 +105,6 @@ const ComunidadView: React.FC<Props> = ({ usuario, onVisitProfile, onLoginReques
     const isLoadingMore = status === "LoadingMore";
     const hasMore = status !== "Exhausted";
 
-    const convexPosts = paginatedResult?.page;
     
     const signalsFeatureEnabled = import.meta.env.VITE_FEATURE_SIGNALS === 'on';
     const activeSignals = useQuery(
@@ -139,6 +139,15 @@ const ComunidadView: React.FC<Props> = ({ usuario, onVisitProfile, onLoginReques
         if (!convexPosts) return [];
         return convexPosts.map(mapConvexPost);
     }, [convexPosts]);
+
+    const openCommunityChat = (communityId: string, communityName: string) => {
+        setActiveCommunityChat({ id: communityId, name: communityName });
+        window.dispatchEvent(new CustomEvent('open-community-chat', {
+            detail: { channelId: communityId, communityName }
+        }));
+    };
+
+    const { ref: loadMoreRef, inView } = useInView();
 
     const loadFallbackPosts = useCallback(async () => {
         setFeedDataSignal('fallback');

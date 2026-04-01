@@ -27,19 +27,38 @@ node scripts/notion-task-action.mjs list
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                   CICLO DE TRABAJO                       │
+│              CICLO DE TRABAJO INFINITO                    │
 ├─────────────────────────────────────────────────────────┤
 │                                                          │
 │  1. npm run inicio          → Ver tablero Notion        │
-│  2. Elegir tarea            → Identificar qué hacer      │
+│     (git pull automático)   → Sincronizar con lo último  │
+│  2. Elegir tarea CRÍTICA    → Prioridad más alta         │
 │  3. Marcar "En progreso"    → node scripts/notion-task...│
 │  4. Trabajar                → Implementar solución       │
 │  5. Marcar "Listo"          → node scripts/notion-task...│
-│  6. Git commit + push       → Guardar cambios            │
-│  7. Repetir desde paso 1    → Siguiente tarea            │
+│  6. Git commit              → Guardar cambios            │
+│  7. VOLVER A NOTION         → Reclamar nueva tarea       │
+│  8. REPETIR                 → Hasta que no haya más      │
+│                                                          │
+│  ⚠️  Cada 5 tareas → git push                            │
+│  🚫 PROHIBIDO detenerse si hay tareas pendientes         │
 │                                                          │
 └─────────────────────────────────────────────────────────┘
 ```
+
+---
+
+## Reglas de Oro
+
+| Regla | Descripción |
+|-------|-------------|
+| **Notion es la verdad** | TASK_BOARD.md se genera desde Notion |
+| **Git pull al iniciar** | Siempre sincronizar antes de trabajar |
+| **Git push cada 5 tareas** | Compartir avances con el equipo |
+| **Loop infinito** | Terminar → Commit → Nueva tarea → Repetir |
+| **Una tarea a la vez** | No saltar entre tareas sin terminar |
+| **Marcar en Notion** | Actualizar estado en Notion, no solo en local |
+| **PROHIBIDO detenerse** | Si hay tareas pendientes, seguir trabajando |
 
 ---
 
@@ -47,23 +66,12 @@ node scripts/notion-task-action.mjs list
 
 | Comando | Descripción |
 |---------|-------------|
-| `npm run inicio` | Ver tablero completo desde Notion |
+| `npm run inicio` | Ver tablero completo desde Notion (con git pull) |
 | `node scripts/notion-task-action.mjs list` | Listar todas las tareas |
 | `node scripts/notion-task-action.mjs progress "<tarea>"` | Marcar en progreso |
 | `node scripts/notion-task-action.mjs done "<tarea>"` | Marcar como lista |
 | `node scripts/notion-task-action.mjs ready "<tarea>"` | Marcar como ready |
 | `node scripts/notion-task-action.mjs backlog "<tarea>"` | Devolver a backlog |
-
----
-
-## Reglas
-
-| Regla | Descripción |
-|-------|-------------|
-| **Notion es la verdad** | TASK_BOARD.md se genera desde Notion |
-| **Una tarea a la vez** | No saltar entre tareas sin terminar |
-| **Commit al terminar** | Siempre hacer commit y push |
-| **Marcar en Notion** | Actualizar estado en Notion, no solo en local |
 
 ---
 

@@ -247,9 +247,14 @@ function showNextSteps() {
   console.log(`  ${GREEN}3.${RESET} Trabajar en la tarea`);
   console.log(`  ${GREEN}4.${RESET} Marcar como ${YELLOW}"Listo"${RESET} en Notion al terminar`);
   console.log(`  ${GREEN}5.${RESET} Hacer commit a Git`);
+  console.log(`  ${GREEN}6.${RESET} ${BOLD}${CYAN}VOLVER A NOTION${RESET} — Reclamar nueva tarea automáticamente`);
+  console.log(`  ${GREEN}7.${RESET} ${BOLD}${CYAN}REPETIR${RESET} hasta que no haya más tareas`);
   console.log(`\n${BOLD}${YELLOW}⚠️  REGLA DE ORO: Cada 5 tareas terminadas → git push${RESET}`);
   console.log(`${DIM}   node scripts/notion-task-action.mjs done "nombre tarea"${RESET}`);
   console.log(`${DIM}   git add . && git commit -m "fix: descripción" && git push${RESET}`);
+  console.log(`\n${BOLD}${CYAN}🔄 LOOP AUTOMÁTICO:${RESET}`);
+  console.log(`${CYAN}   Terminar tarea → Commit → Volver a Notion → Nueva tarea → Repetir${RESET}`);
+  console.log(`${CYAN}   PROHIBIDO detenerse si hay tareas pendientes.${RESET}`);
   console.log(`\n${DIM}URL de Notion: https://www.notion.so/${NOTION_DATABASE_ID}${RESET}`);
   console.log(`${DIM}Repositorio: https://github.com/iuratobraian/trade-share${RESET}\n`);
 }

@@ -53,8 +53,42 @@ Lectura **OBLIGATORIA** e **INAMOVIBLE** al iniciar cualquier sesión:
 4. `.agent/workspace/coordination/TEAM_PROTOCOL.md` ← **PROTOCOLO DE EQUIPO ACOMPAÑADO** (OBLIGATORIO)
 5. `.agent/workspace/coordination/DAILY_STANDUP.md` ← **STANDUP DIARIO** (Escribir al empezar)
 6. `.agent/workspace/coordination/TEAM_CONVERSATIONS.md` ← **LOG DE CHARLAS** (Documentar todo)
-7. `.agent/workspace/coordination/TASK_BOARD.md` ← **Tareas Pendientes**
-8. `.agent/workspace/coordination/CURRENT_FOCUS.md` ← **En qué está trabajando cada agente**
+7. `.agent/workspace/agent_memories/INDEX.md` ← **MEMORIA DE CADA AGENTE** (Individual y persistente)
+8. `.agent/workspace/coordination/TASK_BOARD.md` ← **Tareas Pendientes**
+9. `.agent/workspace/coordination/CURRENT_FOCUS.md` ← **En qué está trabajando cada agente**
+
+## 🧠 MEMORIA INDIVIDUAL DE AGENTE (OBLIGATORIO)
+
+**Cada agente tiene SU PROPIA MEMORIA persistente.**
+
+### Ubicación
+`.agent/workspace/agent_memories/AGENT-[ID]-[Nombre].md`
+
+### Contenido Obligatorio
+Cada agente DEBE mantener su memoria con:
+1. **Resumen de actividad** - Métricas personales
+2. **Historial de tareas** - Qué hizo, cómo, fallas, mejoras
+3. **Conocimiento adquirido** - Patrones, atajos, errores comunes
+4. **Relaciones con otros agentes** - Interacciones y respeto
+5. **Evolución del agente** - Crecimiento a lo largo del tiempo
+6. **Objetivos personales** - Corto, mediano y largo plazo
+7. **Reflexiones personales** - Aprendizajes y pensamientos
+8. **Notas pendientes** - Temas pendientes de investigar
+
+### Cuándo Actualizar
+- **DESPUÉS de cada tarea:** Agregar lo que hiciste
+- **ANTES de empezar:** Leer memorias de otros agentes
+- **SEMANALMENTe:** Actualizar objetivos y reflexiones
+
+### Cómo Leer Memoria de Otro Agente
+1. Abrir `.agent/workspace/agent_memories/INDEX.md`
+2. Click en el archivo del agente
+3. Leer su historial y conocimiento
+4. Usar para colaborar mejor
+
+### Regla de Oro
+**NUNCA modificar la memoria de otro agente.**  
+**SIEMPRE actualizar tu propia memoria.**
 
 ## 🤝 PROTOCOLO DE EQUIPO ACOMPAÑADO (OBLIGATORIO)
 

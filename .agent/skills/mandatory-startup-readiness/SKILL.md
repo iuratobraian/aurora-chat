@@ -1,56 +1,43 @@
 ---
 name: mandatory-startup-readiness
-description: Lectura y entrenamiento obligatorio al iniciar una sesión en este repo. Úsalo siempre al arrancar trabajo operativo, auditorías, hardening, tareas Convex, admin, pagos, feeds, noticias, creator, Instagram o cualquier cambio que pueda terminar marcado como done. Previene errores graves ya observados en TradePortal: mocks cerrados como reales, localStorage como fuente de verdad, RLS incompleto, contratos frontend/backend rotos, llamadas a internal mutations desde UI, y smoke insuficiente.
+description: PROTOCOLO INSTITUCIONAL DE PRE-VUELO (MEMORIA, MAESTRÍA Y ESTABILIDAD). Este protocolo es el pilar de operación profesional de TradeShare. Ningún agente puede iniciar sesión sin completar satisfactoriamente este proceso. Garantiza sincronización total con el Jefe, prevención de errores recurrentes y estabilidad absoluta de la plataforma.
 ---
 
-# Mandatory Startup Readiness
+# 🛡️ PROTOCOLO DE PRE-VUELO INSTITUCIONAL (TRADE SHARE)
 
-## Cuándo se usa
+Este documento define el estándar inamovible de inicio de sesión para todo agente. No es opcional; es la base de nuestra profesionalidad.
 
-Siempre al iniciar una sesión o antes de reclamar una tarea.
+---
 
-## Flujo obligatorio
+## 📋 PASO 1: SINCRONIZACIÓN DE MEMORIA (CONTEXTO)
+Antes de tocar el código, el agente debe sincronizarse con las órdenes directas del Jefe.
+1. **Leer [pasado.md](../../workspace/coordination/pasado.md)**: Aquí reside la mente del Jefe. Si no conoces lo que se habló, tu trabajo será errático.
+2. **Identificar Tareas**: Consultar el **TASK_BOARD.md** y reclamar un lote de 3 tareas (1 en curso, 2 en espera).
 
-1. Leer `../../workspace/coordination/pasado.md` (Memoria del Jefe - Contexto Actual).
-2. Leer `../aurora-mastery/SKILL.md` (Sistema de Maestría - Errores Solucionados).
-3. Leer `../README.md`.
-4. Leer `references/critical-failures.md`.
-3. Confirmar el source of truth de la superficie a tocar:
-   - Convex real
-   - servicio cliente oficial
-   - endpoint backend oficial
-   - env de producción correctas
-4. Revisar que el frontend y el backend compartan el mismo contrato:
-   - mismos args
-   - mismos nombres de campos
-   - mismas reglas de auth
-5. Antes de marcar `done`, rechazar el cierre si existe alguno de estos anti-patrones:
-   - mock/demo data activa
-   - fallback silencioso a `localStorage`
-   - `window.convex`
-   - `adminId`, `moderatorId`, `userId` hardcodeados
-   - `internalMutation` o `internalAction` llamados desde cliente
-   - `fetch('/api/...')` legacy compitiendo con el orquestador oficial
-   - `alert`, `confirm`, `showToast('info', '... en desarrollo')`
-   - consultas Convex sin ownership/admin validation
-   - `collect()` completo o N+1 en listados administrativos grandes
-6. Validar con doble check:
-   - lint/typecheck
-   - smoke de flujo real y, si aplica, cross-browser
+---
 
-## Reglas de escritura
+## 🧠 PASO 2: SISTEMA DE MAESTRÍA (INTELIGENCIA)
+Aprender de los errores para no repetirlos jamás.
+1. **Lectura de [aurora-mastery](../aurora-mastery/SKILL.md)**: Revisar las últimas soluciones aplicadas.
+2. **Revisión de [fallos críticos](references/critical-failures.md)**: Interiorizar los "NUNCA MÁS" del proyecto (IDOR, Mismatches, Hardcoding).
 
-- Escribir desde el contrato backend hacia la UI, no al revés.
-- Si el estado es compartido entre navegadores, no usar `localStorage` como fuente de verdad.
-- Si una acción es admin-only, la validación vive en Convex, no en la vista.
-- Si un mutation pide `userId` o `moderatorId`, la UI debe enviarlo y el backend debe además validar `ctx.auth`.
-- Si existe un flujo oficial, no dejar un flujo legacy paralelo “por compatibilidad”.
-- Si hay degradación, debe ser explícita y visible; no silenciosa.
-- Si una tarea dice “real”, “cloud”, “prod” o “sync”, el criterio de cierre es comportamiento real, no UI bonita.
-- **Sincronización de Maestría**: Al finalizar una tarea, documentar la solución en `aurora-mastery/SKILL.md` si es nueva, previa validación del Jefe.
+---
 
-## Qué leer después
+## 🧪 PASO 3: VERIFICACIÓN TÉCNICA (ESTABILIDAD)
+Asegurar que el sistema está en línea y los cambios son seguros.
+1. **Ejecutar Readiness Check**: Es **MANDATORIO** correr el comando:
+   `node scripts/aurora-readiness-check.mjs`
+2. **Validación de Conexión**: Confirmar que Convex y Notion responden correctamente.
+3. **Pase de Tipos**: Asegurar que `npm run lint` retorna 0 errores.
 
-- `../foundations/README.md`
-- `../agents/AGENT_TASK_DIVISION.md`
-- `../../session/SESSION_START_PROTOCOL.md`
+---
+
+## 🚀 PASO 4: MEJORAS SIN FALLAS (ESTÁNDAR)
+Todo cambio debe mejorar el sistema, no degradarlo.
+- **Doble Verificación**: Al finalizar una tarea, realizar dos ciclos completos de revisión de código.
+- **Sincronización de Secretos**: Si se modifican llaves, ejecutar `node scripts/aurora-sync-secrets.mjs`.
+- **Registro de Aprendizaje**: Si la solución es nueva, proponer su adición al Skill de Maestría.
+
+---
+
+**ESTABILIDAD TOTAL | SINCRONIZACIÓN REAL | PROFESIONALIDAD INSTITUCIONAL**

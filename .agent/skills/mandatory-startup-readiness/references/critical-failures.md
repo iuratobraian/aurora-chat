@@ -1,49 +1,38 @@
-# Critical Failures To Remember
+# HISTORIAL DE FALLOS CRÍTICOS (NUNCA MÁS)
 
-## Fallas ya observadas en este repo
+Este documento es una base de datos de errores graves que han ocurrido en el pasado. Es **OBLIGATORIO** consultarlo para asegurar que ninguna "mejora" sea en realidad un retroceso o una falla.
 
-### 1. Source of truth roto
+---
 
-- Feeds y paneles admin cerrados con fallback a `localStorage`.
-- Resultado: dos navegadores muestran estados distintos.
+## 🛑 FALLOS DE INFRAESTRUCTURA
 
-### 2. Backend abierto o con RLS incompleto
+### 1. Desconexión de Base de Datos (Convex 401)
+- **Error**: El sistema dejaba de funcionar porque la `CONVEX_DEPLOY_KEY` expiraba o no estaba en `.env.local`.
+- **Regla Inmutable**: Antes de cualquier tarea de backend, ejecutar `node scripts/check-db.mjs`. No operar a ciegas.
 
-- Queries por `userId` sin comprobar `ctx.auth`.
-- Mutations admin protegidas solo por un `adminId` enviado desde el cliente.
-- Resultado: leaks de datos y acciones sensibles forjables.
+### 2. Pérdida de Claves Notion
+- **Error**: Agentes externos sin acceso a las tareas reales por falta de `NOTION_API_KEY`.
+- **Regla Inmutable**: Ejecutar `node scripts/aurora-sync-secrets.mjs` para asegurar que el repositorio tiene las claves necesarias en GitHub Secrets (si aplica) o que tu entorno local está al día.
 
-### 3. Contrato frontend/backend desalineado
+---
 
-- UI llamando mutations sin args requeridos.
-- UI usando funciones `internal` como si fueran públicas.
-- Resultado: botones que parecen funcionar pero fallan en runtime o quedan solo locales.
+## 🛑 FALLOS DE LÓGICA Y CÓDIGO
 
-### 4. Trabajo marcado como done con placeholders
+### 3. Mismatch de Contrato Frontend/Backend
+- **Error**: Modificar una mutación en Convex sin actualizar el servicio en el Frontend, rompiendo la aplicación.
+- **Regla Inmutable**: Todo cambio en `convex/*.ts` debe ir acompañado de una actualización en `src/services/` y una verificación de tipos (`npm run lint`).
 
-- Toasters “en desarrollo”.
-- analytics en cero o calculados por estimación.
-- mocks ocultos detrás de una vista premium.
+### 4. Uso de localStorage como Base de Datos
+- **Error**: Guardar configuraciones críticas que deben ser compartidas (como estados de Admin) en el navegador local.
+- **Regla Inmutable**: Si el dato debe ser visto por otros agentes o usuarios, **DEBE IR A CONVEX**. Prohibido usar `localStorage` para datos globales.
 
-### 5. Caminos legacy paralelos
+---
 
-- pagos por `fetch('/api/...')` conviviendo con orquestadores Convex
-- wrappers viejos mezclados con hooks nuevos
+## 🛑 FALLOS DE PRODUCTIVIDAD (REDUNDANCIA)
 
-## Checklist duro antes de cerrar una tarea
+### 5. Trabajo Duplicado (Drifting)
+- **Error**: Dos agentes trabajando en el mismo archivo porque no leyeron lo que el anterior ya marcó como `done`.
+- **Regla Inmutable**: Leer `pasado.md` y actualizar `TASK_BOARD.md` al **inicio** y al **final** de cada tarea.
 
-- ¿La data visible sale de Convex o de una fuente real verificable?
-- ¿La mutación valida identidad/ownership/admin en backend?
-- ¿La UI envía exactamente los args que el backend exige?
-- ¿No hay mocks, `localStorage`, `window.convex` ni placeholders activos?
-- ¿No quedó un camino legacy compitiendo con el flujo oficial?
-- ¿Se probó el caso real en prod o al menos con smoke verificable?
-
-## Consejos para escribir sin romper el sistema
-
-- Primero leer el handler Convex; después tocar la vista.
-- Preferir helpers de auth reutilizables.
-- Preferir paginación e índices a `collect()` completo.
-- No mezclar demo y prod en el mismo servicio.
-- No dar por bueno un fix si solo “deja de romper”; debe quedar coherente.
-- Si descubres que una tarea previa marcada `done` no estaba cerrada, reabrir el gap en el board en lugar de esconderlo.
+---
+**JEFE DE EQUIPO: "LAS MEJORAS DEBEN SER MEJORAS, NO FALLAS."**

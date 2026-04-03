@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "tracks": [
+    {
+      "id": "agent_runtime",
+      "label": "Agent Runtime",
+      "goal": "aprender orquestacion, herramientas, memory y guardrails",
+      "repos": [
+        "langchain-ai/langgraph",
+        "langchain-ai/open_deep_research",
+        "agno-agi/agno",
+        "microsoft/autogen",
+        "All-Hands-AI/OpenHands"
+      ]
+    },
+    {
+      "id": "coding_agents",
+      "label": "Coding Agents",
+      "goal": "aprender flujos de agente programador, ejecucion y sandbox",
+      "repos": [
+        "QwenLM/qwen-agent",
+        "OpenDevin/OpenDevin",
+        "continuedev/continue",
+        "Aider-AI/aider",
+        "stackblitz/bolt.new"
+      ]
+    },
+    {
+      "id": "observability_eval",
+      "label": "Observability and Eval",
+      "goal": "aprender tracing, evaluacion y feedback loops",
+      "repos": [
+        "langfuse/langfuse",
+        "Arize-ai/phoenix",
+        "braintrustdata/braintrust-sdk",
+        "truera/trulens"
+      ]
+    },
+    {
+      "id": "app_builders",
+      "label": "App Builders",
+      "goal": "aprender como bajar ideas a productos y creadores de apps",
+      "repos": [
+        "appsmithorg/appsmith",
+        "activepieces/activepieces",
+        "n8n-io/n8n",
+        "supabase/supabase",
+        "vercel/next.js"
+      ]
+    }
+  ]
+}

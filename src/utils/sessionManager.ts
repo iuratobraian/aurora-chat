@@ -200,4 +200,10 @@ export const syncSessionToConvex = async (userData: any): Promise<boolean> => {
   }
 };
 
+// Test helper - reset internal caches (only used in tests)
+export const __resetCachesForTesting = () => {
+  sessionCache = null;
+  userCache = null;
+};
+
 updateCacheFromStorage();

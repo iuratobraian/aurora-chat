@@ -12,11 +12,13 @@ const localStorageMock = (() => {
 })();
 Object.defineProperty(globalThis, 'localStorage', { value: localStorageMock });
 
-const { saveSession, getSession, clearSession, isSessionExpired, extendSession, saveSessionUser, getSessionUser } = await import('../../src/utils/sessionManager');
+const mod = await import('../../src/utils/sessionManager');
+const { saveSession, getSession, clearSession, isSessionExpired, extendSession, saveSessionUser, getSessionUser, __resetCachesForTesting } = mod;
 
 describe('sessionManager', () => {
   beforeEach(() => {
     localStorageMock.__reset();
+    __resetCachesForTesting();
     vi.clearAllMocks();
   });
 

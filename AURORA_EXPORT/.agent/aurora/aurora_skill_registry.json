@@ -1,0 +1,187 @@
+{
+  "version": 1,
+  "description": "Aurora Skill Registry - Defines reusable skills for agent orchestration",
+  "skills": [
+    {
+      "id": "skill_auth_security",
+      "name": "Auth Security Checker",
+      "description": "Verifica que mutaciones Convex tengan checks de ctx.auth.identity.subject",
+      "domains": ["security", "convex", "backend"],
+      "autoTrigger": ["mutation", "auth", "security", "permission"],
+      "script": "aurora-auth-check.mjs",
+      "confidence": 0.95,
+      "trustScore": 90,
+      "patterns": [
+        "ctx.auth.getUserIdentity",
+        "identity.subject",
+        "admin fallback"
+      ],
+      "antiPatterns": [
+        "Sin verificar identity",
+        "Solo client-side checks"
+      ],
+      "validation": {
+        "required": ["ctx.auth", "identity.subject"],
+        "forbidden": ["userId directo sin verificar"]
+      }
+    },
+    {
+      "id": "skill_rate_limit",
+      "name": "Rate Limiter",
+      "description": "Agrega rate limiting diferenciado por tier a mutaciones",
+      "domains": ["security", "backend", "convex"],
+      "autoTrigger": ["mutation", "public", "user-action"],
+      "script": "aurora-rate-limit.mjs",
+      "confidence": 0.9,
+      "trustScore": 85,
+      "patterns": [
+        "checkRateLimit(ctx, userId, action)",
+        "TIER_LIMITS config"
+      ],
+      "tiers": {
+        "FREE": 10,
+        "PRO": 50,
+        "ELITE": -1
+      }
+    },
+    {
+      "id": "skill_react_perf",
+      "name": "React Performance Optimizer",
+      "description": "Envuelve componentes en React.memo y usa useCallback para handlers",
+      "domains": ["frontend", "react", "performance"],
+      "autoTrigger": ["component", "handler", "props"],
+      "script": "aurora-react-perf.mjs",
+      "confidence": 0.9,
+      "trustScore": 88,
+      "patterns": [
+        "React.memo(Component)",
+        "useCallback"
+      ]
+    },
+    {
+      "id": "skill_test_isolation",
+      "name": "Test Isolation",
+      "description": "Crea tests con mocks apropiados y cleanup",
+      "domains": ["testing", "vitest"],
+      "autoTrigger": ["test", "spec", "mock"],
+      "script": "aurora-test-isolation.mjs",
+      "confidence": 0.9,
+      "trustScore": 85,
+      "patterns": [
+        "beforeEach cleanup",
+        "vi.clearAllMocks()",
+        "localStorage.clear()"
+      ],
+      "antiPatterns": [
+        "Mock inline sin cleanup",
+        "Convex mocking en unit tests"
+      ]
+    },
+    {
+      "id": "skill_knowledge_destil",
+      "name": "Knowledge Destiller",
+      "description": "Extrae heurísticas de actividad reciente",
+      "domains": ["aurora", "knowledge"],
+      "autoTrigger": ["knowledge", "heuristic", "learn"],
+      "script": "aurora-auto-destil.mjs",
+      "confidence": 0.8,
+      "trustScore": 75,
+      "patterns": [
+        "Pattern extraction",
+        "Anti-pattern detection"
+      ]
+    },
+    {
+      "id": "skill_context_pack",
+      "name": "Context Pack Generator",
+      "description": "Genera context packs por tipo de tarea",
+      "domains": ["aurora", "context"],
+      "autoTrigger": ["context", "prompt", "task-type"],
+      "script": "aurora-context-pack-generator.mjs",
+      "confidence": 0.85,
+      "trustScore": 80,
+      "taskTypes": ["feature", "fix", "refactor", "review", "security"]
+    },
+    {
+      "id": "skill_drift_check",
+      "name": "Drift Detector",
+      "description": "Detecta inconsistencias entre TASK_BOARD, CURRENT_FOCUS y código",
+      "domains": ["coordination", "aurora"],
+      "autoTrigger": ["board", "task", "status"],
+      "script": "aurora-drift-check.mjs",
+      "confidence": 0.9,
+      "trustScore": 85,
+      "checks": [
+        "task status mismatch",
+        "owner drift",
+        "file vs board drift"
+      ]
+    },
+    {
+      "id": "skill_contract_validate",
+      "name": "Contract Validator",
+      "description": "Valida que outputs cumplan con schemas de contrato",
+      "domains": ["aurora", "quality"],
+      "autoTrigger": ["contract", "schema", "validate"],
+      "script": "aurora-contract-validator.mjs",
+      "confidence": 0.95,
+      "trustScore": 90
+    },
+    {
+      "id": "skill_surface_monitor",
+      "name": "Surface Monitor",
+      "description": "Monitorea salud de surfaces de Aurora",
+      "domains": ["aurora", "observability"],
+      "autoTrigger": ["surface", "health", "monitor"],
+      "script": "aurora-surface-monitor.mjs",
+      "confidence": 0.9,
+      "trustScore": 88
+    },
+    {
+      "id": "skill_knowledge_validate",
+      "name": "Knowledge Validator",
+      "description": "Valida y migra schema de knowledge entries",
+      "domains": ["aurora", "knowledge"],
+      "autoTrigger": ["knowledge", "validate", "schema"],
+      "script": "aurora-knowledge-validator.mjs",
+      "confidence": 0.95,
+      "trustScore": 92
+    }
+  ],
+  "domains": {
+    "frontend": {
+      "skills": ["skill_react_perf", "skill_test_isolation"],
+      "priority": 1
+    },
+    "backend": {
+      "skills": ["skill_auth_security", "skill_rate_limit", "skill_test_isolation"],
+      "priority": 1
+    },
+    "security": {
+      "skills": ["skill_auth_security", "skill_rate_limit"],
+      "priority": 1
+    },
+    "testing": {
+      "skills": ["skill_test_isolation"],
+      "priority": 1
+    },
+    "aurora": {
+      "skills": ["skill_knowledge_destil", "skill_context_pack", "skill_drift_check", "skill_contract_validate", "skill_surface_monitor", "skill_knowledge_validate"],
+      "priority": 1
+    },
+    "knowledge": {
+      "skills": ["skill_knowledge_destil", "skill_knowledge_validate", "skill_context_pack"],
+      "priority": 1
+    }
+  },
+  "autoTrigger": {
+    "mutation": ["skill_auth_security", "skill_rate_limit"],
+    "component": ["skill_react_perf"],
+    "test": ["skill_test_isolation"],
+    "knowledge": ["skill_knowledge_destil", "skill_knowledge_validate"],
+    "context": ["skill_context_pack"],
+    "board": ["skill_drift_check"],
+    "contract": ["skill_contract_validate"],
+    "surface": ["skill_surface_monitor"]
+  }
+}

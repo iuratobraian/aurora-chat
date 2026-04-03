@@ -1,5 +1,6 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { mutation, query, internalMutation } from "./_generated/server";
+import { requireAdmin, requireUser } from "./lib/auth";
 
 const DEFAULT_APPS = [
   {
@@ -48,7 +49,7 @@ const DEFAULT_APPS = [
   },
 ];
 
-export const seedApps = mutation({
+export const seedApps = internalMutation({
   args: {},
   handler: async (ctx) => {
     for (const app of DEFAULT_APPS) {
@@ -79,8 +80,10 @@ export const listApps = query({
   args: { isAdmin: v.optional(v.boolean()) },
   handler: async (ctx, args) => {
     if (args.isAdmin) {
+      await requireAdmin(ctx);
       return await ctx.db.query("apps").collect();
     }
+    await requireUser(ctx);
     return await ctx.db
       .query("apps")
       .filter((q) => q.eq(q.field("visibility"), "public"))
@@ -91,6 +94,7 @@ export const listApps = query({
 export const toggleAppVisibility = mutation({
   args: { appId: v.string(), visibility: v.union(v.literal("public"), v.literal("private")) },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const app = await ctx.db
       .query("apps")
       .filter((q) => q.eq(q.field("appId"), args.appId))
@@ -105,6 +109,7 @@ export const toggleAppVisibility = mutation({
 export const updateAppStatus = mutation({
   args: { appId: v.string(), status: v.union(v.literal("active"), v.literal("beta"), v.literal("maintenance")) },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const app = await ctx.db
       .query("apps")
       .filter((q) => q.eq(q.field("appId"), args.appId))

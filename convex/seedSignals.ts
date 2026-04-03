@@ -1,4 +1,4 @@
-import { mutation } from "./_generated/server";
+import { internalMutation } from "./_generated/server";
 
 const SIGNAL_PLANS = [
   {
@@ -208,7 +208,7 @@ const SAMPLE_PROVIDERS = [
   },
 ];
 
-export const seedSignalPlans = mutation({
+export const seedSignalPlans = internalMutation({
   args: {},
   handler: async (ctx) => {
     const now = Date.now();

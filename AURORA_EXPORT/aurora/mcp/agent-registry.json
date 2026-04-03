@@ -1,0 +1,127 @@
+{
+  "version": 2,
+  "agentes": [
+    {
+      "nombre": "Aurora Core",
+      "id": "aurora-core",
+      "tipo": "coordinador",
+      "origen": "repo_local",
+      "estado": "activo",
+      "fortalezas": [
+        "coordinacion",
+        "conocimiento_del_repo",
+        "priorizacion",
+        "consulta_local",
+        "busqueda_web_configurable",
+        "routing_de_tareas",
+        "validacion_automatica"
+      ],
+      "aprendeDe": [
+        "task_board",
+        "current_focus",
+        "knowledge_db",
+        "web_search",
+        "agent_metrics"
+      ],
+      "scripts": [
+        "aurora-reasoning.mjs",
+        "aurora-metrics-dashboard.mjs",
+        "aurora-auto-validate.mjs",
+        "aurora-agent-bridge-v2.mjs"
+      ],
+      "notas": "Nucleo coordinador del sistema. Orchestrates todos los agentes."
+    },
+    {
+      "nombre": "CODEX",
+      "id": "codex",
+      "tipo": "agente_codificacion",
+      "origen": "local",
+      "estado": "activo",
+      "fortalezas": [
+        "backend",
+        "schema",
+        "convex",
+        "fixes",
+        "tests",
+        "performance"
+      ],
+      "aprendeDe": [
+        "task_board",
+        "AGENTS.md",
+        "convex/"
+      ],
+      "ruta": "C:\\Users\\iurato\\codex",
+      "notas": "Especializado en backend, fixes críticos y performance."
+    },
+    {
+      "nombre": "OPENCODE",
+      "id": "opencode",
+      "tipo": "agente_codificacion",
+      "origen": "local",
+      "estado": "activo",
+      "fortalezas": [
+        "frontend",
+        "react",
+        "tsx",
+        "features",
+        "ui",
+        "components"
+      ],
+      "aprendeDe": [
+        "task_board",
+        "AGENTS.md",
+        "views/",
+        "components/"
+      ],
+      "ruta": "opencode",
+      "notas": "Especializado en frontend, features y componentes UI."
+    },
+    {
+      "nombre": "BIG-PICKLE",
+      "id": "big-pickle",
+      "tipo": "agente_fullstack",
+      "origen": "external",
+      "estado": "disponible",
+      "fortalezas": [
+        "fullstack",
+        "integrations",
+        "refactoring",
+        "large_features"
+      ],
+      "aprendeDe": [
+        "task_board",
+        "AGENTS.md"
+      ],
+      "notas": "Para tareas grandes que requieren alcance fullstack."
+    },
+    {
+      "nombre": "ANTIGRAVITY",
+      "id": "antigravity",
+      "tipo": "agente_research",
+      "origen": "repo_local",
+      "estado": "activo",
+      "fortalezas": [
+        "research",
+        "specs",
+        "planning",
+        "architecture"
+      ],
+      "aprendeDe": [
+        "task.md",
+        "implementation_plan.md",
+        "docs/"
+      ],
+      "notas": "Especializado en investigación, specs y planificación."
+    }
+  ],
+  "equipo_stats": {
+    "total_agents": 5,
+    "active": 4,
+    "specialties": {
+      "backend": ["codex"],
+      "frontend": ["opencode"],
+      "fullstack": ["big-pickle", "antigravity"],
+      "coordination": ["aurora-core"]
+    }
+  }
+}

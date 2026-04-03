@@ -6,7 +6,7 @@ import { addXpInternal } from "./lib/gamification";
 import { api } from "./_generated/api";
 import { checkSpam, checkUserRateLimit } from "./moderation";
 import { checkRateLimit } from "./lib/rateLimit";
-import { assertOwnershipOrAdmin } from "./lib/auth";
+import { assertOwnershipOrAdmin, requireUser } from "./lib/auth";
 import logger from "./logger";
 
 const AI_BOT_USER_ID = "ai_agent_system";
@@ -355,17 +355,27 @@ export const updatePost = mutation({
     imagenUrl: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    await assertOwnershipOrAdmin(ctx, args.userId);
+    const identity = await requireUser(ctx);
     const { id, userId, ...updates } = args;
+    
+    // Ensure the provided userId (requested as subject) matches the identity
+    if (identity.subject !== userId) {
+      throw new Error("IDOR Detectado: No puedes editar como otro usuario.");
+    }
+
     const post = await ctx.db.get(id);
     if (!post) throw new Error("Post no encontrado");
 
-    if (post.userId !== userId) {
+    const isOwner = post.userId === identity.subject;
+    
+    if (!isOwner) {
       const admin = await ctx.db
         .query("profiles")
-        .withIndex("by_userId", (q) => q.eq("userId", userId))
+        .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
         .unique();
-      if (!admin || (admin.role || 0) < 5) throw new Error("No tienes permiso para editar este post");
+      if (!admin || (admin.role || 0) < 5) {
+        throw new Error("No tienes permiso para editar este post");
+      }
     }
 
     // Registrar edición en historial antes de actualizar
@@ -389,32 +399,38 @@ export const updatePost = mutation({
 
 // Toggle like en un post
 export const toggleLike = mutation({
-  args: { id: v.id("posts"), userId: v.string() },
+  args: {
+    id: v.id("posts"),
+    userId: v.string(),
+  },
   handler: async (ctx, args) => {
-    await assertOwnershipOrAdmin(ctx, args.userId);
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.userId) {
+      throw new Error("IDOR Detectado: No puedes likear como otro usuario.");
+    }
 
     const post = await ctx.db.get(args.id);
     if (!post) return;
-    const likes = post.likes || [];
+    const likes = (post as any).likes || [];
     const hasLiked = likes.includes(args.userId);
     const newLikes = hasLiked
-      ? likes.filter((id) => id !== args.userId)
+      ? likes.filter((id: string) => id !== args.userId)
       : [...likes, args.userId];
-    
+
     await ctx.db.patch(args.id, { likes: newLikes });
 
     if (!hasLiked) {
       // XP for Liker
       await addXpInternal(ctx, args.userId, "like");
-      
+
       // Notification and XP for Author
-      if (post.userId !== args.userId) {
-        await addXpInternal(ctx, post.userId, "like");
+      if ((post as any).userId !== args.userId) {
+        await addXpInternal(ctx, (post as any).userId, "like");
         await ctx.db.insert("notifications", {
-          userId: post.userId,
+          userId: (post as any).userId,
           type: "like",
           title: "👍 ¡NUEVO LIKE!",
-          body: `A alguien le gustó tu post: ${post.titulo || 'Sin título'}`,
+          body: `A alguien le gustó tu post: ${(post as any).titulo || 'Sin título'}`,
           read: false,
           avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${args.userId}`,
           createdAt: Date.now(),
@@ -435,7 +451,10 @@ export const addComment = mutation({
     parentId: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await assertOwnershipOrAdmin(ctx, args.userId);
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.userId) {
+      throw new Error("IDOR Detectado: No puedes comentar como otro usuario.");
+    }
 
     // Check rate limit for comments
     const rateLimit = await checkUserRateLimit(ctx, args.userId, "comment");
@@ -522,7 +541,10 @@ export const addComment = mutation({
 export const deletePost = mutation({
   args: { id: v.id("posts"), userId: v.string() },
   handler: async (ctx, args) => {
-    await assertOwnershipOrAdmin(ctx, args.userId);
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.userId) {
+      throw new Error("IDOR Detectado: No puedes eliminar como otro usuario.");
+    }
     
     const post = await ctx.db.get(args.id);
     if (!post) throw new Error("Post no encontrado");
@@ -659,16 +681,19 @@ export const getPendingPosts = query({
 export const restorePost = mutation({
   args: { id: v.id("posts"), userId: v.string() },
   handler: async (ctx, args) => {
-    if (!args.userId) throw new Error("userId requerido");
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.userId) {
+      throw new Error("IDOR Detectado: No puedes restaurar como otro usuario.");
+    }
     
     const post = await ctx.db.get(args.id);
     if (!post) throw new Error("Post no encontrado");
     
     // Verificar autorización
-    const isOwner = post.userId === args.userId;
+    const isOwner = post.userId === identity.subject;
     const admin = await ctx.db
       .query("profiles")
-      .withIndex("by_userId", (q) => q.eq("userId", args.userId))
+      .withIndex("by_userId", (q: any) => q.eq("userId", identity.subject))
       .unique();
     const isAdmin = !!admin && (admin.role || 0) >= 4;
     
@@ -701,10 +726,14 @@ export const restorePost = mutation({
 export const permanentDeletePost = mutation({
   args: { id: v.id("posts"), userId: v.string() },
   handler: async (ctx, args) => {
-    if (!args.userId) throw new Error("userId requerido");
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.userId) {
+       throw new Error("IDOR Detectado");
+    }
+
     const admin = await ctx.db
       .query("profiles")
-      .withIndex("by_userId", (q) => q.eq("userId", args.userId))
+      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
       .unique();
     if (!admin || (admin.role || 0) < 5) throw new Error("No autorizado para eliminar posts");
 
@@ -716,7 +745,10 @@ export const permanentDeletePost = mutation({
 export const givePoints = mutation({
   args: { postId: v.id("posts"), userId: v.string(), points: v.number() },
   handler: async (ctx, args) => {
-    if (!args.userId) throw new Error("userId requerido");
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.userId) {
+      throw new Error("IDOR Detectado");
+    }
 
     const post = await ctx.db.get(args.postId);
     if (!post) throw new Error("Post no encontrado");
@@ -728,7 +760,7 @@ export const givePoints = mutation({
     // 1. Verificar balance del donante
     const donor = await ctx.db
       .query("profiles")
-      .withIndex("by_userId", (q) => q.eq("userId", args.userId))
+      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
       .unique();
     
     if (!donor) throw new Error("Perfil de donante no encontrado");
@@ -775,8 +807,8 @@ export const givePoints = mutation({
   },
 });
 
-// Mutación interna para dar puntos (sin require auth Convex)
-export const givePointsInternal = mutation({
+// Mutación interna para dar puntos (solamente via internal calls)
+export const givePointsInternal = internalMutation({
   args: { postId: v.id("posts"), userId: v.string(), points: v.number() },
   handler: async (ctx, args) => {
     if (args.points <= 0) throw new Error("Los puntos deben ser mayores a cero");
@@ -1261,6 +1293,10 @@ export const givePostPoints = mutation({
   },
   handler: async (ctx, args) => {
     const { postId, userId, points } = args;
+    const identity = await requireUser(ctx);
+    if (identity.subject !== userId) {
+        throw new Error("IDOR Detectado: No puedes dar puntos como otro usuario.");
+    }
 
     // Verificar si el usuario ya dio puntos a este post
     const existingVote = await ctx.db
@@ -1316,6 +1352,11 @@ export const getPostPointsGiven = query({
     userId: v.string(),
   },
   handler: async (ctx, args) => {
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.userId) {
+        throw new Error("IDOR Detectado: No puedes ver puntos dados por otro usuario.");
+    }
+
     const vote = await ctx.db
       .query("post_points")
       .withIndex("by_post_user", (q) => q.eq("postId", args.postId).eq("userId", args.userId))

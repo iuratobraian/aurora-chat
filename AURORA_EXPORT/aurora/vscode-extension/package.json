@@ -1,0 +1,76 @@
+{
+  "name": "aurora-ai",
+  "displayName": "Aurora AI Assistant",
+  "description": "Always-on AI assistant for development teams",
+  "version": "1.0.0",
+  "publisher": "aurora-ai",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other",
+    "Programming Languages",
+    "Snippets"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "aurora.review",
+        "title": "Aurora: Code Review"
+      },
+      {
+        "command": "aurora.analyze",
+        "title": "Aurora: Deep Analysis"
+      },
+      {
+        "command": "aurora.optimize",
+        "title": "Aurora: Optimize"
+      },
+      {
+        "command": "aurora.explain",
+        "title": "Aurora: Explain Code"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "aurora.review",
+          "group": "aurora@1",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "aurora.analyze",
+          "group": "aurora@2"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Aurora AI",
+      "properties": {
+        "aurora.apiUrl": {
+          "type": "string",
+          "default": "http://localhost:4310",
+          "description": "Aurora API URL"
+        },
+        "aurora.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "Aurora API Key"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "node ./test/extension.test.js"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "eslint": "^8.56.0"
+  }
+}

@@ -7,11 +7,13 @@ import {
   clearSession,
   isSessionExpired,
   extendSession,
+  __resetCachesForTesting,
 } from '../../src/utils/sessionManager';
 
 describe('SessionManager', () => {
   beforeEach(() => {
     localStorage.clear();
+    __resetCachesForTesting();
   });
 
   describe('saveSession', () => {

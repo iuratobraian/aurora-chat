@@ -47,7 +47,7 @@ export default function RewardsView({ usuario, onNavigate, onLoginRequest }: Rew
     ? rewards
     : rewards.filter((r: any) => r.category === selectedCategory);
 
-  const categories = ['all', ...Array.from(new Set(rewards.map((r: any) => r.category)))];
+  const categories = ['all', ...Array.from(new Set(rewards.map((r: any) => String(r.category || 'other'))))];
 
   const handleRedeem = async (reward: any) => {
     if (!usuario) {
@@ -126,7 +126,7 @@ export default function RewardsView({ usuario, onNavigate, onLoginRequest }: Rew
       {/* Category Filter */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 overflow-hidden">
         <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-          {categories.map((cat) => (
+          {categories.map((cat: string) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
@@ -136,9 +136,9 @@ export default function RewardsView({ usuario, onNavigate, onLoginRequest }: Rew
                   : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/10'
               }`}
             >
-              {cat === 'all' ? 'Todas' : CATEGORY_ICONS[cat] ? (
+              {cat === 'all' ? 'Todas' : CATEGORY_ICONS[cat as keyof typeof CATEGORY_ICONS] ? (
                 <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-sm">{CATEGORY_ICONS[cat]}</span>
+                  <span className="material-symbols-outlined text-sm">{CATEGORY_ICONS[cat as keyof typeof CATEGORY_ICONS]}</span>
                   {cat.charAt(0).toUpperCase() + cat.slice(1)}
                 </div>
               ) : cat.charAt(0).toUpperCase() + cat.slice(1)}

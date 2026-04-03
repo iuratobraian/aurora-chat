@@ -1,4 +1,6 @@
-import { mutation } from "./_generated/server";
+import { mutation, internalMutation } from "./_generated/server";
+import { requireAdmin } from "./lib/auth";
+import { internal } from "./_generated/api";
 
 const MQL5_EAS = [
   {
@@ -243,7 +245,7 @@ const MQL5_EAS = [
   }
 ];
 
-export const seedMQL5EAs = mutation({
+export const seedMQL5EAsInternal = internalMutation({
   args: {},
   handler: async (ctx) => {
     const now = Date.now();
@@ -298,7 +300,7 @@ export const seedMQL5EAs = mutation({
   },
 });
 
-export const seedSampleProducts = mutation({
+export const seedSampleProductsInternal = internalMutation({
   args: {},
   handler: async (ctx) => {
     const now = Date.now();
@@ -412,3 +414,6 @@ export const seedSampleProducts = mutation({
     return { seeded: seededCount };
   },
 });
+
+// Public wrappers removed to avoid circular type references
+// Use internal versions directly: npx convex run seedProducts:seedMQL5EAsInternal

@@ -160,17 +160,19 @@ export const joinCommunity = mutation({
 
     // Verificar suscripción para comunidades pagadas
     if (community.accessType === "paid" && community.priceMonthly && community.priceMonthly > 0) {
-      const activeSubscription = await ctx.db
+      // Note: General subscriptions table doesn't have communityId
+      // Check for any active subscription as a placeholder
+      // TODO: Implement community-specific subscriptions if needed
+      const hasActiveSubscription = await ctx.db
         .query("subscriptions")
         .withIndex("by_userId", (q) => q.eq("userId", args.userId))
         .collect()
-        .then(subs => subs.find(s => 
-          s.status === "active" && 
-          s.communityId === args.communityId &&
+        .then(subs => subs.some(s =>
+          s.status === "active" &&
           (!s.currentPeriodEnd || s.currentPeriodEnd > Date.now())
         ));
 
-      if (!activeSubscription) {
+      if (!hasActiveSubscription) {
         throw new Error(`La comunidad "${community.name}" requiere suscripción activa. Realiza el pago primero.`);
       }
     }

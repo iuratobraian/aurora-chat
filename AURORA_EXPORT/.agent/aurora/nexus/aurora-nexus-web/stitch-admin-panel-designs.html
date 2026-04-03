@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin Panel Designs | TradePortal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container-low": "#1a1c1e",
+              "surface-container-highest": "#343538",
+              "on-surface-variant": "#c2c6d6",
+              "secondary-fixed": "#62ff96",
+              "primary-fixed": "#d8e2ff",
+              "surface-tint": "#adc6ff",
+              "surface-dim": "#121316",
+              "tertiary-container": "#b76dff",
+              "primary-container": "#4d8eff",
+              "on-background": "#e3e2e5",
+              "surface-variant": "#343538",
+              "outline": "#8c909f",
+              "surface-container-high": "#292a2d",
+              "primary": "#adc6ff",
+              "secondary": "#7dffa2",
+              "surface": "#121316",
+              "background": "#121316",
+              "tertiary": "#ddb7ff",
+              "error": "#ffb4ab"
+            },
+            fontFamily: {
+              "headline": ["Space Grotesk"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body {
+            background-color: #121316;
+            color: #e3e2e5;
+            font-family: 'Manrope', sans-serif;
+        }
+        .glass {
+            background: rgba(26, 28, 30, 0.4);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .section-title {
+            @apply text-[10px] font-headline uppercase tracking-[0.2em] text-on-surface-variant mb-4;
+        }
+    </style>
+</head>
+<body class="bg-background">
+<div class="p-8 max-w-[1600px] mx-auto">
+    
+    <!-- ============================================ -->
+    <!-- SECTION 1: USER MANAGEMENT -->
+    <!-- ============================================ -->
+    <section class="mb-16" id="user-management">
+        <h1 class="text-3xl font-headline font-bold text-primary mb-2">USER MANAGEMENT</h1>
+        <p class="text-on-surface-variant mb-8">Gestión completa de usuarios del sistema</p>
+        
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="glass p-6 rounded-2xl">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-headline uppercase tracking-[0.2em] text-on-surface-variant">Total Users</span>
+                    <span class="material-symbols-outlined text-primary text-xl">people</span>
+                </div>
+                <div class="text-4xl font-headline font-bold text-on-surface">12,847</div>
+                <div class="mt-4 flex items-center gap-2 text-[10px] text-secondary">
+                    <span class="material-symbols-outlined text-sm">trending_up</span>
+                    <span>+12% ESTE MES</span>
+                </div>
+            </div>
+            <div class="glass p-6 rounded-2xl">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-headline uppercase tracking-[0.2em] text-on-surface-variant">Active Now</span>
+                    <span class="material-symbols-outlined text-secondary text-xl">person</span>
+                </div>
+                <div class="text-4xl font-headline font-bold text-on-surface">2,341</div>
+                <div class="mt-4 text-[10px] text-on-surface-variant uppercase tracking-widest">EN LÍNEA AHORA</div>
+            </div>
+            <div class="glass p-6 rounded-2xl">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-headline uppercase tracking-[0.2em] text-on-surface-variant">New This Week</span>
+                    <span class="material-symbols-outlined text-tertiary text-xl">person_add</span>
+                </div>
+                <div class="text-4xl font-headline font-bold text-on-surface">456</div>
+                <div class="mt-4 text-[10px] text-tertiary uppercase tracking-widest">REGISTRACIONES</div>
+            </div>
+            <div class="glass p-6 rounded-2xl">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-headline uppercase tracking-[0.2em] text-on-surface-variant">Suspended</span>
+                    <span class="material-symbols-outlined text-error text-xl">person_off</span>
+                </div>
+                <div class="text-4xl font-headline font-bold text-on-surface">23</div>
+                <div class="mt-4 text-[10px] text-error uppercase tracking-widest">BANEADOS</div>
+            </div>
+        </div>
+        
+        <!-- Search & Filters -->
+        <div class="glass p-4 rounded-2xl mb-6">
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="flex-1">
+                    <input type="text" placeholder="Search users by name, email or ID..." class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-primary/50 focus:outline-none text-sm">
+                </div>
+                <div class="flex gap-2">
+                    <select class="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm">
+                        <option>All Roles</option>
+                        <option>Admin</option>
+                        <option>Creator</option>
+                        <option>User</option>
+                    </select>
+                    <select class="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm">
+                        <option>All Status</option>
+                        <option>Active</option>
+                        <option>Suspended</option>
+                    </select>
+                    <button class="px-6 py-3 rounded-xl bg-primary/20 border border-primary/30 text-primary font-bold text-sm hover:bg-primary/30 transition-all">
+                        filtrar
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Users Table -->
+        <div class="glass rounded-2xl overflow-hidden">
+            <table class="w-full">
+                <thead class="bg-white/5">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-[10px] font-headline uppercase tracking-widest text-on-surface-variant">User</th>
+                        <th class="px-6 py-4 text-left text-[10px] font-headline uppercase tracking-widest text-on-surface-variant">Role</th>
+                        <th class="px-6 py-4 text-left text-[10px] font-headline uppercase tracking-widest text-on-surface-variant">XP / Level</th>
+                        <th class="px-6 py-4 text-left text-[10px] font-headline uppercase tracking-widest text-on-surface-variant">Status</th>
+                        <th class="px-6 py-4 text-left text-[10px] font-headline uppercase tracking-widest text-on-surface-variant">Joined</th>
+                        <th class="px-6 py-4 text-left text-[10px] font-headline uppercase tracking-widest text-on-surface-variant">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                    <tr class="hover:bg-white/5 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-tertiary"></div>
+                                <div>
+                                    <div class="font-medium">Juan Pérez</div>
+                                    <div class="text-xs text-on-surface-variant">juan@email.com</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-[10px] font-bold uppercase rounded bg-primary/20 text-primary">Admin</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm font-bold">45,230 XP</div>
+                            <div class="text-xs text-on-surface-variant">Level 42</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-[10px] font-bold uppercase rounded bg-secondary/20 text-secondary">Active</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-on-surface-variant">Jan 15, 2026</td>
+                        <td class="px-6 py-4">
+                            <div class="flex gap-2">
+                                <button class="p-2 rounded-lg hover:bg-white/10 transition-colors"><span class="material-symbols-outlined text-sm">edit</span></button>
+                                <button class="p-2 rounded-lg hover:bg-error/20 transition-colors text-error"><span class="material-symbols-outlined text-sm">block</span></button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-white/5 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-secondary to-primary"></div>
+                                <div>
+                                    <div class="font-medium">María García</div>
+                                    <div class="text-xs text-on-surface-variant">maria@email.com</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-[10px] font-bold uppercase rounded bg-tertiary/20 text-tertiary">Creator</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm font-bold">28,500 XP</div>
+                            <div class="text-xs text-on-surface-variant">Level 28</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-[10px] font-bold uppercase rounded bg-secondary/20 text-secondary">Active</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-on-surface-variant">Feb 3, 2026</td>
+                        <td class="px-6 py-4">
+                            <div class="flex gap-2">
+                                <button class="p-2 rounded-lg hover:bg-white/10 transition-colors"><span class="material-symbols-outlined text-sm">edit</span></button>
+                                <button class="p-2 rounded-lg hover:bg-error/20 transition-colors text-error"><span class="material-symbols-outlined text-sm">block</span></button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- SECTION 2: COMMUNITIES -->
+    <!-- ============================================ -->
+    <section class="mb-16" id="communities">
+        <h1 class="text-3xl font-headline font-bold text-secondary mb-2">COMMUNITIES</h1>
+        <p class="text-on-surface-variant mb-8">Administración de comunidades del portal</p>
+        
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="glass p-6 rounded-2xl">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-headline uppercase tracking-[0.2em] text-on-surface-variant">Total Communities</span>
+                    <span class="material-symbols-outlined text-secondary text-xl">groups</span>
+                </div>
+                <div class="text-4xl font-headline font-bold text-on-surface">847</div>
+            </div>
+            <div class="glass p-6 rounded-2xl">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-headline uppercase tracking-[0.2em] text-on-surface-variant">Public</span>
+                    <span class="material-symbols-outlined text-primary text-xl">public</span>
+                </div>
+                <div class="text-4xl font-headline font-bold text-on-surface">623</div>
+            </div>
+            <div class="glass p-6 rounded-2xl">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-headline uppercase tracking-[0.2em] text-on-surface-variant">Private</span>
+                    <span class="material-symbols-outlined text-tertiary text-xl">lock</span>
+                </div>
+                <div class="text-4xl font-headline font-bold text-on-surface">156</div>
+            </div>
+            <div class="glass p-6 rounded-2xl">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-headline uppercase tracking-[0.2em] text-on-surface-variant">Premium</span>
+                    <span class="material-symbols-outlined text-amber-400 text-xl">workspace_premium</span>
+                </div>
+                <div class="text-4xl font-headline font-bold text-on-surface">68</div>
+            </div>
+        </div>
+        
+        <!-- Actions Bar -->
+        <div class="glass p-4 rounded-2xl mb-6 flex justify-between items-center">
+            <input type="text" placeholder="Search communities..." class="px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-secondary/50 focus:outline-none text-sm w-96">
+            <button class="px-6 py-3 rounded-xl bg-gradient-to-r from-secondary to-primary text-surface font-bold text-sm hover:shadow-lg hover:shadow-secondary/30 transition-all flex items-center gap-2">
+                <span class="material-symbols-outlined">add</span>
+                Nueva Comunidad
+            </button>
+        </div>
+        
+        <!-- Communities Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="glass p-5 rounded-2xl hover:border-secondary/30 transition-all">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-tertiary flex items-center justify-center text-2xl">📈</div>
+                    <span class="px-2 py-1 text-[10px] font-bold uppercase rounded bg-secondary/20 text-secondary">Active</span>
+                </div>
+                <h3 class="font-headline font-bold text-lg mb-1">Trading Masters</h3>
+                <p class="text-xs text-on-surface-variant mb-4">Comunidad principal de trading</p>
+                <div class="flex justify-between items-center text-sm">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm text-on-surface-variant">person</span>
+                        <span>12,450 members</span>
+                    </div>
+                    <button class="p-2 rounded-lg hover:bg-white/10 transition-colors"><span class="material-symbols-outlined text-sm">settings</span></button>
+                </div>
+            </div>
+            <div class="glass p-5 rounded-2xl hover:border-secondary/30 transition-all">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-2xl">💎</div>
+                    <span class="px-2 py-1 text-[10px] font-bold uppercase rounded bg-amber-400/20 text-amber-400">Premium</span>
+                </div>
+                <h3 class="font-headline font-bold text-lg mb-1">VIP Signals</h3>
+                <p class="text-xs text-on-surface-variant mb-4">Señales exclusivas para miembros</p>
+                <div class="flex justify-between items-center text-sm">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm text-on-surface-variant">person</span>
+                        <span>2,340 members</span>
+                    </div>
+                    <button class="p-2 rounded-lg hover:bg-white/10 transition-colors"><span class="material-symbols-outlined text-sm">settings</span></button>
+                </div>
+            </div>
+            <div class="glass p-5 rounded-2xl hover:border-secondary/30 transition-all">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-2xl">🎓</div>
+                    <span class="px-2 py-1 text-[10px] font-bold uppercase rounded bg-secondary/20 text-secondary">Active</span>
+                </div>
+                <h3 class="font-headline font-bold text-lg mb-1">EduTrade Academy</h3>
+                <p class="text-xs text-on-surface-variant mb-4">Cursos y educación financiera</p>
+                <div class="flex justify-between items-center text-sm">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm text-on-surface-variant">person</span>
+                        <span>8,920 members</span>
+                    </div>
+                    <button class="p-2 rounded-lg hover:bg-white/10 transition-colors"><span class="material-symbols-outlined text-sm">settings</span></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- SECTION 3: POSTS / CONTENT -->
+    <!-- ============================================ -->
+    <section class="mb-16" id="posts">
+        <h1 class="text-3xl font-headline font-bold text-tertiary mb-2">POSTS & CONTENT</h1>
+        <p class="text-on-surface-variant mb-8">Moderación y gestión de contenido</p>
+        
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="glass p-6 rounded-2xl">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-headline uppercase tracking-[0.2em] text-on-surface-variant">Total Posts</span>
+                    <span class="material-symbols-outlined text-tertiary text-xl">article</span>
+                </div>
+                <div class="text-4xl font-headline font-bold text-on-surface">45,231</div>
+            </div>
+            <div class="glass p-6 rounded-2xl">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-headline uppercase tracking-[0.2em] text-on-surface-variant">Today</span>
+                    <span class="material-symbols-outlined text-primary text-xl">today</span>
+                </div>
+                <div class="text-4xl font-headline font-bold text-on-surface">342</div>
+            </div>
+            <div class="glass p-6 rounded-2xl">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-headline uppercase tracking-[0.2em] text-on-surface-variant">Pending Review</span>
+                    <span class="material-symbols-outlined text-amber-400 text-xl">pending</span>
+                </div>
+                <div class="text-4xl font-headline font-bold text-on-surface">28</div>
+            </div>
+            <div class="glass p-6 rounded-2xl">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-headline uppercase tracking-[0.2em] text-on-surface-variant">Reported</span>
+                    <span class="material-symbols-outlined text-error text-xl">flag</span>
+                </div>
+                <div class="text-4xl font-headline font-bold text-on-surface">7</div>
+            </div>
+        </div>
+        
+        <!-- Filter Tabs -->
+        <div class="flex gap-2 mb-6">
+            <button class="px-4 py-2 rounded-xl bg-primary/20 border border-primary/30 text-primary font-bold text-sm">All</button>
+            <button class="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-on-surface-variant text-sm hover:bg-white/10">Published</button>
+            <button class="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-on-surface-variant text-sm hover:bg-white/10">Pending</button>
+            <button class="px-4 py-2 rounded-xl bg-error/20 border border-error/30 text-error text-sm">Reported</button>
+        </div>
+        
+        <!-- Posts Table -->
+        <div class="glass rounded-2xl overflow-hidden">
+            <table class="w-full">
+                <thead class="bg-white/5">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-[10px] font-headline uppercase tracking-widest text-on-surface-variant">Content</th>
+                        <th class="px-6 py-4 text-left text-[10px] font-headline uppercase tracking-widest text-on-surface-variant">Author</th>
+                        <th class="px-6 py-4 text-left text-[10px] font-headline uppercase tracking-widest text-on-surface-variant">Category</th>
+                        <th class="px-6 py-4 text-left text-[10px] font-headline uppercase tracking-widest text-on-surface-variant">Status</th>
+                        <th class="px-6 py-4 text-left text-[10px] font-headline uppercase tracking-widest text-on-surface-variant">Date</th>
+                        <th class="px-6 py-4 text-left text-[10px] font-headline uppercase tracking-widest text-on-surface-variant">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                    <tr class="hover:bg-white/5 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="max-w-md">
+                                <div class="font-medium line-clamp-1">Análisis técnico del EUR/USD para esta semana</div>
+                                <div class="text-xs text-on-surface-variant line-clamp-2">El par EUR/USD muestra señales mixtas en el gráfico diario...</div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-tertiary"></div>
+                                <span class="text-sm">TraderPro</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-[10px] font-bold uppercase rounded bg-primary/20 text-primary">Signal</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-[10px] font-bold uppercase rounded bg-secondary/20 text-secondary">Published</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-on-surface-variant">2 hours ago</td>
+                        <td class="px-6 py-4">
+                            <div class="flex gap-2">
+                                <button class="p-2 rounded-lg hover:bg-white/10 transition-colors"><span class="material-symbols-outlined text-sm">visibility</span></button>
+                                <button class="p-2 rounded-lg hover:bg-error/20 transition-colors text-error"><span class="material-symbols-outlined text-sm">delete</span></button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-white/5 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="max-w-md">
+                                <div class="font-medium line-clamp-1">Nuevo sistema de referral</div>
+                                <div class="text-xs text-on-surface-variant line-clamp-2">¡Hemos lanzado un nuevo sistema de referidos...</div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-secondary to-primary"></div>
+                                <span class="text-sm">Admin</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-[10px] font-bold uppercase rounded bg-tertiary/20 text-tertiary">Announcement</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-[10px] font-bold uppercase rounded bg-secondary/20 text-secondary">Published</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-on-surface-variant">5 hours ago</td>
+                        <td class="px-6 py-4">
+                            <div class="flex gap-2">
+                                <button class="p-2 rounded-lg hover:bg-white/10 transition-colors"><span class="material-symbols-outlined text-sm">visibility</span></button>
+                                <button class="p-2 rounded-lg hover:bg-error/20 transition-colors text-error"><span class="material-symbols-outlined text-sm">delete</span></button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- SECTION 4: ADS MANAGEMENT -->
+    <!-- ============================================ -->
+    <section class="mb-16" id="ads">
+        <h1 class="text-3xl font-headline font-bold text-amber-400 mb-2">ADS MANAGEMENT</h1>
+        <p class="text-on-surface-variant mb-8">Gestión de publicidad y campañas</p>
+        
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="glass p-6 rounded-2xl">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-headline uppercase tracking-[0.2em] text-on-surface-variant">Active Campaigns</span>
+                    <span class="material-symbols-outlined text-amber-400 text-xl">campaign</span>
+                </div>
+                <div class="text-4xl font-headline font-bold text-on-surface">12</div>
+            </div>
+            <div class="glass p-6 rounded-2xl">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-headline uppercase tracking-[0.2em] text-on-surface-variant">Total Impressions</span>
+                    <span class="material-symbols-outlined text-primary text-xl">visibility</span>
+                </div>
+                <div class="text-4xl font-headline font-bold text-on-surface">2.4M</div>
+            </div>
+            <div class="glass p-6 rounded-2xl">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-headline uppercase tracking-[0.2em] text-on-surface-variant">Clicks</span>
+                    <span class="material-symbols-outlined text-secondary text-xl">touch_app</span>
+                </div>
+                <div class="text-4xl font-headline font-bold text-on-surface">45,231</div>
+            </div>
+            <div class="glass p-6 rounded-2xl">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-headline uppercase tracking-[0.2em] text-on-surface-variant">Revenue</span>
+                    <span class="material-symbols-outlined text-tertiary text-xl">attach_money</span>
+                </div>
+                <div class="text-4xl font-headline font-bold text-on-surface">$8,450</div>
+            </div>
+        </div>
+        
+        <!-- Campaigns Table -->
+        <div class="glass rounded-2xl overflow-hidden">
+            <div class="p-4 border-b border-white/10 flex justify-between items-center">
+                <h3 class="font-headline font-bold">Active Campaigns</h3>
+                <button class="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-surface font-bold text-sm hover:shadow-lg hover:shadow-amber-400/30 transition-all flex items-center gap-2">
+                    <span class="material-symbols-outlined">add</span>
+                    New Campaign
+                </button>
+            </div>
+            <table class="w-full">
+                <thead class="bg-white/5">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-[10px] font-headline uppercase tracking-widest text-on-surface-variant">Campaign</th>
+                        <th class="px-6 py-4 text-left text-[10px] font-headline uppercase tracking-widest text-on-surface-variant">Type</th>
+                        <th class="px-6 py-4 text-left text-[10px] font-headline uppercase tracking-widest text-on-surface-variant">Impressions</th>
+                        <th class="px-6 py-4 text-left text-[10px] font-headline uppercase tracking-widest text-on-surface-variant">Clicks</th>
+                        <th class="px-6 py-4 text-left text-[10px] font-headline uppercase tracking-widest text-on-surface-variant">CTR</th>
+                        <th class="px-6 py-4 text-left text-[10px] font-headline uppercase tracking-widest text-on-surface-variant">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                    <tr class="hover:bg-white/5 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="font-medium">Pro Subscription Promo</div>
+                            <div class="text-xs text-on-surface-variant">Mar 1 - Mar 31, 2026</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-[10px] font-bold uppercase rounded bg-primary/20 text-primary">Banner</span>
+                        </td>
+                        <td class="px-6 py-4">850,000</td>
+                        <td class="px-6 py-4">12,450</td>
+                        <td class="px-6 py-4 text-secondary">1.46%</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-[10px] font-bold uppercase rounded bg-secondary/20 text-secondary">Active</span>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-white/5 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="font-medium">Weekend Signal</div>
+                            <div class="text-xs text-on-surface-variant">Mar 15 - Mar 20, 2026</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-[10px] font-bold uppercase rounded bg-tertiary/20 text-tertiary">Native</span>
+                        </td>
+                        <td class="px-6 py-4">420,000</td>
+                        <td class="px-6 py-4">8,230</td>
+                        <td class="px-6 py-4 text-secondary">1.96%</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-[10px] font-bold uppercase rounded bg-secondary/20 text-secondary">Active</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- SECTION 5: ANALYTICS -->
+    <!-- ============================================ -->
+    <section class="mb-16" id="analytics">
+        <h1 class="text-3xl font-headline font-bold text-primary mb-2">ANALYTICS</h1>
+        <p class="text-on-surface-variant mb-8">Métricas y análisis del portal</p>
+        
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="glass p-6 rounded-2xl">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-headline uppercase tracking-[0.2em] text-on-surface-variant">Page Views</span>
+                    <span class="material-symbols-outlined text-primary text-xl">pageview</span>
+                </div>
+                <div class="text-4xl font-headline font-bold text-on-surface">1.2M</div>
+                <div class="mt-4 flex items-center gap-2 text-[10px] text-secondary">
+                    <span class="material-symbols-outlined text-sm">trending_up</span>
+                    <span>+18% vs last week</span>
+                </div>
+            </div>
+            <div class="glass p-6 rounded-2xl">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-headline uppercase tracking-[0.2em] text-on-surface-variant">Avg. Session</span>
+                    <span class="material-symbols-outlined text-secondary text-xl">schedule</span>
+                </div>
+                <div class="text-4xl font-headline font-bold text-on-surface">8:24</div>
+                <div class="mt-4 text-[10px] text-on-surface-variant uppercase tracking-widest">MINUTES</div>
+            </div>
+            <div class="glass p-6 rounded-2xl">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-headline uppercase tracking-[0.2em] text-on-surface-variant">Bounce Rate</span>
+                    <span class="material-symbols-outlined text-tertiary text-xl">exit_to_app</span>
+                </div>
+                <div class="text-4xl font-headline font-bold text-on-surface">32%</div>
+                <div class="mt-4 text-[10px] text-secondary uppercase tracking-widest">-5% IMPROVEMENT</div>
+            </div>
+            <div class="glass p-6 rounded-2xl">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-headline uppercase tracking-[0.2em] text-on-surface-variant">Conversions</span>
+                    <span class="material-symbols-outlined text-amber-400 text-xl">trending_up</span>
+                </div>
+                <div class="text-4xl font-headline font-bold text-on-surface">4.2%</div>
+                <div class="mt-4 text-[10px] text-secondary uppercase tracking-widest">+0.8% THIS MONTH</div>
+            </div>
+        </div>
+        
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Traffic Chart -->
+            <div class="glass p-6 rounded-2xl">
+                <h3 class="font-headline font-bold mb-6">Traffic Overview</h3>
+                <div class="h-48 flex items-end gap-2">
+                    <div class="flex-1 bg-primary/20 rounded-t-lg" style="height: 40%"></div>
+                    <div class="flex-1 bg-primary/30 rounded-t-lg" style="height: 65%"></div>
+                    <div class="flex-1 bg-primary/40 rounded-t-lg" style="height: 55%"></div>
+                    <div class="flex-1 bg-primary/50 rounded-t-lg" style="height: 80%"></div>
+                    <div class="flex-1 bg-primary/60 rounded-t-lg" style="height: 70%"></div>
+                    <div class="flex-1 bg-primary/70 rounded-t-lg" style="height: 90%"></div>
+                    <div class="flex-1 bg-primary rounded-t-lg" style="height: 75%"></div>
+                </div>
+                <div class="flex justify-between mt-2 text-xs text-on-surface-variant">
+                    <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                </div>
+            </div>
+            
+            <!-- User Growth -->
+            <div class="glass p-6 rounded-2xl">
+                <h3 class="font-headline font-bold mb-6">User Growth</h3>
+                <div class="h-48 flex items-end gap-2">
+                    <div class="flex-1 bg-secondary/20 rounded-t-lg" style="height: 30%"></div>
+                    <div class="flex-1 bg-secondary/30 rounded-t-lg" style="height: 45%"></div>
+                    <div class="flex-1 bg-secondary/40 rounded-t-lg" style="height: 50%"></div>
+                    <div class="flex-1 bg-secondary/50 rounded-t-lg" style="height: 65%"></div>
+                    <div class="flex-1 bg-secondary/60 rounded-t-lg" style="height: 70%"></div>
+                    <div class="flex-1 bg-secondary/70 rounded-t-lg" style="height: 85%"></div>
+                    <div class="flex-1 bg-secondary rounded-t-lg" style="height: 100%"></div>
+                </div>
+                <div class="flex justify-between mt-2 text-xs text-on-surface-variant">
+                    <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Top Pages -->
+        <div class="glass p-6 rounded-2xl">
+            <h3 class="font-headline font-bold mb-6">Top Pages</h3>
+            <div class="space-y-4">
+                <div class="flex items-center justify-between p-3 rounded-xl bg-white/5">
+                    <div class="flex items-center gap-4">
+                        <span class="text-primary font-bold">1</span>
+                        <span>/dashboard</span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-on-surface-variant">245,000 views</span>
+                        <span class="text-secondary">+12%</span>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between p-3 rounded-xl bg-white/5">
+                    <div class="flex items-center gap-4">
+                        <span class="text-primary font-bold">2</span>
+                        <span>/comunidad</span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-on-surface-variant">189,000 views</span>
+                        <span class="text-secondary">+8%</span>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between p-3 rounded-xl bg-white/5">
+                    <div class="flex items-center gap-4">
+                        <span class="text-primary font-bold">3</span>
+                        <span>/signals</span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-on-surface-variant">156,000 views</span>
+                        <span class="text-secondary">+15%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+</body></html>

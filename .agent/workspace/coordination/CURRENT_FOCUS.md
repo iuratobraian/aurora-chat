@@ -1,20 +1,27 @@
-# CURRENT FOCUS: QA Sprint 5 & Final Stability
+# CURRENT FOCUS: Audit Cleanup - Type Guards & NeonLoader
+
+## AGENT: @aurora
+- TASK-ID: AUDIT-004, AUDIT-005
+- Fecha: 2026-04-02
+- Estado: **IN PROGRESS**
 
 ## Tasks
-- [ ] **QA-005**: Smoke test Sprint 5 (Communities, Rewards, Pricing, News, Capitalize).
-- [ ] **QA-006**: Visual Audit (Consistency with Flat v2 design system).
-- [x] **TSK-106**: Discover Communities Polish (Filters added).
-- [x] **TSK-107**: Rewards System Polish (XP Boosters added).
-- [x] **TSK-108**: Subscriptions Polish (Module tooltips & builder UI).
+- [ ] **AUDIT-004**: Add type guards for ctx.db.get() across Convex files
+- [ ] **AUDIT-005**: Fix NeonLoader size prop type
 
 ## Files Involved
-- `src/views/DiscoverCommunities.tsx`
-- `src/views/RewardsView.tsx`
-- `src/views/PricingView.tsx`
-- `src/views/NewsView.tsx`
-- `src/views/CapitalizeView.tsx`
+- `convex/posts.ts` (type guards for ctx.db.get)
+- `convex/*.ts` (type assertions)
+- `src/components/AuthModal.tsx` (NeonLoader size prop)
+- `src/components/ui/NeonLoader.tsx` (size prop definition)
 
 ## Forbidden Files
 - `App.tsx`
-- `Navigation.tsx` (unless explicitly needed for QA fixes)
-- `AdminView.tsx` (unless explicitly needed for QA fixes)
+- `Navigation.tsx`
+- `ComunidadView.tsx`
+- `PricingView.tsx`
+
+## Output Signal
+- `npm run lint` returns "Found 0 errors"
+- `npm run build` exits with code 0
+- AUDIT-004, AUDIT-005 marked as `done` in TASK_BOARD.md

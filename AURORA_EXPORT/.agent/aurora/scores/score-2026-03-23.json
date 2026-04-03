@@ -1,0 +1,51 @@
+{
+  "generatedAt": "2026-03-23T07:34:59.484Z",
+  "metrics": {
+    "utilityScore": 100,
+    "reuseScore": 0.64,
+    "driftScore": 73,
+    "contextPrecision": 50,
+    "overallScore": 48
+  },
+  "knowledgeEntries": 139,
+  "structuredKnowledgeEntries": 139,
+  "structuredCoveragePct": 100,
+  "validatedKnowledgeEntries": 139,
+  "validatedCoveragePct": 100,
+  "averageConfidence": 0.72,
+  "averageReuseScore": 0.64,
+  "recentActivityEntries24h": 0,
+  "agentLogEntries": 43,
+  "learningLogEntries": 10,
+  "activityFreshnessMs": 190009032.76904297,
+  "knowledgeFreshnessMs": 128413597.44458008,
+  "topDomains": [
+    {
+      "domain": "general",
+      "count": 81
+    },
+    {
+      "domain": "aurora_ops",
+      "count": 33
+    },
+    {
+      "domain": "community_product",
+      "count": 9
+    },
+    {
+      "domain": "security",
+      "count": 9
+    },
+    {
+      "domain": "growth",
+      "count": 7
+    }
+  ],
+  "taskStats": {
+    "total": 205,
+    "done": 191,
+    "pending": 11,
+    "claimed": 0
+  },
+  "historicalScores": []
+}

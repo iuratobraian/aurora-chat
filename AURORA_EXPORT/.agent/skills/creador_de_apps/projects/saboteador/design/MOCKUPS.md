@@ -1,0 +1,944 @@
+---
+name: saboteador_mockups
+description: Mockups HTML/CSS funcionales para El Saboteador Invisible
+---
+
+# El Saboteador Invisible - Mockups
+
+## Archivo: mockups.html
+
+Demo funcional con StartScreen y RevealScreen.
+
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>El Saboteador Invisible</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ==================== TOKENS ==================== */
+    :root {
+      --bg-void: #0a0a0b;
+      --bg-obsidian: #0f0f12;
+      --bg-card: rgba(20, 20, 24, 0.85);
+      --border-subtle: rgba(73, 68, 84, 0.15);
+      --border-glow: rgba(255, 255, 255, 0.08);
+      
+      --neon-red: #ff003c;
+      --neon-red-glow: rgba(255, 0, 60, 0.4);
+      --neon-green: #00ff94;
+      --neon-green-glow: rgba(0, 255, 148, 0.4);
+      --neon-blue: #00d4ff;
+      --neon-blue-glow: rgba(0, 212, 255, 0.4);
+      --neon-yellow: #ffd700;
+      --neon-yellow-glow: rgba(255, 215, 0, 0.4);
+      --neon-purple: #a855f7;
+      --neon-purple-glow: rgba(168, 85, 247, 0.4);
+      
+      --text-primary: #e5e2e1;
+      --text-secondary: #86868b;
+      --accent-gradient: linear-gradient(135deg, #d0bcff 0%, #a078ff 100%);
+      
+      --font-display: 'Orbitron', sans-serif;
+      --font-body: 'Inter', sans-serif;
+    }
+
+    /* ==================== RESET ==================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-void);
+      color: var(--text-primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
+    /* ==================== ANIMATIONS ==================== */
+    @keyframes glitch {
+      0%, 100% { transform: translate(0); filter: none; }
+      20% { transform: translate(-2px, 2px); filter: hue-rotate(90deg); }
+      40% { transform: translate(-2px, -2px); }
+      60% { transform: translate(2px, 2px); filter: hue-rotate(-90deg); }
+      80% { transform: translate(2px, -2px); }
+    }
+
+    @keyframes pulse-neon {
+      0%, 100% { 
+        box-shadow: 0 0 5px var(--neon-green), 0 0 10px var(--neon-green-glow);
+      }
+      50% { 
+        box-shadow: 0 0 20px var(--neon-green), 0 0 40px var(--neon-green-glow);
+      }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes breathe {
+      0%, 100% { opacity: 0.8; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.02); }
+    }
+
+    @keyframes hold-fill {
+      from { width: 0%; }
+      to { width: 100%; }
+    }
+
+    @keyframes reveal-fade {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes scanline {
+      0% { top: -100%; }
+      100% { top: 100%; }
+    }
+
+    /* ==================== START SCREEN ==================== */
+    .start-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      text-align: center;
+      animation: breathe 4s ease-in-out infinite;
+    }
+
+    .logo {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: clamp(2rem, 8vw, 3.5rem);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: none;
+      filter: drop-shadow(0 0 20px rgba(160, 120, 255, 0.5));
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .logo-icon {
+      font-size: clamp(4rem, 15vw, 6rem);
+      display: block;
+      margin-bottom: 1rem;
+      animation: pulse-neon 2s ease-in-out infinite;
+      filter: drop-shadow(0 0 20px var(--neon-red));
+    }
+
+    .subtitle {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      margin-top: -1rem;
+    }
+
+    .menu-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .btn {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 1rem 3rem;
+      border-radius: 0.75rem;
+      border: 2px solid var(--neon-green);
+      background: transparent;
+      color: var(--neon-green);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+      min-width: 280px;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 255, 148, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .btn:hover {
+      background: var(--neon-green);
+      color: var(--bg-void);
+      box-shadow: 0 0 20px var(--neon-green-glow), 0 0 40px var(--neon-green-glow);
+      transform: scale(1.02);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn--secondary {
+      border-color: var(--text-secondary);
+      color: var(--text-secondary);
+    }
+
+    .btn--secondary:hover {
+      background: var(--text-secondary);
+      color: var(--bg-void);
+      box-shadow: 0 0 20px rgba(134, 134, 139, 0.4);
+    }
+
+    .btn--danger {
+      border-color: var(--neon-red);
+      color: var(--neon-red);
+    }
+
+    .btn--danger:hover {
+      background: var(--neon-red);
+      color: var(--bg-void);
+      box-shadow: 0 0 20px var(--neon-red-glow);
+    }
+
+    .version {
+      position: fixed;
+      bottom: 1rem;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      opacity: 0.5;
+    }
+
+    /* ==================== PLAYER SETUP ==================== */
+    .setup-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+      max-width: 400px;
+      width: 100%;
+    }
+
+    .setup-title {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-primary);
+    }
+
+    .player-counter {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      padding: 1.5rem 2rem;
+      border-radius: 1rem;
+      border: 1px solid var(--border-glow);
+    }
+
+    .counter-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: 2px solid var(--neon-purple);
+      background: transparent;
+      color: var(--neon-purple);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .counter-btn:hover {
+      background: var(--neon-purple);
+      color: var(--bg-void);
+      box-shadow: 0 0 15px var(--neon-purple-glow);
+    }
+
+    .counter-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .counter-value {
+      font-family: var(--font-display);
+      font-size: 3rem;
+      font-weight: 900;
+      color: var(--neon-purple);
+      min-width: 80px;
+      text-align: center;
+    }
+
+    .player-range {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      text-align: center;
+      margin-top: -1rem;
+    }
+
+    /* Role preview */
+    .role-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+
+    .role-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border: 1px solid;
+    }
+
+    .role-badge--saboteur {
+      background: rgba(255, 0, 60, 0.2);
+      border-color: var(--neon-red);
+      color: var(--neon-red);
+    }
+
+    .role-badge--normal {
+      background: rgba(0, 255, 148, 0.2);
+      border-color: var(--neon-green);
+      color: var(--neon-green);
+    }
+
+    .role-badge--detective {
+      background: rgba(168, 85, 247, 0.2);
+      border-color: var(--neon-purple);
+      color: var(--neon-purple);
+    }
+
+    .role-badge--agent {
+      background: rgba(255, 215, 0, 0.2);
+      border-color: var(--neon-yellow);
+      color: var(--neon-yellow);
+    }
+
+    .role-badge--protector {
+      background: rgba(0, 212, 255, 0.2);
+      border-color: var(--neon-blue);
+      color: var(--neon-blue);
+    }
+
+    /* ==================== REVEAL SCREEN ==================== */
+    .reveal-screen {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .reveal-screen::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      opacity: 0.03;
+      pointer-events: none;
+    }
+
+    .reveal-content {
+      text-align: center;
+      z-index: 1;
+    }
+
+    .reveal-question {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      margin-bottom: 3rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+    }
+
+    .reveal-button {
+      position: relative;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      border: 3px solid var(--neon-purple);
+      background: transparent;
+      color: var(--neon-purple);
+      font-size: 3rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      overflow: hidden;
+    }
+
+    .reveal-button:hover {
+      box-shadow: 0 0 30px var(--neon-purple-glow);
+    }
+
+    .reveal-progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 4px;
+      background: var(--neon-purple);
+      box-shadow: 0 0 10px var(--neon-purple-glow);
+      transition: width 0.1s linear;
+    }
+
+    .reveal-hint {
+      margin-top: 2rem;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      opacity: 0.6;
+    }
+
+    /* Role reveal card */
+    .role-card {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-void);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      animation: reveal-fade 0.5s ease-out;
+    }
+
+    .role-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, transparent 0%, var(--bg-void) 70%);
+      pointer-events: none;
+    }
+
+    .role-icon {
+      font-size: 6rem;
+      margin-bottom: 2rem;
+      animation: glitch 0.5s ease-out;
+    }
+
+    .role-icon--saboteur {
+      filter: drop-shadow(0 0 30px var(--neon-red));
+    }
+
+    .role-icon--normal {
+      filter: drop-shadow(0 0 30px var(--neon-green));
+    }
+
+    .role-icon--detective {
+      filter: drop-shadow(0 0 30px var(--neon-purple));
+    }
+
+    .role-icon--agent {
+      filter: drop-shadow(0 0 30px var(--neon-yellow));
+    }
+
+    .role-icon--protector {
+      filter: drop-shadow(0 0 30px var(--neon-blue));
+    }
+
+    .role-title {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.5rem;
+    }
+
+    .role-title--saboteur { color: var(--neon-red); }
+    .role-title--normal { color: var(--neon-green); }
+    .role-title--detective { color: var(--neon-purple); }
+    .role-title--agent { color: var(--neon-yellow); }
+    .role-title--protector { color: var(--neon-blue); }
+
+    .role-description {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      max-width: 300px;
+      text-align: center;
+      line-height: 1.6;
+      margin-bottom: 3rem;
+    }
+
+    .btn--continue {
+      border-color: var(--neon-purple);
+      color: var(--neon-purple);
+    }
+
+    .btn--continue:hover {
+      background: var(--neon-purple);
+      color: var(--bg-void);
+      box-shadow: 0 0 20px var(--neon-purple-glow);
+    }
+
+    /* ==================== MISSION SCREEN ==================== */
+    .mission-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+      padding: 2rem;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .mission-header {
+      text-align: center;
+    }
+
+    .mission-number {
+      font-family: var(--font-display);
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+    }
+
+    .mission-title {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-top: 0.5rem;
+    }
+
+    .mission-timer {
+      font-family: var(--font-display);
+      font-size: 4rem;
+      font-weight: 900;
+      color: var(--neon-green);
+      text-shadow: 0 0 20px var(--neon-green-glow);
+      animation: pulse-neon 1s ease-in-out infinite;
+    }
+
+    .mission-timer--warning {
+      color: var(--warning);
+      animation: glitch 0.2s ease-in-out infinite;
+    }
+
+    .mission-timer--critical {
+      color: var(--neon-red);
+      animation: glitch 0.1s ease-in-out infinite;
+    }
+
+    .mission-content {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      padding: 2rem;
+      border-radius: 1rem;
+      border: 1px solid var(--border-glow);
+      width: 100%;
+      text-align: center;
+    }
+
+    .mission-prompt {
+      font-size: 1.125rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .mission-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .mission-option {
+      padding: 1rem;
+      border-radius: 0.5rem;
+      border: 2px solid var(--border-subtle);
+      background: transparent;
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .mission-option:hover {
+      border-color: var(--neon-purple);
+      background: rgba(168, 85, 247, 0.1);
+    }
+
+    .mission-option--success {
+      border-color: var(--neon-green);
+      background: rgba(0, 255, 148, 0.1);
+    }
+
+    .mission-option--sabotage {
+      border-color: var(--neon-red);
+      background: rgba(255, 0, 60, 0.1);
+    }
+
+    /* ==================== UTILITY ==================== */
+    .hidden {
+      display: none !important;
+    }
+
+    .screen {
+      display: none;
+      width: 100%;
+      height: 100%;
+    }
+
+    .screen.active {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Scanline overlay */
+    .scanline {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      animation: scanline 4s linear infinite;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.3;
+    }
+  </style>
+</head>
+<body>
+  <div class="scanline"></div>
+
+  <!-- ==================== START SCREEN ==================== -->
+  <div id="start-screen" class="screen active">
+    <div class="start-screen">
+      <span class="logo-icon">💀</span>
+      <h1 class="logo">El Saboteador<br>Invisible</h1>
+      <p class="subtitle">Juego Social de Deducción</p>
+      
+      <div class="menu-buttons">
+        <button class="btn" onclick="showScreen('setup-screen')">Nueva Partida</button>
+        <button class="btn btn--secondary" onclick="showScreen('tutorial-screen')">Cómo Jugar</button>
+        <button class="btn btn--secondary" disabled>Continuar</button>
+      </div>
+    </div>
+    <span class="version">v1.0.0 • 5-10 jugadores</span>
+  </div>
+
+  <!-- ==================== SETUP SCREEN ==================== -->
+  <div id="setup-screen" class="screen">
+    <div class="setup-screen">
+      <h2 class="setup-title">¿Cuántos jugadores?</h2>
+      
+      <div class="player-counter">
+        <button class="counter-btn" onclick="changePlayers(-1)" id="btn-minus">−</button>
+        <span class="counter-value" id="player-count">6</span>
+        <button class="counter-btn" onclick="changePlayers(1)" id="btn-plus">+</button>
+      </div>
+      
+      <p class="player-range">Mínimo 5 • Máximo 10</p>
+      
+      <div class="role-preview" id="role-preview">
+        <!-- Dynamically populated -->
+      </div>
+      
+      <div class="menu-buttons" style="margin-top: 2rem;">
+        <button class="btn" onclick="startGame()">Comenzar</button>
+        <button class="btn btn--secondary" onclick="showScreen('start-screen')">Volver</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== REVEAL SCREEN ==================== -->
+  <div id="reveal-screen" class="screen">
+    <div class="reveal-screen">
+      <div class="reveal-content">
+        <p class="reveal-question">¿Listo para ver tu rol?</p>
+        <button 
+          class="reveal-button" 
+          id="reveal-btn"
+          onmousedown="startHold()"
+          onmouseup="cancelHold()"
+          onmouseleave="cancelHold()"
+          ontouchstart="startHold()"
+          ontouchend="cancelHold()"
+        >
+          <span>👁️</span>
+          <div class="reveal-progress" id="reveal-progress"></div>
+        </button>
+        <p class="reveal-hint">Mantén presionado para revelar</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== ROLE CARD ==================== -->
+  <div id="role-card" class="screen">
+    <div class="role-card">
+      <span class="role-icon" id="role-icon">☘️</span>
+      <h2 class="role-title" id="role-title">Normal</h2>
+      <p class="role-description" id="role-description">
+        Trabaja con los demás para completar las misiones. Identifica a los saboteadores antes de que fallen todo.
+      </p>
+      <button class="btn btn--continue" onclick="showScreen('mission-screen')">Entendido</button>
+    </div>
+  </div>
+
+  <!-- ==================== MISSION SCREEN ==================== -->
+  <div id="mission-screen" class="screen">
+    <div class="mission-screen">
+      <div class="mission-header">
+        <p class="mission-number">Misión 1 de 5</p>
+        <h2 class="mission-title">El Dilema del Prisionero</h2>
+      </div>
+      
+      <p class="mission-timer" id="mission-timer">60</p>
+      
+      <div class="mission-content">
+        <p class="mission-prompt">¿Cooperas con el equipo o actúas solo?</p>
+        <div class="mission-options">
+          <button class="mission-option mission-option--success">✅ Cooperar - Completar la misión</button>
+          <button class="mission-option mission-option--sabotage">💥 Sabotear - Fracasar a propósito</button>
+        </div>
+      </div>
+      
+      <button class="btn btn--secondary" onclick="showScreen('start-screen')" style="margin-top: 1rem;">Abandonar</button>
+    </div>
+  </div>
+
+  <!-- ==================== TUTORIAL SCREEN ==================== -->
+  <div id="tutorial-screen" class="screen">
+    <div class="setup-screen" style="padding: 2rem; overflow-y: auto;">
+      <h2 class="setup-title">Cómo Jugar</h2>
+      
+      <div style="text-align: left; margin-top: 2rem; line-height: 1.8; color: var(--text-secondary);">
+        <p style="margin-bottom: 1rem;"><strong style="color: var(--neon-red);">💀 Saboteadores:</strong> Hackean las misiones para que fallen. No los conoces.</p>
+        <p style="margin-bottom: 1rem;"><strong style="color: var(--neon-green);">☘️ Normales:</strong> Intentan completar las misiones sin saber quién es quién.</p>
+        <p style="margin-bottom: 1rem;"><strong style="color: var(--neon-purple);">🔍 Detective:</strong> Normal con poder de ver cuántos saboteadores hay en una misión.</p>
+        <p style="margin-bottom: 1rem;"><strong style="color: var(--neon-yellow);">🃏 Doble Agente:</strong> Vota como normal pero gana si hay empate.</p>
+        <p style="margin-bottom: 1rem;"><strong style="color: var(--neon-blue);">🛡️ Protector:</strong> Puede neutralize un sabotaje una vez por partida.</p>
+      </div>
+      
+      <div class="menu-buttons" style="margin-top: 2rem;">
+        <button class="btn" onclick="showScreen('start-screen')">Entendido</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==================== STATE ====================
+    let playerCount = 6;
+    let holdInterval = null;
+    let holdProgress = 0;
+    
+    const roles = {
+      saboteur: { icon: '💀', title: 'Saboteador', class: 'saboteur', description: 'Tu misión es hacer fallar las misiones. Trabaja en las sombras y no te descubran.' },
+      normal: { icon: '☘️', title: 'Normal', class: 'normal', description: 'Trabaja con los demás para completar las misiones. Identifica a los saboteadores.' },
+      detective: { icon: '🔍', title: 'Detective', class: 'detective', description: 'Eres normal, pero al final de cada ronda puedes ver cuántos saboteadores participaron.' },
+      agent: { icon: '🃏', title: 'Doble Agente', class: 'agent', description: 'Votas como normal pero ganas si hay empate de vivos. No te expulsen.' },
+      protector: { icon: '🛡️', title: 'Protector', class: 'protector', description: 'Una vez por partida puedes neutralize un sabotaje si estás en la misión.' }
+    };
+
+    // ==================== NAVIGATION ====================
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(screenId).classList.add('active');
+      
+      if (screenId === 'setup-screen') {
+        updateRolePreview();
+      }
+    }
+
+    // ==================== PLAYER COUNTER ====================
+    function changePlayers(delta) {
+      playerCount = Math.max(5, Math.min(10, playerCount + delta));
+      document.getElementById('player-count').textContent = playerCount;
+      document.getElementById('btn-minus').disabled = playerCount <= 5;
+      document.getElementById('btn-plus').disabled = playerCount >= 10;
+      updateRolePreview();
+    }
+
+    function updateRolePreview() {
+      const preview = document.getElementById('role-preview');
+      const roleConfig = calculateRoles(playerCount);
+      
+      let html = '';
+      
+      // Saboteadores
+      for (let i = 0; i < roleConfig.saboteur; i++) {
+        html += `<span class="role-badge role-badge--saboteur">💀 ${roleConfig.saboteur}x</span>`;
+        break;
+      }
+      
+      // Normales
+      for (let i = 0; i < roleConfig.normal; i++) {
+        html += `<span class="role-badge role-badge--normal">☘️ ${roleConfig.normal}x</span>`;
+        break;
+      }
+      
+      if (roleConfig.detective) html += `<span class="role-badge role-badge--detective">🔍 1</span>`;
+      if (roleConfig.agent) html += `<span class="role-badge role-badge--agent">🃏 1</span>`;
+      if (roleConfig.protector) html += `<span class="role-badge role-badge--protector">🛡️ 1</span>`;
+      
+      preview.innerHTML = html;
+    }
+
+    function calculateRoles(count) {
+      const config = {
+        saboteur: Math.ceil(count / 4),
+        normal: 0,
+        detective: 0,
+        agent: 0,
+        protector: 0
+      };
+      
+      config.normal = count - config.saboteur;
+      
+      if (count >= 9) { config.protector = 1; config.normal--; }
+      if (count >= 8) { config.agent = 1; config.normal--; }
+      if (count >= 7) { config.detective = 1; config.normal--; }
+      
+      return config;
+    }
+
+    // ==================== GAME FLOW ====================
+    function startGame() {
+      showScreen('reveal-screen');
+    }
+
+    // ==================== HOLD TO REVEAL ====================
+    function startHold() {
+      const progress = document.getElementById('reveal-progress');
+      holdProgress = 0;
+      progress.style.width = '0%';
+      
+      holdInterval = setInterval(() => {
+        holdProgress += 4; // ~2.5 seconds total
+        progress.style.width = holdProgress + '%';
+        
+        if (holdProgress >= 100) {
+          clearInterval(holdInterval);
+          revealRole();
+        }
+      }, 100);
+    }
+
+    function cancelHold() {
+      if (holdInterval) {
+        clearInterval(holdInterval);
+        holdInterval = null;
+      }
+      document.getElementById('reveal-progress').style.width = '0%';
+    }
+
+    function revealRole() {
+      // Random role for demo
+      const roleKeys = Object.keys(roles);
+      const randomRole = roleKeys[Math.floor(Math.random() * roleKeys.length)];
+      const role = roles[randomRole];
+      
+      document.getElementById('role-icon').textContent = role.icon;
+      document.getElementById('role-icon').className = 'role-icon role-icon--' + role.class;
+      document.getElementById('role-title').textContent = role.title;
+      document.getElementById('role-title').className = 'role-title role-title--' + role.class;
+      document.getElementById('role-description').textContent = role.description;
+      
+      showScreen('role-card');
+    }
+
+    // ==================== TIMER ====================
+    let timerInterval = null;
+    let timerValue = 60;
+
+    function startTimer() {
+      timerValue = 60;
+      const display = document.getElementById('mission-timer');
+      
+      timerInterval = setInterval(() => {
+        timerValue--;
+        display.textContent = timerValue;
+        
+        if (timerValue <= 10) {
+          display.classList.add('mission-timer--warning');
+        }
+        if (timerValue <= 5) {
+          display.classList.remove('mission-timer--warning');
+          display.classList.add('mission-timer--critical');
+        }
+        if (timerValue <= 0) {
+          clearInterval(timerInterval);
+        }
+      }, 1000);
+    }
+
+    // Initialize
+    updateRolePreview();
+  </script>
+</body>
+</html>
+```
+
+## Validación de Mockups
+
+### StartScreen ✅
+- [x] Logo pulsante con animación `float`
+- [x] Botones de entrada con efecto hover neón
+- [x] Subtítulo con tracking amplio
+- [x] Scanline overlay para efecto retro
+
+### PlayerSetup ✅
+- [x] Contador con botones +/- (rango 5-10)
+- [x] Preview de roles dinámico según cantidad
+- [x] Badges con iconos + colores para accesibilidad
+
+### RevealScreen ✅
+- [x] Pantalla de cortina negra con textura noise
+- [x] Botón hold-to-reveal (2.5s)
+- [x] Barra de progreso en hold
+- [x] Transición glitch en revelación
+
+### RoleCard ✅
+- [x] Icono grande con filter glow
+- [x] Título con color del rol
+- [x] Descripción del poder
+- [x] Botón continuar
+
+### MissionScreen ✅
+- [x] Número de misión
+- [x] Timer con colores de warning/critical
+- [x] Contenido de misión con opciones
+- [x] Botón de abandonar
+
+### Accesibilidad ✅
+- [x] Iconos + texto + color para roles
+- [x] Nunca depender solo de color
+- [x] Fuentes legibles (Orbitron + Inter)
+- [x] Touch-friendly buttons

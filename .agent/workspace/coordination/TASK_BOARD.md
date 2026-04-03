@@ -248,6 +248,14 @@
 | TSK-114 | Front | done | OpenCode | **[UI KIT]** Crear 21 componentes Tailwind: TransactionCard, AlertCard, NotificationCard, GalaxyButton, GlowCard, PremiumCard, ProductCard, ShineCard, GoldButton, NeonLoader, TermsModal, DeleteButton, ConfirmCard, StarRating, CustomCheckbox, PlayButton, ShoppingCart, LoginForm, RegisterForm, DotPattern, Starfield. Archivos: `src/components/ui/*`, `src/styles/patterns.css`. |
 | QA-005 | Test | done | Antigravity | [QA Sprint 5] Smoke test completo de todos los flujos de la Wave 5. Fixes aplicados a NewsView (Sentiment & Calendar). |
 | QA-006 | UI | done | Antigravity | [Visual Audit] Revisión de consistencia estética (Flat v2) en todas las vistas de Sprint 5. Starfield incorporado en Rewards y Pricing. |
+| AUTH-001 | Sec | done | Antigravity | [Quality] Fix auth ownership in `posts.ts` (CRITICAL). |
+| AUTH-002 | Sec | done | Antigravity | [Quality] Fix auth ownership across backend (CRITICAL). |
+| SEED-001 | Sec | done | Antigravity | [Quality] Convert seed mutations to internal (SECURITY). |
+| AUDIT-001 | Bug | done | @aurora | **[CRITICAL]** Fix 44 TypeScript errors blocking build. Priority: convex/posts.ts (17), convex/profiles.ts (7), QueryCtx vs MutationCtx (10), frontend (10). Files: convex/posts.ts, convex/profiles.ts, convex/achievements.ts, convex/gamification.ts, convex/apps.ts, convex/products.ts, convex/market/economicCalendar.ts, src/components/AuthModal.tsx, src/views/ComunidadView.tsx, src/views/RewardsView.tsx. |
+| AUDIT-002 | Ops | done | @aurora | **[HIGH]** Fix Notion API integration (HTTP 401). Regenerate API key, update .env.local, test sync. Files: .env.local, scripts/aurora-notion-sync.mjs. |
+| AUDIT-003 | Back | done | @aurora | **[MEDIUM]** Fix Convex schema mismatch in communities.ts. Add communityId to subscriptions table or use correct field. Files: convex/communities.ts, convex/_generated/schema.ts. |
+| AUDIT-004 | Sec | done | @aurora | **[LOW]** Add type guards for ctx.db.get() across Convex files. Ensure proper type assertions. Files: convex/posts.ts, convex/*.ts. |
+| AUDIT-005 | Front | done | @aurora | **[LOW]** Fix NeonLoader size prop type. Change number to "sm" | "md" | "lg" or update component definition. Files: src/components/AuthModal.tsx, src/components/ui/NeonLoader.tsx. |
 
 ---
 

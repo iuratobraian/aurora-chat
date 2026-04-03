@@ -1,4 +1,24 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
+// Mock MercadoPago before importing - need to mock the entire module
+vi.mock('../../convex/lib/mercadopago', async () => {
+  const actual = await vi.importActual('../../convex/lib/mercadopago');
+  return {
+    ...actual,
+    MercadoPagoProvider: vi.fn().mockImplementation(() => ({
+      id: 'mercadopago',
+      name: 'MercadoPago',
+      supportedCurrencies: ['ARS', 'USD'],
+      processPayment: vi.fn().mockResolvedValue({ success: true }),
+      createSubscription: vi.fn().mockResolvedValue({ success: true }),
+      cancelSubscription: vi.fn().mockResolvedValue({ success: true }),
+      getPaymentStatus: vi.fn().mockResolvedValue({ success: true }),
+      refundPayment: vi.fn().mockResolvedValue({ success: true }),
+      generateCheckoutUrl: vi.fn().mockResolvedValue('https://mock-checkout.com'),
+    })),
+  };
+});
+
 import {
   getPaymentProvider,
   getAvailableProviders,
@@ -10,6 +30,7 @@ import {
 describe('paymentFactory', () => {
   beforeEach(() => {
     vi.resetModules();
+    vi.clearAllMocks();
   });
 
   afterEach(() => {

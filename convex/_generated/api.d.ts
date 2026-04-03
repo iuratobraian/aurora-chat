@@ -10,6 +10,7 @@
 
 import type * as achievements from "../achievements.js";
 import type * as adAuction from "../adAuction.js";
+import type * as adAuctions from "../adAuctions.js";
 import type * as adTargeting from "../adTargeting.js";
 import type * as adminFindings from "../adminFindings.js";
 import type * as ads from "../ads.js";
@@ -70,13 +71,16 @@ import type * as propFirms from "../propFirms.js";
 import type * as push from "../push.js";
 import type * as pushActions from "../pushActions.js";
 import type * as qa from "../qa.js";
+import type * as queries_instagramAccountQueries from "../queries/instagramAccountQueries.js";
 import type * as recursos from "../recursos.js";
 import type * as referrals from "../referrals.js";
 import type * as reviews from "../reviews.js";
+import type * as rewards from "../rewards.js";
 import type * as savedPosts from "../savedPosts.js";
 import type * as seedProducts from "../seedProducts.js";
 import type * as seedSignals from "../seedSignals.js";
 import type * as seedSubscriptionPlans from "../seedSubscriptionPlans.js";
+import type * as seed_all from "../seed_all.js";
 import type * as signalNotifications from "../signalNotifications.js";
 import type * as signals from "../signals.js";
 import type * as stats from "../stats.js";
@@ -103,6 +107,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   achievements: typeof achievements;
   adAuction: typeof adAuction;
+  adAuctions: typeof adAuctions;
   adTargeting: typeof adTargeting;
   adminFindings: typeof adminFindings;
   ads: typeof ads;
@@ -163,13 +168,16 @@ declare const fullApi: ApiFromModules<{
   push: typeof push;
   pushActions: typeof pushActions;
   qa: typeof qa;
+  "queries/instagramAccountQueries": typeof queries_instagramAccountQueries;
   recursos: typeof recursos;
   referrals: typeof referrals;
   reviews: typeof reviews;
+  rewards: typeof rewards;
   savedPosts: typeof savedPosts;
   seedProducts: typeof seedProducts;
   seedSignals: typeof seedSignals;
   seedSubscriptionPlans: typeof seedSubscriptionPlans;
+  seed_all: typeof seed_all;
   signalNotifications: typeof signalNotifications;
   signals: typeof signals;
   stats: typeof stats;

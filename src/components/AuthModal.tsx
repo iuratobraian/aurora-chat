@@ -174,11 +174,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ type: initialType, onClose, onSuc
 
         <GlowCard className="overflow-hidden p-0 bg-[#0f1115]/80">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50"></div>
-          
+
           <div className="p-8 sm:p-12">
             {loading ? (
               <div className="py-12">
-                <NeonLoader size={64} />
+                <NeonLoader size="lg" />
               </div>
             ) : (
               <div className="w-full flex flex-col items-center">

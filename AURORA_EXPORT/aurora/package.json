@@ -1,0 +1,93 @@
+{
+  "name": "@aurora/ai-framework",
+  "version": "1.0.0",
+  "description": "Aurora AI Framework - Always-on AI assistant for development teams",
+  "type": "module",
+  "main": "core/daemon/aurora-daemon.mjs",
+  "bin": {
+    "aurora": "./cli/aurora-cli.mjs"
+  },
+  "scripts": {
+    "start": "node core/daemon/aurora-daemon.mjs",
+    "daemon": "node core/daemon/aurora-always-on.mjs start",
+    "daemon:stop": "node core/daemon/aurora-always-on.mjs stop",
+    "daemon:status": "node core/daemon/aurora-always-on.mjs status",
+    "api": "node api/aurora-api.mjs",
+    "shell": "node cli/aurora-shell.mjs",
+    "cli": "node cli/aurora-cli.mjs menu",
+    "sync:notion": "node scripts/sync/aurora-notion-sync.mjs",
+    "backup": "node scripts/backup/aurora-backup.mjs",
+    "health": "node scripts/aurora-health-check.mjs",
+    "status": "node scripts/aurora-status.mjs",
+    "scorecard": "node scripts/aurora-scorecard.mjs",
+    "doctor": "node scripts/aurora-doctor.mjs",
+    "test": "vitest",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "lint": "tsc --noEmit",
+    "build": "echo 'Aurora is runtime - no build step'"
+  },
+  "keywords": [
+    "ai",
+    "assistant",
+    "developer-tools",
+    "automation",
+    "multi-agent",
+    "llm",
+    "orchestration"
+  ],
+  "author": "Aurora Development Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iuratobraian/aurora-ai-framework"
+  },
+  "bugs": {
+    "url": "https://github.com/iuratobraian/aurora-ai-framework/issues"
+  },
+  "homepage": "https://github.com/iuratobraian/aurora-ai-framework#readme",
+  "dependencies": {
+    "@openrouter/sdk": "^0.9.11",
+    "axios": "^1.13.6",
+    "chalk": "^5.4.1",
+    "commander": "^13.1.0",
+    "date-fns": "^4.1.0",
+    "express": "^5.2.1",
+    "node-fetch": "^3.3.2",
+    "ora": "^8.2.0",
+    "ws": "^8.19.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@types/ws": "^8.18.1",
+    "typescript": "~5.8.2",
+    "vitest": "^4.1.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "files": [
+    "core/",
+    "agents/",
+    "mcp/",
+    "skills/",
+    "cli/",
+    "api/",
+    "scripts/",
+    "lib/",
+    "README.md",
+    "LICENSE"
+  ],
+  "peerDependencies": {
+    "groq-sdk": "*",
+    "openai": "*"
+  },
+  "peerDependenciesMeta": {
+    "groq-sdk": {
+      "optional": true
+    },
+    "openai": {
+      "optional": true
+    }
+  }
+}

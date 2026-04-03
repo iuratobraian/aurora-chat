@@ -1,0 +1,1 @@
+{"id":"OSS-OPENCODE-BASE","title":"OpenCode Operational Base","statement":"OpenCode CLI provides lightweight prompt chaining, sandbox execution, and reproducible automation. Aurora uses its local agent for tooling, referencing its README as core knowledge for chaining commands and logging results.","tags":["opencode","automation"]}

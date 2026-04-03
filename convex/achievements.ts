@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query, internalMutation } from "./_generated/server";
+import { requireUser, requireAdmin } from "./lib/auth";
 
 export const DEFAULT_ACHIEVEMENTS = [
   // Social
@@ -78,6 +79,10 @@ export const getAllAchievements = query({
 export const getUserAchievements = query({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.userId) {
+        throw new Error("IDOR Detectado: No puedes ver los logros de otro usuario.");
+    }
     const userAchievements = await ctx.db
       .query("userAchievements")
       .withIndex("by_user", q => q.eq("userId", args.userId))
@@ -107,6 +112,10 @@ export const getUserAchievements = query({
 export const getAchievementProgress = query({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.userId) {
+        throw new Error("IDOR Detectado: No puedes ver el progreso de otro usuario.");
+    }
     const userAchievements = await ctx.db
       .query("userAchievements")
       .withIndex("by_user", q => q.eq("userId", args.userId))
@@ -388,6 +397,10 @@ export const getLeaderboardByAchievements = query({
 export const getAchievementStats = query({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.userId) {
+        throw new Error("IDOR Detectado: No puedes ver las estadísticas de otro usuario.");
+    }
     const userAchievements = await ctx.db
       .query("userAchievements")
       .withIndex("by_user", q => q.eq("userId", args.userId))

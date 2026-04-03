@@ -1,16 +1,6 @@
-import { mutation, query } from "./_generated/server";
+import { mutation, query, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
-import { Doc } from "./_generated/dataModel";
-
-async function getCallerAdminStatus(ctx: any): Promise<boolean> {
-  const identity = await ctx.auth.getUserIdentity();
-  if (!identity) return false;
-  const profile = await ctx.db
-    .query("profiles")
-    .withIndex("by_userId", (q: any) => q.eq("userId", identity.subject))
-    .unique();
-  return !!profile && (profile.role || 0) >= 5;
-}
+import { requireAdmin, requireUser } from "./lib/auth";
 
 export const getPropFirms = query({
   args: {},
@@ -33,7 +23,20 @@ export const getAllPropFirms = query({
         .collect();
     }
     
-    return await ctx.db.query("prop_firms").collect();
+    // Check if admin
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+      .unique();
+    
+    if (profile && (profile.role || 0) >= 5) {
+      return await ctx.db.query("prop_firms").collect();
+    }
+    
+    return await ctx.db
+        .query("prop_firms")
+        .filter((q) => q.eq(q.field("isActive"), true))
+        .collect();
   },
 });
 
@@ -49,8 +52,7 @@ export const createPropFirm = mutation({
     characteristics: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
-    const isAdmin = await getCallerAdminStatus(ctx);
-    if (!isAdmin) throw new Error("Solo administradores pueden crear prop firms");
+    await requireAdmin(ctx);
 
     const firmId = await ctx.db.insert("prop_firms", {
       ...args,
@@ -73,8 +75,7 @@ export const updatePropFirm = mutation({
     characteristics: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
-    const isAdmin = await getCallerAdminStatus(ctx);
-    if (!isAdmin) throw new Error("Solo administradores pueden actualizar prop firms");
+    await requireAdmin(ctx);
 
     const { id, ...updates } = args;
     await ctx.db.patch(id, updates);
@@ -84,8 +85,7 @@ export const updatePropFirm = mutation({
 export const deletePropFirm = mutation({
   args: { id: v.id("prop_firms") },
   handler: async (ctx, args) => {
-    const isAdmin = await getCallerAdminStatus(ctx);
-    if (!isAdmin) throw new Error("Solo administradores pueden eliminar prop firms");
+    await requireAdmin(ctx);
 
     await ctx.db.delete(args.id);
   },
@@ -160,11 +160,9 @@ const PROP_FIRMS_DATA = [
   },
 ];
 
-export const seedPropFirms = mutation({
+export const seedPropFirms = internalMutation({
   args: {},
   handler: async (ctx) => {
-    const isAdmin = await getCallerAdminStatus(ctx);
-    if (!isAdmin) throw new Error("Solo administradores pueden inicializar prop firms");
     
     const now = Date.now();
     let seeded = 0;

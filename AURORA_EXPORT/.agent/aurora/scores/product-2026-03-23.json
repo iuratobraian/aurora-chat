@@ -1,0 +1,494 @@
+{
+  "generatedAt": "2026-03-23T19:17:27.839Z",
+  "product": "TradePortal",
+  "category": "community trading platform",
+  "overallHealth": {
+    "score": 81,
+    "status": "green",
+    "totalSurfaces": 10,
+    "surfacesGreen": 9,
+    "surfacesYellow": 1,
+    "surfacesRed": 0
+  },
+  "summary": {
+    "totalFailuresHigh": 5,
+    "openProductTasks": 0,
+    "platformHealthStatus": "green"
+  },
+  "surfaceHealths": [
+    {
+      "surfaceId": "community_feed",
+      "label": "Feed y comunidad",
+      "domain": "community_product",
+      "goal": "retencion de calidad, utilidad inmediata y conversacion",
+      "signals": [
+        "likes",
+        "comentarios",
+        "guardados",
+        "tiempo de lectura",
+        "feedback negativo"
+      ],
+      "files": [
+        "views/ComunidadView.tsx",
+        "services/feed/feedRanker.ts",
+        "components/PostCard.tsx"
+      ],
+      "health": {
+        "score": 88,
+        "taskHealth": 100,
+        "ownerHealth": 60,
+        "signalHealth": 100,
+        "failurePenalty": 0,
+        "activeTasks": 0,
+        "doneTasks": 0,
+        "owner": "CODEX-LEAD"
+      },
+      "failuresHigh": 0,
+      "topRecommendations": 2,
+      "openTasks": 0,
+      "doneTasks": 0
+    },
+    {
+      "surfaceId": "onboarding_activation",
+      "label": "Onboarding y activacion",
+      "domain": "community_product",
+      "goal": "llevar al usuario al primer valor en minutos",
+      "signals": [
+        "registro",
+        "completo onboarding",
+        "entra a comunidad",
+        "primera interaccion"
+      ],
+      "files": [
+        "components/OnboardingFlow.tsx",
+        "services/storage.ts",
+        "views/DashboardView.tsx"
+      ],
+      "health": {
+        "score": 58,
+        "taskHealth": 100,
+        "ownerHealth": 60,
+        "signalHealth": 100,
+        "failurePenalty": 30,
+        "activeTasks": 0,
+        "doneTasks": 0,
+        "owner": "CODEX-LEAD"
+      },
+      "failuresHigh": 2,
+      "topRecommendations": 2,
+      "openTasks": 0,
+      "doneTasks": 0
+    },
+    {
+      "surfaceId": "trust_reputation",
+      "label": "Perfil, reputacion y confianza",
+      "domain": "community_product",
+      "goal": "hacer visible quien aporta valor y quien genera confianza",
+      "signals": [
+        "seguidores",
+        "likes recibidos",
+        "consistencia",
+        "verificacion",
+        "reportes"
+      ],
+      "files": [
+        "views/PerfilView.tsx",
+        "convex/achievements.ts",
+        "types.ts"
+      ],
+      "health": {
+        "score": 88,
+        "taskHealth": 100,
+        "ownerHealth": 60,
+        "signalHealth": 100,
+        "failurePenalty": 0,
+        "activeTasks": 0,
+        "doneTasks": 0,
+        "owner": "CODEX-LEAD"
+      },
+      "failuresHigh": 0,
+      "topRecommendations": 1,
+      "openTasks": 0,
+      "doneTasks": 0
+    },
+    {
+      "surfaceId": "creator_monetization",
+      "label": "Creators y monetizacion",
+      "domain": "growth",
+      "goal": "activar creators, comunidades y monetizacion sana",
+      "signals": [
+        "miembros",
+        "conversion",
+        "retencion",
+        "ingresos",
+        "engagement"
+      ],
+      "files": [
+        "views/CreatorDashboard.tsx",
+        "services/analytics/communityAnalytics.ts",
+        "views/CreatorView.tsx"
+      ],
+      "health": {
+        "score": 73,
+        "taskHealth": 100,
+        "ownerHealth": 60,
+        "signalHealth": 100,
+        "failurePenalty": 15,
+        "activeTasks": 0,
+        "doneTasks": 0,
+        "owner": "CODEX-LEAD"
+      },
+      "failuresHigh": 1,
+      "topRecommendations": 2,
+      "openTasks": 0,
+      "doneTasks": 0
+    },
+    {
+      "surfaceId": "moderation_safety",
+      "label": "Moderacion y seguridad",
+      "domain": "security",
+      "goal": "proteger la comunidad sin matar la conversacion util",
+      "signals": [
+        "reportes",
+        "spam",
+        "acciones de moderacion",
+        "falsos positivos"
+      ],
+      "files": [
+        "views/AdminView.tsx",
+        "convex/moderation.ts",
+        "server.ts"
+      ],
+      "health": {
+        "score": 73,
+        "taskHealth": 100,
+        "ownerHealth": 60,
+        "signalHealth": 100,
+        "failurePenalty": 15,
+        "activeTasks": 0,
+        "doneTasks": 0,
+        "owner": "CODEX-LEAD"
+      },
+      "failuresHigh": 1,
+      "topRecommendations": 1,
+      "openTasks": 0,
+      "doneTasks": 0
+    },
+    {
+      "surfaceId": "aurora_utility",
+      "label": "IA y utilidad transversal",
+      "domain": "aurora_ops",
+      "goal": "resolver dudas, apoyar onboarding y acelerar trabajo del equipo",
+      "signals": [
+        "consultas resueltas",
+        "latencia",
+        "reuso de conocimiento",
+        "errores evitados"
+      ],
+      "files": [
+        "scripts/aurora-api.mjs",
+        "scripts/aurora-shell.mjs",
+        "lib/ai/*"
+      ],
+      "health": {
+        "score": 88,
+        "taskHealth": 100,
+        "ownerHealth": 60,
+        "signalHealth": 100,
+        "failurePenalty": 0,
+        "activeTasks": 0,
+        "doneTasks": 0,
+        "owner": "aurora_ops"
+      },
+      "failuresHigh": 0,
+      "topRecommendations": 1,
+      "openTasks": 0,
+      "doneTasks": 0
+    },
+    {
+      "surfaceId": "viral_growth",
+      "label": "Referidos y premios",
+      "domain": "growth",
+      "goal": "incentivar crecimiento viral con recompensas por referido",
+      "signals": [
+        "registros referidos",
+        "compras referidas",
+        "20% comision",
+        "milestone rewards"
+      ],
+      "files": [
+        "convex/referrals.ts",
+        "views/LeaderboardView.tsx",
+        "components/ReferralPanel.tsx"
+      ],
+      "health": {
+        "score": 88,
+        "taskHealth": 100,
+        "ownerHealth": 60,
+        "signalHealth": 100,
+        "failurePenalty": 0,
+        "activeTasks": 0,
+        "doneTasks": 0,
+        "owner": "CODEX-LEAD"
+      },
+      "failuresHigh": 0,
+      "topRecommendations": 1,
+      "openTasks": 0,
+      "doneTasks": 0
+    },
+    {
+      "surfaceId": "signals_trading",
+      "label": "Signals y trading",
+      "domain": "trading_product",
+      "goal": "proveer señales de trading precisas y oportunas",
+      "signals": [
+        "suscriptores",
+        "winrate",
+        "pips generados",
+        "precision"
+      ],
+      "files": [
+        "views/SignalsView.tsx",
+        "convex/signals.ts",
+        "services/analytics/userSignals.ts"
+      ],
+      "health": {
+        "score": 73,
+        "taskHealth": 100,
+        "ownerHealth": 60,
+        "signalHealth": 100,
+        "failurePenalty": 15,
+        "activeTasks": 0,
+        "doneTasks": 0,
+        "owner": "CODEX-LEAD"
+      },
+      "failuresHigh": 1,
+      "topRecommendations": 1,
+      "openTasks": 0,
+      "doneTasks": 0
+    },
+    {
+      "surfaceId": "leaderboard_gamification",
+      "label": "Gamificacion y leaderboard",
+      "domain": "engagement",
+      "goal": "mantener engagement con XP, niveles, logros y competencias",
+      "signals": [
+        "xp ganado",
+        "nivel",
+        "referidos",
+        "streak",
+        "competencias"
+      ],
+      "files": [
+        "views/LeaderboardView.tsx",
+        "convex/gamification.ts",
+        "convex/achievements.ts"
+      ],
+      "health": {
+        "score": 88,
+        "taskHealth": 100,
+        "ownerHealth": 60,
+        "signalHealth": 100,
+        "failurePenalty": 0,
+        "activeTasks": 0,
+        "doneTasks": 0,
+        "owner": "CODEX-LEAD"
+      },
+      "failuresHigh": 0,
+      "topRecommendations": 1,
+      "openTasks": 0,
+      "doneTasks": 0
+    },
+    {
+      "surfaceId": "ai_agent",
+      "label": "AI Agent interno",
+      "domain": "ai_platform",
+      "goal": "IA que aprende del usuario y proporciona insights personalizados",
+      "signals": [
+        "conversaciones",
+        "aprendizaje",
+        "insights generados",
+        "accuracy"
+      ],
+      "files": [
+        "lib/ai/*",
+        "convex/aiAgent.ts",
+        "views/AdminView.tsx"
+      ],
+      "health": {
+        "score": 88,
+        "taskHealth": 100,
+        "ownerHealth": 60,
+        "signalHealth": 100,
+        "failurePenalty": 0,
+        "activeTasks": 0,
+        "doneTasks": 0,
+        "owner": "aurora_ops"
+      },
+      "failuresHigh": 0,
+      "topRecommendations": 1,
+      "openTasks": 0,
+      "doneTasks": 0
+    }
+  ],
+  "worstSurfaces": [
+    {
+      "surfaceId": "onboarding_activation",
+      "label": "Onboarding y activacion",
+      "domain": "community_product",
+      "goal": "llevar al usuario al primer valor en minutos",
+      "signals": [
+        "registro",
+        "completo onboarding",
+        "entra a comunidad",
+        "primera interaccion"
+      ],
+      "files": [
+        "components/OnboardingFlow.tsx",
+        "services/storage.ts",
+        "views/DashboardView.tsx"
+      ],
+      "health": {
+        "score": 58,
+        "taskHealth": 100,
+        "ownerHealth": 60,
+        "signalHealth": 100,
+        "failurePenalty": 30,
+        "activeTasks": 0,
+        "doneTasks": 0,
+        "owner": "CODEX-LEAD"
+      },
+      "failuresHigh": 2,
+      "topRecommendations": 2,
+      "openTasks": 0,
+      "doneTasks": 0
+    },
+    {
+      "surfaceId": "creator_monetization",
+      "label": "Creators y monetizacion",
+      "domain": "growth",
+      "goal": "activar creators, comunidades y monetizacion sana",
+      "signals": [
+        "miembros",
+        "conversion",
+        "retencion",
+        "ingresos",
+        "engagement"
+      ],
+      "files": [
+        "views/CreatorDashboard.tsx",
+        "services/analytics/communityAnalytics.ts",
+        "views/CreatorView.tsx"
+      ],
+      "health": {
+        "score": 73,
+        "taskHealth": 100,
+        "ownerHealth": 60,
+        "signalHealth": 100,
+        "failurePenalty": 15,
+        "activeTasks": 0,
+        "doneTasks": 0,
+        "owner": "CODEX-LEAD"
+      },
+      "failuresHigh": 1,
+      "topRecommendations": 2,
+      "openTasks": 0,
+      "doneTasks": 0
+    },
+    {
+      "surfaceId": "moderation_safety",
+      "label": "Moderacion y seguridad",
+      "domain": "security",
+      "goal": "proteger la comunidad sin matar la conversacion util",
+      "signals": [
+        "reportes",
+        "spam",
+        "acciones de moderacion",
+        "falsos positivos"
+      ],
+      "files": [
+        "views/AdminView.tsx",
+        "convex/moderation.ts",
+        "server.ts"
+      ],
+      "health": {
+        "score": 73,
+        "taskHealth": 100,
+        "ownerHealth": 60,
+        "signalHealth": 100,
+        "failurePenalty": 15,
+        "activeTasks": 0,
+        "doneTasks": 0,
+        "owner": "CODEX-LEAD"
+      },
+      "failuresHigh": 1,
+      "topRecommendations": 1,
+      "openTasks": 0,
+      "doneTasks": 0
+    }
+  ],
+  "topRecommendations": [
+    {
+      "surfaceId": "onboarding_activation",
+      "surfaceLabel": "Onboarding y activacion",
+      "improvement": "Automatizar follow a creadores trending en signup",
+      "impact": "high",
+      "effort": "low",
+      "priority": 11,
+      "owner": "CODEX-LEAD",
+      "recommendedAction": "Automatizar follow a creadores trending en signup",
+      "riskLevel": "low"
+    },
+    {
+      "surfaceId": "community_feed",
+      "surfaceLabel": "Feed y comunidad",
+      "improvement": "Optimizar feed ranking para nuevos usuarios",
+      "impact": "high",
+      "effort": "low",
+      "priority": 9,
+      "owner": "CODEX-LEAD",
+      "recommendedAction": "Optimizar feed ranking para nuevos usuarios",
+      "riskLevel": "low"
+    },
+    {
+      "surfaceId": "viral_growth",
+      "surfaceLabel": "Referidos y premios",
+      "improvement": "Simplificar link de referido a /?ref=user",
+      "impact": "high",
+      "effort": "low",
+      "priority": 9,
+      "owner": "CODEX-LEAD",
+      "recommendedAction": "Simplificar link de referido a /?ref=user",
+      "riskLevel": "low"
+    },
+    {
+      "surfaceId": "leaderboard_gamification",
+      "surfaceLabel": "Gamificacion y leaderboard",
+      "improvement": "Streak rewards más visibles",
+      "impact": "high",
+      "effort": "low",
+      "priority": 9,
+      "owner": "CODEX-LEAD",
+      "recommendedAction": "Streak rewards más visibles",
+      "riskLevel": "low"
+    },
+    {
+      "surfaceId": "ai_agent",
+      "surfaceLabel": "AI Agent interno",
+      "improvement": "User feedback on agent responses",
+      "impact": "high",
+      "effort": "low",
+      "priority": 9,
+      "owner": "aurora_ops",
+      "recommendedAction": "User feedback on agent responses",
+      "riskLevel": "low"
+    }
+  ],
+  "activityMetrics": {
+    "signalsLast7d": 438,
+    "uniqueActiveAgents": 1,
+    "domainBreakdown": {
+      "unknown": 438
+    }
+  }
+}

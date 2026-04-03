@@ -1,0 +1,62 @@
+{
+  "project_name": "tradeportal-2025-platinum",
+  "coordination_dir": ".agent/workspace/coordination",
+  "required_files_on_code_change": [
+    ".agent/workspace/coordination/TASK_BOARD.md",
+    ".agent/workspace/coordination/CURRENT_FOCUS.md",
+    ".agent/workspace/coordination/AGENT_LOG.md"
+  ],
+  "critical_files": [
+    "App.tsx",
+    "components/Navigation.tsx",
+    "views/ComunidadView.tsx",
+    "views/PricingView.tsx",
+    "components/SEO.tsx",
+    "index.html",
+    "server.ts",
+    "src/config.ts",
+    "src/config/urls.ts",
+    "services/storage.ts",
+    "services/auth/authService.ts",
+    "services/posts/postService.ts",
+    "services/users/userService.ts"
+  ],
+  "guarded_paths": [
+    {
+      "pattern": "App.tsx",
+      "required_scope": "brand_and_shell"
+    },
+    {
+      "pattern": "components/Navigation.tsx",
+      "required_scope": "navigation"
+    },
+    {
+      "pattern": "views/ComunidadView.tsx",
+      "required_scope": "community_feed"
+    },
+    {
+      "pattern": "views/PricingView.tsx",
+      "required_scope": "pricing_and_conversion"
+    },
+    {
+      "pattern": "components/SEO.tsx",
+      "required_scope": "seo_and_metadata"
+    },
+    {
+      "pattern": "server.ts",
+      "required_scope": "backend_support"
+    },
+    {
+      "pattern": "src/config.ts",
+      "required_scope": "backend_support"
+    },
+    {
+      "pattern": "src/config/urls.ts",
+      "required_scope": "backend_support"
+    },
+    {
+      "pattern": "services/",
+      "required_scope": "backend_support"
+    }
+  ]
+}

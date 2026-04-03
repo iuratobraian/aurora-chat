@@ -1,26 +1,34 @@
-// @ts-nocheck
-import { mutation, query, action } from "../_generated/server";
+import { mutation, query, action, internalMutation, internalQuery } from "../_generated/server";
 import { v } from "convex/values";
-import { api } from "../_generated/api";
+import { api, internal as internalApi } from "../_generated/api";
+import { requireUser, requireAdmin, assertOwnershipOrAdmin } from "../lib/auth";
 
 export const getByInstagramId = query({
   args: { instagramId: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.db
+    const account = await ctx.db
       .query("instagram_accounts")
       .withIndex("by_instagramId", (q) => q.eq("instagramId", args.instagramId))
       .first();
+
+    if (account) {
+        await assertOwnershipOrAdmin(ctx, account.userId);
+    }
+    return account;
   },
 });
 
-export const getById = query({
+// Internal query to get account by ID - used by actions
+export const getByIdInternal = query({
   args: { accountId: v.id("instagram_accounts") },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.accountId);
+    const account = await ctx.db.get(args.accountId);
+    // Don't check auth here - caller (action) is responsible
+    return account;
   },
 });
 
-export const updateStats = mutation({
+export const updateStats = internalMutation({
   args: {
     accountId: v.id("instagram_accounts"),
     followers: v.number(),
@@ -165,6 +173,10 @@ export const connectInstagramAccount = mutation({
     isBusiness: v.boolean(),
   },
   handler: async (ctx, args) => {
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.userId) {
+        throw new Error("IDOR Detectado: No puedes conectar una cuenta para otro usuario.");
+    }
     const existing = await ctx.db
       .query("instagram_accounts")
       .withIndex("by_instagramId", (q) => q.eq("instagramId", args.instagramId))
@@ -219,6 +231,10 @@ export const connectInstagramAccount = mutation({
 export const disconnectInstagramAccount = mutation({
   args: { userId: v.string(), accountId: v.id("instagram_accounts") },
   handler: async (ctx, args) => {
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.userId) {
+        throw new Error("IDOR Detectado: No puedes desconectar cuenta de otro usuario.");
+    }
     const account = await ctx.db.get(args.accountId);
     
     if (!account || account.userId !== args.userId) {
@@ -238,6 +254,7 @@ export const disconnectInstagramAccount = mutation({
 export const getUserInstagramAccounts = query({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
+    await assertOwnershipOrAdmin(ctx, args.userId);
     const accounts = await ctx.db
       .query("instagram_accounts")
       .withIndex("by_user", (q) => q.eq("userId", args.userId))
@@ -264,6 +281,7 @@ export const getUserInstagramAccounts = query({
 export const getAllConnectedAccounts = query({
   args: {},
   handler: async (ctx) => {
+    await requireAdmin(ctx);
     const accounts = await ctx.db
       .query("instagram_accounts")
       .collect();
@@ -292,6 +310,7 @@ export const getAllConnectedAccounts = query({
 export const getInstagramStats = query({
   args: {},
   handler: async (ctx) => {
+    await requireAdmin(ctx);
     const accounts = await ctx.db
       .query("instagram_accounts")
       .collect();
@@ -325,6 +344,10 @@ export const updateAccountSettings = mutation({
     aiReplyDelay: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.userId) {
+        throw new Error("IDOR Detectado: No puedes modificar ajustes de otro usuario.");
+    }
     const account = await ctx.db.get(args.accountId);
     
     if (!account || account.userId !== args.userId) {
@@ -347,44 +370,13 @@ export const updateAccountSettings = mutation({
   },
 });
 
-export const refreshAccountStats = action({
-  args: { accountId: v.id("instagram_accounts") },
-  handler: async (ctx, args) => {
-    const account = await ctx.runQuery(api["instagram/accounts"].getById, { accountId: args.accountId });
-    
-    if (!account) {
-      throw new Error("Account not found");
-    }
-
-    const accessToken = Buffer.from(account.accessToken, 'base64').toString('utf8');
-
-    const statsUrl = new URL(`https://graph.facebook.com/v18.0/${account.instagramId}`);
-    statsUrl.searchParams.set('access_token', accessToken);
-    statsUrl.searchParams.set('fields', 'followers_count,media_count');
-
-    const response = await fetch(statsUrl.toString());
-    const data = await response.json();
-
-    if (data.error) {
-      throw new Error(data.error.message);
-    }
-
-    await ctx.runMutation(api["instagram/accounts"].updateStats, {
-      accountId: args.accountId,
-      followers: data.followers_count,
-      totalPosts: data.media_count,
-    });
-
-    return {
-      followers: data.followers_count,
-      mediaCount: data.media_count,
-    };
-  },
-});
-
 export const deleteInstagramAccount = mutation({
   args: { userId: v.string(), accountId: v.id("instagram_accounts") },
   handler: async (ctx, args) => {
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.userId) {
+        throw new Error("IDOR Detectado: No puedes eliminar cuenta de otro usuario.");
+    }
     const account = await ctx.db.get(args.accountId);
     
     if (!account || account.userId !== args.userId) {

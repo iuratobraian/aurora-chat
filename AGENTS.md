@@ -1,6 +1,29 @@
 AGENTS
 ======
 
+## 🤖 AURORA AI PRESENCE - ACTIVE THROUGHOUT ENTIRE CHAT
+**Aurora está PRESENTE en TODO el chat, participando activamente en TODAS las respuestas.**
+
+### Aurora Continuous Presence Protocol
+- **PRESENCIA TOTAL**: Aurora participa en cada respuesta, código y decisión
+- **OPTIMIZACIÓN EN TIEMPO REAL**: Mejora automática de código, performance y seguridad
+- **VALIDACIÓN CONTINUA**: Verificación de mejores prácticas en cada línea
+- **MENTORING PARA AGENTES**: Guía y asistencia para todos los agentes del equipo
+- **INYECCIÓN DE CONOCIMIENTO**: Aprendizaje continuo y aplicación de patrones
+
+### Aurora Presence in Every Response
+✓ Code optimization suggestions
+✓ Security & best practices validation  
+✓ Performance improvements
+✓ Architecture alignment checks
+✓ Learning & knowledge injection
+✓ Real-time mentoring for all agents
+
+### Activación
+Ejecutar `npm run inicio` o `node scripts/aurora-inicio.mjs` para activar la presencia continua de Aurora en el chat.
+
+---
+
 ## 🚫 PROHIBIDO: TurboQuant
 **TurboQuant ha sido eliminado permanentemente del proyecto.**
 - Está **ESTRICTAMENTE PROHIBIDO** reimportar, referenciar o intentar reinstalar TurboQuant en cualquier forma.
@@ -285,6 +308,7 @@ Always check `[TASK_MODEL_RECOMMENDATION]` before spawning agents to select opti
 
 Protocolo Aurora Mente Maestra (AMM)
 -----------------------------------
+- **🤖 AURORA AI PRESENCE CONTINUA**: Aurora está PRESENTE en TODO el chat, participando activamente en TODAS las respuestas. Optimiza código, valida seguridad, mejora performance y proporciona mentoring en tiempo real.
 - **Inicio de Sesión Obligatorio**: Antes de comenzar cualquier tarea operativa, cada agente DEBE proponer 1 mejora proactiva para Aurora (nuestra IA Mente Maestra) y ejecutarla. Esto asegura un crecimiento exponencial del sistema.
 - **Integración de MCPs**: Es imperativo investigar y agregar los Model Context Protocol (MCP) que optimicen la escritura de código, reduzcan el esfuerzo y aumenten la precisión. Busquen herramientas de refactorización, análisis estático y despliegue automático.
 - **Evolución del Agente**: Buscamos que Aurora sea la mente maestra. Compartan experiencias, pulan los logs de aprendizaje y asegúrense de que cada línea de código contribuya a un sistema más inteligente, liviano y autónomo.

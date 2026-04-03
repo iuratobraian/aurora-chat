@@ -1,0 +1,17 @@
+{
+  "artifact": "aurora_learning_record",
+  "version": 1,
+  "requiredFields": [
+    "id",
+    "domain",
+    "surface",
+    "taskId",
+    "statement",
+    "confidence",
+    "reuseScore",
+    "freshness",
+    "sourceType",
+    "validated",
+    "createdAt"
+  ]
+}

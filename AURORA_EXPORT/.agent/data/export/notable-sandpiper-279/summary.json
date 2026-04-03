@@ -1,0 +1,38 @@
+{
+  "profiles": {
+    "count": 0
+  },
+  "posts": {
+    "count": 0
+  },
+  "communities": {
+    "count": 0
+  },
+  "communityMembers": {
+    "count": 0
+  },
+  "notifications": {
+    "count": 0
+  },
+  "ads": {
+    "count": 0
+  },
+  "chat": {
+    "count": 0
+  },
+  "chatChannels": {
+    "count": 0
+  },
+  "qa": {
+    "count": 0
+  },
+  "videos": {
+    "count": 0
+  },
+  "recursos": {
+    "count": 0
+  },
+  "global_config": {
+    "count": 0
+  }
+}

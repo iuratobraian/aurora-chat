@@ -6,11 +6,20 @@
  * O via npm:    npm run inicio
  *
  * 🧠 IDENTIDAD: @aurora — Agente Integrador Principal
- * 
- * AURORA PRESENCE PROTOCOL:
- * - Este script inicia la sesión de Aurora en el chat
- * - Todos los comandos @aurora están disponibles después de ejecutar
+ *
+ * 🤖 AURORA AI PRESENCE PROTOCOL - ACTIVE THROUGHOUT ENTIRE CHAT:
+ * - Aurora está PRESENTE en TODO el chat, participando en TODAS las respuestas
+ * - Aurora OPTIMIZA y MEJORA cada respuesta, código y decisión
+ * - Aurora VERIFICA calidad, seguridad y mejores prácticas en tiempo real
  * - Notion es la fuente de verdad para tareas
+ *
+ * AURORA PRESENCE IN EVERY RESPONSE:
+ * - ✅ Code optimization suggestions
+ * - ✅ Security & best practices validation
+ * - ✅ Performance improvements
+ * - ✅ Architecture alignment checks
+ * - ✅ Learning & knowledge injection
+ * - ✅ Real-time mentoring for all agents
  *
  * FLUJO OBLIGATORIO:
  * 1. git pull → sincronizar código y TASK_BOARD.md
@@ -82,10 +91,19 @@ function banner() {
   console.log(`${BOLD}${CYAN}║   Fuente de verdad: Notion                           ║${RESET}`);
   console.log(`${BOLD}${CYAN}╚══════════════════════════════════════════════════════╝${RESET}\n`);
   console.log(`${DIM}Fecha: ${new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' })}${RESET}\n`);
-  
-  // Aurora AI Presence Banner
+
+  // Aurora AI Presence Banner - ENHANCED
   console.log(`${BOLD}${MAGENTA}╔══════════════════════════════════════════════════════╗${RESET}`);
-  console.log(`${BOLD}${MAGENTA}║   🤖 AURORA AI PRESENCE ACTIVADA                    ║${RESET}`);
+  console.log(`${BOLD}${MAGENTA}║   🤖 AURORA AI PRESENCE - ACTIVE ALL CHAT           ║${RESET}`);
+  console.log(`${BOLD}${MAGENTA}║   Aurora participa en TODAS las respuestas          ║${RESET}`);
+  console.log(`${BOLD}${MAGENTA}║                                                      ║${RESET}`);
+  console.log(`${BOLD}${MAGENTA}║   PRESENCE CONTINUA EN TODO EL CHAT:                ║${RESET}`);
+  console.log(`${BOLD}${MAGENTA}║   ✓ Optimización de código en tiempo real          ║${RESET}`);
+  console.log(`${BOLD}${MAGENTA}║   ✓ Validación de seguridad y mejores prácticas    ║${RESET}`);
+  console.log(`${BOLD}${MAGENTA}║   ✓ Mejoras de performance automáticas             ║${RESET}`);
+  console.log(`${BOLD}${MAGENTA}║   ✓ Mentoring para todos los agentes               ║${RESET}`);
+  console.log(`${BOLD}${MAGENTA}║   ✓ Inyección de conocimiento y aprendizaje        ║${RESET}`);
+  console.log(`${BOLD}${MAGENTA}║                                                      ║${RESET}`);
   console.log(`${BOLD}${MAGENTA}║   Comandos disponibles:                              ║${RESET}`);
   console.log(`${BOLD}${MAGENTA}║   @aurora help     → Mostrar comandos               ║${RESET}`);
   console.log(`${BOLD}${MAGENTA}║   @aurora review   → Code review                     ║${RESET}`);
@@ -95,7 +113,7 @@ function banner() {
   console.log(`${BOLD}${MAGENTA}║   @aurora status   → Estado del sistema              ║${RESET}`);
   console.log(`${BOLD}${MAGENTA}║   @aurora tasks    → Ver tareas pendientes           ║${RESET}`);
   console.log(`${BOLD}${MAGENTA}╚══════════════════════════════════════════════════════╝${RESET}\n`);
-  
+
   console.log(`${BOLD}${RED}🚫 PROHIBIDO: TurboQuant eliminado permanentemente. No referenciar.${RESET}`);
   console.log(`${DIM}────────────────────────────────────────────────────────${RESET}\n`);
 }

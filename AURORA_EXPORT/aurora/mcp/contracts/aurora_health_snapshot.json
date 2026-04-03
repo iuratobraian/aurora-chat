@@ -1,0 +1,16 @@
+{
+  "artifact": "aurora_health_snapshot",
+  "version": 1,
+  "requiredFields": [
+    "generatedAt",
+    "repo",
+    "openTasks",
+    "criticalTasks",
+    "focusActive",
+    "connectorsReady",
+    "localAgentsReady",
+    "auroraFunctions",
+    "driftSignals",
+    "health"
+  ]
+}

@@ -1,5 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { requireUser, assertOwnershipOrAdmin } from "./lib/auth";
 
 export const getRewardsCatalog = query({
   args: {},
@@ -12,6 +13,10 @@ export const getRewardsCatalog = query({
 export const getUserRewards = query({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
+    await requireUser(ctx);
+    if ((await ctx.auth.getUserIdentity())?.subject !== args.userId) {
+        throw new Error("IDOR Detectado: No puedes ver los canjes de otro usuario.");
+    }
     const rewards = await ctx.db
       .query("rewards_history")
       .withIndex("by_userId", (q) => q.eq("userId", args.userId))
@@ -27,6 +32,10 @@ export const redeemReward = mutation({
     rewardId: v.id("rewards"),
   },
   handler: async (ctx, args) => {
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.userId) {
+        throw new Error("IDOR Detectado: No puedes canjear recompensas para otro usuario.");
+    }
     const profile = await ctx.db
       .query("profiles")
       .withIndex("by_userId", (q) => q.eq("userId", args.userId))
@@ -75,6 +84,10 @@ export const activateReward = mutation({
     historyId: v.id("rewards_history"),
   },
   handler: async (ctx, args) => {
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.userId) {
+        throw new Error("IDOR Detectado: No puedes activar recompensas de otro usuario.");
+    }
     const history = await ctx.db.get(args.historyId);
     if (!history || history.userId !== args.userId) {
       throw new Error("Recompensa no encontrada");

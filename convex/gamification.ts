@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { requireUser, requireAdmin } from "./lib/auth";
 import { ACHIEVEMENTS, XP_VALUES, getLevelFromXP, getAchievementById } from "./lib/achievements";
 
 function getXpMultiplier(profile?: any): number {
@@ -22,6 +23,10 @@ export const awardXP = mutation({
     reason: v.string()
   },
   handler: async (ctx, args) => {
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.userId) {
+        throw new Error("IDOR Detectado: No puedes otorgar XP a otro usuario.");
+    }
     // Multiplier will be calculated after fetching profile
     let multiplier = 1;
     let finalAmount = args.amount;
@@ -74,6 +79,10 @@ export const awardXP = mutation({
 export const getUserProgress = query({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.userId) {
+        throw new Error("IDOR Detectado: No puedes ver el progreso de otro usuario.");
+    }
     const profile = await ctx.db
       .query("profiles")
       .withIndex("by_userId", (q) => q.eq("userId", args.userId))
@@ -202,6 +211,10 @@ export const getMonthlyLeaderboard = query({
 export const getUserAchievements = query({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.userId) {
+        throw new Error("IDOR Detectado: No puedes ver los logros de otro usuario.");
+    }
     const userAchievements = await ctx.db
       .query("userAchievements")
       .withIndex("by_user", (q) => q.eq("userId", args.userId))
@@ -274,6 +287,10 @@ async function checkAndUnlockAchievements(ctx: any, userId: string, profile: any
 export const checkAchievements = mutation({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.userId) {
+        throw new Error("IDOR Detectado: No puedes verificar logros para otro usuario.");
+    }
     const profile = await ctx.db
       .query("profiles")
       .withIndex("by_userId", (q) => q.eq("userId", args.userId))
@@ -293,6 +310,10 @@ export const checkAchievements = mutation({
 export const recordDailyLogin = mutation({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.userId) {
+        throw new Error("IDOR Detectado: No puedes registrar login para otro usuario.");
+    }
     const profile = await ctx.db
       .query("profiles")
       .withIndex("by_userId", (q) => q.eq("userId", args.userId))
@@ -427,6 +448,10 @@ export const awardPostXP = mutation({
     reason: v.string()
   },
   handler: async (ctx, args) => {
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.userId) {
+        throw new Error("IDOR Detectado: No puedes otorgar XP a otro usuario.");
+    }
     const profile = await ctx.db
       .query("profiles")
       .withIndex("by_userId", (q) => q.eq("userId", args.userId))
@@ -453,6 +478,10 @@ export const awardPostXP = mutation({
 export const awardLikeXP = mutation({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.userId) {
+        throw new Error("IDOR Detectado: No puedes otorgar XP a otro usuario.");
+    }
     const profile = await ctx.db
       .query("profiles")
       .withIndex("by_userId", (q) => q.eq("userId", args.userId))
@@ -479,6 +508,10 @@ export const awardLikeXP = mutation({
 export const awardCommentXP = mutation({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.userId) {
+        throw new Error("IDOR Detectado: No puedes otorgar XP a otro usuario.");
+    }
     const profile = await ctx.db
       .query("profiles")
       .withIndex("by_userId", (q) => q.eq("userId", args.userId))

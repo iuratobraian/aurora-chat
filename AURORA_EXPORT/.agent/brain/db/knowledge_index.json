@@ -1,0 +1,35 @@
+{
+  "entries": [
+    {
+      "id": "distill-1774392785361",
+      "query": "aurora code review",
+      "timestamp": "2026-03-24T22:53:05.361Z",
+      "insightCount": 5,
+      "confidence": 0.8200000000000001
+    },
+    {
+      "id": "distill-1774394287057",
+      "query": "MCP servers integrations compute translation",
+      "timestamp": "2026-03-24T23:18:07.057Z",
+      "insightCount": 5,
+      "confidence": 0.8799999999999997
+    },
+    {
+      "id": "tutor-lms-2026",
+      "query": "Tutor LMS WordPress eLearning course monetization",
+      "timestamp": "2026-03-24T23:30:00.000Z",
+      "insightCount": 50,
+      "confidence": 0.95,
+      "doc": ".agent/brain/docs/tutor-lms.md"
+    },
+    {
+      "id": "notion-mcp-2026",
+      "query": "Notion MCP server AI content management databases",
+      "timestamp": "2026-03-24T23:40:00.000Z",
+      "insightCount": 22,
+      "confidence": 0.92,
+      "doc": ".agent/brain/docs/notion-mcp.md"
+    }
+  ],
+  "lastUpdated": "2026-03-24T23:40:00.000Z"
+}

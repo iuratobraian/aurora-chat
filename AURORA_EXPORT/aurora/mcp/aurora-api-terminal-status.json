@@ -1,0 +1,10 @@
+{
+    "updatedAt":  "2026-03-24T22:23:38.2555566-03:00",
+    "phase":  "running",
+    "message":  "Aurora API corriendo en terminal dedicada.",
+    "healthy":  true,
+    "pid":  22792,
+    "apiUrl":  "http://127.0.0.1:4310/app",
+    "healthUrl":  "http://127.0.0.1:4310/health",
+    "runtimeStatusFile":  "C:\\Users\\iurato\\Downloads\\tradeportal-2025-platinum\\.agent\\aurora\\aurora-api-runtime.json"
+}

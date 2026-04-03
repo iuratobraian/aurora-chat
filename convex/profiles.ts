@@ -1,7 +1,7 @@
 import { query, mutation, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 import { getLevelFromXp } from "./lib/permissions";
-import { assertOwnershipOrAdmin } from "./lib/auth";
+import { assertOwnershipOrAdmin, requireUser } from "./lib/auth";
 import bcrypt from "bcryptjs";
 import logger from "./logger";
 
@@ -171,7 +171,11 @@ export const upsertProfile = mutation({
     monthlyXPResetAt: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    if (!args.userId) throw new Error("userId requerido");
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.userId) {
+       // Only allow the user to upsert their own profile
+       throw new Error("No puedes crear perfiles para otros usuarios");
+    }
 
     const existing = await ctx.db
       .query("profiles")
@@ -404,16 +408,19 @@ export const updateProfile = mutation({
     rol: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    if (!args.userId) throw new Error("userId requerido");
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.userId) {
+      throw new Error("IDOR Detectado: No puedes editar como otro usuario.");
+    }
 
     const profile = await ctx.db.get(args.id);
     if (!profile) throw new Error("Perfil no encontrado");
 
-    const isSelf = profile.userId === args.userId;
+    const isSelf = profile.userId === identity.subject;
 
     const caller = await ctx.db
       .query("profiles")
-      .withIndex("by_userId", (q) => q.eq("userId", args.userId))
+      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
       .unique();
     const isAdmin = caller && (caller.role || 0) >= 5;
 
@@ -421,7 +428,7 @@ export const updateProfile = mutation({
 
     const { id, userId, ...updates } = args;
 
-    const sensitiveFields = ['saldo', 'isBlocked', 'reputation', 'esPro', 'esVerificado', 'rol'];
+    const sensitiveFields = ['saldo', 'isBlocked', 'reputation', 'esPro', 'esVerificado', 'rol', 'role'];
     for (const field of sensitiveFields) {
       if (field in updates && !isAdmin) {
         throw new Error(`Solo admins pueden modificar ${field}`);
@@ -448,11 +455,14 @@ export const updateProfile = mutation({
 export const toggleFollow = mutation({
   args: { followerId: v.string(), targetId: v.string() },
   handler: async (ctx, args) => {
-    if (!args.followerId) throw new Error("followerId requerido");
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.followerId) {
+      throw new Error("No puedes seguir como otro usuario");
+    }
 
     const follower = await ctx.db
       .query("profiles")
-      .withIndex("by_userId", (q) => q.eq("userId", args.followerId))
+      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
       .unique();
 
     const target = await ctx.db
@@ -490,9 +500,12 @@ export const toggleFollow = mutation({
 export const banUser = mutation({
   args: { userId: v.string(), adminUserId: v.string(), status: v.string() },
   handler: async (ctx, args) => {
-    if (!args.adminUserId) throw new Error("adminUserId requerido");
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.adminUserId) {
+      throw new Error("IDOR Detectado");
+    }
     
-    const admin = await ctx.db.query("profiles").withIndex("by_userId", q => q.eq("userId", args.adminUserId)).unique();
+    const admin = await ctx.db.query("profiles").withIndex("by_userId", q => q.eq("userId", identity.subject)).unique();
     if (!admin || (admin.role || 0) < 5) throw new Error("Solo admins pueden banear usuarios");
 
     const profile = await ctx.db
@@ -520,7 +533,10 @@ export const banUser = mutation({
 export const setNewPassword = mutation({
   args: { email: v.string(), password: v.string(), userId: v.string() },
   handler: async (ctx, args) => {
-    if (!args.userId) throw new Error("userId requerido");
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.userId) {
+       throw new Error("IDOR Detectado");
+    }
 
     const profile = await ctx.db
       .query("profiles")
@@ -530,7 +546,7 @@ export const setNewPassword = mutation({
 
     const caller = await ctx.db
       .query("profiles")
-      .withIndex("by_userId", (q) => q.eq("userId", args.userId))
+      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
       .unique();
     const isAdmin = caller && (caller.role || 0) >= 5;
 
@@ -547,18 +563,19 @@ export const resendConfirmationEmail = mutation({
     adminUserId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    if (!args.userId) throw new Error("userId requerido");
+    const identity = await requireUser(ctx);
 
     let isAdmin: boolean = false;
     if (args.adminUserId) {
+      if (identity.subject !== args.adminUserId) throw new Error("IDOR Detectado");
       const caller = await ctx.db
         .query("profiles")
-        .withIndex("by_userId", (q) => q.eq("userId", args.adminUserId!))
+        .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
         .unique();
       isAdmin = caller !== null && (caller.role || 0) >= 5;
     }
 
-    if (!isAdmin && args.adminUserId !== args.userId) {
+    if (!isAdmin && identity.subject !== args.userId) {
       throw new Error("No tienes permiso para reenviar este email");
     }
 
@@ -745,12 +762,13 @@ export const fixAdmin = internalMutation({
 export const deleteProfile = mutation({
   args: { userId: v.string(), adminUserId: v.string(), reason: v.optional(v.string()) },
   handler: async (ctx, args) => {
-    if (!args.adminUserId) {
-      throw new Error("adminUserId requerido");
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.adminUserId) {
+      throw new Error("IDOR Detectado");
     }
     
     const profile = await ctx.db.query("profiles")
-      .withIndex("by_userId", q => q.eq("userId", args.adminUserId))
+      .withIndex("by_userId", q => q.eq("userId", identity.subject))
       .unique();
     
     const isAdmin = profile && (profile.rol === "admin" || (profile.role || 0) >= 5);

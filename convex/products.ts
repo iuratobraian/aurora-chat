@@ -157,6 +157,7 @@ export const getProductsByCategory = query({
 export const getAllProductsAdmin = query({
   args: {},
   handler: async (ctx) => {
+    await requireAdmin(ctx);
     return await ctx.db
       .query("products")
       .collect()
@@ -204,6 +205,14 @@ export const createProduct = mutation({
     mql5Url: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.authorId) {
+        throw new Error("IDOR Detectado: No puedes crear productos como otro usuario.");
+    }
+    
+    // Si no es admin y no es el autor, assertOwnershipOrAdmin lanzará error
+    // En este caso, ya validamos identity.subject matches authorId.
+    
     const now = Date.now();
     const productId = await ctx.db.insert("products", {
       authorId: args.authorId,
@@ -355,7 +364,10 @@ export const purchaseProduct = mutation({
     MercadoPagoPreferenceId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    await assertOwnershipOrAdmin(ctx, args.buyerId);
+    const identity = await requireUser(ctx);
+    if (identity.subject !== args.buyerId) {
+        throw new Error("IDOR Detectado: No puedes realizar compras para otro usuario.");
+    }
     const product = await ctx.db.get(args.productId);
     if (!product) throw new Error("Product not found");
     if (product.isDeleted) throw new Error("Product no longer available");
@@ -444,6 +456,10 @@ export const addToWishlist = mutation({
     userId: v.string(),
   },
   handler: async (ctx, { productId, userId }) => {
+    const identity = await requireUser(ctx);
+    if (identity.subject !== userId) {
+        throw new Error("IDOR Detectado: No puedes modificar la wishlist de otro usuario.");
+    }
     const existing = await ctx.db
       .query("wishlists")
       .filter((q) => q.and(
@@ -470,6 +486,10 @@ export const removeFromWishlist = mutation({
     userId: v.string(),
   },
   handler: async (ctx, { productId, userId }) => {
+    const identity = await requireUser(ctx);
+    if (identity.subject !== userId) {
+        throw new Error("IDOR Detectado: No puedes modificar la wishlist de otro usuario.");
+    }
     const items = await ctx.db
       .query("wishlists")
       .filter((q) => q.and(
@@ -487,6 +507,10 @@ export const removeFromWishlist = mutation({
 export const getUserWishlist = query({
   args: { userId: v.string() },
   handler: async (ctx, { userId }) => {
+    const identity = await requireUser(ctx);
+    if (identity.subject !== userId) {
+        throw new Error("IDOR Detectado: No puedes ver la wishlist de otro usuario.");
+    }
     const wishlistItems = await ctx.db
       .query("wishlists")
       .filter((q) => q.eq(q.field("userId"), userId))
@@ -524,6 +548,7 @@ export const importFromMQL5 = mutation({
     tags: v.array(v.string()),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const existing = await ctx.db
       .query("products")
       .filter((q) => q.eq(q.field("mql5Id"), args.mql5Id))
@@ -571,6 +596,7 @@ export const importFromMQL5 = mutation({
 export const getProductStats = query({
   args: {},
   handler: async (ctx) => {
+    await requireAdmin(ctx);
     const products = await ctx.db
       .query("products")
       .filter((q) => q.eq(q.field("isDeleted"), false))

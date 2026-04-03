@@ -428,6 +428,7 @@ export interface Publicacion {
   tokenTipsReceived?: number;
   tokenTipsCount?: number;
   userPuntosGiven?: number; // Puntos que el usuario actual ya dio a este post
+  createdAt?: number; // Timestamp de creación del post
 }
 
 export interface PollOption {

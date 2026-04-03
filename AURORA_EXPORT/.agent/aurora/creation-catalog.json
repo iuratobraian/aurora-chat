@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "name": "Aurora Creation Catalog",
+  "categories": [
+    {
+      "id": "core_web",
+      "label": "Web Platforms",
+      "items": [
+        "Landing pages",
+        "SaaS websites",
+        "Marketplaces",
+        "Community platforms",
+        "Media/content hubs",
+        "Corporate websites",
+        "Web builders by prompt"
+      ]
+    },
+    {
+      "id": "mobile_apps",
+      "label": "Mobile Apps",
+      "items": [
+        "Super apps",
+        "Productivity apps",
+        "Fintech apps",
+        "Education apps",
+        "Creator tools",
+        "Community apps"
+      ]
+    },
+    {
+      "id": "games",
+      "label": "Mobile Games",
+      "items": [
+        "Hypercasual",
+        "Idle/Tycoon",
+        "Puzzle",
+        "Runner",
+        "Strategy",
+        "Social sim",
+        "Game creator app"
+      ]
+    },
+    {
+      "id": "ai_systems",
+      "label": "AI Systems",
+      "items": [
+        "Agent rooms",
+        "Support assistants",
+        "Prompt-driven builders",
+        "Research copilots",
+        "Content engines",
+        "Multi-agent orchestration"
+      ]
+    },
+    {
+      "id": "future_products",
+      "label": "Future Product Lab",
+      "items": [
+        "MT5 automation platform",
+        "Social account growth app",
+        "Website creator app",
+        "Word-to-product superapp",
+        "Research platforms",
+        "Monetization and analytics suites"
+      ]
+    }
+  ]
+}

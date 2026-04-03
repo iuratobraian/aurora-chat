@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "product": "TradePortal",
+  "frontend": {
+    "framework": "React 19",
+    "bundler": "Vite 6",
+    "styling": "Tailwind CSS 4",
+    "routing": "react-router-dom 7",
+    "i18n": "i18next + react-i18next",
+    "monitoring": "@sentry/react"
+  },
+  "backend": {
+    "server": "Express 5",
+    "realtime": "ws WebSocketServer",
+    "runtime": "Node.js ESM + tsx",
+    "apiEntry": "server.ts"
+  },
+  "data": {
+    "primary": "Convex",
+    "clientPattern": "ConvexHttpClient + useQuery/useMutation",
+    "schemas": "convex/schema.ts",
+    "generatedApi": "convex/_generated/api"
+  },
+  "testing": {
+    "unit": "Vitest",
+    "dom": "@testing-library/dom",
+    "coverage": "@vitest/coverage-v8"
+  },
+  "payments": {
+    "providers": ["Stripe", "MercadoPago", "Zenobank"],
+    "serverRoutes": ["server.ts", "convex/payments.ts", "convex/paymentOrchestrator.ts", "convex/webhooks.ts"]
+  },
+  "communityCore": {
+    "views": ["views/ComunidadView.tsx", "views/DiscoverCommunities.tsx", "views/CreatorDashboard.tsx", "views/PerfilView.tsx"],
+    "convexModules": ["convex/posts.ts", "convex/communities.ts", "convex/subcommunities.ts", "convex/chat.ts", "convex/moderation.ts"],
+    "services": ["services/feed/feedRanker.ts", "services/posts/postService.ts", "services/storage.ts", "services/analytics/communityAnalytics.ts"]
+  },
+  "aiLayer": {
+    "localRuntime": ["scripts/aurora-api.mjs", "scripts/aurora-shell.mjs"],
+    "productAi": ["lib/ai/briefing.ts", "lib/ai/coach.ts", "convex/aiAgent.ts", "server.ts"]
+  }
+}

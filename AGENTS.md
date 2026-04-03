@@ -47,7 +47,8 @@ This file defines how agentic coding agents should operate inside this repositor
 
 Lectura **OBLIGATORIA** e **INAMOVIBLE** al iniciar cualquier sesión:
 
-1. `.agent/workspace/coordination/pasado.md` ← **Órdenes y Contexto del Jefe** (Prioridad Máxima)
+1. `.agent/workspace/coordination/URGENT_NOTICES.md` ← **Alertas de Emergencia / Broadcast** (LEER ANTES QUE NADA)
+2. `.agent/workspace/coordination/pasado.md` ← **Órdenes y Contexto del Jefe** (Prioridad Máxima)
 2. `.agent/workspace/coordination/AGENT_REGISTRY.md` ← **Registro de Agentes** (Verificar identidad)
 3. `.agent/workspace/coordination/TEAM_CHAT.md` ← **CHAT DEL EQUIPO** (Discusiones activas)
 4. `.agent/workspace/coordination/TEAM_PROTOCOL.md` ← **PROTOCOLO DE EQUIPO ACOMPAÑADO** (OBLIGATORIO)
@@ -78,7 +79,7 @@ Cada agente DEBE mantener su memoria con:
 ### Cuándo Actualizar
 - **DESPUÉS de cada tarea:** Agregar lo que hiciste
 - **ANTES de empezar:** Leer memorias de otros agentes
-- **SEMANALMENTe:** Actualizar objetivos y reflexiones
+- **SEMANALMENTE (Regla Anti-Fatiga):** Condensar tus aprendizajes. Purgar logs triviales y transformarlos en Principios Arquitectónicos. Manda las enseñanzas universales a `aurora-mastery/SKILL.md` para limpiar tu contexto.
 
 ### Cómo Leer Memoria de Otro Agente
 1. Abrir `.agent/workspace/agent_memories/INDEX.md`
@@ -104,6 +105,12 @@ Cada agente DEBE mantener su memoria con:
    - Qué mejoras proponés
 3. Notificá en `TEAM_CHAT.md` para que otros respondan
 4. Esperá respuestas del equipo antes de cerrar la tarea
+
+### Cuando DEBES ABANDONAR A MEDIAS o DELEGAR (HANDOFF)
+1. Si dejas una tarea rota o pasas de Backend a Frontend, **DEBES** crear un relevo.
+2. Abre `.agent/workspace/coordination/HANDOFFS.md`.
+3. Completa la Plantilla Obligatoria de Relevo (qué hacías, por qué paras, zona blindada, próximo paso).
+4. Actualiza el TASK_BOARD a `handoff`.
 
 ### Cuando EMPEZÁS una sesión:
 1. Leé `DAILY_STANDUP.md` para ver qué hicieron otros agentes

@@ -12,7 +12,8 @@ Este documento define el estándar inamovible de inicio de sesión para todo age
 ## 📋 PASO 1: SINCRONIZACIÓN DE MEMORIA (CONTEXTO)
 Antes de tocar el código, el agente debe sincronizarse con las órdenes directas del Jefe.
 1. **Leer [pasado.md](../../workspace/coordination/pasado.md)**: Aquí reside la mente del Jefe. Si no conoces lo que se habló, tu trabajo será errático.
-2. **Identificar Tareas**: Consultar el **TASK_BOARD.md** y reclamar un lote de 3 tareas (1 en curso, 2 en espera).
+2. **Leer [URGENT_NOTICES.md](../../workspace/coordination/URGENT_NOTICES.md)**: Alertas críticas y directivas inmediatas para todo el enjambre. Ignorar esto es causa de fallo crítico.
+3. **Identificar Tareas**: Consultar el **TASK_BOARD.md** y reclamar un lote de tareas. También revisar **HANDOFFS.md** por si quedó alguna tarea bloqueada a punto de caramelo.
 
 ---
 

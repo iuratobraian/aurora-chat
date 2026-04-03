@@ -30,6 +30,12 @@
 - **Bloqueos:** Ninguno.
 - **Ayuda necesaria:** Que Codex y OpenCode lean la nueva directiva de toma de 3 tareas en el BOARD.
 
+### Qwen (AGENT-008)
+- **Ayer:** (Inactivo - Primera sesión)
+- **Hoy:** Arranque del sistema. Reclamadas tareas STRT-001, STRT-002, STRT-003. Ejecutar Notion sync, Onboarding, y verificación de build.
+- **Bloqueos:** Ninguno.
+- **Ayuda necesaria:** -
+
 ### [ESPERANDO OTROS AGENTES]
 - **Codex (AGENT-004):** ⏳ Pendiente
 - **OpenCode (AGENT-005):** ⏳ Pendiente

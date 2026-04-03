@@ -11,8 +11,10 @@ Siempre al iniciar una sesión o antes de reclamar una tarea.
 
 ## Flujo obligatorio
 
-1. Leer `../README.md`.
-2. Leer `references/critical-failures.md`.
+1. Leer `../../workspace/coordination/pasado.md` (Memoria del Jefe - Contexto Actual).
+2. Leer `../aurora-mastery/SKILL.md` (Sistema de Maestría - Errores Solucionados).
+3. Leer `../README.md`.
+4. Leer `references/critical-failures.md`.
 3. Confirmar el source of truth de la superficie a tocar:
    - Convex real
    - servicio cliente oficial
@@ -45,6 +47,7 @@ Siempre al iniciar una sesión o antes de reclamar una tarea.
 - Si existe un flujo oficial, no dejar un flujo legacy paralelo “por compatibilidad”.
 - Si hay degradación, debe ser explícita y visible; no silenciosa.
 - Si una tarea dice “real”, “cloud”, “prod” o “sync”, el criterio de cierre es comportamiento real, no UI bonita.
+- **Sincronización de Maestría**: Al finalizar una tarea, documentar la solución en `aurora-mastery/SKILL.md` si es nueva, previa validación del Jefe.
 
 ## Qué leer después
 

@@ -2190,3 +2190,130 @@ export default defineSchema({
     expiresAt: v.optional(v.number()),
   }).index("by_topic", ["topic"]).index("by_createdAt", ["createdAt"]),
 });
+
+/*
+ * =============================================================================
+ * FASE 8 CLOSURE - SCHEMA NOTES
+ * =============================================================================
+ * 
+ * TODO: Reels / Micro-Capsules Feature (Fase 8)
+ * ------------------------------------------------
+ * The following features are planned but NOT YET IMPLEMENTED:
+ * 
+ * 1. Instagram Reels Integration:
+ *    - Schema for storing Instagram Reels (video content)
+ *    - Video upload/compression pipeline
+ *    - Reels analytics (views, likes, shares, completion rate)
+ *    - Integration with Instagram Graph API for Reels publishing
+ * 
+ * 2. Micro-Capsules (Educational Short-form Content):
+ *    - Schema for micro-learning capsules (30s-2min videos)
+ *    - Creator tools for micro-capsule creation
+ *    - Progress tracking for users consuming capsules
+ *    - Quiz/assessment integration
+ * 
+ * Related Files:
+ *    - Frontend: src/views/InstagramMarketingView.tsx (video tab)
+ *    - Components: InstagramMediaLibrary, InstagramPostEditor
+ *    - Backend: convex/instagram/ (future implementation)
+ * 
+ * Estimated Implementation: Fase 9 or later
+ */
+
+// ============================================================
+// AGENT MEMORY & LEARNING SYSTEM
+// Agents learn from engagement, remember what works, evolve over time
+// ============================================================
+
+agentMemories: defineTable({
+    // Agent identity
+    agentId: v.string(), // userId of the agent
+    agentName: v.string(),
+    
+    // Learning data
+    contentHistory: v.array(v.object({
+      postId: v.optional(v.string()),
+      content: v.string(),
+      contentType: v.string(), // viral_angle used
+      category: v.string(),
+      createdAt: v.number(),
+      likes: v.number(),
+      comments: v.number(),
+      engagementScore: v.number(), // calculated score
+    })),
+    
+    // What works for this agent
+    topPerformingTypes: v.array(v.object({
+      contentType: v.string(),
+      category: v.string(),
+      avgEngagement: v.number(),
+      postCount: v.number(),
+    })),
+    
+    // What to avoid
+    lowPerformingTypes: v.array(v.object({
+      contentType: v.string(),
+      category: v.string(),
+      avgEngagement: v.number(),
+      postCount: v.number(),
+    })),
+    
+    // Engagement patterns
+    bestPostingTimes: v.array(v.number()), // hours that work best
+    worstPostingTimes: v.array(v.number()), // hours to avoid
+    
+    // Voice evolution
+    voiceStyle: v.object({
+      emojiUsage: v.number(), // 0-1 scale, evolves over time
+      postLength: v.number(), // 0=short, 1=long, evolves
+      formality: v.number(), // 0=casual, 1=formal, evolves
+      questionFrequency: v.number(), // how often they ask questions
+      personalStoryFrequency: v.number(), // how often they share personal stories
+    }),
+    
+    // Knowledge accumulation
+    learnedTopics: v.array(v.string()), // topics the agent has posted about successfully
+    avoidedTopics: v.array(v.string()), // topics that didn't resonate
+    signaturePhrases: v.array(v.string()), // phrases the agent uses naturally
+    
+    // Maturity level
+    maturityLevel: v.number(), // 1-100, increases with experience
+    totalPosts: v.number(),
+    totalEngagement: v.number(),
+    avgEngagementPerPost: v.number(),
+    
+    // Last learning update
+    lastLearnedAt: v.number(),
+    learningIterations: v.number(),
+    
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_agentId", ["agentId"]),
+
+// Agent daily activity log for learning
+agentActivityLog: defineTable({
+    agentId: v.string(),
+    date: v.string(), // YYYY-MM-DD
+    postsCreated: v.number(),
+    likesGiven: v.number(),
+    commentsMade: v.number(),
+    repliesMade: v.number(),
+    totalEngagementReceived: v.number(),
+    avgEngagementPerPost: v.number(),
+    topPostType: v.optional(v.string()),
+    topPostCategory: v.optional(v.string()),
+    lessons: v.array(v.string()), // what the agent learned today
+    createdAt: v.number(),
+  }).index("by_agent_date", ["agentId", "date"]),
+
+// Market knowledge base - agents share market insights
+marketKnowledge: defineTable({
+    topic: v.string(), // e.g., "BTC", "EUR/USD", "Fed rates"
+    sentiment: v.string(), // bullish, bearish, neutral
+    confidence: v.number(), // 0-1
+    source: v.string(), // which agent or system
+    data: v.any(), // market data snapshot
+    createdAt: v.number(),
+    expiresAt: v.optional(v.number()),
+  }).index("by_topic", ["topic"]).index("by_createdAt", ["createdAt"]),
+});

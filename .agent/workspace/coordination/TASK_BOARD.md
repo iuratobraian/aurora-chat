@@ -259,4 +259,13 @@
 
 ---
 
+## SISTEMA DE MAESTRÍA Y MEMORIA AURORA (SUB-JEFE CONTROL)
+
+| TASK-ID | Tipo | Estado | Asignado | Descripción |
+|---------|------|--------|----------|-------------|
+| MEM-101 | Mem  | done   | Antigravity | [Memoria] Crear `pasado.md` para persistencia de órdenes del Jefe. |
+| MEM-102 | Mem  | done   | Antigravity | [Maestría] Implementar hub central `aurora-mastery/SKILL.md`. |
+| PROT-001| Prot | done   | Antigravity | [Protocolo] Actualizar `AGENTS.md` y startup readiness con lecturas obligatorias. |
+| DB-101  | Back | in_progress | Antigravity | [Técnico] Resolver conexión Convex (Clave actual expirada/401). |
+
 **Nota:** ¡Obligatorio reclamar tareas de a 3 y actualizar `CURRENT_FOCUS.md`!

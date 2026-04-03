@@ -45,13 +45,15 @@ This file defines how agentic coding agents should operate inside this repositor
 
 ## AVISO IMPORTANTE - Mandatory Startup Readiness
 
-Lectura obligatoria al iniciar cualquier sesión:
+Lectura **OBLIGATORIA** e **INAMOVIBLE** al iniciar cualquier sesión:
 
-1. `.agent/skills/README.md`
-2. `.agent/skills/mandatory-startup-readiness/SKILL.md`
-3. `.agent/skills/mandatory-startup-readiness/references/critical-failures.md`
-4. `.agent/skills/agents/AGENT_TASK_DIVISION.md`
-5. `.agent/workspace/coordination/NOTION_SYNC_PROTOCOL.md` ← **Sincronizar con Notion**
+1. `.agent/workspace/coordination/pasado.md` ← **Órdenes y Contexto del Jefe** (Prioridad Máxima)
+2. `.agent/skills/aurora-mastery/SKILL.md` ← **Sistema de Maestría** (Errores Solucionados)
+3. `.agent/skills/README.md`
+4. `.agent/skills/mandatory-startup-readiness/SKILL.md`
+5. `.agent/skills/mandatory-startup-readiness/references/critical-failures.md`
+6. `.agent/skills/agents/AGENT_TASK_DIVISION.md`
+7. `.agent/workspace/coordination/NOTION_SYNC_PROTOCOL.md` ← **Sincronizar con Notion**
 
 ## 🚀 Notion Real-Time Coordination (OBLIGATORIO)
 
@@ -227,15 +229,17 @@ Cursor / Copilot rules
 - If `.cursor` or Copilot instructions exist include them here. (No `.cursor` or `.github/copilot-instructions.md` detected in this repo.)
 
 Operational Checklist for agents
-1) Read `.agent/skills/README.md`, `.agent/skills/mandatory-startup-readiness/SKILL.md`, `.agent/skills/mandatory-startup-readiness/references/critical-failures.md` and `AGENT_TASK_DIVISION.md`.
-2) Choose a task from `.agent/workspace/coordination/TASK_BOARD.md` and add a claim (status `claimed`, your agent name and date).
-3) Add `CURRENT_FOCUS.md` entry with files to touch and files forbidden.
-4) Make changes only within declared scope.
-5) Run `npm run lint` and the relevant tests locally before committing.
-6) Update `AGENT_LOG.md` with a short, verifiable entry (date, TASK-ID, files changed, validation, remaining risk).
-7) Mark task as `done` in TASK_BOARD.md.
-8) **Auto-sync to Notion**: Run `node scripts/notion-auto-sync.mjs` to push status updates.
-9) If handing off, use `.agent/workspace/coordination/HANDOFFS.md` and `HANDOFF_TEMPLATE.md`.
+------------------------------
+1) **MEMORIA**: Leer `pasado.md` y `aurora-mastery/SKILL.md`. No empezar sin entender el contexto del Jefe.
+2) **NO REDUNDANCIA**: Revisar `TASK_BOARD.md` y `AGENT_LOG.md`. Prohibido trabajar en lo que ya está hecho o en curso.
+3) **ESTABILIDAD**: No cambiar rutas de archivos existentes para no desorientar al resto del equipo.
+4) **TASK BOARD**: Elegir tarea de `TASK_BOARD.md`, marcar como `claimed` y actualizar `CURRENT_FOCUS.md`.
+5) **EJECUCIÓN**: Realizar cambios solo dentro del scope declarado. Reportar como Sub-jefe (detallista y claro).
+6) **VERIFICACIÓN**: Correr `npm run lint` y tests antes de cada commit.
+7) **REGISTRO**: Actualizar `AGENT_LOG.md` y marcar tarea como `done` en Notion y TASK_BOARD.md.
+8) **APRENDIZAJE**: Si la solución es nueva y confirmada por el Jefe, agregar a `aurora-mastery/SKILL.md`.
+9) **AUTO-SYNC**: Ejecutar `node scripts/notion-auto-sync.mjs`.
+10) **HANDOFF**: Si se retira, usar `HANDOFFS.md`.
 
 ### Double Verification Protocol (MANDATORY)
 Before marking any task as `done`, every agent MUST perform TWO complete review cycles:

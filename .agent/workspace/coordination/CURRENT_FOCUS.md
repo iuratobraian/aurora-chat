@@ -1,19 +1,17 @@
-# CURRENT FOCUS: Audit Cleanup - Type Guards & NeonLoader
+# CURRENT FOCUS: Orquestación del Enjambre - Tags y Salud
 
-## AGENT: @aurora
-- TASK-ID: AUDIT-004, AUDIT-005
-- Fecha: 2026-04-02
-- Estado: **IN PROGRESS**
+## AGENT: Antigravity (AGENT-007)
+- TASK-ID: (Ninguna asignada actualmente)
+- Fecha: 2026-04-03
+- Estado: **STANDBY**
 
 ## Tasks
-- [ ] **AUDIT-004**: Add type guards for ctx.db.get() across Convex files
-- [ ] **AUDIT-005**: Fix NeonLoader size prop type
+- [x] **SWARM-003**: Consolidar memorias y registrar equipo en INDEX.md con Tags.
+- [x] **SWARM-001**: Implementar Onboarding Express (Script mjs).
+- [x] **SWARM-002**: Dashboard de Salud del Enjambre.
 
 ## Files Involved
-- `convex/posts.ts` (type guards for ctx.db.get)
-- `convex/*.ts` (type assertions)
-- `src/components/AuthModal.tsx` (NeonLoader size prop)
-- `src/components/ui/NeonLoader.tsx` (size prop definition)
+- Ninguno por el momento.
 
 ## Forbidden Files
 - `App.tsx`
@@ -22,6 +20,4 @@
 - `PricingView.tsx`
 
 ## Output Signal
-- `npm run lint` returns "Found 0 errors"
-- `npm run build` exits with code 0
-- AUDIT-004, AUDIT-005 marked as `done` in TASK_BOARD.md
+- Esperando próxima carga de trabajo.

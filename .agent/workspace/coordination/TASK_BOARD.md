@@ -266,6 +266,31 @@
 | MEM-101 | Mem  | done   | Antigravity | [Memoria] Crear `pasado.md` para persistencia de órdenes del Jefe. |
 | MEM-102 | Mem  | done   | Antigravity | [Maestría] Implementar hub central `aurora-mastery/SKILL.md`. |
 | PROT-001| Prot | done   | Antigravity | [Protocolo] Actualizar `AGENTS.md` y startup readiness con lecturas obligatorias. |
-| DB-101  | Back | in_progress | Antigravity | [Técnico] Resolver conexión Convex (Clave actual expirada/401). |
+| DB-101  | Back | done | Antigravity | [Técnico] Resolver conexión Convex (Clave actual expirada/401). |
+
+---
+
+## FASE 6: ENJAMBRE Y MANTENIMIENTO OBLITERATUS
+
+> **TAREAS RECIÉN AGREGADAS PARA ESTABILIZACIÓN DEL EQUIPO:**
+
+| TASK-ID | Tipo | Estado | Asignado | Descripción |
+|---------|------|--------|----------|-------------|
+| SWARM-001 | Feat | done | Antigravity | [Tools] Implementar script de Onboarding Express para Nuevos Agentes. |
+| SWARM-002 | Ops  | done | Antigravity | [Vigilancia] Desarrollar Dashboard de Salud del Enjambre (SWARM_HEALTH.md). |
+| SWARM-003 | Mem  | done | Antigravity | [Indexado] Consolidar memorias, registrar a equipo en `INDEX.md` con Tags de Especialización. |
+
+---
+
+## FASE 7: RUTINA DE ARRANQUE AUTÓNOMO (PRÓXIMO INICIO)
+
+> **TAREAS PENDIENTES QUE LOS AGENTES DEBEN TOMAR AL CORRER `npm run inicio`:**
+
+| TASK-ID | Tipo | Estado | Asignado | Descripción |
+|---------|------|--------|----------|-------------|
+| STRT-001 | Ops  | available | Codex | [Sincronización] Ejecutar `npm run aurora:notion` para inyectar tareas reales desde el Workspace de Notion. |
+| STRT-002 | Mem  | available | OpenCode | [Consciencia] Correr Onboarding MJS y actualizar `SWARM_HEALTH.md` con status de la base local Convex. |
+| STRT-003 | QA   | available | BIG-PICKLE | [Estabilidad] Correr `npm run lint` y verificar que el build local de Vite no esté roto antes de programar nada. |
+| STRT-004 | Back | available | Antigravity | [Database Check] Revisar Convex production dashboard por latencia o index alerts. |
 
 **Nota:** ¡Obligatorio reclamar tareas de a 3 y actualizar `CURRENT_FOCUS.md`!

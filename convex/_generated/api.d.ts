@@ -84,6 +84,7 @@ import type * as seed_all from "../seed_all.js";
 import type * as signalNotifications from "../signalNotifications.js";
 import type * as signals from "../signals.js";
 import type * as socialAgents from "../socialAgents.js";
+import type * as social_cron from "../social_cron.js";
 import type * as stats from "../stats.js";
 import type * as strategies from "../strategies.js";
 import type * as subcommunities from "../subcommunities.js";
@@ -182,6 +183,7 @@ declare const fullApi: ApiFromModules<{
   signalNotifications: typeof signalNotifications;
   signals: typeof signals;
   socialAgents: typeof socialAgents;
+  social_cron: typeof social_cron;
   stats: typeof stats;
   strategies: typeof strategies;
   subcommunities: typeof subcommunities;

@@ -1415,3 +1415,68 @@ export const deleteAllPosts = internalMutation({
     return { deleted, message: `Se eliminaron ${deleted} posts` };
   },
 });
+
+// AGENT POSTING - Internal mutation for social agents (bypasses auth)
+export const createPostForAgent = internalMutation({
+  args: {
+    userId: v.string(),
+    contenido: v.string(),
+    categoria: v.string(),
+    titulo: v.optional(v.string()),
+    tipo: v.optional(v.string()),
+    par: v.optional(v.string()),
+    tags: v.optional(v.array(v.string())),
+    imagenUrl: v.optional(v.string()),
+    sentiment: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const now = Date.now();
+    const postId = await ctx.db.insert("posts", {
+      userId: args.userId,
+      contenido: args.contenido,
+      categoria: args.categoria,
+      titulo: args.titulo,
+      tipo: args.tipo || "general",
+      par: args.par,
+      tags: args.tags || [],
+      imagenUrl: args.imagenUrl,
+      sentiment: args.sentiment,
+      esAnuncio: false,
+      likes: [],
+      comentarios: [],
+      compartidos: 0,
+      createdAt: now,
+      ultimaInteraccion: now,
+      status: "approved",
+      reputationSnapshot: 0,
+      badgesSnapshot: [],
+      comentariosCerrados: false,
+      isAiAgent: true,
+    });
+    return { postId };
+  },
+});
+
+// AGENT COMMENT - Internal mutation for social agents (bypasses auth)
+export const addCommentForAgent = internalMutation({
+  args: {
+    postId: v.id("posts"),
+    userId: v.string(),
+    text: v.string(),
+    parentId: v.optional(v.id("comments")),
+  },
+  handler: async (ctx, args) => {
+    const post = await ctx.db.get(args.postId);
+    if (!post) throw new Error("Post not found");
+    
+    const comentarios = (post as any).comentarios || [];
+    comentarios.push({
+      userId: args.userId,
+      text: args.text,
+      createdAt: Date.now(),
+    });
+    
+    await ctx.db.patch(args.postId, { comentarios });
+    return { success: true };
+  },
+});

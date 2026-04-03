@@ -48,6 +48,10 @@ This file defines how agentic coding agents should operate inside this repositor
 Lectura **OBLIGATORIA** e **INAMOVIBLE** al iniciar cualquier sesión:
 
 1. `.agent/workspace/coordination/pasado.md` ← **Órdenes y Contexto del Jefe** (Prioridad Máxima)
+2. `.agent/workspace/coordination/AGENT_REGISTRY.md` ← **Registro de Agentes** (Verificar identidad)
+3. `.agent/workspace/coordination/TEAM_CHAT.md` ← **CHAT DEL EQUIPO** (Discusiones activas)
+4. `.agent/workspace/coordination/TASK_BOARD.md` ← **Tareas Pendientes**
+5. `.agent/workspace/coordination/CURRENT_FOCUS.md` ← **En qué está trabajando cada agente**
 2. `.agent/skills/aurora-mastery/SKILL.md` ← **Sistema de Maestría** (Errores Solucionados)
 3. `.agent/skills/README.md`
 4. `.agent/skills/mandatory-startup-readiness/SKILL.md`

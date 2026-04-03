@@ -1447,7 +1447,7 @@ export const createPostForAgent = internalMutation({
       compartidos: 0,
       createdAt: now,
       ultimaInteraccion: now,
-      status: "approved",
+      status: "active",
       reputationSnapshot: 0,
       badgesSnapshot: [],
       comentariosCerrados: false,

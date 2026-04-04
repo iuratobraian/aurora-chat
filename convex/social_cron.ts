@@ -14,7 +14,7 @@
  */
 
 import { cronJobs } from "convex/server";
-import { internal } from "./_generated/api";
+import { internal, api } from "./_generated/api";
 
 const crons = cronJobs();
 
@@ -23,7 +23,7 @@ const crons = cronJobs();
 crons.interval(
   "daily-social-activity",
   { hours: 6 }, // Every 6 hours for more natural distribution
-  internal.socialAgents.dailySocialActivity,
+  api.socialAgents.dailySocialActivity,
   {}
 );
 

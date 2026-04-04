@@ -171,9 +171,11 @@ const ComunidadView: React.FC<Props> = ({ usuario, onVisitProfile, onLoginReques
 
     const loadFallbackPosts = useCallback(async () => {
         setFeedDataSignal('fallback');
-        const localPosts = await api.posts.getPosts();
-        setPosts((localPosts as any[]) || []);
+        // Note: api.posts.getPosts() cannot be called directly as a function in React.
+        // Feed relies on usePaginatedQuery - on exhaustion, show empty state.
+        setPosts([]);
     }, []);
+
 
     // Effect to update final posts display
     useEffect(() => {
@@ -401,6 +403,7 @@ const ComunidadView: React.FC<Props> = ({ usuario, onVisitProfile, onLoginReques
             if (result) {
                 setJustPublishedPostId(tempPostId);
                 setIsRefreshing(true);
+                try { await StorageService.awardXP(usuario.id, 10, 'post_created'); } catch {}
             }
         } catch (error: any) {
             console.error('Error creating post:', error);
@@ -437,6 +440,9 @@ const ComunidadView: React.FC<Props> = ({ usuario, onVisitProfile, onLoginReques
         try {
             const likePostMutation = api.posts.likePost;
             await likePostMutation({ postId: post.id, userId: usuario.id } as any);
+            if (!hasLiked && post.idUsuario && post.idUsuario !== usuario.id) {
+                try { await StorageService.awardXP(post.idUsuario, 5, 'post_liked'); } catch {}
+            }
         } catch (err) {
             logger.error('[ComunidadView] handleLike failed:', err);
             setPosts(prev => prev.map(p => p.id === post.id ? { ...p, likes: originalLikes } : p));
@@ -498,6 +504,7 @@ const ComunidadView: React.FC<Props> = ({ usuario, onVisitProfile, onLoginReques
         };
         await handleUpdatePost(updatedPost);
         setPosts(prev => prev.map(p => p.id === postId ? updatedPost : p));
+        try { await StorageService.awardXP(usuario.id, 3, 'comment_created'); } catch {}
     };
 
     const handleLikeComment = useCallback(async (postId: string, commentId: string) => {

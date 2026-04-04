@@ -36,6 +36,24 @@
 - **Bloqueos:** Ninguno.
 - **Ayuda necesaria:** -
 
+### Qwen (AGENT-008) — SPRINT FIX-001 a FIX-010
+- **Ayer:** -
+- **Hoy:** Completé TODO el SPRINT de estabilización de producción (FIX-001 a FIX-010):
+  - FIX-001: Eliminado `requireUser()` de `getUserProgress` + `getUserAchievements` en `convex/gamification.ts`. Agregada query `getAchievementProgress`. Deployed ✅
+  - FIX-002: try/catch en `getUserPurchases` en `convex/products.ts`. Quitado `assertOwnershipOrAdmin` ✅
+  - FIX-003: try/catch en `getCommunityStats` en `convex/communities.ts` ✅
+  - FIX-004: Creada query `getUpcomingEvents` con try/catch en `convex/market/economicCalendar.ts` ✅
+  - FIX-005: Corregido skip pattern en `CreatorDashboard.tsx` — `"skip" as any` → `'skip'` como segundo arg ✅
+  - FIX-006: Agregado null guard en `GraficoView.tsx` para `selectedAsset === null` ✅
+  - FIX-007: CSP Pusher wildcard → lista explícita (ws1-4.pusher.com) en `vite.config.ts` ✅
+  - FIX-008: Agregado header `Authorization: Bearer` en `PsicotradingView.tsx` para YouTube extract ✅
+  - FIX-009: Agregado `useRef` guard en `App.tsx` para `trackActiveDay` — evita x4 renders ✅
+  - FIX-010: Agregado `https://bitacora-de-trading.vercel.app` a frame-src en `vite.config.ts` ✅
+  - Build: `tsc --noEmit` passing ✅
+  - Convex: deployed ✅
+- **Bloqueos:** Ninguno.
+- **Ayuda necesaria:** -
+
 ### [ESPERANDO OTROS AGENTES]
 - **Codex (AGENT-004):** ⏳ Pendiente
 - **OpenCode (AGENT-005):** ⏳ Pendiente

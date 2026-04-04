@@ -1,30 +1,40 @@
-import React, { memo, useState, useEffect } from 'react';
+import React, { memo, useState, useEffect, useMemo } from 'react';
+import { useQuery, useMutation } from 'convex/react';
+import { api } from '../../../convex/_generated/api';
 
 interface DailyPollResultsProps {
     compact?: boolean;
+    userId?: string;
+    communityId?: string;
 }
 
 const POLL_ASSETS = ['NAS100', 'EUR/USD', 'GBP/USD', 'BTC/USD', 'XAU/USD'];
 
-const getTodayKey = () => new Date().toISOString().split('T')[0];
-
-export const DailyPollResults: React.FC<DailyPollResultsProps> = memo(({ compact = false }) => {
+export const DailyPollResults: React.FC<DailyPollResultsProps> = memo(({ compact = false, userId, communityId }) => {
     const [selectedAsset, setSelectedAsset] = useState(POLL_ASSETS[0]);
-    const [userVote, setUserVote] = useState<'Long' | 'Short' | null>(null);
-    const [hasVoted, setHasVoted] = useState(false);
 
-    useEffect(() => {
-        const today = getTodayKey();
-        const answered = localStorage.getItem(`daily_poll_answered_${today}`);
-        setHasVoted(answered === 'true');
-        
-        const savedVote = localStorage.getItem(`daily_poll_${selectedAsset}`);
-        if (savedVote) {
-            setUserVote(savedVote as 'Long' | 'Short');
-        }
-    }, [selectedAsset]);
+    const pollData = useQuery(
+        api.dailyPolls.getPollResults,
+        { asset: selectedAsset }
+    );
 
-    if (!hasVoted) {
+    const userVoteData = useQuery(
+        communityId && userId
+            ? api.dailyPolls.getTodayPoll
+            : 'skip',
+        communityId && userId
+            ? { communityId: communityId as any, asset: selectedAsset, userId }
+            : 'skip' as any
+    );
+
+    const hasVoted = userVoteData?.userVote !== null && userVoteData?.userVote !== undefined;
+    const userVote = (userVoteData?.userVote === 'up' ? 'Long' : userVoteData?.userVote === 'down' ? 'Short' : null) as 'Long' | 'Short' | null;
+
+    const longPercent = pollData?.upPercentage ?? 50;
+    const shortPercent = pollData?.downPercentage ?? 50;
+    const participants = pollData?.totalVotes ?? 0;
+
+    if (!hasVoted && !compact) {
         return (
             <div className="glass rounded-2xl overflow-hidden border border-white/5 p-4">
                 <div className="flex items-center gap-3 mb-3">
@@ -46,9 +56,22 @@ export const DailyPollResults: React.FC<DailyPollResultsProps> = memo(({ compact
         );
     }
 
-    const longPercent = 50 + Math.floor(Math.random() * 30);
-    const shortPercent = 100 - longPercent;
-    const participants = Math.floor(Math.random() * 500 + 100);
+    if (compact && !hasVoted) {
+        return (
+            <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Encuesta</span>
+                    <span className="text-[8px] text-gray-500">Sin votar</span>
+                </div>
+                <button
+                    onClick={() => window.dispatchEvent(new CustomEvent('open-daily-poll'))}
+                    className="w-full py-2 bg-primary/10 hover:bg-primary/20 text-primary text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all"
+                >
+                    Responder Encuesta
+                </button>
+            </div>
+        );
+    }
 
     if (compact) {
         return (

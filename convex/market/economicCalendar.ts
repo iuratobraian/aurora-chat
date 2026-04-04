@@ -21,12 +21,17 @@ export const isAdminUser = query({
 export const getEventsByDate = query({
   args: { date: v.string() },
   handler: async (ctx, args) => {
+    try {
     const events = await ctx.db
       .query("economic_calendar")
       .withIndex("by_date", (q) => q.eq("date", args.date))
       .collect();
     
     return events.sort((a, b) => a.datetime - b.datetime);
+    } catch(e) {
+      console.error('[getEventsByDate] error:', e);
+      return [];
+    }
   },
 });
 
@@ -36,6 +41,7 @@ export const getEventsByDateRange = query({
     endDate: v.string(),
   },
   handler: async (ctx, args) => {
+    try {
     const events = await ctx.db
       .query("economic_calendar")
       .withIndex("by_date")
@@ -46,6 +52,32 @@ export const getEventsByDateRange = query({
       .collect();
     
     return events.sort((a, b) => a.datetime - b.datetime);
+    } catch(e) {
+      console.error('[getEventsByDateRange] error:', e);
+      return [];
+    }
+  },
+});
+
+export const getUpcomingEvents = query({
+  args: { limit: v.optional(v.number()) },
+  handler: async (ctx, args) => {
+    try {
+      const limit = args.limit || 10;
+      const now = Date.now();
+      
+      const events = await ctx.db
+        .query("economic_calendar")
+        .filter((q) => q.gte(q.field("datetime"), now))
+        .collect();
+      
+      return events
+        .sort((a, b) => a.datetime - b.datetime)
+        .slice(0, limit);
+    } catch(e) {
+      console.error('[getUpcomingEvents] error:', e);
+      return [];
+    }
   },
 });
 

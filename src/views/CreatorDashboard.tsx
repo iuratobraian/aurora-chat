@@ -79,8 +79,8 @@ const CreatorDashboard: React.FC<CreatorDashboardProps> = ({ usuario, onVisitPro
     : undefined;
 
   const communityMembersResult = useQuery(
-    validCommunityId ? api.communities.getCommunityMembers : "skip" as any, 
-    validCommunityId ? { communityId: validCommunityId, limit: 50 } : {}
+    api.communities.getCommunityMembers,
+    validCommunityId ? { communityId: validCommunityId, limit: 50 } : 'skip'
   );
   const communityMembers = communityMembersResult?.members as CommunityMember[] | undefined;
 

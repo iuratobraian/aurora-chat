@@ -151,7 +151,7 @@ export const AuthService = {
     login: async (identifier: string, password: string): Promise<{ user: Usuario | null, error: string | null }> => {
         try {
             if (convex) {
-                const result = await convex.query(api.profiles.validateLogin, { identifier, password });
+                const result = await (convex as any).action(api.auth_actions.validateLoginAction, { identifier, password });
                 
                 if (result.success && result.user) {
                     const user = mapConvexProfileToUsuario(result.user);

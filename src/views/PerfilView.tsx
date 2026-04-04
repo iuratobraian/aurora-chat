@@ -21,6 +21,7 @@ import {
     ProfileComprasTab,
     ProfileBibliotecaTab
 } from './profile';
+import { SubscriptionHistoryView } from '../components/payments/SubscriptionHistoryView';
 
 interface PerfilProps {
     usuario: Usuario;
@@ -46,7 +47,7 @@ const PerfilView: React.FC<PerfilProps> = ({ usuario, onUpdate, viewingUserId, o
 
     const userCommunitiesQuery = useQuery(api.communities.getUserCommunities, { userId: profileUser?.id || '' });
     const creatorCommunities = userCommunitiesQuery?.filter((c: any) => c.ownerId === profileUser?.id) || [];
-    const traderVerification = useQuery(api.traderVerification.getVerificationStatus, { oderId: profileUser?.id || '' });
+    const traderVerification = useQuery(api.traderVerification.getVerificationStatus, { userId: profileUser?.id || '' });
     const userBookLibrary = useQuery(api.strategies.getUserBookLibrary, { userId: usuario?.id || '' });
 
     const [userProgress, setUserProgress] = useState<any>(null);
@@ -682,18 +683,7 @@ const PerfilView: React.FC<PerfilProps> = ({ usuario, onUpdate, viewingUserId, o
             {/* Mis Compras Tab */}
             {activeTab === 'compras' && isOwnProfile && (
                 <div className="space-y-6">
-                    <div className="glass rounded-2xl p-6 border border-white/10">
-                        <h3 className="text-lg font-black uppercase tracking-widest text-white mb-6 flex items-center gap-3">
-                            <span className="material-symbols-outlined text-primary">shopping_bag</span>
-                            Mis Compras
-                        </h3>
-                        
-                        <div className="text-center py-8">
-                            <span className="material-symbols-outlined text-4xl text-white/20 mb-2">receipt_long</span>
-                            <p className="text-white/40 text-sm">No tienes compras realizadas</p>
-                            <p className="text-white/20 text-xs mt-2">Explora el Marketplace para encontrar estrategias y recursos</p>
-                        </div>
-                    </div>
+                    <SubscriptionHistoryView userId={profileUser.id} />
                 </div>
             )}
 

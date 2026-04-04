@@ -6,78 +6,116 @@ export const votePoll = mutation({
     communityId: v.id("communities"),
     asset: v.string(),
     direction: v.union(v.literal("up"), v.literal("down")),
+    userId: v.string(),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Debes iniciar sesión para votar");
-    
-    const userId = identity.subject;
-    const todayStart = new Date().setHours(0, 0, 0, 0);
+    try {
+      const todayStart = new Date().setHours(0, 0, 0, 0);
 
-    const existingVotes = await ctx.db
-      .query("dailyPolls")
-      .withIndex("by_community_user", (q) => 
-        q.eq("communityId", args.communityId).eq("userId", userId)
-      )
-      .collect();
-    
-    const todayVote = existingVotes.find(v => v.votedAt >= todayStart);
+      const existingVotes = await ctx.db
+        .query("dailyPolls")
+        .withIndex("by_community_user", (q) =>
+          q.eq("communityId", args.communityId).eq("userId", args.userId)
+        )
+        .collect();
 
-    if (todayVote) {
-      if (todayVote.direction === args.direction) {
-        return { success: true, message: "Ya has votado esta dirección hoy", changed: false };
+      const todayVote = existingVotes.find(v => v.votedAt >= todayStart && v.asset === args.asset);
+
+      if (todayVote) {
+        if (todayVote.direction === args.direction) {
+          return { success: true, message: "Ya has votado esta dirección hoy", changed: false };
+        }
+        await ctx.db.patch(todayVote._id, {
+          direction: args.direction,
+          votedAt: Date.now(),
+        });
+        return { success: true, message: "Voto actualizado", changed: true };
       }
-      await ctx.db.patch(todayVote._id, {
+
+      await ctx.db.insert("dailyPolls", {
+        communityId: args.communityId,
+        userId: args.userId,
+        asset: args.asset,
         direction: args.direction,
         votedAt: Date.now(),
       });
-      return { success: true, message: "Voto actualizado", changed: true };
+
+      return { success: true, message: "Voto registrado", changed: true };
+    } catch(e) {
+      console.error('[votePoll] error:', e);
+      return { success: false, message: 'Error al votar', changed: false };
     }
-
-    await ctx.db.insert("dailyPolls", {
-      communityId: args.communityId,
-      userId,
-      asset: args.asset,
-      direction: args.direction,
-      votedAt: Date.now(),
-    });
-
-    return { success: true, message: "Voto registrado", changed: true };
   },
 });
 
 export const getTodayPoll = query({
-  args: { communityId: v.id("communities"), asset: v.string() },
+  args: { communityId: v.id("communities"), asset: v.string(), userId: v.optional(v.string()) },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    const userId = identity?.subject;
-    
-    const todayStart = new Date().setHours(0, 0, 0, 0);
+    try {
+      const todayStart = new Date().setHours(0, 0, 0, 0);
 
-    const userVote = userId ? await ctx.db
-      .query("dailyPolls")
-      .withIndex("by_community_user", (q) => 
-        q.eq("communityId", args.communityId).eq("userId", userId)
-      )
-      .first() : null;
+      let todayUserVote = null;
+      if (args.userId) {
+        const uid = args.userId;
+        const userVote = await ctx.db
+          .query("dailyPolls")
+          .withIndex("by_community_user", (q) =>
+            q.eq("communityId", args.communityId).eq("userId", uid)
+          )
+          .first();
+        if (userVote && userVote.votedAt >= todayStart && userVote.asset === args.asset) {
+          todayUserVote = userVote;
+        }
+      }
 
-    const todayUserVote = userVote && userVote.votedAt >= todayStart ? userVote : null;
+      const allVotes = await ctx.db
+        .query("dailyPolls")
+        .withIndex("by_asset", (q) => q.eq("asset", args.asset))
+        .collect();
 
-    const allVotes = await ctx.db
-      .query("dailyPolls")
-      .withIndex("by_asset", (q) => q.eq("asset", args.asset))
-      .collect();
+      const todayVotes = allVotes.filter(v => v.votedAt >= todayStart);
+      const upVotes = todayVotes.filter(v => v.direction === "up").length;
+      const downVotes = todayVotes.filter(v => v.direction === "down").length;
 
-    const todayVotes = allVotes.filter(v => v.votedAt >= todayStart);
-    const upVotes = todayVotes.filter(v => v.direction === "up").length;
-    const downVotes = todayVotes.filter(v => v.direction === "down").length;
+      return {
+        userVote: todayUserVote?.direction || null,
+        upVotes,
+        downVotes,
+        totalVotes: todayVotes.length,
+        upPercentage: todayVotes.length > 0 ? Math.round((upVotes / todayVotes.length) * 100) : 50,
+      };
+    } catch(e) {
+      console.error('[getTodayPoll] error:', e);
+      return { userVote: null, upVotes: 0, downVotes: 0, totalVotes: 0, upPercentage: 50 };
+    }
+  },
+});
 
-    return {
-      userVote: todayUserVote?.direction || null,
-      upVotes,
-      downVotes,
-      totalVotes: todayVotes.length,
-      upPercentage: todayVotes.length > 0 ? Math.round((upVotes / todayVotes.length) * 100) : 50,
-    };
+export const getPollResults = query({
+  args: { asset: v.string() },
+  handler: async (ctx, args) => {
+    try {
+      const todayStart = new Date().setHours(0, 0, 0, 0);
+
+      const allVotes = await ctx.db
+        .query("dailyPolls")
+        .withIndex("by_asset", (q) => q.eq("asset", args.asset))
+        .collect();
+
+      const todayVotes = allVotes.filter(v => v.votedAt >= todayStart);
+      const upVotes = todayVotes.filter(v => v.direction === "up").length;
+      const downVotes = todayVotes.filter(v => v.direction === "down").length;
+
+      return {
+        upVotes,
+        downVotes,
+        totalVotes: todayVotes.length,
+        upPercentage: todayVotes.length > 0 ? Math.round((upVotes / todayVotes.length) * 100) : 50,
+        downPercentage: todayVotes.length > 0 ? Math.round((downVotes / todayVotes.length) * 100) : 50,
+      };
+    } catch(e) {
+      console.error('[getPollResults] error:', e);
+      return { upVotes: 0, downVotes: 0, totalVotes: 0, upPercentage: 50, downPercentage: 50 };
+    }
   },
 });

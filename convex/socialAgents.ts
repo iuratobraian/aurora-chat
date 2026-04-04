@@ -467,21 +467,21 @@ function getMarketContext() {
 // HELPER FUNCTIONS
 // ============================================================
 
-function randomChoice(arr) {
+function randomChoice(arr: any[]) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function randomInt(min, max) {
+function randomInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function fillTemplate(template, data) {
+function fillTemplate(template: string, data: any) {
   return template.replace(/\{(\w+)\}/g, (_, key) => {
     return data[key] !== undefined ? String(data[key]) : "";
   });
 }
 
-function getAgentById(userId) {
+function getAgentById(userId: string) {
   return AGENT_PERSONALITIES.find(a => a.userId === userId);
 }
 
@@ -489,7 +489,7 @@ function getAgentById(userId) {
 // CONTENT GENERATION - Learns from past performance
 // ============================================================
 
-function generatePostForAgent(agent, memory, market) {
+function generatePostForAgent(agent: any, memory: any, market: any) {
   const m = market.mercado;
   
   // If agent has memory, bias toward top-performing content types
@@ -538,12 +538,12 @@ function generatePostForAgent(agent, memory, market) {
       category = randomChoice(keys);
   }
 
-  const posts = VIRAL_POSTS[category];
+  const posts = (VIRAL_POSTS as any)[category];
   if (!posts || posts.length === 0) {
     const keys = Object.keys(VIRAL_POSTS);
     category = randomChoice(keys);
   }
-  const postObj = randomChoice(VIRAL_POSTS[category] || VIRAL_POSTS.quick_tips);
+  const postObj = randomChoice((VIRAL_POSTS as any)[category] || VIRAL_POSTS.quick_tips);
   
   // Generate data for template
   const data = {
@@ -611,16 +611,16 @@ function generatePostForAgent(agent, memory, market) {
   
   const categoria = agent.interests[0] || "general";
   const tags = [...agent.expertise.slice(0, 3), randomChoice(market.noticias).substring(0, 20)];
-  const par = agent.expertise.find(e => e.includes("/")) || undefined;
+  const par = agent.expertise.find((e: any) => e.includes("/")) || undefined;
   const sentiment = randomChoice(["bullish", "neutral", "bearish"]);
   const imagenUrl = Math.random() > 0.6 ? `https://images.unsplash.com/photo-${randomChoice(["1611974789855-9c2a0a7236a3", "1642790106117-e829e14a795f", "1639762681485-074b7f938ba0", "1551288049-bebda4e38f71", "1590283603385-17ffb3a7f29f", "1518186285589-2f7103f0845a", "1610375461246-83df859d849d", "1579621970563-ebec7560ff3e"])}?w=600` : undefined;
 
   return { contenido, titulo, categoria, tipo: viralAngle, tags, par, sentiment, imagenUrl };
 }
 
-function generateComment(agent) {
+function generateComment(agent: any) {
   const style = randomChoice(Object.keys(COMMENT_TEMPLATES));
-  const templates = COMMENT_TEMPLATES[style];
+  const templates = (COMMENT_TEMPLATES as any)[style];
   const template = randomChoice(templates);
   
   const data = {
@@ -783,7 +783,7 @@ export const recordPostPerformance = internalMutation({
       .first();
     
     if (!activityLog) {
-      activityLog = {
+      const newLog = {
         agentId: args.agentId,
         date: today,
         postsCreated: 0,
@@ -794,8 +794,9 @@ export const recordPostPerformance = internalMutation({
         avgEngagementPerPost: 0,
         lessons: [],
         createdAt: now,
-      } as any;
-      await ctx.db.insert("agentActivityLog", activityLog);
+      };
+      const newLogId = await ctx.db.insert("agentActivityLog", newLog);
+      activityLog = { ...newLog, _id: newLogId, _creationTime: now } as any;
     }
     
     (activityLog as any).postsCreated += 1;
@@ -900,7 +901,7 @@ export const getAgentMemoryForAction = query({
  */
 export const postAsAgent = action({
   args: { agentUserId: v.string() },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<any> => {
     const agent = getAgentById(args.agentUserId);
     if (!agent) throw new Error(`Agent ${args.agentUserId} not found`);
     
@@ -944,7 +945,7 @@ export const postAsAgent = action({
  */
 export const agentLikePosts = action({
   args: { agentUserId: v.string(), count: v.number() },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<any> => {
     const agent = getAgentById(args.agentUserId);
     if (!agent) throw new Error(`Agent ${args.agentUserId} not found`);
     
@@ -978,7 +979,7 @@ export const agentLikePosts = action({
  */
 export const agentCommentPosts = action({
   args: { agentUserId: v.string(), count: v.number() },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<any> => {
     const agent = getAgentById(args.agentUserId);
     if (!agent) throw new Error(`Agent ${args.agentUserId} not found`);
     
@@ -1093,7 +1094,7 @@ export const logDailyActivity = internalMutation({
  */
 export const dailySocialActivity = action({
   args: {},
-  handler: async (ctx) => {
+  handler: async (ctx): Promise<any> => {
     const results: any[] = [];
     const market = getMarketContext();
     

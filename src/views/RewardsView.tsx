@@ -37,7 +37,11 @@ export default function RewardsView({ usuario, onNavigate, onLoginRequest }: Rew
   const [showHistory, setShowHistory] = useState(false);
 
   const rewards = useQuery(api.rewards.getRewardsCatalog) || [];
-  const userRewards = usuario ? (useQuery(api.rewards.getUserRewards, { userId: usuario.id }) || []) : [];
+  const userRewardsData = useQuery(
+    api.rewards.getUserRewards,
+    usuario ? { userId: usuario.id } : 'skip'
+  );
+  const userRewards = userRewardsData || [];
   const redeemMutation = useMutation(api.rewards.redeemReward);
 
   const userXp = usuario?.xp || 0;

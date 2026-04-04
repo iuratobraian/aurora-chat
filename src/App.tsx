@@ -10,7 +10,7 @@ import { OnboardingFlow } from './components/OnboardingFlow';
 import { ToastProvider } from './components/ToastProvider';
 import { ChatBadgeProvider } from './components/ChatBadgeContext';
 import SEO from './components/SEO';
-import ErrorBoundary from './components/ErrorBoundary';
+import ErrorBoundary, { AdminErrorPopupMount } from './components/ErrorBoundary';
 import GlobalErrorHandler from './components/GlobalErrorHandler';
 import AppViewFallback from './components/AppViewFallback';
 import { parseDeepLink, navigateToSection, getShareableLink } from './utils/deeplink';
@@ -105,6 +105,7 @@ const SaboteadorInvisibleView = lazy(() => import('./views/SaboteadorInvisibleVi
 const MarketingView = lazy(() => import('./views/MarketingView'));
 const NewsView = lazy(() => import('./views/NewsView'));
 const PremiumObservatory = lazy(() => import('./views/CommunityCreatorSuite'));
+const AuroraHiveDashboard = lazy(() => import('./views/admin/AuroraHiveDashboard').then(m => ({ default: m.AuroraHiveDashboard })));
 
 const TRADER_PHRASES = [
   "El mercado perdona a los pacientes...",
@@ -173,6 +174,7 @@ const App: React.FC = memo(() => {
   const [subcommunityParams, setSubcommunityParams] = useState<{ parentSlug: string; subSlug: string } | null>(null);
   const [communitySlug, setCommunitySlug] = useState<string | null>(null);
   const location = useLocation();
+  const loginRecordedRef = React.useRef(false);
   const navigate = useNavigate();
 
   // Preload critical routes for faster navigation
@@ -202,7 +204,10 @@ const App: React.FC = memo(() => {
         const user = await StorageService.getSesion();
         if (user) {
           setUsuario(user);
-          await StorageService.trackActiveDay(user.id);
+          if (!loginRecordedRef.current) {
+            loginRecordedRef.current = true;
+            await StorageService.trackActiveDay(user.id);
+          }
           const hasOnboarded = await StorageService.hasCompletedOnboarding();
           if (!hasOnboarded) {
             setShowOnboarding(true);
@@ -418,6 +423,7 @@ const App: React.FC = memo(() => {
         propfirms: '/prop-firms',
         'community-admin': '/comunidad/admin',
         'premium-observatory': '/premium-observatory',
+        'aurora-hive': '/admin/aurora-hive',
       };
       const newPath = pathMap[pestañaActiva] || `/${pestañaActiva}`;
       const currentPath = location.pathname;
@@ -735,6 +741,9 @@ const App: React.FC = memo(() => {
                 {pestañaActiva === 'premium-observatory' && (
                   <PremiumObservatory usuario={usuario} />
                 )}
+                {pestañaActiva === 'aurora-hive' && (usuario?.rol === 'admin' || usuario?.rol === 'ceo') && (
+                  <AuroraHiveDashboard />
+                )}
 
               </Suspense>
             </ErrorBoundary>
@@ -868,6 +877,7 @@ const App: React.FC = memo(() => {
           </Suspense>
 
           <AdminErrorToast userRole={usuario?.role} userRol={usuario?.rol} />
+          <AdminErrorPopupMount />
         </ErrorBoundary>
       </div>
       </GlobalErrorHandler>

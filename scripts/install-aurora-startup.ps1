@@ -1,32 +1,26 @@
-param(
-  [switch]$Uninstall
-)
+# Instalador Unificado de Auto-Boot de TradeShare
+# Reemplaza el Sentinel aislado e instala el Boot Completo (Server + Centinela)
 
-$ErrorActionPreference = "Stop"
+$WshShell = New-Object -comObject WScript.Shell
+$StartupFolder = $WshShell.SpecialFolders.Item("Startup")
+$ProjectFolder = (Get-Item -Path ".\").FullName
+$BootScriptPath = Join-Path $ProjectFolder "scripts\windows-auto-boot.bat"
 
-$projectRoot = Split-Path -Parent $PSScriptRoot
-$startupDir = [Environment]::GetFolderPath("Startup")
-$startupCmdPath = Join-Path $startupDir "AuroraAutoStart.cmd"
-$repoLauncherPath = Join-Path $projectRoot "scripts\aurora-startup.cmd"
-
-if ($Uninstall) {
-  if (Test-Path $startupCmdPath) {
-    Remove-Item $startupCmdPath -Force
-    Write-Host "Autoarranque de Aurora removido de Startup." -ForegroundColor Yellow
-  } else {
-    Write-Host "No existía autoarranque instalado." -ForegroundColor DarkYellow
-  }
-  return
+# Limpieza del viejo acceso (Si existe)
+$OldShortcutPath = Join-Path $StartupFolder "Aurora-Hive-Sentinel.lnk"
+if (Test-Path $OldShortcutPath) {
+    Remove-Item $OldShortcutPath -Force
 }
 
-$content = @"
-@echo off
-cd /d "$projectRoot"
-call "$repoLauncherPath"
-"@
+$ShortcutPath = Join-Path $StartupFolder "TradeShare-Auto-Boot.lnk"
+$Shortcut = $WshShell.CreateShortcut($ShortcutPath)
 
-$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
-[System.IO.File]::WriteAllText($startupCmdPath, $content.Trim() + "`r`n", $utf8NoBom)
+$Shortcut.TargetPath = """$BootScriptPath"""
+$Shortcut.WorkingDirectory = $ProjectFolder
+$Shortcut.WindowStyle = 7 # Ejecutar minimizado si es posible
+$Shortcut.Description = "Sistema Central TradeShare: Arranca Server y Sentinel en segundo plano"
+$Shortcut.Save()
 
-Write-Host "Autoarranque de Aurora instalado en Startup." -ForegroundColor Green
-Write-Host "Archivo: $startupCmdPath" -ForegroundColor DarkGray
+Write-Host "✨ [AURORA] Sistema Unificado de Arranque instalado."
+Write-Host "Ruta del acceso: $ShortcutPath"
+Write-Host "La próxima vez que enciendas, localhost:3000 y el Sentinel vivirán solos."

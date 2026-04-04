@@ -19,12 +19,17 @@ interface AuctionWithSlot {
 }
 
 const AdAuctionView: React.FC = () => {
-  const [selectedTab, setSelectedTab] = useState<'auctions' | 'campaigns' | 'create'>('auctions');
+  const [selectedTab, setSelectedTab] = useState<'auctions' | 'campaigns' | 'create' | 'slots'>('auctions');
   const [bidAmount, setBidAmount] = useState<Record<string, string>>({});
+  const [advertiserId, setAdvertiserId] = useState<string>('');
 
   const auctions = useQuery(api.adAuction.getActiveAuctions) || [];
   const slots = useQuery(api.adAuction.getActiveSlots) || [];
   const stats = useQuery(api.adAuction.getAuctionStats);
+  const campaigns = useQuery(
+    advertiserId ? api.adAuction.getCampaignsByAdvertiser : 'skip',
+    advertiserId ? { advertiserId } : 'skip' as any
+  );
 
   const placeBid = useMutation(api.adAuction.placeBid);
   const createCampaign = useMutation(api.adAuction.createCampaign);
@@ -51,6 +56,7 @@ const AdAuctionView: React.FC = () => {
   };
 
   const handlePlaceBid = async (auctionId: any, slotId: any) => {
+    if (!advertiserId) return;
     const amount = parseFloat(bidAmount[auctionId] || '0');
     if (amount <= 0) return;
 
@@ -60,7 +66,7 @@ const AdAuctionView: React.FC = () => {
         campaignId: auctionId as any,
         amount,
         bidType: 'cpm',
-        bidderId: 'demo_advertiser',
+        bidderId: advertiserId,
       });
       setBidAmount((prev: Record<string, string>) => ({ ...prev, [auctionId]: '' }));
     } catch (error) {
@@ -73,7 +79,7 @@ const AdAuctionView: React.FC = () => {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-black uppercase tracking-wider text-white">
-            📢 Publicidad
+            Publicidad
           </h1>
           <p className="text-sm text-gray-500 mt-1">
             Sistema de subastas publicitarias
@@ -94,10 +100,22 @@ const AdAuctionView: React.FC = () => {
         </div>
       </div>
 
+      <div className="mb-4">
+        <label className="text-xs text-gray-500 uppercase font-bold block mb-1">Advertiser ID</label>
+        <input
+          type="text"
+          value={advertiserId}
+          onChange={(e) => setAdvertiserId(e.target.value)}
+          placeholder="Ingresa tu advertiser ID"
+          className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:border-primary outline-none w-64"
+        />
+      </div>
+
       <div className="flex gap-2 mb-6">
         {[
           { id: 'auctions', label: 'Subastas', icon: 'gavel' },
           { id: 'campaigns', label: 'Campañas', icon: 'campaign' },
+          { id: 'slots', label: 'Slots', icon: 'view_quilt' },
           { id: 'create', label: 'Crear', icon: 'add' },
         ].map(tab => (
           <button
@@ -191,7 +209,7 @@ const AdAuctionView: React.FC = () => {
                   />
                   <button
                     onClick={() => handlePlaceBid(auction._id, auction.slotId)}
-                    disabled={auction.status !== 'active'}
+                    disabled={auction.status !== 'active' || !advertiserId}
                     className="px-4 py-2 rounded-xl bg-gradient-to-r from-primary to-blue-600 text-white text-sm font-bold hover:shadow-lg hover:shadow-primary/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Pujar
@@ -224,7 +242,7 @@ const AdAuctionView: React.FC = () => {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div className="glass rounded-xl p-4 bg-white/5">
               <p className="text-xs text-gray-500 uppercase">Campañas Activas</p>
               <p className="text-2xl font-black text-white">{stats?.totalCampaigns || 0}</p>
@@ -240,11 +258,65 @@ const AdAuctionView: React.FC = () => {
               <p className="text-2xl font-black text-primary">{stats?.avgCTR || 0}%</p>
             </div>
           </div>
+
+          {!advertiserId ? (
+            <div className="text-center py-8 text-gray-500">
+              <p>Ingresa tu Advertiser ID arriba para ver tus campañas</p>
+            </div>
+          ) : campaigns && campaigns.length > 0 ? (
+            <div className="space-y-3">
+              {campaigns.map((c: any) => (
+                <div key={c._id} className="glass rounded-xl p-4 bg-white/5 flex items-center justify-between">
+                  <div>
+                    <h4 className="text-sm font-bold text-white">{c.name}</h4>
+                    <p className="text-xs text-gray-500">
+                      Presupuesto: {formatCurrency(c.budget, 'USD')} | Gastado: {formatCurrency(c.spent || 0, 'USD')}
+                    </p>
+                  </div>
+                  <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${
+                    c.status === 'active' ? 'bg-green-500/20 text-green-400' :
+                    c.status === 'paused' ? 'bg-yellow-500/20 text-yellow-400' :
+                    'bg-gray-500/20 text-gray-400'
+                  }`}>
+                    {c.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <p>No tienes campañas aún. Crea una nueva para comenzar.</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {selectedTab === 'slots' && (
+        <div className="glass rounded-2xl p-6 bg-black/40 border border-white/10">
+          <h3 className="text-lg font-bold text-white mb-4">Slots Disponibles</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {slots.map((slot: any) => (
+              <div key={slot._id} className="glass rounded-xl p-4 bg-white/5">
+                <h4 className="text-sm font-bold text-white">{slot.name}</h4>
+                <p className="text-xs text-gray-500 mt-1">
+                  {slot.size?.width}x{slot.size?.height} · {slot.type} · {slot.page}
+                </p>
+                <p className="text-xs text-primary mt-2">
+                  Floor: {formatCurrency(slot.floorPrice || 0, slot.currency || 'USD')}
+                </p>
+              </div>
+            ))}
+          </div>
+          {slots.length === 0 && (
+            <div className="text-center py-8 text-gray-500">
+              <p>No hay slots disponibles</p>
+            </div>
+          )}
         </div>
       )}
 
       {selectedTab === 'create' && (
-        <CreateCampaignForm onSuccess={() => setSelectedTab('campaigns')} onCancel={() => setSelectedTab('auctions')} slots={slots} />
+        <CreateCampaignForm onSuccess={() => setSelectedTab('campaigns')} onCancel={() => setSelectedTab('auctions')} slots={slots} advertiserId={advertiserId} />
       )}
     </div>
   );
@@ -254,9 +326,10 @@ interface CreateCampaignFormProps {
   onSuccess: () => void;
   onCancel: () => void;
   slots: any[];
+  advertiserId: string;
 }
 
-const CreateCampaignForm: React.FC<CreateCampaignFormProps> = ({ onSuccess, onCancel, slots }) => {
+const CreateCampaignForm: React.FC<CreateCampaignFormProps> = ({ onSuccess, onCancel, slots, advertiserId }) => {
   const [name, setName] = useState('');
   const [budget, setBudget] = useState('100');
   const [targeting, setTargeting] = useState({
@@ -269,17 +342,19 @@ const CreateCampaignForm: React.FC<CreateCampaignFormProps> = ({ onSuccess, onCa
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!advertiserId) return;
+    
     try {
       await createCampaign({
-        advertiserId: 'demo_advertiser',
+        advertiserId,
         name,
         ads: [{
           adId: `ad_${Date.now()}`,
-          title: 'Sample Ad',
-          description: 'Sample description',
+          title: name,
+          description: `Campaña: ${name}`,
           imageUrl: 'https://picsum.photos/600/400',
           link: '/',
-          ctaText: 'Learn More',
+          ctaText: 'Ver más',
         }],
         budget: parseFloat(budget),
         budgetType: 'total',
@@ -367,7 +442,8 @@ const CreateCampaignForm: React.FC<CreateCampaignFormProps> = ({ onSuccess, onCa
           </button>
           <button
             type="submit"
-            className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-primary to-blue-600 text-white font-bold hover:shadow-lg hover:shadow-primary/30 transition-all"
+            disabled={!advertiserId}
+            className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-primary to-blue-600 text-white font-bold hover:shadow-lg hover:shadow-primary/30 transition-all disabled:opacity-50"
           >
             Crear Campaña
           </button>

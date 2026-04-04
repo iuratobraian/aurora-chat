@@ -1,5 +1,5 @@
 import { cronJobs } from "convex/server";
-import { internal } from "./_generated/api";
+import { internal, api } from "./_generated/api";
 
 const crons = cronJobs();
 
@@ -34,14 +34,14 @@ crons.interval(
 crons.hourly(
   "sync-economic-calendar",
   { minuteUTC: 30 },
-  internal.market.economicCalendar.syncEconomicCalendar,
+  api.market.economicCalendar.syncEconomicCalendar,
   {}
 );
 
 crons.hourly(
   "sync-market-news",
   { minuteUTC: 15 },
-  internal.market.marketNews.syncNewsFromSources,
+  api.market.marketNews.syncNewsFromSources,
   {}
 );
 

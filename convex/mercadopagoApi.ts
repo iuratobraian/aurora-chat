@@ -10,7 +10,15 @@ import { requireAdmin } from "./lib/auth";
 
 export const getPaymentStats = query({
   handler: async (ctx) => {
-    await requireAdmin(ctx);
+    try {
+      await requireAdmin(ctx);
+    } catch {
+      return {
+        totalDeposits: 0, totalWithdrawals: 0,
+        activeSubscriptions: 0, pendingPayments: 0,
+        totalPayments: 0, recentPaymentsCount: 0,
+      };
+    }
     const now = Date.now();
     const thirtyDaysAgo = now - 30 * 24 * 60 * 60 * 1000;
     
@@ -39,37 +47,34 @@ export const getPaymentStats = query({
   },
 });
 
+
 export const getRecentPayments = query({
   args: { limit: v.optional(v.number()) },
   handler: async (ctx, args) => {
-    await requireAdmin(ctx);
+    try { await requireAdmin(ctx); } catch { return []; }
     const limit = args.limit || 50;
-    const payments = await ctx.db.query("payments").collect();
-    return payments
-      .sort((a, b) => b.createdAt - a.createdAt)
-      .slice(0, limit);
+    const payments = await ctx.db.query("payments").order("desc").take(limit);
+    return payments;
   },
 });
 
 export const getRecentSubscriptions = query({
   args: { limit: v.optional(v.number()) },
   handler: async (ctx, args) => {
-    await requireAdmin(ctx);
+    try { await requireAdmin(ctx); } catch { return []; }
     const limit = args.limit || 50;
-    const subscriptions = await ctx.db.query("subscriptions").collect();
-    return subscriptions
-      .sort((a, b) => b.createdAt - a.createdAt)
-      .slice(0, limit);
+    const subscriptions = await ctx.db.query("subscriptions").order("desc").take(limit);
+    return subscriptions;
   },
 });
 
 export const getCreditBalances = query({
   args: { limit: v.optional(v.number()) },
   handler: async (ctx, args) => {
-    await requireAdmin(ctx);
+    try { await requireAdmin(ctx); } catch { return []; }
     const limit = args.limit || 50;
-    const credits = await ctx.db.query("userCredits").collect();
-    return credits.sort((a, b) => b.credits - a.credits).slice(0, limit);
+    const credits = await ctx.db.query("userCredits").take(limit);
+    return credits.sort((a: any, b: any) => b.credits - a.credits);
   },
 });
 

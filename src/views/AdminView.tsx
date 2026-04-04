@@ -110,6 +110,10 @@ interface AuroraFindingPreview {
 
 const AdminView: React.FC<{ onVisitProfile?: (id: string) => void; usuario?: Usuario | null }> = ({ onVisitProfile, usuario }) => {
     const { showToast } = useToast();
+
+    // Derived admin check — used for conditional queries (skip pattern)
+    const isAdmin = usuario?.rol === 'admin' || usuario?.rol === 'ceo' || (usuario?.role ?? 0) >= 5;
+
     const convexAds = useQuery(api.ads.getAds);
     const saveAdMutation = useMutation(api.ads.saveAd);
     const deleteAdMutation = useMutation(api.ads.deleteAd);
@@ -158,12 +162,12 @@ const AdminView: React.FC<{ onVisitProfile?: (id: string) => void; usuario?: Usu
     const banUserMutation = useMutation(api.profiles.banUser);
 
     // Bitácora / Trader Verification
-    const allTraderVerifications = useQuery(api.traderVerification.listAllVerifications);
+    const allTraderVerifications = useQuery(api.traderVerification.listAllVerifications, isAdmin ? {} : "skip");
 
-    const paymentStats = useQuery(api.mercadopagoApi.getPaymentStats);
-    const recentPayments = useQuery(api.mercadopagoApi.getRecentPayments, { limit: 50 });
-    const recentSubscriptions = useQuery(api.mercadopagoApi.getRecentSubscriptions, { limit: 50 });
-    const creditBalances = useQuery(api.mercadopagoApi.getCreditBalances, { limit: 50 });
+    const paymentStats = useQuery(api.mercadopagoApi.getPaymentStats, isAdmin ? {} : "skip");
+    const recentPayments = useQuery(api.mercadopagoApi.getRecentPayments, isAdmin ? { limit: 50 } : "skip");
+    const recentSubscriptions = useQuery(api.mercadopagoApi.getRecentSubscriptions, isAdmin ? { limit: 50 } : "skip");
+    const creditBalances = useQuery(api.mercadopagoApi.getCreditBalances, isAdmin ? { limit: 50 } : "skip");
     const updateVerificationMutation = useMutation(api.traderVerification.updateVerificationStatus);
 
     const [users, setUsers] = useState<Usuario[]>([]);

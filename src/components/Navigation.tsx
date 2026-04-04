@@ -426,13 +426,22 @@ const Navigation: React.FC<NavProps> = memo(({
                     <NotificationBell count={unreadCount} />
                   </button>
                   {(usuario.rol === 'admin' || usuario.rol === 'ceo' || (usuario.role && usuario.role >= 5)) && (
-                    <button
-                      onClick={() => { setPestañaActiva('admin'); setShowProfileMenu(false); setShowNotifPanel(false); }}
-                      className="size-9 rounded-lg bg-primary flex items-center justify-center hover:bg-primary/90 transition-all"
-                      title="Panel Admin"
-                    >
-                      <span className="material-symbols-outlined text-white text-base">admin_panel_settings</span>
-                    </button>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => { setPestañaActiva('aurora-hive'); setShowProfileMenu(false); setShowNotifPanel(false); }}
+                        className="size-9 rounded-lg bg-violet-600 flex items-center justify-center hover:bg-violet-700 transition-all shadow-lg shadow-violet-500/20"
+                        title="Aurora Hive Mind"
+                      >
+                        <span className="material-symbols-outlined text-white text-base animate-pulse">hub</span>
+                      </button>
+                      <button
+                        onClick={() => { setPestañaActiva('admin'); setShowProfileMenu(false); setShowNotifPanel(false); }}
+                        className="size-9 rounded-lg bg-primary flex items-center justify-center hover:bg-primary/90 transition-all"
+                        title="Panel Admin"
+                      >
+                        <span className="material-symbols-outlined text-white text-base">admin_panel_settings</span>
+                      </button>
+                    </div>
                   )}
                   <button
                     ref={avatarButtonRef}

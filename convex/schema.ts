@@ -2189,4 +2189,28 @@ export default defineSchema({
     createdAt: v.number(),
     expiresAt: v.optional(v.number()),
   }).index("by_topic", ["topic"]).index("by_createdAt", ["createdAt"]),
+
+  // ============================================================
+  // AURORA HIVE MIND (Sincronización en vivo de agentes)
+  // ============================================================
+  auroraTasks: defineTable({
+    title: v.string(),
+    epic: v.optional(v.string()),
+    description: v.optional(v.string()),
+    status: v.union(v.literal('pending'), v.literal('in_progress'), v.literal('review'), v.literal('done')),
+    assignedTo: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    priority: v.optional(v.number()),
+    source: v.optional(v.string()), // 'manual' | 'auto-diagnostic'
+  }).index("by_status", ["status"]).index("by_assignedTo", ["assignedTo"]).index("by_epic", ["epic"]),
+
+  auroraTransmissions: defineTable({
+    agentId: v.string(),
+    type: v.union(v.literal('claim'), v.literal('handoff'), v.literal('error'), v.literal('success'), v.literal('log'), v.literal('complete'), v.literal('alert')),
+    message: v.string(),
+    relatedTaskId: v.optional(v.id("auroraTasks")),
+    createdAt: v.number(),
+    expiresAt: v.optional(v.number()),
+  }).index("by_agent", ["agentId"]).index("by_type", ["type"]).index("by_createdAt", ["createdAt"]).index("by_expiresAt", ["expiresAt"]),
 });

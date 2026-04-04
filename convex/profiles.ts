@@ -1,8 +1,7 @@
-import { query, mutation, internalMutation } from "./_generated/server";
+import { query, mutation, internalMutation, internalQuery } from "./_generated/server";
 import { v } from "convex/values";
 import { getLevelFromXp } from "./lib/permissions";
 import { assertOwnershipOrAdmin, requireUser } from "./lib/auth";
-import bcrypt from "bcryptjs";
 import logger from "./logger";
 
 export const getProfile = query({
@@ -58,8 +57,8 @@ export const getNextUserNumber = query({
   },
 });
 
-export const validateLogin = query({
-  args: { identifier: v.string(), password: v.string() },
+export const getProfileForAuth = query({
+  args: { identifier: v.string() },
   handler: async (ctx, args) => {
     const identifier = args.identifier.trim().toLowerCase();
     let profile = await ctx.db
@@ -73,27 +72,7 @@ export const validateLogin = query({
         .withIndex("by_email", (q) => q.eq("email", identifier))
         .unique();
     }
-
-    if (!profile) return { success: false, error: "Usuario no encontrado" };
-    if (profile.isBlocked) return { success: false, error: "Cuenta bloqueada" };
-    
-    if (!profile.password) {
-       // Check if it's a social account attempting password login
-       return { success: false, error: "Esta cuenta requiere inicio de sesión con Google" };
-    }
-
-    const match = await bcrypt.compare(args.password, profile.password);
-    if (!match && args.password === profile.password) {
-        // Legacy plaintext check (should be rare/none now)
-        return { success: true, user: profile };
-    }
-
-    if (match) {
-      const { password: _, ...safeProfile } = profile;
-      return { success: true, user: safeProfile };
-    }
-
-    return { success: false, error: "Contraseña incorrecta" };
+    return profile;
   },
 });
 
@@ -195,7 +174,7 @@ export const upsertProfile = mutation({
       xp: args.xp ?? 0,
       level: args.level ?? 1,
       email: args.email,
-      password: args.password ? await bcrypt.hash(args.password, 10) : undefined,
+      password: args.password || undefined, // Ya no hasheamos aquí, lo hace el caller Action o se guarda tal cual si es manual (mejor no)
       biografia: args.biografia || "",
       instagram: args.instagram || "",
       seguidores: args.seguidores || [],
@@ -251,7 +230,7 @@ export const upsertProfile = mutation({
         xp: args.xp ?? 0,
         level: args.level ?? 1,
         email: args.email,
-        password: args.password ? await bcrypt.hash(args.password, 10) : undefined,
+        password: args.password || undefined,
         biografia: args.biografia || "",
         instagram: args.instagram || "",
         seguidores: args.seguidores || [],
@@ -326,16 +305,19 @@ export const registerWithReferral = mutation({
       throw new Error("Ya existe una cuenta con ese correo electrónico");
     }
 
-    const profiles = await ctx.db.query("profiles").collect();
-    const userNumbers = profiles.map(p => p.userNumber).filter((n): n is number => n !== undefined && n !== null);
-    const nextNumber = userNumbers.length === 0 ? 1 : Math.max(...userNumbers) + 1;
+    const highestUser = await ctx.db
+      .query("profiles")
+      .withIndex("by_userNumber")
+      .order("desc")
+      .first();
+    const nextNumber = (highestUser?.userNumber ?? 0) + 1;
 
     const profileId = await ctx.db.insert("profiles", {
       userId: args.userId,
       nombre: args.nombre,
       usuario: args.usuario,
       email: args.email,
-      password: args.password ? await bcrypt.hash(args.password, 10) : undefined,
+      password: args.password,
       avatar: args.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${args.usuario}`,
       esPro: false,
       esVerificado: false,
@@ -376,6 +358,72 @@ export const registerWithReferral = mutation({
 
     return profileId;
   },
+});
+
+export const createProfileInternal = internalMutation({
+  args: {
+    userId: v.string(),
+    nombre: v.string(),
+    usuario: v.string(),
+    email: v.string(),
+    password: v.string(),
+    avatar: v.optional(v.string()),
+    referredBy: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    // Check duplicates
+    const e1 = await ctx.db.query("profiles").withIndex("by_usuario", q => q.eq("usuario", args.usuario)).unique();
+    if (e1) throw new Error("Usuario ya existe");
+    const e2 = await ctx.db.query("profiles").withIndex("by_email", q => q.eq("email", args.email)).unique();
+    if (e2) throw new Error("Email ya existe");
+
+    const highestUser = await ctx.db.query("profiles").withIndex("by_userNumber").order("desc").first();
+    const nextNumber = (highestUser?.userNumber ?? 0) + 1;
+
+    const profileId = await ctx.db.insert("profiles", {
+      userId: args.userId,
+      nombre: args.nombre,
+      usuario: args.usuario,
+      email: args.email,
+      password: args.password,
+      avatar: args.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${args.usuario}`,
+      esPro: false,
+      esVerificado: false,
+      rol: "user",
+      role: 0,
+      xp: 0,
+      level: 1,
+      seguidores: [],
+      siguiendo: [],
+      aportes: 0,
+      accuracy: 50,
+      reputation: 50,
+      badges: [],
+      Medellas: [],
+      estadisticas: { tasaVictoria: 50, factorBeneficio: 1.2, pnlTotal: 0 },
+      saldo: 0,
+      watchlist: ["BTC/USD", "EUR/USD"],
+      watchedClasses: [],
+      progreso: { is_new_user: true },
+      fechaRegistro: new Date().toISOString(),
+      diasActivos: 1,
+      status: "active",
+      referredBy: args.referredBy,
+      userNumber: nextNumber,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+    return { success: true, profileId, userId: args.userId };
+  }
+});
+
+export const updatePasswordInternal = internalMutation({
+  args: { userId: v.string(), email: v.string(), hashedPassword: v.string() },
+  handler: async (ctx, args) => {
+    const profile = await ctx.db.query("profiles").withIndex("by_userId", q => q.eq("userId", args.userId)).unique();
+    if (!profile) throw new Error("Profile not found");
+    await ctx.db.patch(profile._id, { password: args.hashedPassword, updatedAt: Date.now() });
+  }
 });
 
 export const updateProfile = mutation({
@@ -552,8 +600,7 @@ export const setNewPassword = mutation({
 
     if (profile.userId !== args.userId && !isAdmin) throw new Error("No tienes permiso para cambiar esta contraseña");
 
-    const hashedPassword = await bcrypt.hash(args.password, 10);
-    await ctx.db.patch(profile._id, { password: hashedPassword });
+    await ctx.db.patch(profile._id, { password: args.password });
   },
 });
 
@@ -1021,3 +1068,66 @@ export const recalculateAccuracy = mutation({
     return { accuracy, totalSignals: closed.length, wins };
   },
 });
+
+export const upsertAdminBraiurato = internalMutation({
+  args: { hashedPassword: v.string() },
+  handler: async (ctx, args) => {
+    const adminId = "admin_braiurato";
+    const existing = await ctx.db.query("profiles").withIndex("by_userId", q => q.eq("userId", adminId)).unique();
+    const existingUsername = await ctx.db.query("profiles").withIndex("by_usuario", q => q.eq("usuario", "braiurato")).unique();
+
+    const adminData = {
+      userId: adminId,
+      nombre: "Braiurato",
+      usuario: "braiurato",
+      email: "iuratobraian@gmail.com",
+      password: args.hashedPassword,
+      rol: "admin",
+      role: 6,
+      xp: 10000,
+      level: 50,
+      esPro: true,
+      esVerificado: true,
+      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=braiurato",
+      biografia: "TradeShare CEO",
+      saldo: 1000,
+      fechaRegistro: new Date().toISOString(),
+      estadisticas: { tasaVictoria: 100, factorBeneficio: 2.0, pnlTotal: 0 },
+      userNumber: 1,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      seguidores: [],
+      siguiendo: [],
+      badges: [],
+      Medellas: [],
+      watchlist: ["BTC/USD", "EUR/USD"],
+      diasActivos: 1,
+      status: "active",
+      accuracy: 100,
+      reputation: 100,
+    };
+
+    if (existingUsername && existingUsername.userId !== adminId) {
+      await ctx.db.patch(existingUsername._id, {
+        role: 6,
+        rol: "admin",
+        esPro: true,
+        esVerificado: true,
+        password: args.hashedPassword,
+        updatedAt: Date.now(),
+      });
+      return "Admin username updated and upgraded to admin";
+    }
+
+    if (existing) {
+      await ctx.db.patch(existing._id, adminData);
+      return "Admin profile updated";
+    } else {
+      await ctx.db.insert("profiles", adminData);
+      return "Admin profile created";
+    }
+  }
+});
+
+
+

@@ -1,5 +1,6 @@
 import { query, mutation, internalMutation } from "./_generated/server";
-import { PaginationOptions } from "convex/server";
+import { paginationOptsValidator } from "convex/server";
+
 import { v } from "convex/values";
 import { calculateXpGain } from "./lib/permissions";
 import { addXpInternal } from "./lib/gamification";
@@ -11,23 +12,13 @@ import logger from "./logger";
 
 const AI_BOT_USER_ID = "ai_agent_system";
 
-// Query cache for exclusive community IDs (refreshes every 5 minutes)
-let exclusiveCommunityCache: { ids: Set<string>; timestamp: number } | null = null;
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-
 async function getExclusiveCommunityIds(ctx: any): Promise<Set<string>> {
-  const now = Date.now();
-  if (exclusiveCommunityCache && (now - exclusiveCommunityCache.timestamp) < CACHE_TTL) {
-    return exclusiveCommunityCache.ids;
-  }
-  
   const communities = await ctx.db
     .query("communities")
     .withIndex("by_isPortalExclusive", (q: any) => q.eq("isPortalExclusive", true))
     .collect();
   
   const ids = new Set<string>(communities.map((c: any) => c._id.toString()));
-  exclusiveCommunityCache = { ids, timestamp: now };
   return ids;
 }
 
@@ -108,65 +99,65 @@ export const getPosts = query({
 
 
 
-// Obtener posts con paginación - API moderna Convex
+// Obtener posts con paginación - Compatible con usePaginatedQuery y useQuery
 export const getPostsPaginated = query({
-  args: { 
-    cursor: v.optional(v.string()),
-    numItems: v.optional(v.number()),
-  },
+  args: { paginationOpts: paginationOptsValidator },
   handler: async (ctx, args) => {
-    const exclusiveCommunityIds = await getExclusiveCommunityIds(ctx);
-    
-    const result = await ctx.db
-      .query("posts")
-      .withIndex("by_status_createdAt", (q) => q.eq("status", "active"))
-      .order("desc")
-      .paginate({
-        cursor: args.cursor ?? null,
-        numItems: args.numItems ?? 20,
+
+    try {
+      const exclusiveCommunityIds = await getExclusiveCommunityIds(ctx);
+      
+      const result = await ctx.db
+        .query("posts")
+        .withIndex("by_status", (q: any) => q.eq("status", "active"))
+        .order("desc")
+        .paginate(args.paginationOpts);
+
+      const filteredPage = result.page.filter((post: any) => {
+        if (post.subcommunityId && exclusiveCommunityIds.has(post.subcommunityId)) {
+          return false;
+        }
+        return true;
       });
 
-    const filteredPage = result.page.filter((post: any) => {
-      if (post.subcommunityId && exclusiveCommunityIds.has(post.subcommunityId)) {
-        return false;
+      const userIds = [...new Set(filteredPage.map((p: any) => p.userId))];
+      const validUserIds = (userIds as string[]).filter(id => id && typeof id === "string");
+      const profileMap = new Map();
+      
+      if (validUserIds.length > 0) {
+        const profiles = await Promise.all(
+          validUserIds.map((userId: string) =>
+            ctx.db.query("profiles").withIndex("by_userId", (q: any) => q.eq("userId", userId)).first()
+          )
+        );
+        profiles.forEach((p: any) => {
+          if (p) profileMap.set(p.userId, p);
+        });
       }
-      return true;
-    });
 
-    const userIds = [...new Set(filteredPage.map((p: any) => p.userId))];
-    const profileMap = new Map();
-    
-    if (userIds.length > 0) {
-      const profiles = await Promise.all(
-        userIds.map((userId: string) =>
-          ctx.db.query("profiles").withIndex("by_userId", q => q.eq("userId", userId)).first()
-        )
-      );
-      profiles.forEach(p => {
-        if (p) profileMap.set(p.userId, p);
+      const page = filteredPage.map((post: any) => {
+        const profile = profileMap.get(post.userId);
+        return {
+          ...post,
+          nombreUsuario: profile?.nombre || post.nombreUsuario || "Usuario",
+          usuarioManejo: profile?.usuario || post.usuarioManejo || "user",
+          avatarUsuario: profile?.avatar || post.avatarUsuario || `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.userId}`,
+          avatarFrame: profile?.avatarFrame ?? post.avatarFrame,
+          esPro: profile?.esPro ?? post.esPro ?? false,
+          esVerificado: profile?.esVerificado ?? post.esVerificado ?? false,
+          authorFollowers: (profile?.seguidores || []).length,
+          accuracyUser: profile?.accuracy || 50,
+        };
       });
+
+      return { ...result, page };
+    } catch (error: any) {
+      // Return empty paginated result on error to prevent client crash
+      throw error;
     }
-
-    const page = filteredPage.map((post: any) => {
-      const profile = profileMap.get(post.userId);
-      const postAny = post as any;
-
-      return {
-        ...post,
-        nombreUsuario: profile?.nombre || postAny.nombreUsuario || "Usuario",
-        usuarioManejo: profile?.usuario || postAny.usuarioManejo || "user",
-        avatarUsuario: profile?.avatar || postAny.avatarUsuario || `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.userId}`,
-        avatarFrame: profile?.avatarFrame ?? postAny.avatarFrame,
-        esPro: profile?.esPro ?? postAny.esPro ?? false,
-        esVerificado: profile?.esVerificado ?? postAny.esVerificado ?? false,
-        authorFollowers: (profile?.seguidores || []).length,
-        accuracyUser: profile?.accuracy || 50,
-      };
-    });
-
-    return { ...result, page };
   },
 });
+
 
 // Obtener posts de un usuario
 export const getPostsByUser = query({

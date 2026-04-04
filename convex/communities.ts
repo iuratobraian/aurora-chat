@@ -866,6 +866,7 @@ export const updateCommunityRevenue = mutation({
 export const getCommunityStats = query({
   args: { communityId: v.id("communities") },
   handler: async (ctx, args) => {
+    try {
     const community = await ctx.db.get(args.communityId);
     if (!community) return null;
 
@@ -893,6 +894,10 @@ export const getCommunityStats = query({
       monthlyRevenue: (community.priceMonthly || 0) * activeSubscriptions.length,
       totalRevenue: community.totalRevenue || 0,
     };
+    } catch(e) {
+      console.error('[getCommunityStats] error:', e);
+      return { memberCount: 0, postCount: 0, activeMembers: 0 };
+    }
   },
 });
 

@@ -44,7 +44,7 @@ export const checkAchievements = async (userId: string): Promise<any[]> => {
 export const awardXP = async (userId: string, amount: number, reason: string): Promise<any> => {
     if (!userId || userId === 'guest') return null;
     try {
-        return await convex.mutation(api.gamification.awardXP, { userId, amount, reason });
+        return await convex.mutation(api.gamification.awardXP, { userId, amount, reason } as any);
     } catch (err) {
         logger.error("Award XP Error:", err);
         return null;
@@ -92,9 +92,49 @@ export const getAchievementLeaderboard = async (limit?: number): Promise<any[]> 
 export const triggerAchievementCheck = async (userId: string, action: string, metadata?: any): Promise<any> => {
     if (!userId || userId === 'guest') return null;
     try {
-        return await convex.mutation(api.achievements.checkAndAwardAchievements, { userId, action, metadata });
+        return await convex.mutation(api.achievements.checkAndAwardAchievements, { userId, action, metadata } as any);
     } catch (err) {
         logger.error("Trigger Achievement Check Error:", err);
+        return null;
+    }
+};
+
+export const recordDailyLogin = async (userId: string): Promise<any> => {
+    if (!userId || userId === 'guest') return null;
+    try {
+        return await convex.mutation(api.gamification.recordDailyLogin, { userId });
+    } catch (err) {
+        logger.error("Record Daily Login Error:", err);
+        return null;
+    }
+};
+
+export const awardPostXP = async (userId: string, reason: string = 'post_created'): Promise<any> => {
+    if (!userId || userId === 'guest') return null;
+    try {
+        return await convex.mutation(api.gamification.awardPostXP, { userId, reason } as any);
+    } catch (err) {
+        logger.error("Award Post XP Error:", err);
+        return null;
+    }
+};
+
+export const awardLikeXP = async (userId: string): Promise<any> => {
+    if (!userId || userId === 'guest') return null;
+    try {
+        return await convex.mutation(api.gamification.awardLikeXP, { userId } as any);
+    } catch (err) {
+        logger.error("Award Like XP Error:", err);
+        return null;
+    }
+};
+
+export const awardCommentXP = async (userId: string): Promise<any> => {
+    if (!userId || userId === 'guest') return null;
+    try {
+        return await convex.mutation(api.gamification.awardCommentXP, { userId } as any);
+    } catch (err) {
+        logger.error("Award Comment XP Error:", err);
         return null;
     }
 };

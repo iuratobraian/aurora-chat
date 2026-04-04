@@ -41,9 +41,9 @@ export function usePostsFeed({
   const { ref: loadMoreRef, inView } = useInView();
 
   const paginatedResult = useQuery(api.posts.getPostsPaginated, {
-    numItems: PAGE_SIZE,
-    cursor: cursor !== null ? cursor : undefined,
+    paginationOpts: { cursor: cursor, numItems: PAGE_SIZE, id: 0 },
   }) as { page: any[]; continueCursor: string | null; isDone: boolean } | undefined;
+
 
   const convexPosts = paginatedResult?.page;
 

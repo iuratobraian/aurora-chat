@@ -89,8 +89,8 @@ const TradingViewChart: React.FC<{
 };
 
 const GraficoView: React.FC<GraficoViewProps> = ({ usuario }) => {
-    const [assets, setAssets] = useState(ASSETS);
-    const [selectedAsset, setSelectedAsset] = useState(ASSETS[0]);
+    const [assets, setAssets] = useState<any[]>(ASSETS);
+    const [selectedAsset, setSelectedAsset] = useState<any | null>(ASSETS[0] ?? null);
     const [timeframe, setTimeframe] = useState('D');
     const [chartStyle, setChartStyle] = useState('1');
     const [filterCategory, setFilterCategory] = useState('Todos');
@@ -119,6 +119,17 @@ const GraficoView: React.FC<GraficoViewProps> = ({ usuario }) => {
     const filteredAssets = filterCategory === 'Todos'
         ? assets
         : assets.filter(a => a.category === filterCategory);
+
+    if (!selectedAsset) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="text-center">
+                    <span className="material-symbols-outlined text-4xl text-gray-600">candlestick_chart</span>
+                    <p className="text-gray-400 mt-2">Cargando activos...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-[1600px] mx-auto animate-in fade-in duration-700 space-y-6">

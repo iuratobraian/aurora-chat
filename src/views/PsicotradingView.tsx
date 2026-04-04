@@ -145,10 +145,13 @@ const PsicotradingView: React.FC<PsicotradingProps> = ({ usuario, onUpdateUser }
         showToast('info', 'Extrayendo contenido de YouTube...');
         
         try {
-            // Call server-side endpoint (API key stays on server)
+            const token = localStorage.getItem('authToken');
             const response = await fetch('/api/youtube/extract', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token && { 'Authorization': `Bearer ${token}` }),
+                },
             });
             
             if (!response.ok) {

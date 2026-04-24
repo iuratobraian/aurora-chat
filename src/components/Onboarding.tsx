@@ -1,7 +1,8 @@
+import { useState } from 'react';
 import { api } from '../api';
 import { useUserStore } from '../store';
 import { User, Mail, AtSign, Loader2 } from 'lucide-react';
-import { useConvex } from 'convex/react';
+import { useConvex, useMutation } from 'convex/react';
 
 export default function Onboarding() {
   const [email, setEmail] = useState('');

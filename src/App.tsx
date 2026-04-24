@@ -40,9 +40,21 @@ export default function AuroraChat() {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [viewingProfileUser, setViewingProfileUser] = useState<any>(null);
   const [interimTranscript, setInterimTranscript] = useState('');
+  
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      if (!mobile) setIsSidebarOpen(true);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   
   // User state
   const { user, setUser, logout } = useUserStore();
@@ -331,7 +343,20 @@ export default function AuroraChat() {
       <audio ref={audioRef} src={NOTIFICATION_SOUND} preload="auto" />
       
       {/* SIDEBAR */}
-      <div className={`${isSidebarOpen ? 'w-80' : 'w-0'} border-r border-white/10 flex flex-col bg-black/20 shrink-0 transition-all duration-300 overflow-hidden relative`}>
+      <div className={`
+        ${isSidebarOpen ? 'w-80 translate-x-0' : 'w-0 -translate-x-full'} 
+        ${isMobile ? 'fixed inset-y-0 left-0 z-[150] shadow-2xl' : 'relative shrink-0'}
+        border-r border-white/10 flex flex-col bg-black/90 transition-all duration-300 overflow-hidden
+      `}>
+        {isMobile && isSidebarOpen && (
+          <button 
+            onClick={() => setIsSidebarOpen(false)}
+            className="absolute top-4 right-4 text-gray-500 hover:text-white z-50 p-2 bg-white/5 rounded-lg"
+          >
+            <X size={20}/>
+          </button>
+        )}
+
         {/* User Profile Header */}
         <div className="p-4 border-b border-white/10 flex items-center justify-between bg-black/40 min-w-[320px]">
           <button onClick={() => setShowProfileModal(true)} className="flex items-center gap-3 group text-left">
@@ -507,7 +532,7 @@ export default function AuroraChat() {
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               className="p-2 text-gray-500 hover:text-white transition-all bg-white/5 rounded-xl border border-white/10"
             >
-              <MoreVertical size={20} className={isSidebarOpen ? '' : 'rotate-90'} />
+              {isMobile ? <Plus size={20} className={isSidebarOpen ? 'rotate-45' : ''} /> : <MoreVertical size={20} className={isSidebarOpen ? '' : 'rotate-90'} />}
             </button>
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 text-primary">
@@ -635,15 +660,20 @@ export default function AuroraChat() {
              </div>
 
              <div className="flex flex-col gap-2 shrink-0">
-               <button type="button" onClick={startSpeechToText} className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${isRecording ? 'bg-red-500/20 text-red-500 border border-red-500/30' : 'bg-white/5 text-gray-400 hover:text-white border border-white/10'}`}>
-                 {isRecording ? <MicOff size={22}/> : <Mic size={22}/>}
-               </button>
+               {!isMobile && (
+                  <button type="button" onClick={startSpeechToText} className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${isRecording ? 'bg-red-500/20 text-red-500 border border-red-500/30' : 'bg-white/5 text-gray-400 hover:text-white border border-white/10'}`}>
+                    {isRecording ? <MicOff size={22}/> : <Mic size={22}/>}
+                  </button>
+               )}
                <button type="submit" disabled={!text.trim() && !attachedImage} className="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/30 active:scale-95 disabled:opacity-30 transition-all">
                  <Send size={22} />
                </button>
              </div>
            </form>
         </div>
+        {isMobile && isSidebarOpen && (
+           <div className="fixed inset-0 bg-black/40 z-[140] backdrop-blur-sm" onClick={() => setIsSidebarOpen(false)} />
+        )}
       </div>
 
       {/* MODALS */}

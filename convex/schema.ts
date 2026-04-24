@@ -72,6 +72,7 @@ export default defineSchema({
     username: v.string(),
     name: v.string(),
     avatar: v.string(),
+    password: v.optional(v.string()),
     bio: v.optional(v.string()),
     phone: v.optional(v.string()),
     privacyMode: v.optional(v.union(v.literal("everyone"), v.literal("requests"))),

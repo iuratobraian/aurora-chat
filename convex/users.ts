@@ -6,16 +6,14 @@ export const createUser = mutation({
     email: v.string(),
     username: v.string(),
     name: v.string(),
+    password: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const existingEmail = await ctx.db
+    const existing = await ctx.db
       .query("users")
       .withIndex("by_email", (q) => q.eq("email", args.email))
       .first();
-
-    if (existingEmail) {
-      throw new Error("El email ya está registrado");
-    }
+    if (existing) return existing._id;
 
     const existingUsername = await ctx.db
       .query("users")

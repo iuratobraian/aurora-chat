@@ -26,12 +26,15 @@ export default function Onboarding() {
       if (existingUser) {
         if (existingUser.password && existingUser.password !== password) {
           setError("Contraseña incorrecta");
+          setLoading(false);
           return;
         }
+        // If user exists but has no password, allow entry (they can set it later in profile)
         setUser(existingUser);
       } else {
         setError("Usuario no encontrado. Por favor regístrate.");
       }
+
     } catch (err: any) {
       setError(err.message || "Error al iniciar sesión");
     } finally {

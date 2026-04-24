@@ -766,51 +766,77 @@ export default function AuroraChat() {
         </div>
       )}
 
-      {/* Viewing Other User Profile Popup (Elegant & Subtle) */}
+      {/* Viewing Other User Profile Popup (Premium WhatsApp/Telegram Style) */}
       {viewingProfileUser && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] flex items-center justify-center p-4" onClick={() => setViewingProfileUser(null)}>
-          <div className="bg-[#1a1a1a]/90 rounded-[2rem] border border-white/10 p-6 w-full max-w-[280px] space-y-5 shadow-2xl relative animate-fadeIn" onClick={e => e.stopPropagation()}>
-            <button onClick={() => setViewingProfileUser(null)} className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors"><X size={18}/></button>
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-[200] flex items-center justify-center p-4 animate-fadeIn" onClick={() => setViewingProfileUser(null)}>
+          <div className="bg-[#1a1a1a] rounded-[2.5rem] border border-white/10 w-full max-w-[320px] overflow-hidden shadow-[0_32px_64px_-12px_rgba(0,0,0,0.8)] relative" onClick={e => e.stopPropagation()}>
             
-            <div className="text-center space-y-3">
-              <div className="relative w-20 h-20 mx-auto">
-                <img src={viewingProfileUser.avatar} className="w-full h-full rounded-2xl object-cover shadow-lg ring-2 ring-primary/20" alt="" />
-                <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#1a1a1a]" />
+            {/* Header / Avatar */}
+            <div className="bg-gradient-to-b from-primary/20 to-transparent p-8 text-center relative">
+              <button onClick={() => setViewingProfileUser(null)} className="absolute top-6 right-6 text-white/40 hover:text-white transition-colors"><X size={20}/></button>
+              <div className="relative w-28 h-28 mx-auto mb-4 group">
+                <img src={viewingProfileUser.avatar} className="w-full h-full rounded-[2.5rem] object-cover shadow-2xl ring-4 ring-primary/10 transition-transform group-hover:scale-105 duration-500" alt="" />
+                <div className="absolute bottom-1 right-1 w-5 h-5 bg-emerald-500 rounded-full border-4 border-[#1a1a1a]" title="En línea" />
               </div>
-              <div>
-                <h2 className="text-sm font-black text-white uppercase tracking-widest">{viewingProfileUser.name}</h2>
-                <p className="text-[9px] text-gray-500 font-mono tracking-tighter">PERFIL AURORA</p>
-              </div>
+              <h2 className="text-xl font-black text-white uppercase tracking-tight">{viewingProfileUser.name}</h2>
+              <p className="text-[10px] text-primary font-black uppercase tracking-[0.3em] opacity-70">@{viewingProfileUser.username || 'usuario'}</p>
             </div>
-            
-            <div className="space-y-2">
-              <button 
-                onClick={() => { startDM(viewingProfileUser); setViewingProfileUser(null); }} 
-                className="w-full bg-primary/10 hover:bg-primary/20 text-primary py-3 rounded-xl font-bold uppercase tracking-widest text-[9px] border border-primary/20 flex items-center justify-center gap-2 transition-all active:scale-95"
-              >
-                <MessageSquare size={14} /> Mensaje Privado
-              </button>
 
-              {user._id !== viewingProfileUser._id && !friendsList?.find((f:any) => f._id === viewingProfileUser._id) && !sentFriendRequests?.find((r:any) => r.user2Id === viewingProfileUser._id) && (
+            {/* Info Sections */}
+            <div className="px-6 pb-8 space-y-4">
+              <div className="space-y-1 bg-white/5 rounded-2xl p-4 border border-white/5">
+                <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2 mb-1">
+                  <Info size={12} className="text-primary"/> Información y Bio
+                </label>
+                <p className="text-xs text-gray-300 leading-relaxed italic">
+                  {viewingProfileUser.bio || "Este usuario prefiere mantener su bio en misterio... ✨"}
+                </p>
+              </div>
+
+              {viewingProfileUser.phone && (
+                <div className="flex items-center gap-4 bg-white/5 rounded-2xl p-4 border border-white/5">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                    <Phone size={18} />
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-bold text-gray-500 uppercase">Teléfono</p>
+                    <p className="text-sm text-white font-mono">{viewingProfileUser.phone}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="grid grid-cols-1 gap-2 pt-2">
                 <button 
-                  onClick={() => sendFriendRequest({ fromId: user._id as any, toId: viewingProfileUser._id })}
-                  className="w-full bg-white/5 hover:bg-white/10 text-gray-400 py-3 rounded-xl font-bold uppercase tracking-widest text-[9px] border border-white/10 flex items-center justify-center gap-2 transition-all active:scale-95"
+                  onClick={() => { startDM(viewingProfileUser); setViewingProfileUser(null); }} 
+                  className="w-full bg-primary hover:bg-primary-hover text-white py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 shadow-lg shadow-primary/20 transition-all active:scale-95"
                 >
-                  <Users size={14} /> Añadir Amigo
+                  <MessageSquare size={16} /> Chatear ahora
                 </button>
-              )}
 
-              {sentFriendRequests?.find((r:any) => r.user2Id === viewingProfileUser._id) && (
-                <div className="w-full bg-white/5 text-gray-600 py-3 rounded-xl font-bold uppercase tracking-widest text-[9px] border border-white/5 flex items-center justify-center gap-2">
-                  <Clock size={14} /> Solicitud Pendiente
-                </div>
-              )}
-              
-              {friendsList?.find((f:any) => f._id === viewingProfileUser._id) && (
-                <div className="py-2 flex items-center justify-center gap-2 text-emerald-500 font-black uppercase text-[8px] tracking-tighter opacity-80">
-                  <Users size={12} /> Amigo Confirmado
-                </div>
-              )}
+                {user._id !== viewingProfileUser._id && !friendsList?.find((f:any) => f._id === viewingProfileUser._id) && !sentFriendRequests?.find((r:any) => r.user2Id === viewingProfileUser._id) && (
+                  <button 
+                    onClick={() => sendFriendRequest({ fromId: user._id as any, toId: viewingProfileUser._id })}
+                    className="w-full bg-white/5 hover:bg-white/10 text-white/60 py-4 rounded-2xl font-bold uppercase tracking-widest text-[10px] border border-white/10 flex items-center justify-center gap-2 transition-all active:scale-95"
+                  >
+                    <Users size={16} /> Agregar Amigo
+                  </button>
+                )}
+
+                {sentFriendRequests?.find((r:any) => r.user2Id === viewingProfileUser._id) && (
+                  <div className="w-full bg-emerald-500/10 text-emerald-500 py-4 rounded-2xl font-black uppercase tracking-widest text-[9px] border border-emerald-500/20 flex items-center justify-center gap-2">
+                    <Clock size={16} /> Solicitud Enviada
+                  </div>
+                )}
+                
+                {friendsList?.find((f:any) => f._id === viewingProfileUser._id) && (
+                  <div className="py-2 text-center">
+                    <span className="bg-emerald-500/20 text-emerald-500 px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center justify-center gap-2 mx-auto w-fit">
+                      <Users size={12} /> Amigo Mutuo
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

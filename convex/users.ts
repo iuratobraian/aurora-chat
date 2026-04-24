@@ -31,12 +31,14 @@ export const createUser = mutation({
       username: args.username.toLowerCase(),
       name: args.name,
       avatar,
+      password: args.password,
       createdAt: Date.now(),
     });
 
     return userId;
   },
 });
+
 
 export const getUserByEmail = query({
   args: { email: v.string() },
@@ -77,6 +79,7 @@ export const updateProfile = mutation({
     bio: v.optional(v.string()),
     phone: v.optional(v.string()),
     avatar: v.optional(v.string()),
+    privacyMode: v.optional(v.union(v.literal("everyone"), v.literal("requests"))),
   },
   handler: async (ctx, args) => {
     const { userId, ...updates } = args;
@@ -84,4 +87,5 @@ export const updateProfile = mutation({
     return await ctx.db.get(userId);
   },
 });
+
 

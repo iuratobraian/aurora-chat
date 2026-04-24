@@ -70,6 +70,7 @@ export default function AuroraChat() {
   const sendFriendRequest = useMutation(api.friends.sendFriendRequest);
   const acceptFriendRequest = useMutation(api.friends.acceptFriendRequest);
   const pendingFriendRequests = useQuery(api.friends.getPendingRequests, user?._id ? { userId: user._id as any } : "skip");
+  const sentFriendRequests = useQuery(api.friends.getSentRequests, user?._id ? { userId: user._id as any } : "skip");
   const friendsList = useQuery(api.friends.getFriends, user?._id ? { userId: user._id as any } : "skip");
 
   // Safe Convex queries
@@ -228,15 +229,25 @@ export default function AuroraChat() {
 
     rec.onresult = (e: any) => {
       let final = '';
+      let interim = '';
       for (let i = e.resultIndex; i < e.results.length; ++i) {
         if (e.results[i].isFinal) {
           final += e.results[i][0].transcript;
+        } else {
+          interim += e.results[i][0].transcript;
         }
       }
+      
       if (final) {
         setText(p => p + (p ? ' ' : '') + final);
       }
+      
+      // Mostrar transcripción temporal en el placeholder o un estado
+      if (interim) {
+        console.log('Interim speech:', interim);
+      }
     };
+
 
     try {
       rec.start();
@@ -353,13 +364,34 @@ export default function AuroraChat() {
              <div className="space-y-2">
                {pendingFriendRequests.map((req: any) => (
                  <div key={req._id} className="flex items-center justify-between bg-black/20 p-2 rounded-xl border border-white/5">
-                   <span className="text-[10px] text-white">Nueva solicitud</span>
+                   <div className="flex items-center gap-2">
+                     <img src={req.user?.avatar} className="w-6 h-6 rounded-lg" alt="" />
+                     <span className="text-[10px] text-white font-bold">{req.user?.name}</span>
+                   </div>
                    <button 
                     onClick={() => acceptFriendRequest({ friendId: req._id })}
-                    className="bg-primary text-white text-[9px] font-bold px-3 py-1 rounded-lg uppercase"
+                    className="bg-primary text-white text-[8px] font-bold px-3 py-1.5 rounded-lg uppercase transition-all active:scale-95"
                    >
                      Aceptar
                    </button>
+                 </div>
+               ))}
+             </div>
+          </div>
+        )}
+
+        {/* Sent Friend Requests */}
+        {sentFriendRequests && sentFriendRequests.length > 0 && (
+          <div className="p-4 border-b border-white/5">
+             <h4 className="text-[9px] font-black text-gray-500 uppercase mb-2">Solicitudes Enviadas</h4>
+             <div className="space-y-2">
+               {sentFriendRequests.map((req: any) => (
+                 <div key={req._id} className="flex items-center justify-between bg-black/10 p-2 rounded-xl">
+                   <div className="flex items-center gap-2 opacity-60">
+                     <img src={req.user?.avatar} className="w-6 h-6 rounded-lg" alt="" />
+                     <span className="text-[10px] text-white">{req.user?.name}</span>
+                   </div>
+                   <span className="text-[8px] text-gray-600 font-bold uppercase">Pendiente</span>
                  </div>
                ))}
              </div>
@@ -717,13 +749,19 @@ export default function AuroraChat() {
                 <MessageSquare size={14} /> Mensaje Privado
               </button>
 
-              {user._id !== viewingProfileUser._id && !friendsList?.find((f:any) => f._id === viewingProfileUser._id) && (
+              {user._id !== viewingProfileUser._id && !friendsList?.find((f:any) => f._id === viewingProfileUser._id) && !sentFriendRequests?.find((r:any) => r.user2Id === viewingProfileUser._id) && (
                 <button 
-                  onClick={() => sendFriendRequest({ fromId: user._id, toId: viewingProfileUser._id })}
+                  onClick={() => sendFriendRequest({ fromId: user._id as any, toId: viewingProfileUser._id })}
                   className="w-full bg-white/5 hover:bg-white/10 text-gray-400 py-3 rounded-xl font-bold uppercase tracking-widest text-[9px] border border-white/10 flex items-center justify-center gap-2 transition-all active:scale-95"
                 >
                   <Users size={14} /> Añadir Amigo
                 </button>
+              )}
+
+              {sentFriendRequests?.find((r:any) => r.user2Id === viewingProfileUser._id) && (
+                <div className="w-full bg-white/5 text-gray-600 py-3 rounded-xl font-bold uppercase tracking-widest text-[9px] border border-white/5 flex items-center justify-center gap-2">
+                  <Clock size={14} /> Solicitud Pendiente
+                </div>
               )}
               
               {friendsList?.find((f:any) => f._id === viewingProfileUser._id) && (

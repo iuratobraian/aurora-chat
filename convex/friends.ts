@@ -59,10 +59,38 @@ export const getFriends = query({
 export const getPendingRequests = query({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
-    return await ctx.db
+    const pending = await ctx.db
       .query("friends")
       .withIndex("by_user2", (q) => q.eq("user2Id", args.userId))
       .filter((q) => q.eq(q.field("status"), "pending"))
       .collect();
+
+    const results = [];
+    for (const req of pending) {
+      const u = await ctx.db.get(req.user1Id);
+      if (u) results.push({ ...req, user: u });
+    }
+    return results;
   },
 });
+
+
+export const getSentRequests = query({
+  args: { userId: v.id("users") },
+  handler: async (ctx, args) => {
+    const sent = await ctx.db
+      .query("friends")
+      .withIndex("by_user1", (q) => q.eq("user1Id", args.userId))
+      .filter((q) => q.eq(q.field("status"), "pending"))
+      .collect();
+
+    const results = [];
+    for (const req of sent) {
+      const u = await ctx.db.get(req.user2Id);
+      if (u) results.push({ ...req, user: u });
+    }
+    return results;
+  },
+});
+
+

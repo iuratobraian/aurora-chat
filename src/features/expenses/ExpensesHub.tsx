@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation } from 'convex/react';
-import { anyApi } from 'convex/server';
-const api = anyApi;
+import { api } from '../../api';
 import { 
   TrendingUp, TrendingDown, CreditCard, Calendar, 
   Plus, Search, ArrowRight, DollarSign, Wallet,

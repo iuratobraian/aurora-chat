@@ -81,7 +81,9 @@ export const updateProfile = mutation({
     avatar: v.optional(v.string()),
     password: v.optional(v.string()),
     privacyMode: v.optional(v.union(v.literal("everyone"), v.literal("requests"))),
+    themeColor: v.optional(v.string()),
   },
+
 
   handler: async (ctx, args) => {
     const { userId, ...updates } = args;

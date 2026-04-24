@@ -98,8 +98,10 @@ export default defineSchema({
     bio: v.optional(v.string()),
     phone: v.optional(v.string()),
     privacyMode: v.optional(v.union(v.literal("everyone"), v.literal("requests"))),
+    themeColor: v.optional(v.string()),
     createdAt: v.number(),
   }).index("by_email", ["email"])
+
     .index("by_username", ["username"]),
 
   statuses: defineTable({

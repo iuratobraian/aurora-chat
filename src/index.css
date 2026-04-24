@@ -3,15 +3,21 @@
 @theme {
   --color-background: #0f1115;
   --color-surface: #1a1a2e;
-  --color-primary: #6366f1;
-  --color-primary-hover: #4f46e5;
+  --color-primary: var(--primary-color, #6366f1);
+  --color-primary-hover: var(--primary-hover, #4f46e5);
   --color-text: #e0e0e0;
   --color-text-muted: #888;
   --color-border: #2a2a3e;
-  --color-message-me: #6c63ff22;
+  --color-message-me: rgba(var(--primary-rgb, 99, 102, 241), 0.15);
   --color-message-other: #1e1e30;
   --color-input-bg: #1a1a2e;
 }
+
+:root {
+  --primary-color: #6366f1;
+  --primary-rgb: 99, 102, 241;
+}
+
 
 * {
   scrollbar-width: thin;

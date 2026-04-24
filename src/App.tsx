@@ -85,6 +85,8 @@ export default function AuroraChat() {
   const [editPhone, setEditPhone] = useState(user?.phone || '');
   const [editAvatar, setEditAvatar] = useState(user?.avatar || '');
   const [editPrivacy, setEditPrivacy] = useState(user?.privacyMode || 'everyone');
+  const [editThemeColor, setEditThemeColor] = useState(user?.themeColor || '#6366f1');
+
   const [editPassword, setEditPassword] = useState(user?.password || '');
 
 
@@ -404,13 +406,49 @@ export default function AuroraChat() {
     }
   }, [channelsList, messages, activeStatuses, currentChannel]);
 
+  // Dynamic Theme Support
+  useEffect(() => {
+    const hexToRgb = (hex: string) => {
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      return `${r}, ${g}, ${b}`;
+    };
+
+    if (user?.themeColor) {
+      document.documentElement.style.setProperty('--primary-color', user.themeColor);
+      document.documentElement.style.setProperty('--primary-rgb', hexToRgb(user.themeColor));
+    } else {
+      document.documentElement.style.setProperty('--primary-color', '#6366f1');
+      document.documentElement.style.setProperty('--primary-rgb', '99, 102, 241');
+    }
+  }, [user?.themeColor]);
+
+
   const cachedChannels = JSON.parse(localStorage.getItem('aurora_cache_channels') || '[]');
+
   const cachedMessages = JSON.parse(localStorage.getItem(`aurora_cache_msgs_${currentChannel}`) || '[]');
   const cachedStatuses = JSON.parse(localStorage.getItem('aurora_cache_statuses') || '[]');
 
   const displayChannels = channelsList || cachedChannels;
-  const displayMessages = messages || cachedMessages;
+  
+  // Combine server messages with local offline queue
+  const displayMessages = [...(messages || cachedMessages), ...offlineQueue
+    .filter(msg => msg.channelId === currentChannel)
+    .map((msg, idx) => ({
+      _id: `offline-${idx}`,
+      userId: user?._id || '',
+      nombre: user?.name || 'Yo',
+      avatar: user?.avatar || '',
+      texto: msg.texto,
+      imagenUrl: msg.imagenUrl,
+      createdAt: Date.now(),
+      isOffline: true
+    }))
+  ];
+
   const displayStatuses = activeStatuses || cachedStatuses;
+
 
   const handleSubmit = async (e: React.FormEvent) => {
 
@@ -822,10 +860,14 @@ export default function AuroraChat() {
                       )}
                     </div>
                     <div className={`
-                      max-w-[85%] px-4 py-2.5 rounded-2xl relative
-                      ${m.userId === user?._id ? 'bg-primary text-white rounded-tr-none' : 'bg-white/5 text-gray-200 rounded-tl-none border border-white/5'}
-                      ${m.isPinned ? 'ring-2 ring-primary/40' : ''}
-                    `}>
+                      max-w-[80%] px-3.5 py-2 rounded-2xl relative transition-all duration-300
+                      ${m.userId === user?._id 
+                        ? 'bg-primary/20 text-white border border-primary/30 backdrop-blur-md rounded-tr-none' 
+                        : 'bg-white/[0.03] text-gray-200 rounded-tl-none border border-white/10 backdrop-blur-sm'}
+                      ${m.isPinned ? 'ring-1 ring-primary/50' : ''}
+                      ${(m as any).isOffline ? 'opacity-60 grayscale-[0.5]' : ''}
+                     shadow-lg hover:shadow-primary/5`}>
+
                       {m.imagenUrl && (
                         <div className="mb-3 rounded-xl overflow-hidden ring-1 ring-white/10 group relative">
                           <img 
@@ -840,7 +882,13 @@ export default function AuroraChat() {
                         </div>
                       )}
                       <div className="text-[12px] leading-relaxed break-words">{formatText(decryptMessage(m.texto || '', currentChannel))}</div>
+                      {(m as any).isOffline && (
+                        <div className="absolute bottom-1 right-2 text-[8px] uppercase font-black tracking-tighter text-white/40 flex items-center gap-1">
+                          <Clock size={8}/> Pendiente
+                        </div>
+                      )}
                     </div>
+
                     <span className="text-[9px] text-gray-600 px-1 font-mono">{new Date(m.createdAt).toLocaleTimeString(undefined, {hour: '2-digit', minute:'2-digit'})}</span>
                   </div>
                 </div>
@@ -850,7 +898,8 @@ export default function AuroraChat() {
           <div ref={messagesEndRef} />
         </div>
 
-        <div className="p-6 bg-black/40 border-t border-white/10 backdrop-blur-md">
+        <div className="p-3 bg-black/40 border-t border-white/10 backdrop-blur-md">
+
             {showEmoji && (
               <div className="absolute bottom-24 left-6 bg-[#1a1a1a] border border-white/10 p-2 rounded-2xl shadow-2xl flex gap-2 z-[100] animate-in fade-in slide-in-from-bottom-2">
                 {EMOJIS.map(emoji => (
@@ -875,38 +924,44 @@ export default function AuroraChat() {
              </div>
            )}
 
-           <form onSubmit={handleSubmit} className="flex items-end gap-2">
-              <button type="button" onClick={() => fileInputRef.current?.click()} className="w-11 h-11 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-500 hover:text-white transition-all shrink-0"><Plus size={22}/></button>
+           <form onSubmit={handleSubmit} className="flex items-center gap-2 max-w-5xl mx-auto">
+              <button type="button" onClick={() => fileInputRef.current?.click()} className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-500 hover:text-white transition-all shrink-0"><Plus size={20}/></button>
               
-              <div className="flex-1 bg-white/5 border border-white/10 rounded-[1.5rem] p-1 focus-within:border-primary/40 transition-all flex items-end">
-                <button type="button" onClick={() => setShowEmoji(!showEmoji)} className="p-2.5 text-gray-500 hover:text-primary transition-colors"><Smile size={20}/></button>
+              <div className="flex-1 bg-white/5 border border-white/10 rounded-[2rem] px-2 py-1 focus-within:border-primary/40 transition-all flex items-center gap-1">
+                <button type="button" onClick={() => setShowEmoji(!showEmoji)} className="p-2 text-gray-500 hover:text-primary transition-colors shrink-0"><Smile size={20}/></button>
                 <textarea
                   value={text + (interimTranscript ? (text ? ' ' : '') + interimTranscript : '')}
-
                   onChange={e => { setText(e.target.value); handleTyping(); }}
                   onPaste={handlePaste}
                   placeholder={isRecording ? "Escuchando..." : "Escribe un mensaje..."}
-                  className={`flex-1 bg-transparent text-sm text-white outline-none placeholder-gray-600 px-3 py-2.5 resize-none max-h-32 min-h-[44px] ${isRecording ? 'text-primary' : ''}`}
+                  className={`flex-1 bg-transparent text-sm text-white outline-none placeholder-gray-600 px-2 py-2 resize-none max-h-32 min-h-[40px] leading-tight ${isRecording ? 'text-primary' : ''}`}
                   rows={1}
                   onKeyDown={e => { if(e.key === 'Enter' && !e.shiftKey && !isMobile) { e.preventDefault(); handleSubmit(e); } }}
                 />
-                <button type="submit" disabled={(!text.trim() && !attachedImage) || uploading} className="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20 disabled:opacity-20 transition-all active:scale-90 m-0.5">
-                  <Send size={18} />
-                </button>
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <button type="button" onClick={() => cameraInputRef.current?.click()} className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-500 hover:text-white transition-all">
-                  <Camera size={20}/>
-                </button>
-                <button type="button" onClick={startSpeechToText} className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${isRecording ? 'bg-red-500/20 text-red-500 border border-red-500/30' : 'bg-white/5 text-gray-500 hover:text-white border border-white/10'}`}>
-                  {isRecording ? <MicOff size={20}/> : <Mic size={20}/>}
-                </button>
+                
+                <div className="flex items-center gap-1 shrink-0 pr-1">
+                   <button type="button" onClick={() => cameraInputRef.current?.click()} className="p-2 text-gray-500 hover:text-white transition-all">
+                     <Camera size={20}/>
+                   </button>
+                   <button type="button" onClick={startSpeechToText} className={`p-2 transition-all ${isRecording ? 'text-red-500 animate-pulse' : 'text-gray-500 hover:text-white'}`}>
+                     {isRecording ? <MicOff size={20}/> : <Mic size={20}/>}
+                   </button>
+                   {(text.trim() || attachedImage) ? (
+                     <button type="submit" disabled={uploading} className="p-2.5 bg-primary text-white rounded-full shadow-lg shadow-primary/20 transition-all active:scale-90">
+                       <Send size={16} />
+                     </button>
+                   ) : (
+                     <div className="w-10 h-10 flex items-center justify-center text-gray-700">
+                        <Send size={16} />
+                     </div>
+                   )}
+                </div>
               </div>
 
               <input type="file" ref={fileInputRef} className="hidden" accept="image/*,.pdf,.docx,.xlsx,.xls,.csv" onChange={(e) => handleImageUpload(e, 'chat')} />
               <input type="file" ref={cameraInputRef} className="hidden" accept="image/*" capture="environment" onChange={(e) => handleImageUpload(e, 'chat')} />
             </form>
+
         </div>
         {isMobile && isSidebarOpen && (
            <div className="fixed inset-0 bg-black/40 z-[140] backdrop-blur-sm" onClick={() => setIsSidebarOpen(false)} />
@@ -1087,8 +1142,37 @@ export default function AuroraChat() {
                   </button>
                 </div>
               </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-gray-500 uppercase px-4">Color de Tema</label>
+                <div className="flex gap-2 px-1">
+                   {['#6366f1', '#ec4899', '#f59e0b', '#10b981', '#06b6d4', '#8b5cf6'].map(color => (
+                     <button 
+                        key={color} 
+                        onClick={() => setEditThemeColor(color)}
+                        className={`w-8 h-8 rounded-full border-2 transition-all ${editThemeColor === color ? 'border-white scale-110 shadow-lg' : 'border-transparent opacity-50'}`}
+                        style={{ backgroundColor: color }}
+                     />
+                   ))}
+                </div>
+              </div>
             </div>
-            <button onClick={handleUpdateProfile} className="w-full bg-primary hover:bg-primary-hover text-white py-5 rounded-[1.5rem] font-bold uppercase tracking-widest shadow-xl shadow-primary/20">Guardar Cambios</button>
+            <button 
+              onClick={async () => {
+                await updateProfile({
+                  userId: user._id as any,
+                  name: editName,
+                  bio: editBio,
+                  phone: editPhone,
+                  privacyMode: editPrivacy as any,
+                  themeColor: editThemeColor
+                });
+                setShowProfileModal(false);
+              }} 
+              className="w-full bg-primary hover:bg-primary-hover text-white py-5 rounded-[1.5rem] font-bold uppercase tracking-widest shadow-xl shadow-primary/20"
+            >
+              Guardar Cambios
+            </button>
+
           </div>
         </div>
       )}
@@ -1131,12 +1215,13 @@ export default function AuroraChat() {
             <div className="w-full max-w-sm aspect-[9/16] bg-white/5 rounded-[2rem] overflow-hidden relative shadow-2xl">
                {viewingStatus.type === 'text' ? (
                  <div className="w-full h-full flex items-center justify-center p-8 text-center text-xl font-bold text-white bg-gradient-to-br from-primary/20 to-purple-500/20">
-                    {viewingStatus.text}
+                    {viewingStatus.content}
                  </div>
                ) : (
-                 <img src={viewingStatus.contentUrl} className="w-full h-full object-cover" alt="" />
+                 <img src={viewingStatus.content} className="w-full h-full object-cover" alt="" />
                )}
             </div>
+
          </div>
        )}
 

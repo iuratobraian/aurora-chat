@@ -62,6 +62,7 @@ export default defineSchema({
     avatar: v.string(),
     bio: v.optional(v.string()),
     phone: v.optional(v.string()),
+    privacyMode: v.optional(v.union(v.literal("everyone"), v.literal("requests"))),
     createdAt: v.number(),
   }).index("by_email", ["email"])
     .index("by_username", ["username"]),

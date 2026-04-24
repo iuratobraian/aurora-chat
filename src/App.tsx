@@ -40,6 +40,8 @@ export default function AuroraChat() {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [viewingProfileUser, setViewingProfileUser] = useState<any>(null);
   
   // User state
   const { user, setUser, logout } = useUserStore();
@@ -264,8 +266,9 @@ export default function AuroraChat() {
       <audio ref={audioRef} src={NOTIFICATION_SOUND} preload="auto" />
       
       {/* SIDEBAR */}
-      <div className="w-80 border-r border-white/10 flex flex-col bg-black/20 shrink-0">
-        <div className="p-4 border-b border-white/10 flex items-center justify-between bg-black/40">
+      <div className={`${isSidebarOpen ? 'w-80' : 'w-0'} border-r border-white/10 flex flex-col bg-black/20 shrink-0 transition-all duration-300 overflow-hidden relative`}>
+        {/* User Profile Header */}
+        <div className="p-4 border-b border-white/10 flex items-center justify-between bg-black/40 min-w-[320px]">
           <button onClick={() => setShowProfileModal(true)} className="flex items-center gap-3 group text-left">
             <div className="relative">
               <img src={user.avatar} className="w-10 h-10 rounded-xl shadow-lg border border-white/10 group-hover:border-primary/50 transition-all" alt="" />
@@ -283,7 +286,8 @@ export default function AuroraChat() {
           </div>
         </div>
 
-        <div className="p-4 border-b border-white/5 bg-black/10 overflow-x-auto no-scrollbar flex gap-4">
+        {/* Statuses Row */}
+        <div className="p-4 border-b border-white/5 bg-black/10 overflow-x-auto no-scrollbar flex gap-4 min-w-[320px]">
           <button onClick={() => setShowStatusModal(true)} className="flex flex-col items-center gap-1 shrink-0 group">
             <div className="w-12 h-12 rounded-full border-2 border-dashed border-gray-600 flex items-center justify-center group-hover:border-primary transition-all">
               <Plus size={20} className="text-gray-500 group-hover:text-primary" />
@@ -300,39 +304,62 @@ export default function AuroraChat() {
           ))}
         </div>
 
-        <div className="flex-1 overflow-y-auto custom-scrollbar">
-          <div className="p-4">
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
-                <MessageSquare size={12} /> SALAS Y CHATS
+        {/* Channels & Chats List */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar min-w-[320px]">
+          {/* SECCIÓN SALAS PÚBLICAS */}
+          <div className="p-4 border-b border-white/5">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] flex items-center gap-2">
+                <Hash size={12} /> SALAS PÚBLICAS
               </h4>
-              <button onClick={() => setShowCreateChannel(true)} className="p-1 hover:bg-white/5 rounded transition-all text-primary"><Plus size={16}/></button>
+              <button onClick={() => setShowCreateChannel(true)} className="p-1 hover:bg-primary/10 rounded transition-all text-primary"><Plus size={16}/></button>
             </div>
             <div className="space-y-1">
               <button
                 onClick={() => setCurrentChannel('global')}
                 className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${currentChannel === 'global' ? 'bg-primary/20 border-primary/20 text-white' : 'text-gray-400 hover:bg-white/5 border-transparent'} border`}
               >
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center"><Hash size={20} className="text-primary"/></div>
-                <div className="flex-1 text-left">
-                  <div className="text-sm font-bold">General</div>
-                  <div className="text-[10px] opacity-60">Sala pública</div>
-                </div>
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Hash size={16} className="text-primary"/></div>
+                <div className="flex-1 text-left text-sm font-bold">General</div>
               </button>
-              {channelsList.filter((c:any) => c.slug !== 'global').map((c: any) => (
+              {channelsList.filter((c: any) => c.slug !== 'global' && !c.type).map((c: any) => (
                 <button
                   key={c._id}
                   onClick={() => setCurrentChannel(c.slug)}
                   className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${currentChannel === c.slug ? 'bg-primary/20 border-primary/20 text-white' : 'text-gray-400 hover:bg-white/5 border-transparent'} border`}
                 >
-                  <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center">
-                    {c.type === 'direct' ? <User size={20}/> : c.isPrivate ? <Lock size={18}/> : <Hash size={20}/>}
+                  <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
+                    {c.isPrivate ? <Lock size={14}/> : <Hash size={16}/>}
                   </div>
-                  <div className="flex-1 text-left">
-                    <div className="text-sm font-bold truncate">{c.name}</div>
-                    <div className="text-[10px] opacity-60 uppercase tracking-tighter">{c.type === 'direct' ? 'Conversación' : 'Canal'}</div>
+                  <div className="flex-1 text-left text-sm font-bold truncate">{c.name}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* SECCIÓN CHATS PRIVADOS */}
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] flex items-center gap-2">
+                <MessageSquare size={12} /> CHATS PRIVADOS
+              </h4>
+              <button onClick={() => setShowUserSearch(true)} className="p-1 hover:bg-emerald-500/10 rounded transition-all text-emerald-500"><Plus size={16}/></button>
+            </div>
+            <div className="space-y-1">
+              {channelsList.filter((c: any) => c.type === 'direct').length === 0 && (
+                <p className="text-[10px] text-gray-600 text-center py-4">No hay chats privados aún</p>
+              )}
+              {channelsList.filter((c: any) => c.type === 'direct').map((c: any) => (
+                <button
+                  key={c._id}
+                  onClick={() => setCurrentChannel(c.slug)}
+                  className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${currentChannel === c.slug ? 'bg-emerald-500/20 border-emerald-500/20 text-white' : 'text-gray-400 hover:bg-white/5 border-transparent'} border`}
+                >
+                  <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                    <User size={16}/>
                   </div>
-                  <ChevronRight size={14} className="opacity-30" />
+                  <div className="flex-1 text-left text-sm font-bold truncate">{c.name}</div>
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50" />
                 </button>
               ))}
             </div>
@@ -342,16 +369,25 @@ export default function AuroraChat() {
 
       {/* MAIN CONTENT */}
       <div className="flex-1 flex flex-col relative bg-[#0f1115]">
-        <div className="h-16 px-6 border-b border-white/10 flex items-center justify-between bg-black/40 backdrop-blur-md z-10">
+        {/* Chat Header */}
+        <div className="h-16 px-4 border-b border-white/10 flex items-center justify-between bg-black/40 backdrop-blur-md z-10">
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 text-primary">
-              <span className="material-symbols-outlined">smart_toy</span>
-            </div>
-            <div>
-              <h2 className="text-sm font-bold text-white uppercase tracking-wider">{(currentChat as any).name}</h2>
-              <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[10px] text-emerald-500 font-bold uppercase">En Línea</span>
+            <button 
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              className="p-2 text-gray-500 hover:text-white transition-all bg-white/5 rounded-xl border border-white/10"
+            >
+              <MoreVertical size={20} className={isSidebarOpen ? '' : 'rotate-90'} />
+            </button>
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 text-primary">
+                <span className="material-symbols-outlined text-lg">smart_toy</span>
+              </div>
+              <div>
+                <h2 className="text-xs font-black text-white uppercase tracking-widest">{(currentChat as any).name}</h2>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-[9px] text-emerald-500 font-bold uppercase tracking-tighter">En Línea</span>
+                </div>
               </div>
             </div>
           </div>
@@ -372,9 +408,23 @@ export default function AuroraChat() {
               const isMe = m.userId === user._id;
               return (
                 <div key={m._id || idx} className={`flex items-end gap-3 ${isMe ? 'flex-row-reverse' : 'flex-row'} message-enter`}>
-                  {!isMe && <img src={m.avatar} className="w-9 h-9 rounded-xl shadow-lg border border-white/10 shrink-0" alt="" />}
+                  {!isMe && (
+                    <button 
+                      onClick={() => setViewingProfileUser({ _id: m.userId, name: m.nombre, avatar: m.avatar })}
+                      className="shrink-0 group"
+                    >
+                      <img src={m.avatar} className="w-9 h-9 rounded-xl shadow-lg border border-white/10 group-hover:border-primary transition-all" alt="" />
+                    </button>
+                  )}
                   <div className={`flex flex-col gap-1.5 max-w-[75%] ${isMe ? 'items-end' : 'items-start'}`}>
-                    {!isMe && <span className="text-[10px] font-bold text-gray-500 ml-1 uppercase tracking-wider">{m.nombre}</span>}
+                    {!isMe && (
+                      <button 
+                        onClick={() => setViewingProfileUser({ _id: m.userId, name: m.nombre, avatar: m.avatar })}
+                        className="text-[10px] font-bold text-gray-500 ml-1 uppercase tracking-wider hover:text-primary transition-colors"
+                      >
+                        {m.nombre}
+                      </button>
+                    )}
                     <div className={`px-4 py-3 rounded-2xl shadow-xl ${isMe ? 'bg-primary/20 text-white rounded-br-none border border-primary/30' : 'bg-white/[0.04] text-gray-200 rounded-bl-none border border-white/5'}`}>
                       {m.imagenUrl && (
                         <div className="mb-3 rounded-xl overflow-hidden ring-1 ring-white/10 group relative">
@@ -509,6 +559,36 @@ export default function AuroraChat() {
               ))}
             </div>
             <button onClick={() => setShowUserSearch(false)} className="w-full text-xs text-gray-500 py-2 uppercase font-bold tracking-widest">Cerrar</button>
+          </div>
+        </div>
+      )}
+
+      {/* Viewing Other User Profile Popup */}
+      {viewingProfileUser && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-xl z-[200] flex items-center justify-center p-4" onClick={() => setViewingProfileUser(null)}>
+          <div className="bg-[#1a1a1a] rounded-[2.5rem] border border-white/10 p-8 w-full max-w-sm space-y-6 shadow-2xl relative animate-fadeIn" onClick={e => e.stopPropagation()}>
+            <button onClick={() => setViewingProfileUser(null)} className="absolute top-6 right-6 text-gray-500 hover:text-white"><X size={24}/></button>
+            <div className="text-center space-y-4">
+              <img src={viewingProfileUser.avatar} className="w-32 h-32 mx-auto rounded-[3rem] object-cover shadow-2xl ring-4 ring-primary/20" alt="" />
+              <div>
+                <h2 className="text-xl font-bold text-white uppercase tracking-widest">{viewingProfileUser.name}</h2>
+                <p className="text-xs text-gray-500 font-mono">USUARIO VERIFICADO</p>
+              </div>
+            </div>
+            
+            <div className="bg-white/5 rounded-3xl p-4 border border-white/10 space-y-3">
+              <div className="flex items-center gap-3 text-xs text-gray-400">
+                <Info size={16} className="text-primary"/>
+                <span>Información del perfil lista para chat.</span>
+              </div>
+            </div>
+
+            <button 
+              onClick={() => startDM(viewingProfileUser)} 
+              className="w-full bg-primary hover:bg-primary-hover text-white py-5 rounded-[1.5rem] font-bold uppercase tracking-widest shadow-xl shadow-primary/20 flex items-center justify-center gap-2"
+            >
+              <MessageSquare size={20} /> Enviar Mensaje Directo
+            </button>
           </div>
         </div>
       )}

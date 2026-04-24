@@ -13,7 +13,9 @@ export const createChannel = mutation({
     name: v.string(),
     password: v.optional(v.string()),
     createdBy: v.string(),
+    welcomeMessage: v.optional(v.string()),
   },
+
   handler: async (ctx, args) => {
     const slug = args.name.toLowerCase().replace(/\s+/g, '-');
     const existing = await ctx.db
@@ -32,7 +34,9 @@ export const createChannel = mutation({
       createdAt: Date.now(),
       password: args.password,
       isPrivate: !!args.password,
+      welcomeMessage: args.welcomeMessage,
     });
+
 
     return { _id: channelId, slug, name: args.name, isPrivate: !!args.password };
   },
@@ -215,7 +219,24 @@ export const getOrCreatePrivateChannel = mutation({
       user1Id,
       user2Id,
     });
-    return await ctx.db.get(channelId);
+    
+    // Send automated welcome message if exists
+    const welcome = user2?.name ? `¡Hola ${user2.name}! Bienvenido a este chat privado con ${user1?.name}.` : "¡Hola! Bienvenido al chat.";
+    
+    const channel = await ctx.db.get(channelId);
+    
+    await ctx.db.insert("chat", {
+      userId: "system",
+      nombre: "Aurora Bot",
+      avatar: "https://cdn-icons-png.flaticon.com/512/2593/2593635.png",
+      texto: welcome,
+      channelId: channel?.slug || '',
+      createdAt: Date.now(),
+    });
+
+    return channel;
+
+
   },
 });
 
@@ -253,3 +274,37 @@ export const deleteOldMessages = mutation({
 });
 
 
+export const togglePinMessage = mutation({
+  args: { messageId: v.id("chat"), isPinned: v.boolean() },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.messageId, { isPinned: args.isPinned });
+  },
+});
+
+export const togglePauseChannel = mutation({
+  args: { channelId: v.id("chatChannels"), isPaused: v.boolean() },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.channelId, { isPaused: args.isPaused });
+  },
+});
+
+export const getPinnedMessages = query({
+  args: { channelId: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("chat")
+      .withIndex("by_channel", (q) => q.eq("channelId", args.channelId))
+      .filter((q) => q.eq(q.field("isPinned"), true))
+      .collect();
+  },
+});
+
+export const getChannelBySlug = query({
+  args: { slug: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("chatChannels")
+      .withIndex("by_slug", (q) => q.eq("slug", args.slug))
+      .first();
+  },
+});

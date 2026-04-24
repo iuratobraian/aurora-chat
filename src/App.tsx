@@ -13,7 +13,9 @@ import { useUserStore } from './store';
 import Onboarding from './components/Onboarding';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { Calendar, Ticket } from 'lucide-react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { parseFile } from './lib/fileParser';
 import imageCompression from 'browser-image-compression';
@@ -85,7 +87,14 @@ export default function AuroraChat() {
 
 
   // Audio/Speech
+  const [showEvents, setShowEvents] = useState(false);
+  const [showCreateEvent, setShowCreateEvent] = useState(false);
+  const [newEventTitle, setNewEventTitle] = useState('');
+  const [newEventDesc, setNewEventDesc] = useState('');
+  const [newEventDate, setNewEventDate] = useState('');
+
   const [isRecording, setIsRecording] = useState(false);
+
   const recognitionRef = useRef<any>(null);
 
   // Sync edit states with user
@@ -133,6 +142,29 @@ export default function AuroraChat() {
   const rawServerStats = useQuery(api.chat.getServerStats);
   const serverStats = rawServerStats || null;
 
+  const pinnedMessages = useQuery(api.chat.getPinnedMessages, { channelId: currentChannel });
+  const channelData = useQuery(api.chat.getChannelBySlug, { slug: currentChannel });
+  
+  const togglePin = useMutation(api.chat.togglePinMessage);
+  const togglePause = useMutation(api.chat.togglePauseChannel);
+
+  const events = useQuery(api.events.getEventsByChannel, { channelId: currentChannel });
+  const createEvent = useMutation(api.events.createEvent);
+  const joinEvent = useMutation(api.events.joinEvent);
+  const leaveEvent = useMutation(api.events.leaveEvent);
+
+  const polls = useQuery(api.polls.getPollsByChannel, { channelId: currentChannel });
+  const createPoll = useMutation(api.polls.createPoll);
+  const voteInPoll = useMutation(api.polls.voteInPoll);
+
+  const [showPolls, setShowPolls] = useState(false);
+  const [showCreatePoll, setShowCreatePoll] = useState(false);
+  const [newPollQuestion, setNewPollQuestion] = useState('');
+  const [newPollOptions, setNewPollOptions] = useState(['', '']);
+
+
+
+
   // Notification Helper
   const showLocalNotification = useCallback((m: ChatMessage) => {
     if (m.userId === user?._id) return;
@@ -173,7 +205,9 @@ export default function AuroraChat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const profileImageInputRef = useRef<HTMLInputElement>(null);
+
   const isAtBottom = useRef(true);
 
   useEffect(() => {
@@ -355,8 +389,14 @@ export default function AuroraChat() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if ((!text.trim() && !attachedImage) || uploading || !user) return;
+    
+    // Check if channel is paused
+    if (channelData?.isPaused && channelData.createdBy !== user._id) {
+      setError("El chat está pausado por el moderador");
+      return;
+    }
 
-    const encryptedText = encryptMessage(text.trim());
+    const encryptedText = encryptMessage(text.trim(), currentChannel);
 
     if (!isOnline) {
       setOfflineQueue(prev => [...prev, {
@@ -380,6 +420,7 @@ export default function AuroraChat() {
   };
 
 
+
   const startDM = async (targetUser: any) => {
     if (!user) return;
     try {
@@ -395,24 +436,34 @@ export default function AuroraChat() {
 
 
   const formatText = (content: string) => {
+    // Mentions highlighting
+    const parts = content.split(/(@\w+)/g);
+    const processedContent = parts.map(part => {
+      if (part.startsWith('@')) return `**${part}**`;
+      return part;
+    }).join('');
+
     return (
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
-        components={{
-          code({ inline, className, children }: any) {
-            const match = /language-(\w+)/.exec(className || '');
-            return !inline && match ? (
-              <SyntaxHighlighter style={atomDark} language={match[1]} PreTag="div" className="rounded-lg text-[10px] my-2">
-                {String(children).replace(/\n$/, '')}
-              </SyntaxHighlighter>
-            ) : <code className="bg-white/10 px-1 rounded text-[10px]">{children}</code>;
-          },
-          a: ({ children, ...props }: any) => <a className="text-primary hover:underline font-bold" target="_blank" rel="noopener noreferrer" {...props}>{children}</a>,
-          p: ({ children }: any) => <p className="mb-1 last:mb-0">{children}</p>
-        }}
-      >
-        {content}
-      </ReactMarkdown>
+      <div className="prose prose-invert max-w-none">
+
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          components={{
+            code({ inline, className, children }: any) {
+              const match = /language-(\w+)/.exec(className || '');
+              return !inline && match ? (
+                <SyntaxHighlighter style={atomDark} language={match[1]} PreTag="div" className="rounded-lg text-[10px] my-2">
+                  {String(children).replace(/\n$/, '')}
+                </SyntaxHighlighter>
+              ) : <code className="bg-white/10 px-1 rounded text-[10px]">{children}</code>;
+            },
+            a: ({ children, ...props }: any) => <a className="text-primary hover:underline font-bold" target="_blank" rel="noopener noreferrer" {...props}>{children}</a>,
+            p: ({ children }: any) => <p className="mb-1 last:mb-0">{children}</p>
+          }}
+        >
+          {content}
+        </ReactMarkdown>
+      </div>
     );
   };
 
@@ -629,16 +680,43 @@ export default function AuroraChat() {
               <div>
                 <h2 className="text-xs font-black text-white uppercase tracking-widest">{(currentChat as any).name}</h2>
                 <div className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-[9px] text-emerald-500 font-bold uppercase tracking-tighter">En Línea</span>
+                  <span className={`w-1.5 h-1.5 rounded-full ${channelData?.isPaused ? 'bg-amber-500' : 'bg-emerald-500'} animate-pulse`} />
+                  <span className={`text-[9px] ${channelData?.isPaused ? 'text-amber-500' : 'text-emerald-500'} font-bold uppercase tracking-tighter`}>
+                    {channelData?.isPaused ? 'Pausado por Moderador' : 'En Línea'}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+               <button 
+                onClick={() => setShowEvents(!showEvents)}
+                className={`p-2 rounded-xl transition-all ${showEvents ? 'bg-primary text-white' : 'text-gray-500 hover:text-white bg-white/5'}`}
+                title="Eventos del Equipo"
+               >
+                 <Calendar size={20}/>
+               </button>
+               <button 
+                onClick={() => setShowPolls(!showPolls)}
+                className={`p-2 rounded-xl transition-all ${showPolls ? 'bg-indigo-500 text-white' : 'text-gray-500 hover:text-white bg-white/5'}`}
+                title="Encuestas"
+               >
+                 <HardDrive size={20}/>
+               </button>
+
+               {channelData?.createdBy === user?._id && (
+               <button 
+                onClick={() => togglePause({ channelId: channelData._id, isPaused: !channelData.isPaused })}
+                className={`p-2 rounded-xl transition-all ${channelData?.isPaused ? 'bg-amber-500 text-white' : 'text-gray-500 hover:text-white bg-white/5'}`}
+                title={channelData?.isPaused ? "Reanudar Chat" : "Pausar Chat"}
+               >
+                 {channelData?.isPaused ? <Play size={20}/> : <Pause size={20}/>}
+               </button>
+             )}
              <button className="p-2 text-gray-500 hover:text-white transition-all"><Volume2 size={20}/></button>
              <button className="p-2 text-gray-500 hover:text-white transition-all"><MoreVertical size={20}/></button>
           </div>
+
         </div>
 
         {/* Message Request Banner */}
@@ -662,6 +740,25 @@ export default function AuroraChat() {
           </div>
         )}
 
+        {/* Pinned Messages Area */}
+        {pinnedMessages && pinnedMessages.length > 0 && (
+          <div className="bg-primary/10 border-b border-primary/20 px-4 py-2 flex items-center gap-3 overflow-hidden relative group">
+            <div className="bg-primary/20 p-1.5 rounded-lg text-primary">
+              <Clock size={14} className="animate-spin-slow" />
+            </div>
+            <div className="flex-1 overflow-hidden">
+               <div className="flex flex-col animate-marquee-vertical">
+                  {pinnedMessages.map((m: any) => (
+                    <div key={m._id} className="text-[10px] text-white/80 font-bold uppercase tracking-wide truncate">
+                      <span className="text-primary mr-2">📌</span> {decryptMessage(m.texto, currentChannel)}
+                    </div>
+                  ))}
+               </div>
+            </div>
+            <div className="text-[8px] font-black text-primary/50 uppercase tracking-widest whitespace-nowrap">Destacados</div>
+          </div>
+        )}
+
         {/* Messages Area */}
         <div ref={scrollRef} onScroll={handleScroll} className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')]">
           {messages.length === 0 ? (
@@ -673,7 +770,7 @@ export default function AuroraChat() {
             messages.map((m: ChatMessage, idx: number) => {
               const isMe = m.userId === user._id;
               return (
-                <div key={m._id || idx} className={`flex items-end gap-3 ${isMe ? 'flex-row-reverse' : 'flex-row'} message-enter`}>
+                <div key={m._id || idx} className={`flex items-end gap-3 ${isMe ? 'flex-reverse' : ''} message-enter`}>
                   {!isMe && (
                     <button 
                       onClick={() => setViewingProfileUser({ _id: m.userId, name: m.nombre, avatar: m.avatar })}
@@ -682,16 +779,23 @@ export default function AuroraChat() {
                       <img src={m.avatar} className="w-9 h-9 rounded-xl shadow-lg border border-white/10 group-hover:border-primary transition-all" alt="" />
                     </button>
                   )}
-                  <div className={`flex flex-col gap-1.5 max-w-[75%] ${isMe ? 'items-end' : 'items-start'}`}>
-                    {!isMe && (
-                      <button 
-                        onClick={() => setViewingProfileUser({ _id: m.userId, name: m.nombre, avatar: m.avatar })}
-                        className="text-[10px] font-bold text-gray-500 ml-1 uppercase tracking-wider hover:text-primary transition-colors"
-                      >
-                        {m.nombre}
-                      </button>
-                    )}
-                    <div className={`px-4 py-3 rounded-2xl shadow-xl ${isMe ? 'bg-primary/20 text-white rounded-br-none border border-primary/30' : 'bg-white/[0.04] text-gray-200 rounded-bl-none border border-white/5'}`}>
+                  <div className={`flex flex-col ${m.userId === user?._id ? 'items-end' : 'items-start'} gap-1 group`}>
+                    <div className="flex items-center gap-2 mb-0.5">
+                      {m.userId !== user?._id && <span className="text-[10px] font-black text-primary uppercase tracking-tighter">{m.nombre}</span>}
+                      {channelData?.createdBy === user?._id && (
+                        <button 
+                          onClick={() => togglePin({ messageId: m._id, isPinned: !m.isPinned })}
+                          className={`opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-white/10 ${m.isPinned ? 'text-primary' : 'text-gray-500'}`}
+                        >
+                          <Clock size={12}/>
+                        </button>
+                      )}
+                    </div>
+                    <div className={`
+                      max-w-[85%] px-4 py-2.5 rounded-2xl relative
+                      ${m.userId === user?._id ? 'bg-primary text-white rounded-tr-none' : 'bg-white/5 text-gray-200 rounded-tl-none border border-white/5'}
+                      ${m.isPinned ? 'ring-2 ring-primary/40' : ''}
+                    `}>
                       {m.imagenUrl && (
                         <div className="mb-3 rounded-xl overflow-hidden ring-1 ring-white/10 group relative">
                           <img 
@@ -705,7 +809,7 @@ export default function AuroraChat() {
                           </div>
                         </div>
                       )}
-                      <div className="text-[12px] leading-relaxed break-words">{formatText(decryptMessage(m.texto || ''))}</div>
+                      <div className="text-[12px] leading-relaxed break-words">{formatText(decryptMessage(m.texto || '', currentChannel))}</div>
                     </div>
                     <span className="text-[9px] text-gray-600 px-1 font-mono">{new Date(m.createdAt).toLocaleTimeString(undefined, {hour: '2-digit', minute:'2-digit'})}</span>
                   </div>
@@ -748,6 +852,9 @@ export default function AuroraChat() {
              </div>
 
              <div className="flex flex-col gap-2 shrink-0">
+               <button type="button" onClick={() => cameraInputRef.current?.click()} className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all bg-white/5 text-gray-400 hover:text-white border border-white/10">
+                 <Camera size={22}/>
+               </button>
                <button type="button" onClick={startSpeechToText} className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${isRecording ? 'bg-red-500/20 text-red-500 border border-red-500/30' : 'bg-white/5 text-gray-400 hover:text-white border border-white/10'}`}>
                  {isRecording ? <MicOff size={22}/> : <Mic size={22}/>}
                </button>
@@ -764,7 +871,137 @@ export default function AuroraChat() {
       </div>
 
       {/* MODALS */}
-      {showProfileModal && (
+       {showEvents && (
+         <div className="fixed inset-y-0 right-0 w-80 bg-[#1a1a1a] border-l border-white/10 z-[150] shadow-2xl p-6 flex flex-col gap-6 overflow-y-auto">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2"><Calendar size={18} className="text-primary"/> Eventos</h2>
+              <button onClick={() => setShowEvents(false)} className="text-gray-500 hover:text-white"><X size={20}/></button>
+            </div>
+            <button onClick={() => setShowCreateEvent(true)} className="w-full bg-primary/10 border border-primary/20 text-primary py-3 rounded-xl text-[10px] font-black uppercase hover:bg-primary/20 transition-all">Crear Nuevo Evento</button>
+            <div className="space-y-4">
+              {events?.map((ev: any) => (
+                <div key={ev._id} className="bg-white/5 border border-white/5 p-4 rounded-2xl space-y-3">
+                  <h3 className="text-xs font-bold text-white">{ev.title}</h3>
+                  <p className="text-[10px] text-gray-500 line-clamp-2">{ev.description}</p>
+                  <div className="flex items-center gap-2 text-[9px] font-mono text-primary bg-primary/5 px-2 py-1 rounded w-fit">
+                    <Clock size={10}/> {new Date(ev.date).toLocaleDateString()}
+                  </div>
+                  <div className="flex items-center justify-between pt-2 border-t border-white/5">
+                    <span className="text-[9px] text-gray-600 uppercase font-black">{ev.participants.length} Anotados</span>
+                    {ev.participants.includes(user?._id) ? (
+                      <button onClick={() => leaveEvent({ eventId: ev._id, userId: user?._id as any })} className="text-[9px] font-black text-red-400 uppercase">Salir</button>
+                    ) : (
+                      <button onClick={() => joinEvent({ eventId: ev._id, userId: user?._id as any })} className="text-[9px] font-black text-emerald-400 uppercase">Anotarme</button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+         </div>
+       )}
+
+       {showPolls && (
+         <div className="fixed inset-y-0 right-0 w-80 bg-[#1a1a1a] border-l border-white/10 z-[150] shadow-2xl p-6 flex flex-col gap-6 overflow-y-auto">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2"><HardDrive size={18} className="text-indigo-500"/> Encuestas</h2>
+              <button onClick={() => setShowPolls(false)} className="text-gray-500 hover:text-white"><X size={20}/></button>
+            </div>
+            <button onClick={() => setShowCreatePoll(true)} className="w-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-500 py-3 rounded-xl text-[10px] font-black uppercase hover:bg-indigo-500/20 transition-all">Crear Encuesta</button>
+            <div className="space-y-4">
+              {polls?.map((poll: any) => (
+                <div key={poll._id} className="bg-white/5 border border-white/5 p-4 rounded-2xl space-y-4">
+                  <h3 className="text-xs font-bold text-white">{poll.question}</h3>
+                  <div className="space-y-2">
+                    {poll.options.map((opt: any, idx: number) => {
+                      const totalVotes = poll.options.reduce((acc: number, o: any) => acc + o.votes.length, 0);
+                      const percentage = totalVotes > 0 ? Math.round((opt.votes.length / totalVotes) * 100) : 0;
+                      const hasVoted = poll.options.some((o: any) => o.votes.includes(user?._id));
+                      
+                      return (
+                        <div key={idx} className="space-y-1">
+                          <button 
+                            disabled={hasVoted}
+                            onClick={() => voteInPoll({ pollId: poll._id, optionIndex: idx, userId: user?._id as any })}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-[10px] transition-all ${hasVoted ? 'bg-white/10 text-gray-400' : 'bg-white/5 hover:bg-white/10 text-white'}`}
+                          >
+                            <span>{opt.text}</span>
+                            <span className="font-bold">{percentage}%</span>
+                          </button>
+                          <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                            <div className="h-full bg-indigo-500 transition-all duration-1000" style={{ width: `${percentage}%` }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+         </div>
+       )}
+
+       {showCreateEvent && (
+         <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[200] flex items-center justify-center p-4">
+            <div className="bg-[#1a1a1a] border border-white/10 rounded-[2rem] p-8 w-full max-w-sm space-y-6">
+              <h2 className="text-sm font-black text-white uppercase tracking-widest text-center">Nuevo Evento</h2>
+              <div className="space-y-4">
+                <input value={newEventTitle} onChange={e => setNewEventTitle(e.target.value)} placeholder="Título del evento" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs outline-none focus:border-primary" />
+                <textarea value={newEventDesc} onChange={e => setNewEventDesc(e.target.value)} placeholder="Descripción..." className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs outline-none focus:border-primary h-20 resize-none" />
+                <input type="date" value={newEventDate} onChange={e => setNewEventDate(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs outline-none focus:border-primary" />
+              </div>
+              <div className="flex gap-3">
+                <button onClick={() => setShowCreateEvent(false)} className="flex-1 py-3 text-[10px] font-black uppercase text-gray-500">Cancelar</button>
+                <button 
+                  onClick={async () => {
+                    await createEvent({ channelId: currentChannel, title: newEventTitle, description: newEventDesc, date: new Date(newEventDate).getTime(), userId: user?._id as any });
+                    setShowCreateEvent(false);
+                    setNewEventTitle(''); setNewEventDesc(''); setNewEventDate('');
+                  }}
+                  className="flex-1 bg-primary text-white py-3 rounded-xl text-[10px] font-black uppercase"
+                >
+                  Crear
+                </button>
+              </div>
+            </div>
+         </div>
+       )}
+
+       {showCreatePoll && (
+         <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[200] flex items-center justify-center p-4">
+            <div className="bg-[#1a1a1a] border border-white/10 rounded-[2rem] p-8 w-full max-w-sm space-y-6">
+              <h2 className="text-sm font-black text-white uppercase tracking-widest text-center">Nueva Encuesta</h2>
+              <div className="space-y-4">
+                <input value={newPollQuestion} onChange={e => setNewPollQuestion(e.target.value)} placeholder="¿Qué quieres preguntar?" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs outline-none focus:border-indigo-500" />
+                <div className="space-y-2">
+                  {newPollOptions.map((opt, idx) => (
+                    <input key={idx} value={opt} onChange={e => {
+                      const copy = [...newPollOptions];
+                      copy[idx] = e.target.value;
+                      setNewPollOptions(copy);
+                    }} placeholder={`Opción ${idx + 1}`} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs outline-none focus:border-indigo-500" />
+                  ))}
+                  <button onClick={() => setNewPollOptions([...newPollOptions, ''])} className="text-[9px] font-black text-indigo-400 uppercase">+ Agregar Opción</button>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <button onClick={() => setShowCreatePoll(false)} className="flex-1 py-3 text-[10px] font-black uppercase text-gray-500">Cancelar</button>
+                <button 
+                  onClick={async () => {
+                    await createPoll({ channelId: currentChannel, question: newPollQuestion, options: newPollOptions.filter(o => o.trim()), userId: user?._id as any });
+                    setShowCreatePoll(false);
+                    setNewPollQuestion(''); setNewPollOptions(['', '']);
+                  }}
+                  className="flex-1 bg-indigo-500 text-white py-3 rounded-xl text-[10px] font-black uppercase"
+                >
+                  Crear
+                </button>
+              </div>
+            </div>
+         </div>
+       )}
+
+       {showProfileModal && (
+
         <div className="fixed inset-0 bg-black/80 backdrop-blur-xl z-[100] flex items-center justify-center p-4">
           <div className="bg-[#1a1a1a] rounded-[2rem] border border-white/10 p-8 w-full max-w-md space-y-8 shadow-2xl relative">
             <button onClick={() => setShowProfileModal(false)} className="absolute top-6 right-6 text-gray-500 hover:text-white"><X size={24}/></button>
@@ -884,6 +1121,25 @@ export default function AuroraChat() {
                   {viewingProfileUser.bio || "Este usuario prefiere mantener su bio en misterio... ✨"}
                 </p>
               </div>
+
+              {typingUsers.length > 0 && (
+                <div className="flex items-center gap-2 text-[10px] text-primary/70 italic px-2 animate-pulse">
+                  <span className="w-1 h-1 bg-primary rounded-full" />
+                  {typingUsers.join(', ')} {typingUsers.length === 1 ? 'está escribiendo...' : 'están escribiendo...'}
+                </div>
+              )}
+              
+              {channelData?.isPaused && channelData.createdBy !== user?._id && (
+                <div className="flex items-center gap-3 bg-amber-500/10 border border-amber-500/20 p-4 rounded-2xl">
+                  <div className="w-8 h-8 bg-amber-500/20 rounded-xl flex items-center justify-center text-amber-500">
+                    <AlertCircle size={18} className="animate-bounce" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest">Atención Equipo</p>
+                    <p className="text-[11px] text-amber-500/80">El moderador está redactando un mensaje importante. El chat se reanudará pronto.</p>
+                  </div>
+                </div>
+              )}
 
               {viewingProfileUser.phone && (
                 <div className="flex items-center gap-4 bg-white/5 rounded-2xl p-4 border border-white/5">

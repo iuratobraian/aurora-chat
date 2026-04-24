@@ -39,6 +39,28 @@ export default defineSchema({
     .index("by_type", ["type"])
     .index("by_users", ["user1Id", "user2Id"]),
 
+  events: defineTable({
+    channelId: v.string(),
+    title: v.string(),
+    description: v.string(),
+    date: v.number(),
+    createdBy: v.id("users"),
+    participants: v.array(v.id("users")),
+    createdAt: v.number(),
+  }).index("by_channel", ["channelId"]),
+
+  polls: defineTable({
+    channelId: v.string(),
+    question: v.string(),
+    options: v.array(v.object({
+      text: v.string(),
+      votes: v.array(v.id("users")),
+    })),
+    createdBy: v.id("users"),
+    createdAt: v.number(),
+  }).index("by_channel", ["channelId"]),
+
+
   friends: defineTable({
     user1Id: v.id("users"),
     user2Id: v.id("users"),

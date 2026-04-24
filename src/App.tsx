@@ -42,6 +42,7 @@ export default function AuroraChat() {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [viewingProfileUser, setViewingProfileUser] = useState<any>(null);
+  const [interimTranscript, setInterimTranscript] = useState('');
   
   // User state
   const { user, setUser, logout } = useUserStore();
@@ -59,6 +60,18 @@ export default function AuroraChat() {
   // Audio/Speech
   const [isRecording, setIsRecording] = useState(false);
   const recognitionRef = useRef<any>(null);
+
+  // Sync edit states with user
+  useEffect(() => {
+    if (user) {
+      setEditName(user.name || '');
+      setEditBio(user.bio || '');
+      setEditPhone(user.phone || '');
+      setEditAvatar(user.avatar || '');
+      setEditPrivacy(user.privacyMode || 'everyone');
+    }
+  }, [user]);
+
 
   // Convex
   const searchedUsers = useQuery(api.users.searchUsers, { query: userSearchQuery });
@@ -240,13 +253,12 @@ export default function AuroraChat() {
       
       if (final) {
         setText(p => p + (p ? ' ' : '') + final);
-      }
-      
-      // Mostrar transcripción temporal en el placeholder o un estado
-      if (interim) {
-        console.log('Interim speech:', interim);
+        setInterimTranscript('');
+      } else {
+        setInterimTranscript(interim);
       }
     };
+
 
 
     try {
@@ -608,11 +620,11 @@ export default function AuroraChat() {
              
              <div className="flex-1 bg-white/5 border border-white/10 rounded-2xl p-2 focus-within:border-primary/50 transition-all flex flex-col">
                <textarea
-                 value={text}
+                 value={text + (interimTranscript ? (text ? ' ' : '') + interimTranscript : '')}
                  onChange={e => { setText(e.target.value); handleTyping(); }}
                  onPaste={handlePaste}
-                 placeholder={isRecording ? "Capturando voz..." : "Escribe un mensaje..."}
-                 className="bg-transparent text-sm text-white outline-none placeholder-gray-600 px-3 py-2 resize-none max-h-32 min-h-[44px]"
+                 placeholder={isRecording ? "Escuchando..." : "Escribe un mensaje..."}
+                 className={`bg-transparent text-sm text-white outline-none placeholder-gray-600 px-3 py-2 resize-none max-h-32 min-h-[44px] ${isRecording ? 'text-primary' : ''}`}
                  rows={1}
                  onKeyDown={e => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(e); } }}
                />

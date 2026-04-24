@@ -68,6 +68,8 @@ export default function AuroraChat() {
   const [editPhone, setEditPhone] = useState(user?.phone || '');
   const [editAvatar, setEditAvatar] = useState(user?.avatar || '');
   const [editPrivacy, setEditPrivacy] = useState(user?.privacyMode || 'everyone');
+  const [editPassword, setEditPassword] = useState(user?.password || '');
+
 
   // Audio/Speech
   const [isRecording, setIsRecording] = useState(false);
@@ -81,8 +83,10 @@ export default function AuroraChat() {
       setEditPhone(user.phone || '');
       setEditAvatar(user.avatar || '');
       setEditPrivacy(user.privacyMode || 'everyone');
+      setEditPassword(user.password || '');
     }
   }, [user]);
+
 
 
   // Convex
@@ -184,8 +188,10 @@ export default function AuroraChat() {
         bio: editBio,
         phone: editPhone,
         avatar: editAvatar,
+        password: editPassword,
         privacyMode: editPrivacy
       });
+
       setUser(updatedUser as any);
       setShowProfileModal(false);
     } catch (err: any) {
@@ -721,6 +727,11 @@ export default function AuroraChat() {
                 <label className="text-[10px] font-bold text-gray-500 uppercase px-4">Teléfono</label>
                 <input value={editPhone} onChange={e => setEditPhone(e.target.value)} placeholder="+54 9..." className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm focus:border-primary outline-none transition-all" />
               </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-gray-500 uppercase px-4">Contraseña</label>
+                <input type="password" value={editPassword} onChange={e => setEditPassword(e.target.value)} placeholder="Nueva contraseña" className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm focus:border-primary outline-none transition-all" />
+              </div>
+
               <div className="space-y-1">
                 <label className="text-[10px] font-bold text-gray-500 uppercase px-4">Privacidad de Mensajes</label>
                 <div className="flex gap-2 px-1">

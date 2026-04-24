@@ -54,6 +54,7 @@ export default function AuroraChat() {
   const [editBio, setEditBio] = useState(user?.bio || '');
   const [editPhone, setEditPhone] = useState(user?.phone || '');
   const [editAvatar, setEditAvatar] = useState(user?.avatar || '');
+  const [editPrivacy, setEditPrivacy] = useState(user?.privacyMode || 'everyone');
 
   // Audio/Speech
   const [isRecording, setIsRecording] = useState(false);
@@ -128,7 +129,8 @@ export default function AuroraChat() {
         name: editName,
         bio: editBio,
         phone: editPhone,
-        avatar: editAvatar
+        avatar: editAvatar,
+        privacyMode: editPrivacy
       });
       setUser(updatedUser as any);
       setShowProfileModal(false);
@@ -364,6 +366,31 @@ export default function AuroraChat() {
               ))}
             </div>
           </div>
+
+          {/* SECCIÓN SOLICITUDES */}
+          {channelsList.filter((c: any) => c.status === 'pending' && c.user2Id === user._id).length > 0 && (
+            <div className="p-4 bg-primary/5">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] flex items-center gap-2">
+                  <Mail size={12} /> SOLICITUDES
+                </h4>
+              </div>
+              <div className="space-y-1">
+                {channelsList.filter((c: any) => c.status === 'pending' && c.user2Id === user._id).map((c: any) => (
+                  <button
+                    key={c._id}
+                    onClick={() => setCurrentChannel(c.slug)}
+                    className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${currentChannel === c.slug ? 'bg-primary/20 border-primary/20 text-white' : 'text-gray-400 hover:bg-white/5 border-transparent'} border`}
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                      <AtSign size={16}/>
+                    </div>
+                    <div className="flex-1 text-left text-[11px] font-bold truncate">Solicitud de {c.name}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -397,6 +424,28 @@ export default function AuroraChat() {
           </div>
         </div>
 
+        {/* Message Request Banner */}
+        {channelsList.find((c:any) => c.slug === currentChannel && c.status === 'pending' && c.user2Id === user._id) && (
+          <div className="bg-primary/10 border-b border-primary/20 p-4 flex flex-col items-center gap-3 text-center">
+            <p className="text-xs text-white">¿Quieres aceptar la solicitud de mensaje de <span className="font-bold">{(currentChat as any).name}</span>?</p>
+            <div className="flex gap-2">
+              <button 
+                onClick={() => useMutation(api.chat.updateChannelStatus)({ channelId: (currentChat as any)._id, status: 'active' })} 
+                className="bg-primary text-white px-6 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider"
+              >
+                Aceptar
+              </button>
+              <button 
+                onClick={() => useMutation(api.chat.deleteChannel)({ channelId: (currentChat as any)._id })} 
+                className="bg-white/5 text-gray-400 px-6 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider border border-white/10"
+              >
+                Rechazar
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Messages Area */}
         <div ref={scrollRef} onScroll={handleScroll} className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')]">
           {messages.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center opacity-20">
@@ -511,9 +560,29 @@ export default function AuroraChat() {
             <div className="space-y-4">
               <input value={editName} onChange={e => setEditName(e.target.value)} placeholder="Nombre completo" className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm outline-none focus:border-primary" />
               <textarea value={editBio} onChange={e => setEditBio(e.target.value)} placeholder="Biografía" className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm outline-none focus:border-primary resize-none h-24" />
-              <input value={editPhone} onChange={e => setEditPhone(e.target.value)} placeholder="Teléfono" className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm outline-none focus:border-primary" />
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-gray-500 uppercase px-4">Teléfono</label>
+                <input value={editPhone} onChange={e => setEditPhone(e.target.value)} placeholder="+54 9..." className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm focus:border-primary outline-none transition-all" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-gray-500 uppercase px-4">Privacidad de Mensajes</label>
+                <div className="flex gap-2 px-1">
+                  <button 
+                    onClick={() => setEditPrivacy('everyone')}
+                    className={`flex-1 py-3 rounded-xl text-[10px] font-bold uppercase transition-all ${editPrivacy === 'everyone' ? 'bg-primary text-white' : 'bg-white/5 text-gray-500'}`}
+                  >
+                    Todos
+                  </button>
+                  <button 
+                    onClick={() => setEditPrivacy('requests')}
+                    className={`flex-1 py-3 rounded-xl text-[10px] font-bold uppercase transition-all ${editPrivacy === 'requests' ? 'bg-emerald-500 text-white' : 'bg-white/5 text-gray-500'}`}
+                  >
+                    Solicitudes
+                  </button>
+                </div>
+              </div>
             </div>
-            <button onClick={handleUpdateProfile} className="w-full bg-primary hover:bg-primary-hover text-white py-5 rounded-[1.5rem] font-bold uppercase tracking-widest">Guardar Cambios</button>
+            <button onClick={handleUpdateProfile} className="w-full bg-primary hover:bg-primary-hover text-white py-5 rounded-[1.5rem] font-bold uppercase tracking-widest shadow-xl shadow-primary/20">Guardar Cambios</button>
           </div>
         </div>
       )}

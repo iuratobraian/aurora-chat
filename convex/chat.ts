@@ -175,29 +175,49 @@ export const getOrCreatePrivateChannel = mutation({
     user2Id: v.string(),
   },
   handler: async (ctx, args) => {
-    const participants = [args.user1Id, args.user2Id].sort();
-    const slug = `dm_${participants[0]}_${participants[1]}`;
-
+    const user1Id = args.user1Id as any;
+    const user2Id = args.user2Id as any;
+    
     const existing = await ctx.db
       .query("chatChannels")
-      .withIndex("by_slug", (q) => q.eq("slug", slug))
+      .withIndex("by_users", (q) => q.eq("user1Id", user1Id).eq("user2Id", user2Id))
+      .first() || await ctx.db
+      .query("chatChannels")
+      .withIndex("by_users", (q) => q.eq("user1Id", user2Id).eq("user2Id", user1Id))
       .first();
 
     if (existing) return existing;
 
-    const user2 = await ctx.db.get(args.user2Id as any); // Assuming ID or just string
-    const name = user2 ? `Chat con ${user2.name}` : "Chat Privado";
+    const user1 = await ctx.db.get(user1Id);
+    const user2 = await ctx.db.get(user2Id);
+
+    // Instagram style: if receiver has "requests" mode, channel is "pending"
+    const status = user2?.privacyMode === "requests" ? "pending" : "active";
 
     const channelId = await ctx.db.insert("chatChannels", {
-      name,
-      slug,
+      name: `${user2?.name || 'User'}`,
+      slug: `dm-${Date.now()}`,
+      createdBy: user1Id,
       type: "direct",
-      participants,
-      createdBy: args.user1Id,
-      createdAt: Date.now(),
+      status,
+      user1Id,
+      user2Id,
     });
+    return await ctx.db.get(channelId);
+  },
+});
 
-    return { _id: channelId, slug, name };
+export const updateChannelStatus = mutation({
+  args: { channelId: v.id("chatChannels"), status: v.union(v.literal("active"), v.literal("pending")) },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.channelId, { status: args.status });
+  },
+});
+
+export const deleteChannel = mutation({
+  args: { channelId: v.id("chatChannels") },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.channelId);
   },
 });
 

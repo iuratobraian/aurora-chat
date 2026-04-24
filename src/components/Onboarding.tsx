@@ -12,6 +12,8 @@ export default function Onboarding() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isRegistering, setIsRegistering] = useState(false);
+  const [hasBiometrics, setHasBiometrics] = useState(!!localStorage.getItem('aurora_last_user'));
+
   
   const setUser = useUserStore(state => state.setUser);
   const createUser = useMutation(api.users.createUser);
@@ -30,6 +32,7 @@ export default function Onboarding() {
           return;
         }
         // If user exists but has no password, allow entry (they can set it later in profile)
+        localStorage.setItem('aurora_last_user', JSON.stringify({ email: existingUser.email, name: existingUser.name }));
         setUser(existingUser);
       } else {
         setError("Usuario no encontrado. Por favor regístrate.");
@@ -41,6 +44,29 @@ export default function Onboarding() {
       setLoading(false);
     }
   };
+
+  const handleBiometricLogin = async () => {
+    const lastUser = JSON.parse(localStorage.getItem('aurora_last_user') || '{}');
+    if (!lastUser.email) return;
+
+    setLoading(true);
+    try {
+      // Mock biometric check (in Capacitor would be NativeBiometric.verifyIdentity)
+      if (window.confirm(`¿Deseas iniciar sesión como ${lastUser.name} usando biometría?`)) {
+        const existingUser = await convex.query(api.users.getUserByEmail, { email: lastUser.email });
+        if (existingUser) {
+          setUser(existingUser);
+        } else {
+          setError("Usuario no encontrado");
+        }
+      }
+    } catch (err) {
+      setError("Error en autenticación biométrica");
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
 
 
@@ -158,7 +184,19 @@ export default function Onboarding() {
           >
             {loading ? <Loader2 className="animate-spin" size={18} /> : (isRegistering ? 'Crear Cuenta' : 'Iniciar Sesión')}
           </button>
+
+          {!isRegistering && hasBiometrics && (
+             <button
+               type="button"
+               onClick={handleBiometricLogin}
+               className="w-full bg-white/5 hover:bg-white/10 text-gray-400 py-4 rounded-2xl font-bold text-[10px] transition-all flex items-center justify-center gap-2 uppercase tracking-[0.2em]"
+             >
+               <span className="material-symbols-outlined text-sm">fingerprint</span>
+               Entrar con Biometría
+             </button>
+          )}
         </form>
+
 
 
         <p className="text-center text-[10px] text-gray-500 uppercase tracking-widest relative">

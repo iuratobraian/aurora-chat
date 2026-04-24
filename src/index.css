@@ -165,10 +165,13 @@ html, body {
 
 #root {
   height: 100%;
+  height: -webkit-fill-available;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
+
 
 input, textarea {
   -webkit-user-select: text;

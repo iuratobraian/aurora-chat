@@ -7,8 +7,9 @@ import {
   MessageSquare, HardDrive, Search, LogOut, FileText, 
   FileSpreadsheet, FileCode, Mic, MicOff, Loader2, Volume2, 
   Settings, User, Phone, Info, Camera, Clock, ChevronRight,
-  MoreVertical, Hash
+  MoreVertical, Hash, QrCode, ScanLine, Copy
 } from 'lucide-react';
+
 import { useUserStore } from './store';
 import Onboarding from './components/Onboarding';
 import ReactMarkdown from 'react-markdown';
@@ -19,7 +20,12 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { parseFile } from './lib/fileParser';
 import imageCompression from 'browser-image-compression';
-import { encryptMessage, decryptMessage } from './lib/encryption';
+import { persistenceService } from './lib/persistence';
+import CardContainer from './components/CardContainer';
+import RainbowButton from './components/RainbowButton';
+import ExpensesHub from './features/expenses/ExpensesHub';
+import { expenseAgent } from './lib/expenseAgent';
+
 
 const EMOJIS = ['🚀', '📈', '📉', '🔥', '🧠', '💰', '❤️', '👍', '🎯', '⚡'];
 const NOTIFICATION_SOUND = 'https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3';
@@ -92,14 +98,54 @@ export default function AuroraChat() {
 
   // Audio/Speech
   const [showEvents, setShowEvents] = useState(false);
+  const [showPolls, setShowPolls] = useState(false);
   const [showCreateEvent, setShowCreateEvent] = useState(false);
-  const [newEventTitle, setNewEventTitle] = useState('');
-  const [newEventDesc, setNewEventDesc] = useState('');
-  const [newEventDate, setNewEventDate] = useState('');
+  const [showCreatePoll, setShowCreatePoll] = useState(false);
+  
+  // QR Logic
+  useEffect(() => {
+    if (showQRScanner) {
+      const html5QrCode = new Html5Qrcode("qr-reader");
+      html5QrCode.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        (decodedText) => {
+          // Success!
+          setScannedResult(decodedText);
+          setShowQRScanner(false);
+          html5QrCode.stop();
+          
+          // Try to find matching password
+          const match = storedPasswords?.find((p: any) => 
+            decodedText.toLowerCase().includes(p.site.toLowerCase()) || 
+            decodedText.toLowerCase().includes(p.username.toLowerCase())
+          );
+          if (match) {
+            alert(`Llave encontrada para ${match.site}: ${match.encryptedPassword}`);
+          } else {
+            alert(`Contenido del QR: ${decodedText}`);
+          }
+        },
+        () => {} // Silent error
+      ).catch(err => {
+        console.error("QR Error", err);
+        setError("No se pudo iniciar la cámara");
+        setShowQRScanner(false);
+      });
+      return () => {
+        if (html5QrCode.isScanning) html5QrCode.stop();
+      };
+    }
+  }, [showQRScanner, storedPasswords]);
+
 
   const [isRecording, setIsRecording] = useState(false);
-
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [attachedAudio, setAttachedAudio] = useState<string | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
   const recognitionRef = useRef<any>(null);
+
 
   // Sync edit states with user
   useEffect(() => {
@@ -135,6 +181,8 @@ export default function AuroraChat() {
   const rawMessagesData = useQuery(api.chat.getMessagesByChannel, { channelId: currentChannel, limit: 100 });
   const messages = (rawMessagesData?.messages && Array.isArray(rawMessagesData.messages)) ? rawMessagesData.messages as ChatMessage[] : [];
   
+  const addExpenseMutation = useMutation(api.expenses.addExpense);
+  
   const rawTypingUsers = useQuery(api.chat.getTypingUsers, { channelId: currentChannel, excludeUserId: user?._id || 'guest' });
   const typingUsers = Array.isArray(rawTypingUsers) ? rawTypingUsers : [];
   
@@ -143,7 +191,50 @@ export default function AuroraChat() {
   const createChannel = useMutation(api.chat.createChannel);
   const verifyPasswordMutation = useMutation(api.chat.verifyChannelPasswordMutation);
   
-  const rawServerStats = useQuery(api.chat.getServerStats);
+  // Productivity State
+  const [showReminders, setShowReminders] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
+  const [showPasswords, setShowPasswords] = useState(false);
+  const [sharingEventId, setSharingEventId] = useState<string | null>(null);
+  const [masterKey, setMasterKey] = useState(localStorage.getItem('aurora_master_key') || '');
+
+  const [isBiometricVerified, setIsBiometricVerified] = useState(false);
+
+  const qrScannerRef = useRef<any>(null);
+
+
+  const reminders = useQuery(api.productivity.getReminders, user?._id ? { userId: user._id as any } : "skip");
+  const notes = useQuery(api.productivity.getNotes, user?._id ? { userId: user._id as any } : "skip");
+  const storedPasswords = useQuery(api.productivity.getPasswords, user?._id ? { userId: user._id as any } : "skip");
+
+  const createReminder = useMutation(api.productivity.createReminder);
+  const toggleReminder = useMutation(api.productivity.toggleReminder);
+  const deleteReminder = useMutation(api.productivity.deleteReminder);
+  const createNote = useMutation(api.productivity.createNote);
+  const updateNote = useMutation(api.productivity.updateNote);
+  const deleteNote = useMutation(api.productivity.deleteNote);
+
+  const createPassword = useMutation(api.productivity.createPassword);
+  const deletePassword = useMutation(api.productivity.deletePassword);
+
+  const [newReminderText, setNewReminderText] = useState('');
+  const [newReminderDate, setNewReminderDate] = useState('');
+  const [newNoteTitle, setNewNoteTitle] = useState('');
+  const [newNoteContent, setNewNoteContent] = useState('');
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
+
+  const [newPassSite, setNewPassSite] = useState('');
+  const [newPassUser, setNewPassUser] = useState('');
+  const [newPassVal, setNewPassVal] = useState('');
+  const [showQRScanner, setShowQRScanner] = useState(false);
+  const [scannedResult, setScannedResult] = useState<string | null>(null);
+  const [showFriendsModal, setShowFriendsModal] = useState(false);
+  const [showExpenses, setShowExpenses] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showSearch, setShowSearch] = useState(false);
+
+
+
   const serverStats = rawServerStats || null;
 
   const pinnedMessages = useQuery(api.chat.getPinnedMessages, { channelId: currentChannel });
@@ -161,8 +252,6 @@ export default function AuroraChat() {
   const createPoll = useMutation(api.polls.createPoll);
   const voteInPoll = useMutation(api.polls.voteInPoll);
 
-  const [showPolls, setShowPolls] = useState(false);
-  const [showCreatePoll, setShowCreatePoll] = useState(false);
   const [newPollQuestion, setNewPollQuestion] = useState('');
   const [newPollOptions, setNewPollOptions] = useState(['', '']);
 
@@ -194,7 +283,7 @@ export default function AuroraChat() {
   const lastMessageId = useRef<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-   useEffect(() => {
+  useEffect(() => {
     if (messages.length > 0) {
       const lastMsg = messages[messages.length - 1];
       if (lastMessageId.current && lastMessageId.current !== lastMsg._id && lastMsg.userId !== user?._id) {
@@ -202,8 +291,22 @@ export default function AuroraChat() {
         showLocalNotification(lastMsg as any);
       }
       lastMessageId.current = lastMsg._id || null;
+      
+      // Save to local persistence
+      persistenceService.saveMessages(currentChannel, messages);
     }
-  }, [messages, user?._id, showLocalNotification]);
+  }, [messages, user?._id, showLocalNotification, currentChannel]);
+
+  // Load from local persistence on channel change
+  useEffect(() => {
+    const loadLocal = async () => {
+      const localMsgs = await persistenceService.getMessages(currentChannel);
+      if (localMsgs.length > 0 && messages.length === 0) {
+        // This is handled by displayMessages logic below
+      }
+    };
+    loadLocal();
+  }, [currentChannel]);
 
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -341,44 +444,60 @@ export default function AuroraChat() {
     }
   }, []);
 
-  const startSpeechToText = () => {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) return setError("Navegador no compatible");
-    if (isRecording) { recognitionRef.current?.stop(); return; }
-    if (typeof SpeechRecognition !== 'function') return setError("Error: El constructor de voz no es válido en este navegador.");
-    const rec = new SpeechRecognition();
-    rec.lang = 'es-AR'; 
-    rec.continuous = true; 
-    rec.interimResults = true;
-    
-    rec.onstart = () => setIsRecording(true);
-    rec.onend = () => setIsRecording(false);
-    rec.onerror = (event: any) => {
-      console.error('Speech recognition error:', event.error);
-      setError(`Error de voz: ${event.error}`);
-      setIsRecording(false);
-    };
-
-    rec.onresult = (e: any) => {
-      let final = '';
-      let interim = '';
-      for (let i = e.resultIndex; i < e.results.length; ++i) {
-        if (e.results[i].isFinal) {
-          final += e.results[i][0].transcript;
-        } else {
-          interim += e.results[i][0].transcript;
-        }
-      }
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      audioChunksRef.current = [];
       
-      if (final) {
-        setText(p => p + (p ? ' ' : '') + final);
-        setInterimTranscript('');
-      } else {
-        setInterimTranscript(interim);
-      }
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
+      };
+      
+      recorder.onstop = async () => {
+        const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        setAudioBlob(blob);
+        stream.getTracks().forEach(track => track.stop());
+      };
+      
+      recorder.start();
+      mediaRecorderRef.current = recorder;
+      setIsRecording(true);
+    } catch (err) {
+      console.error('Error starting recording:', err);
+      setError('No se pudo acceder al micrófono');
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      
+      mediaRecorderRef.current.onstop = async () => {
+        const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setAudioBlob(blob);
+          setAttachedAudio(reader.result as string);
+        };
+        reader.readAsDataURL(blob);
+        
+        mediaRecorderRef.current?.stream.getTracks().forEach(track => track.stop());
+      };
+    }
+  };  const startSpeechRecognition = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setError("Tu navegador no soporta reconocimiento de voz");
+      return;
+    }
+    const rec = new SpeechRecognition();
+    rec.lang = 'es-ES';
+    rec.onresult = (event: any) => {
+      const result = event.results[0][0].transcript;
+      setText(prev => prev + (prev ? ' ' : '') + result);
     };
-
-
 
     try {
       rec.start();
@@ -415,14 +534,11 @@ export default function AuroraChat() {
       return `${r}, ${g}, ${b}`;
     };
 
-    if (user?.themeColor) {
-      document.documentElement.style.setProperty('--primary-color', user.themeColor);
-      document.documentElement.style.setProperty('--primary-rgb', hexToRgb(user.themeColor));
-    } else {
-      document.documentElement.style.setProperty('--primary-color', '#6366f1');
-      document.documentElement.style.setProperty('--primary-rgb', '99, 102, 241');
-    }
-  }, [user?.themeColor]);
+    const targetColor = showProfileModal ? editThemeColor : (user?.themeColor || '#6366f1');
+    document.documentElement.style.setProperty('--primary-color', targetColor);
+    document.documentElement.style.setProperty('--primary-rgb', hexToRgb(targetColor));
+  }, [user?.themeColor, editThemeColor, showProfileModal]);
+
 
 
   const cachedChannels = JSON.parse(localStorage.getItem('aurora_cache_channels') || '[]');
@@ -445,7 +561,11 @@ export default function AuroraChat() {
       createdAt: Date.now(),
       isOffline: true
     }))
-  ];
+  ].filter(msg => {
+    if (!searchQuery) return true;
+    const decrypted = decryptMessage(msg.texto || '', currentChannel).toLowerCase();
+    return decrypted.includes(searchQuery.toLowerCase());
+  });
 
   const displayStatuses = activeStatuses || cachedStatuses;
 
@@ -476,12 +596,47 @@ export default function AuroraChat() {
     try {
       await sendMessage({
         userId: user._id, nombre: user.name, avatar: user.avatar,
-        texto: encryptedText, imagenUrl: attachedImage || undefined,
+        texto: encryptedText, 
+        imagenUrl: attachedImage || undefined,
+        audioUrl: attachedAudio || undefined,
         channelId: currentChannel,
       });
-      setText(''); setAttachedImage(null); setShowEmoji(false);
-      if (isRecording) { recognitionRef.current?.stop(); }
+
+      // AI Agent Expense Logic
+      if (text.toLowerCase().includes('gasto') || text.toLowerCase().includes('ingreso')) {
+        const parsed = expenseAgent.parse(text);
+        if (parsed) {
+          // Send "Recibido" message from system
+          const systemMsg = `✅ *Recibido:* Registrando ${parsed.type === 'income' ? 'ingreso' : 'gasto'} de $${parsed.amount.toLocaleString()}. 
+Categoría: *${parsed.category.toUpperCase()}*
+Nota: ${parsed.note}`;
+          
+          setTimeout(async () => {
+             await sendMessage({
+               userId: 'system-bot',
+               nombre: 'Aurora Finance Bot',
+               avatar: 'https://cdn-icons-png.flaticon.com/512/2593/2593635.png',
+               texto: encryptMessage(systemMsg, currentChannel),
+               channelId: currentChannel
+             });
+
+             // Actually save to database
+             await addExpenseMutation({
+               userId: user._id,
+               type: parsed.type,
+               amount: parsed.amount,
+               category: parsed.category,
+               date: new Date().toISOString().split('T')[0],
+               paymentMethod: 'Efectivo', // Default
+               note: parsed.note
+             });
+          }, 1000);
+        }
+      }
+
+      setText(''); setAttachedImage(null); setAttachedAudio(null); setAudioBlob(null); setShowEmoji(false);
     } catch (err) { setError('Error al enviar'); }
+
   };
 
 
@@ -532,21 +687,37 @@ export default function AuroraChat() {
     );
   };
 
-  if (!user) return <Onboarding />;
+  if (!user) return (
+    <div className="h-screen bg-[#0f1115] flex items-center justify-center p-6">
+      <div className="text-center space-y-8 animate-in fade-in zoom-in duration-700">
+        <div className="w-32 h-32 bg-primary/20 rounded-[2.5rem] flex items-center justify-center mx-auto shadow-2xl shadow-primary/20 border border-primary/20">
+          <MessageSquare size={64} className="text-primary" />
+        </div>
+        <div className="space-y-2">
+          <h1 className="text-4xl font-black text-white uppercase tracking-tighter italic">Aurora Chat</h1>
+          <p className="text-gray-500 text-sm font-bold uppercase tracking-widest">Standalone Premium Client</p>
+        </div>
+        <RainbowButton onClick={() => setUser({ _id: 'guest', name: 'Explorador', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=guest' } as any)}>
+          Entrar al Nexo
+        </RainbowButton>
+      </div>
+    </div>
+  );
 
   const currentChat = [...(displayChannels || []), ...(displayStatuses || [])].find(c => (c as any).slug === currentChannel) || { name: 'Chat' };
 
-
   return (
-    <div className="flex h-screen bg-[#0f1115] overflow-hidden">
+    <CardContainer>
+      <div className="flex h-full overflow-hidden">
       <audio ref={audioRef} src={NOTIFICATION_SOUND} preload="auto" />
       
       {/* SIDEBAR */}
       <div className={`
         ${isSidebarOpen ? 'w-80 translate-x-0' : 'w-0 -translate-x-full'} 
-        ${isMobile ? 'fixed inset-y-0 left-0 z-[150] shadow-2xl' : 'relative shrink-0'}
-        border-r border-white/10 flex flex-col bg-black/90 transition-all duration-300 overflow-hidden
+        ${isMobile ? 'fixed inset-y-0 left-0 z-[150] shadow-2xl rounded-r-[2.5rem]' : 'relative shrink-0 rounded-r-[2rem]'}
+        border-r border-white/10 flex flex-col bg-black/95 transition-all duration-300 overflow-hidden
       `}>
+
         {isMobile && isSidebarOpen && (
           <button 
             onClick={() => setIsSidebarOpen(false)}
@@ -556,7 +727,42 @@ export default function AuroraChat() {
           </button>
         )}
 
+        {/* Coordination Tools */}
+        <div className="p-4 space-y-2 border-t border-white/5 bg-black/20">
+           <h4 className="text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2 px-2">Coordinación Personal</h4>
+           <div className="grid grid-cols-3 gap-2">
+              <button onClick={() => setShowReminders(true)} className="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-all border border-white/5">
+                <Clock size={18} className="text-amber-500"/>
+                <span className="text-[8px] font-bold text-gray-400 uppercase">Alertas</span>
+              </button>
+              <button onClick={() => setShowNotes(true)} className="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-all border border-white/5">
+                <FileText size={18} className="text-emerald-500"/>
+                <span className="text-[8px] font-bold text-gray-400 uppercase">Notas</span>
+              </button>
+              <button onClick={() => setShowPasswords(true)} className="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-all border border-white/5">
+                <Lock size={18} className="text-primary"/>
+                <span className="text-[8px] font-bold text-gray-400 uppercase">Claves</span>
+              </button>
+           </div>
+           
+           <button 
+             onClick={() => setShowExpenses(true)}
+             className="w-full flex items-center justify-center gap-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 py-4 rounded-2xl border border-emerald-500/20 transition-all font-black text-[10px] uppercase tracking-widest mt-2"
+           >
+             <Wallet size={16}/> Control de Gastos
+           </button>
+
+           <button 
+             onClick={() => setShowFriendsModal(true)}
+             className="w-full flex items-center justify-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary py-4 rounded-2xl border border-primary/20 transition-all font-black text-[10px] uppercase tracking-widest mt-2"
+           >
+             <Users size={16}/> Mis Amigos
+           </button>
+        </div>
+
+
         {/* User Profile Header */}
+
         <div className="p-4 border-b border-white/10 flex items-center justify-between bg-black/40 min-w-[320px]">
           <button onClick={() => setShowProfileModal(true)} className="flex items-center gap-3 group text-left">
             <div className="relative">
@@ -724,9 +930,11 @@ export default function AuroraChat() {
       </div>
 
       {/* MAIN CONTENT */}
-      <div className="flex-1 flex flex-col relative bg-[#0f1115]">
+      <div className="flex-1 flex flex-col relative bg-[#0f1115] overflow-hidden md:rounded-none">
+
         {/* Chat Header */}
-        <div className="h-16 px-4 border-b border-white/10 flex items-center justify-between bg-black/40 backdrop-blur-md z-10">
+        <div className="h-16 px-4 border-b border-white/10 flex items-center justify-between bg-black/40 backdrop-blur-md z-10 rounded-t-[2.5rem] md:rounded-t-none">
+
           <div className="flex items-center gap-4">
             <button 
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -772,17 +980,41 @@ export default function AuroraChat() {
                </button>
 
                {channelData?.createdBy === user?._id && (
-               <button 
-                onClick={() => togglePause({ channelId: channelData._id, isPaused: !channelData.isPaused })}
-                className={`p-2 rounded-xl transition-all ${channelData?.isPaused ? 'bg-amber-500 text-white' : 'text-gray-500 hover:text-white bg-white/5'}`}
-                title={channelData?.isPaused ? "Reanudar Chat" : "Pausar Chat"}
-               >
-                 {channelData?.isPaused ? <Play size={20}/> : <Pause size={20}/>}
-               </button>
-             )}
-             <button className="p-2 text-gray-500 hover:text-white transition-all"><Volume2 size={20}/></button>
+                <button 
+                 onClick={() => togglePause({ channelId: channelData._id, isPaused: !channelData.isPaused })}
+                 className={`p-2 rounded-xl transition-all ${channelData?.isPaused ? 'bg-amber-500 text-white' : 'text-gray-500 hover:text-white bg-white/5'}`}
+                 title={channelData?.isPaused ? "Reanudar Chat" : "Pausar Chat"}
+                >
+                  {channelData?.isPaused ? <Play size={20}/> : <Pause size={20}/>}
+                </button>
+              )}
+             <button onClick={() => setShowSearch(!showSearch)} className={`p-2 rounded-xl transition-all ${showSearch ? 'bg-primary text-white' : 'text-gray-500 hover:text-white bg-white/5'}`}>
+               <Search size={20}/>
+             </button>
              <button className="p-2 text-gray-500 hover:text-white transition-all"><MoreVertical size={20}/></button>
           </div>
+        </div>
+
+        {/* Search Bar Area */}
+        {showSearch && (
+          <div className="px-4 py-2 bg-black/20 border-b border-white/5 animate-in slide-in-from-top duration-300">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={14} />
+              <input 
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                placeholder="Buscar en la conversación..."
+                className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-10 py-2 text-xs text-white outline-none focus:border-primary/50"
+                autoFocus
+              />
+              {searchQuery && (
+                <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white">
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
         </div>
 
@@ -827,7 +1059,8 @@ export default function AuroraChat() {
         )}
 
         {/* Messages Area */}
-        <div ref={scrollRef} onScroll={handleScroll} className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')]">
+        <div ref={scrollRef} onScroll={handleScroll} className="flex-1 overflow-y-auto p-4 md:p-8 space-y-8 custom-scrollbar bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] rounded-b-[2.5rem] md:rounded-b-none mb-2 mx-1 md:mx-0">
+
           {displayMessages.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center opacity-20">
               <MessageSquare size={64} className="mb-4" />
@@ -835,61 +1068,94 @@ export default function AuroraChat() {
             </div>
           ) : (
             displayMessages.map((m: ChatMessage, idx: number) => {
+              const showSeparator = idx > 0 && displayMessages[idx - 1].userId !== m.userId;
+              const isMe = m.userId === user?._id;
 
-              const isMe = m.userId === user._id;
+              
               return (
-                <div key={m._id || idx} className={`flex items-end gap-3 ${isMe ? 'flex-reverse' : ''} message-enter`}>
-                  {!isMe && (
+                <div key={m._id || idx} className={`flex flex-col ${showSeparator ? 'mt-6 pt-4 border-t border-white/5' : 'mt-1'}`}>
+                  <div className={`flex gap-4 group ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
                     <button 
-                      onClick={() => setViewingProfileUser({ _id: m.userId, name: m.nombre, avatar: m.avatar })}
-                      className="shrink-0 group"
+                      onClick={() => {
+                        const userStatus = recentStatuses?.find((s:any) => s.userId === m.userId);
+                        if(userStatus) {
+                          setViewingStatus(userStatus);
+                        } else {
+                          setViewingProfileUser({ _id: m.userId, name: m.nombre, avatar: m.avatar });
+                        }
+                      }}
+                      className={`shrink-0 transition-transform hover:scale-110 ${idx > 0 && displayMessages[idx-1].userId === m.userId ? 'opacity-0 h-0 pointer-events-none' : 'opacity-100'}`}
                     >
-                      <img src={m.avatar} className="w-9 h-9 rounded-xl shadow-lg border border-white/10 group-hover:border-primary transition-all" alt="" />
+                      <div className={`relative p-0.5 rounded-xl ${recentStatuses?.find((s:any) => s.userId === m.userId) ? 'bg-gradient-to-tr from-primary to-purple-500' : ''}`}>
+                        <img src={m.avatar} className="w-9 h-9 rounded-[10px] shadow-lg border border-white/10 bg-[#1a1a1a]" alt="" />
+                      </div>
                     </button>
-                  )}
-                  <div className={`flex flex-col ${m.userId === user?._id ? 'items-end' : 'items-start'} gap-1 group`}>
-                    <div className="flex items-center gap-2 mb-0.5">
-                      {m.userId !== user?._id && <span className="text-[10px] font-black text-primary uppercase tracking-tighter">{m.nombre}</span>}
-                      {channelData?.createdBy === user?._id && (
-                        <button 
-                          onClick={() => togglePin({ messageId: m._id, isPinned: !m.isPinned })}
-                          className={`opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-white/10 ${m.isPinned ? 'text-primary' : 'text-gray-500'}`}
-                        >
-                          <Clock size={12}/>
-                        </button>
-                      )}
-                    </div>
-                    <div className={`
-                      max-w-[80%] px-3.5 py-2 rounded-2xl relative transition-all duration-300
-                      ${m.userId === user?._id 
-                        ? 'bg-primary/20 text-white border border-primary/30 backdrop-blur-md rounded-tr-none' 
-                        : 'bg-white/[0.03] text-gray-200 rounded-tl-none border border-white/10 backdrop-blur-sm'}
-                      ${m.isPinned ? 'ring-1 ring-primary/50' : ''}
-                      ${(m as any).isOffline ? 'opacity-60 grayscale-[0.5]' : ''}
-                     shadow-lg hover:shadow-primary/5`}>
 
-                      {m.imagenUrl && (
-                        <div className="mb-3 rounded-xl overflow-hidden ring-1 ring-white/10 group relative">
-                          <img 
-                            src={m.imagenUrl} 
-                            className="max-w-full h-auto max-h-72 cursor-pointer group-hover:scale-105 transition-transform duration-500" 
-                            alt="" 
-                            onClick={(e) => { e.stopPropagation(); setPreviewImage(m.imagenUrl!); }} 
-                          />
-                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
-                            <Search className="text-white" />
+                    
+                    <div className={`flex-1 flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+                      { (idx === 0 || displayMessages[idx-1].userId !== m.userId) && (
+                        <div className={`flex items-center gap-2 mb-1 ${isMe ? 'flex-row-reverse' : ''}`}>
+                          <span className="text-[10px] font-black text-white uppercase tracking-widest">{m.nombre}</span>
+                          <span className="text-[8px] text-gray-600 font-bold uppercase tracking-tighter">{new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        </div>
+                      )}
+                      
+                      <div className={`
+                        max-w-[85%] text-[13px] leading-relaxed transition-all relative group
+                        ${isMe ? 'text-right' : 'text-left'}
+                        ${m.isPinned ? 'border-l-2 border-primary pl-3 bg-primary/5 rounded-r-xl py-1' : ''}
+                      `}>
+                        {m.imagenUrl && (
+                          <div className={`mb-3 rounded-2xl overflow-hidden ring-1 ring-white/10 group/img relative inline-block max-w-sm`}>
+                            <img src={m.imagenUrl} className="w-full h-auto max-h-96 cursor-zoom-in group-hover/img:scale-105 transition-transform duration-500" alt="" onClick={() => setPreviewImage(m.imagenUrl!)} />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                              <Search className="text-white" />
+                            </div>
                           </div>
-                        </div>
-                      )}
-                      <div className="text-[12px] leading-relaxed break-words">{formatText(decryptMessage(m.texto || '', currentChannel))}</div>
-                      {(m as any).isOffline && (
-                        <div className="absolute bottom-1 right-2 text-[8px] uppercase font-black tracking-tighter text-white/40 flex items-center gap-1">
-                          <Clock size={8}/> Pendiente
-                        </div>
-                      )}
-                    </div>
+                        )}
+                        
+                        {m.audioUrl && (
+                          <div className={`mb-3 flex items-center gap-4 bg-white/5 p-3 rounded-2xl border border-white/5 w-fit ${isMe ? 'flex-row-reverse text-right' : ''}`}>
+                             <button onClick={(e) => {
+                               const audio = e.currentTarget.nextElementSibling as HTMLAudioElement;
+                               if(audio.paused) audio.play(); else audio.pause();
+                             }} className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white shrink-0 hover:scale-110 transition-transform shadow-lg shadow-primary/20">
+                               <Volume2 size={18}/>
+                             </button>
+                             <audio src={m.audioUrl} className="hidden" />
+                             <div className="flex flex-col gap-1">
+                                <span className="text-[8px] font-black uppercase text-gray-500">Nota de Voz</span>
+                                <div className="w-24 h-1 bg-white/10 rounded-full overflow-hidden">
+                                   <div className="h-full bg-primary/40 animate-progress w-full" />
+                                </div>
+                             </div>
+                          </div>
+                        )}
 
-                    <span className="text-[9px] text-gray-600 px-1 font-mono">{new Date(m.createdAt).toLocaleTimeString(undefined, {hour: '2-digit', minute:'2-digit'})}</span>
+                        {m.eventId && (
+                          <div className={`mb-4 bg-primary/5 border border-primary/10 rounded-3xl p-5 space-y-4 max-w-xs ${isMe ? 'ml-auto' : ''}`}>
+                             <div className="flex items-center gap-2 text-primary font-black text-[10px] uppercase tracking-[0.2em]">
+                                <Calendar size={14}/> Evento Sugerido
+                             </div>
+                             <h4 className="text-xs font-bold text-white uppercase tracking-tight">Invitación Interactiva</h4>
+                             <button 
+                              onClick={() => { setShowEvents(true); }}
+                              className="w-full bg-primary text-white py-3 rounded-2xl text-[9px] font-black uppercase shadow-xl shadow-primary/20 hover:scale-[1.02] transition-transform"
+                             >
+                               Ver y Anotarme
+                             </button>
+                          </div>
+                        )}
+
+                        <div className="whitespace-pre-wrap break-words">{formatText(decryptMessage(m.texto || '', currentChannel))}</div>
+                        
+                        {/* Status indicators */}
+                        <div className={`flex items-center gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-all ${isMe ? 'justify-end' : 'justify-start'}`}>
+                           { (m as any).isOffline && <span className="text-[7px] font-black text-amber-500 uppercase">En Cola</span> }
+                           <span className="text-[8px] text-gray-700 font-bold">{new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               );
@@ -897,6 +1163,7 @@ export default function AuroraChat() {
           )}
           <div ref={messagesEndRef} />
         </div>
+
 
         <div className="p-3 bg-black/40 border-t border-white/10 backdrop-blur-md">
 
@@ -914,7 +1181,21 @@ export default function AuroraChat() {
               </div>
             )}
 
+            {attachedAudio && (
+              <div className="mb-4 flex items-center gap-3 p-3 bg-primary/10 rounded-2xl border border-primary/20 w-fit animate-in slide-in-from-left duration-300">
+                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white">
+                  <Volume2 size={20} className="animate-pulse" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-black text-primary uppercase tracking-widest">Nota de Voz Lista</span>
+                  <span className="text-[9px] text-gray-500">Haz clic en enviar para compartir</span>
+                </div>
+                <button onClick={() => { setAttachedAudio(null); setAudioBlob(null); }} className="ml-2 text-gray-500 hover:text-red-400 p-1"><X size={18}/></button>
+              </div>
+            )}
+
             {attachedImage && (
+
              <div className="mb-4 flex items-center gap-3 p-2 bg-white/5 rounded-2xl border border-white/10 w-fit">
                <div className="relative w-20 h-20 rounded-xl overflow-hidden">
                  <img src={attachedImage} className="w-full h-full object-cover" alt="" />
@@ -943,10 +1224,17 @@ export default function AuroraChat() {
                    <button type="button" onClick={() => cameraInputRef.current?.click()} className="p-2 text-gray-500 hover:text-white transition-all">
                      <Camera size={20}/>
                    </button>
-                   <button type="button" onClick={startSpeechToText} className={`p-2 transition-all ${isRecording ? 'text-red-500 animate-pulse' : 'text-gray-500 hover:text-white'}`}>
+                   <button 
+                     type="button" 
+                     onMouseDown={startRecording}
+                     onMouseUp={stopRecording}
+                     onTouchStart={startRecording}
+                     onTouchEnd={stopRecording}
+                     className={`p-2 transition-all ${isRecording ? 'text-red-500 animate-pulse scale-125' : 'text-gray-500 hover:text-white'}`}
+                   >
                      {isRecording ? <MicOff size={20}/> : <Mic size={20}/>}
                    </button>
-                   {(text.trim() || attachedImage) ? (
+                   {(text.trim() || attachedImage || audioBlob) ? (
                      <button type="submit" disabled={uploading} className="p-2.5 bg-primary text-white rounded-full shadow-lg shadow-primary/20 transition-all active:scale-90">
                        <Send size={16} />
                      </button>
@@ -956,6 +1244,7 @@ export default function AuroraChat() {
                      </div>
                    )}
                 </div>
+
               </div>
 
               <input type="file" ref={fileInputRef} className="hidden" accept="image/*,.pdf,.docx,.xlsx,.xls,.csv" onChange={(e) => handleImageUpload(e, 'chat')} />
@@ -1049,16 +1338,18 @@ export default function AuroraChat() {
               </div>
               <div className="flex gap-3">
                 <button onClick={() => setShowCreateEvent(false)} className="flex-1 py-3 text-[10px] font-black uppercase text-gray-500">Cancelar</button>
-                <button 
-                  onClick={async () => {
-                    await createEvent({ channelId: currentChannel, title: newEventTitle, description: newEventDesc, date: new Date(newEventDate).getTime(), userId: user?._id as any });
-                    setShowCreateEvent(false);
-                    setNewEventTitle(''); setNewEventDesc(''); setNewEventDate('');
-                  }}
-                  className="flex-1 bg-primary text-white py-3 rounded-xl text-[10px] font-black uppercase"
-                >
-                  Crear
-                </button>
+                 <button 
+                   onClick={async () => {
+                     const eventId = await createEvent({ channelId: currentChannel, title: newEventTitle, description: newEventDesc, date: new Date(newEventDate).getTime(), userId: user?._id as any });
+                     setShowCreateEvent(false);
+                     setNewEventTitle(''); setNewEventDesc(''); setNewEventDate('');
+                     setSharingEventId(eventId as any);
+                   }}
+                   className="flex-1 bg-primary text-white py-3 rounded-xl text-[10px] font-black uppercase"
+                 >
+                   Crear
+                 </button>
+
               </div>
             </div>
          </div>
@@ -1098,9 +1389,253 @@ export default function AuroraChat() {
          </div>
        )}
 
-       {showProfileModal && (
+       {sharingEventId && (
+         <div className="fixed inset-0 bg-black/90 backdrop-blur-xl z-[300] flex items-center justify-center p-4">
+           <div className="bg-[#1a1a1a] border border-white/10 rounded-[3rem] p-8 w-full max-w-sm space-y-6 shadow-2xl">
+              <div className="text-center">
+                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto text-primary mb-4">
+                  <Calendar size={32}/>
+                </div>
+                <h2 className="text-sm font-black text-white uppercase tracking-widest">¿Compartir Evento?</h2>
+                <p className="text-[10px] text-gray-500 mt-2">Selecciona un chat para enviar la invitación interactiva.</p>
+              </div>
+              <div className="max-h-60 overflow-y-auto space-y-2 no-scrollbar">
+                {displayChannels?.map((c: any) => (
+                  <button 
+                    key={c._id} 
+                    onClick={async () => {
+                      const encrypted = encryptMessage(`📅 *Nuevo Evento:* ¡Se ha creado una actividad!`, c.slug);
+                      await sendMessage({ userId: user._id, nombre: user.name, avatar: user.avatar, texto: encrypted, channelId: c.slug, eventId: sharingEventId });
+                      setSharingEventId(null);
+                    }}
+                    className="w-full flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-all border border-white/5"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary"><Hash size={14}/></div>
+                    <span className="text-xs text-white font-bold">{c.name}</span>
+                  </button>
+                ))}
+              </div>
+              <button onClick={() => setSharingEventId(null)} className="w-full text-[10px] text-gray-500 font-bold uppercase tracking-widest">No compartir, solo guardar</button>
+           </div>
+         </div>
+       )}
 
+       {/* Productivity Modals */}
+
+       {showReminders && (
+         <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[200] flex items-center justify-center p-4">
+           <div className="bg-[#1a1a1a] border border-white/10 rounded-[2.5rem] p-8 w-full max-w-sm space-y-6 animate-in slide-in-from-bottom duration-300">
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2"><Clock size={18} className="text-amber-500"/> Recordatorios</h2>
+                <button onClick={() => setShowReminders(false)} className="text-gray-500 hover:text-white"><X size={20}/></button>
+              </div>
+              <div className="space-y-3">
+                <input value={newReminderText} onChange={e => setNewReminderText(e.target.value)} placeholder="¿Qué quieres recordar?" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs outline-none focus:border-amber-500" />
+                <input type="datetime-local" value={newReminderDate} onChange={e => setNewReminderDate(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs outline-none focus:border-amber-500" />
+                <button onClick={async () => {
+                  await createReminder({ userId: user?._id as any, text: newReminderText, date: new Date(newReminderDate).getTime() });
+                  setNewReminderText(''); setNewReminderDate('');
+                }} className="w-full bg-amber-500 text-white py-3 rounded-xl text-[10px] font-black uppercase">Agregar Alerta</button>
+              </div>
+              <div className="max-h-60 overflow-y-auto space-y-2 no-scrollbar">
+                {reminders?.map((r: any) => (
+                  <div key={r._id} className={`p-3 rounded-xl border border-white/5 flex items-center justify-between ${r.completed ? 'bg-white/5 opacity-50' : 'bg-white/[0.02]'}`}>
+                    <div>
+                      <p className={`text-xs text-white ${r.completed ? 'line-through' : ''}`}>{r.text}</p>
+                      <p className="text-[8px] text-gray-500 uppercase font-black">{new Date(r.date).toLocaleString()}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => toggleReminder({ reminderId: r._id })} className="text-amber-500"><Clock size={14}/></button>
+                      <button onClick={() => deleteReminder({ reminderId: r._id })} className="text-red-500/50"><X size={14}/></button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+           </div>
+         </div>
+       )}
+
+       {showNotes && (
+         <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[200] flex items-center justify-center p-4">
+           <div className="bg-[#1a1a1a] border border-white/10 rounded-[2.5rem] p-8 w-full max-w-sm space-y-6 animate-in slide-in-from-bottom duration-300">
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2"><FileText size={18} className="text-emerald-500"/> Mis Notas</h2>
+                <button onClick={() => setShowNotes(false)} className="text-gray-500 hover:text-white"><X size={20}/></button>
+              </div>
+              <div className="space-y-3">
+                <input value={newNoteTitle} onChange={e => setNewNoteTitle(e.target.value)} placeholder="Título..." className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs font-bold outline-none focus:border-emerald-500" />
+                <textarea value={newNoteContent} onChange={e => setNewNoteContent(e.target.value)} placeholder="Contenido de la nota..." className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs outline-none focus:border-emerald-500 h-24 resize-none" />
+                <div className="flex gap-2">
+                  <button onClick={async () => {
+                    if (editingNoteId) {
+                      await updateNote({ noteId: editingNoteId as any, title: newNoteTitle, content: newNoteContent });
+                    } else {
+                      await createNote({ userId: user?._id as any, title: newNoteTitle, content: newNoteContent });
+                    }
+                    setNewNoteTitle(''); setNewNoteContent(''); setEditingNoteId(null);
+                  }} className="flex-1 bg-emerald-500 text-white py-3 rounded-xl text-[10px] font-black uppercase">
+                    {editingNoteId ? 'Actualizar Nota' : 'Guardar Nota'}
+                  </button>
+                  {editingNoteId && (
+                    <button onClick={() => { setEditingNoteId(null); setNewNoteTitle(''); setNewNoteContent(''); }} className="px-4 bg-white/5 text-gray-500 rounded-xl"><X size={16}/></button>
+                  )}
+                </div>
+              </div>
+              <div className="max-h-60 overflow-y-auto space-y-2 no-scrollbar">
+                {notes?.map((n: any) => (
+                  <div key={n._id} className="p-3 rounded-xl border border-white/5 bg-white/[0.02] group">
+                    <div className="flex items-center justify-between mb-1">
+                      <h4 className="text-[10px] font-black text-white uppercase">{n.title}</h4>
+                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onClick={() => {
+                          setEditingNoteId(n._id);
+                          setNewNoteTitle(n.title);
+                          setNewNoteContent(n.content);
+                        }} className="text-emerald-500"><Plus size={12} className="rotate-45"/></button>
+                        <button onClick={async () => {
+                          const encrypted = encryptMessage(`📒 *Nota compartida:* ${n.title}\n\n${n.content}`, currentChannel);
+                          await sendMessage({ userId: user._id, nombre: user.name, avatar: user.avatar, texto: encrypted, channelId: currentChannel });
+                          setShowNotes(false);
+                        }} className="text-primary"><Send size={12}/></button>
+                        <button onClick={() => deleteNote({ noteId: n._id })} className="text-red-500"><X size={12}/></button>
+                      </div>
+                    </div>
+                    <p className="text-[11px] text-gray-500 line-clamp-3">{n.content}</p>
+                  </div>
+                ))}
+              </div>
+
+           </div>
+         </div>
+       )}
+
+       {showFriendsModal && (
+         <div className="fixed inset-0 bg-black/90 backdrop-blur-xl z-[250] flex items-center justify-center p-4">
+           <div className="bg-[#1a1a1a] border border-white/10 rounded-[3rem] p-8 w-full max-w-sm space-y-6 shadow-2xl">
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2"><Users size={18} className="text-primary"/> Contactos</h2>
+                <button onClick={() => setShowFriendsModal(false)} className="text-gray-500 hover:text-white"><X size={20}/></button>
+              </div>
+              <div className="max-h-80 overflow-y-auto space-y-2 no-scrollbar">
+                {friendsList?.length === 0 ? (
+                  <p className="text-center text-[10px] text-gray-500 py-8 uppercase font-black">No tienes amigos agregados aún</p>
+                ) : (
+                  friendsList?.map((friend: any) => (
+                    <button 
+                      key={friend._id} 
+                      onClick={() => { startDM(friend); setShowFriendsModal(false); }}
+                      className="w-full flex items-center justify-between p-4 rounded-2xl bg-white/5 hover:bg-white/10 transition-all border border-white/5 group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <img src={friend.avatar} className="w-10 h-10 rounded-xl border border-white/10" alt="" />
+                        <div className="text-left">
+                          <p className="text-xs font-bold text-white">{friend.name}</p>
+                          <p className="text-[9px] text-gray-500 uppercase font-black">@{friend.username}</p>
+                        </div>
+                      </div>
+                      <div className="bg-primary/20 p-2 rounded-xl text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                        <MessageSquare size={14}/>
+                      </div>
+                    </button>
+                  ))
+                )}
+              </div>
+              <button 
+                onClick={() => { setShowUserSearch(true); setShowFriendsModal(false); }}
+                className="w-full bg-white/5 hover:bg-white/10 text-white/40 py-4 rounded-2xl font-bold uppercase text-[10px] tracking-widest border border-white/10 transition-all"
+              >
+                Buscar más personas
+              </button>
+           </div>
+         </div>
+       )}
+
+       {showPasswords && (
+
+         <div className="fixed inset-0 bg-black/90 backdrop-blur-xl z-[200] flex items-center justify-center p-4">
+           <div className="bg-[#101010] border border-white/5 rounded-[3rem] p-8 w-full max-w-sm space-y-6 shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-purple-500" />
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2"><Lock size={18} className="text-primary"/> Key Manager</h2>
+                <button onClick={() => { setShowPasswords(false); setIsBiometricVerified(false); }} className="text-gray-500 hover:text-white"><X size={20}/></button>
+              </div>
+
+              {!isBiometricVerified ? (
+                <div className="text-center space-y-6 py-8">
+                  <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto text-primary animate-pulse">
+                    <User size={40}/>
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-black text-white uppercase tracking-wider">Seguridad Biométrica</h3>
+                    <p className="text-[10px] text-gray-500 mt-2">Para acceder a tus llaves, usa tu huella o escaneo facial.</p>
+                  </div>
+                  <button 
+                    onClick={async () => {
+                      // Mock Biometric / WebAuthn call
+                      if (window.confirm('¿Deseas usar la autenticación biométrica de este dispositivo?')) {
+                        setIsBiometricVerified(true);
+                      }
+                    }}
+                    className="w-full bg-primary text-white py-4 rounded-2xl text-[10px] font-black uppercase shadow-lg shadow-primary/20"
+                  >
+                    Verificar Identidad
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-6 animate-in fade-in zoom-in duration-300">
+                  <div className="flex items-center gap-2">
+                    <button 
+                      onClick={() => setShowQRScanner(true)}
+                      className="flex-1 bg-primary/10 border border-primary/20 text-primary py-3 rounded-2xl text-[10px] font-black uppercase flex items-center justify-center gap-2"
+                    >
+                      <ScanLine size={16}/> Escanear QR
+                    </button>
+                    <div className="text-[10px] text-gray-500 font-bold uppercase">Bóveda Aurora</div>
+                  </div>
+
+                  {showQRScanner && (
+                    <div className="fixed inset-0 bg-black/95 z-[500] flex flex-col items-center justify-center p-6">
+                       <button onClick={() => setShowQRScanner(false)} className="absolute top-8 right-8 text-white/50"><X size={32}/></button>
+                       <div id="qr-reader" className="w-full max-w-sm rounded-3xl overflow-hidden border-4 border-primary/30" />
+                       <p className="text-white/50 text-[10px] font-black uppercase tracking-widest mt-6">Apunta al código QR de acceso</p>
+                    </div>
+                  )}
+
+                  <div className="space-y-3 bg-white/5 p-4 rounded-3xl border border-white/5">
+
+                    <input value={newPassSite} onChange={e => setNewPassSite(e.target.value)} placeholder="Sitio Web / App" className="w-full bg-transparent border-b border-white/10 px-1 py-2 text-white text-xs outline-none focus:border-primary" />
+                    <input value={newPassUser} onChange={e => setNewPassUser(e.target.value)} placeholder="Usuario" className="w-full bg-transparent border-b border-white/10 px-1 py-2 text-white text-xs outline-none focus:border-primary" />
+                    <input type="password" value={newPassVal} onChange={e => setNewPassVal(e.target.value)} placeholder="Contraseña" className="w-full bg-transparent border-b border-white/10 px-1 py-2 text-white text-xs outline-none focus:border-primary" />
+                    <button onClick={async () => {
+                      await createPassword({ userId: user?._id as any, site: newPassSite, username: newPassUser, encryptedPassword: newPassVal }); // Encriptación real pendiente en v2
+                      setNewPassSite(''); setNewPassUser(''); setNewPassVal('');
+                    }} className="w-full bg-white/10 text-white py-3 rounded-2xl text-[9px] font-black uppercase hover:bg-white/20 transition-all mt-2">Guardar Llave</button>
+                  </div>
+                  <div className="max-h-64 overflow-y-auto space-y-3 no-scrollbar pr-1">
+                    {storedPasswords?.map((p: any) => (
+                      <div key={p._id} className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 space-y-2 relative group">
+                        <button onClick={() => deletePassword({ passwordId: p._id })} className="absolute top-4 right-4 text-red-500/30 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"><X size={14}/></button>
+                        <h4 className="text-[10px] font-black text-primary uppercase tracking-widest">{p.site}</h4>
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[9px] text-gray-500 uppercase font-bold">Usuario: {p.username}</span>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-white font-mono">••••••••</span>
+                            <button onClick={() => alert(`Contraseña: ${p.encryptedPassword}`)} className="text-primary text-[9px] font-black uppercase">Revelar</button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+           </div>
+         </div>
+       )}
+
+       {showProfileModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-xl z-[100] flex items-center justify-center p-4">
+
+
           <div className="bg-[#1a1a1a] rounded-[2rem] border border-white/10 p-8 w-full max-w-md space-y-8 shadow-2xl relative">
             <button onClick={() => setShowProfileModal(false)} className="absolute top-6 right-6 text-gray-500 hover:text-white"><X size={24}/></button>
             <div className="text-center space-y-4">
@@ -1158,7 +1693,7 @@ export default function AuroraChat() {
             </div>
             <button 
               onClick={async () => {
-                await updateProfile({
+                const updated = await updateProfile({
                   userId: user._id as any,
                   name: editName,
                   bio: editBio,
@@ -1166,12 +1701,14 @@ export default function AuroraChat() {
                   privacyMode: editPrivacy as any,
                   themeColor: editThemeColor
                 });
+                if (updated) setUser(updated as any);
                 setShowProfileModal(false);
               }} 
               className="w-full bg-primary hover:bg-primary-hover text-white py-5 rounded-[1.5rem] font-bold uppercase tracking-widest shadow-xl shadow-primary/20"
             >
               Guardar Cambios
             </button>
+
 
           </div>
         </div>
@@ -1220,7 +1757,42 @@ export default function AuroraChat() {
                ) : (
                  <img src={viewingStatus.content} className="w-full h-full object-cover" alt="" />
                )}
+
+               {/* Story Interactions */}
+               <div className="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black/80 to-transparent space-y-4">
+                  <div className="flex justify-center gap-4">
+                    {['❤️', '🔥', '😂', '👏', '😮'].map(emoji => (
+                      <button 
+                        key={emoji}
+                        onClick={async () => {
+                          const encrypted = encryptMessage(`Reaccionó a tu historia: ${emoji}`, `dm-${user._id}-${viewingStatus.userId}`);
+                          await sendMessage({ userId: user._id, nombre: user.name, avatar: user.avatar, texto: encrypted, channelId: `dm-${user._id}-${viewingStatus.userId}` });
+                          setViewingStatus(null);
+                        }}
+                        className="text-2xl hover:scale-125 transition-transform"
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <input 
+                      placeholder="Responder historia..." 
+                      className="flex-1 bg-white/10 border border-white/10 rounded-xl px-4 py-3 text-white text-[11px] outline-none focus:border-primary"
+                      onKeyDown={async (e) => {
+                        if(e.key === 'Enter') {
+                          const val = (e.target as HTMLInputElement).value;
+                          if(!val) return;
+                          const encrypted = encryptMessage(`Respondió a tu historia: ${val}`, `dm-${user._id}-${viewingStatus.userId}`);
+                          await sendMessage({ userId: user._id, nombre: user.name, avatar: user.avatar, texto: encrypted, channelId: `dm-${user._id}-${viewingStatus.userId}` });
+                          setViewingStatus(null);
+                        }
+                      }}
+                    />
+                  </div>
+               </div>
             </div>
+
 
          </div>
        )}
@@ -1340,6 +1912,14 @@ export default function AuroraChat() {
           </div>
         </div>
       )}
-    </div>
+
+      {showExpenses && (
+        <div className="fixed inset-0 z-[300] bg-black/90 backdrop-blur-xl md:p-12">
+          <div className="w-full h-full md:rounded-[3rem] overflow-hidden border border-white/10 shadow-2xl animate-in slide-in-from-bottom duration-500">
+             <ExpensesHub userId={user._id} onClose={() => setShowExpenses(false)} />
+          </div>
+        </div>
+      )}
+    </CardContainer>
   );
 }

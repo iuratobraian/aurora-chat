@@ -53,19 +53,19 @@ C:\Users\iurato\Desktop\backup pc\COSAS BRAI\APP IA\PNA APP\APP PNA FUNCIONANDO\
 
 ## Tareas Pendientes
 ### Alta Prioridad
-- [ ] **Mejorar diseño del input** - Implementar styled-components con el diseño proporcionado (botón + para imagen, input texto, botón enviar flecha)
+- [x] **Mejorar diseño del input** - Implementar styled-components con el diseño proporcionado (botón + para imagen, input texto, botón enviar flecha) ✅
 - [ ] **Botón de entrada animado** - Gradiente rainbow border animado para abrir el chat
 - [ ] **Card container** - bg-[#3d3c3d] con blur decorativo como contenedor principal
 - [ ] **Mejorar visualización de imágenes** - Las imágenes subidas deben verse correctamente en los mensajes
-- [ ] **Soporte para canales** - Agregar tabs de canales (global, comunidades)
-- [ ] **Notificaciones** - Sonidos y badges de mensajes nuevos
+- [x] **Soporte para canales** - Agregar tabs de canales (global, comunidades) ✅
+- [x] **Notificaciones** - Sonidos y badges de mensajes nuevos ✅
 
 ### Media Prioridad
-- [ ] **Autenticación** - Permitir que el usuario se identifique (nombre, avatar)
+- [x] **Autenticación** - Permitir que el usuario se identifique (nombre, avatar) ✅
 - [ ] **Paginación** - Cargar más mensajes al hacer scroll arriba
-- [ ] **Pegar imágenes** - Soporte para Ctrl+V para pegar imágenes
-- [ ] **Timestamps** - Mostrar fecha/hora en mensajes
-- [ ] **Moderación** - Integrar moderación de mensajes del Convex original
+- [x] **Pegar imágenes** - Soporte para Ctrl+V para pegar imágenes ✅
+- [x] **Timestamps** - Mostrar fecha/hora en mensajes ✅
+- [x] **Moderación** - Integrar moderación de mensajes del Convex original ✅
 
 ### Baja Prioridad
 - [ ] **PWA** - Agregar service worker y manifest

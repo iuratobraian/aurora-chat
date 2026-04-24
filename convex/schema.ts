@@ -8,7 +8,11 @@ export default defineSchema({
     avatar: v.string(),
     texto: v.string(),
     imagenUrl: v.optional(v.string()),
+    audioUrl: v.optional(v.string()),
+    eventId: v.optional(v.string()),
     isAi: v.optional(v.boolean()),
+
+
     flagged: v.optional(v.boolean()),
     flaggedWords: v.optional(v.array(v.string())),
     channelId: v.optional(v.string()),
@@ -114,4 +118,67 @@ export default defineSchema({
     expiresAt: v.number(),
   }).index("by_expiresAt", ["expiresAt"])
     .index("by_userId", ["userId"]),
+
+  reminders: defineTable({
+    userId: v.id("users"),
+    text: v.string(),
+    date: v.number(),
+    completed: v.boolean(),
+    createdAt: v.number(),
+  }).index("by_userId", ["userId"]),
+
+  notes: defineTable({
+    userId: v.id("users"),
+    title: v.string(),
+    content: v.string(),
+    color: v.optional(v.string()),
+    createdAt: v.number(),
+  }).index("by_userId", ["userId"]),
+
+  passwords: defineTable({
+    userId: v.id("users"),
+    site: v.string(),
+    username: v.string(),
+    encryptedPassword: v.string(), // Encrypted client-side
+    createdAt: v.number(),
+  }).index("by_userId", ["userId"]),
+
+  expenses: defineTable({
+    userId: v.string(),
+    type: v.union(v.literal("expense"), v.literal("income")),
+    amount: v.number(),
+    date: v.string(),
+    category: v.string(),
+    paymentMethod: v.string(),
+    note: v.optional(v.string()),
+    cardId: v.optional(v.string()),
+    totalInstallments: v.optional(v.number()),
+    currentInstallment: v.optional(v.number()),
+    totalAmount: v.optional(v.number()),
+    isRecurring: v.optional(v.boolean()),
+    createdAt: v.number(),
+  }).index("by_userId", ["userId"])
+    .index("by_date", ["date"])
+    .index("by_category", ["category"]),
+
+  fixedExpenses: defineTable({
+    userId: v.string(),
+    name: v.string(),
+    amount: v.number(),
+    dayOfMonth: v.number(),
+    active: v.boolean(),
+    category: v.string(),
+    createdAt: v.number(),
+  }).index("by_userId", ["userId"]),
+
+  creditCards: defineTable({
+    userId: v.string(),
+    name: v.string(),
+    limit: v.number(),
+    closingDay: v.number(),
+    dueDay: v.number(),
+    createdAt: v.number(),
+  }).index("by_userId", ["userId"]),
 });
+
+

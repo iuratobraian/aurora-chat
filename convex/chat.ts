@@ -68,14 +68,19 @@ export const getMessagesByChannel = query({
   args: {
     channelId: v.string(),
     limit: v.optional(v.number()),
+    before: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const limit = args.limit || 50;
-    const messages = await ctx.db
+    let query = ctx.db
       .query("chat")
-      .withIndex("by_channel", (q) => q.eq("channelId", args.channelId))
-      .order("desc")
-      .take(limit);
+      .withIndex("by_channel", (q) => q.eq("channelId", args.channelId));
+
+    if (args.before) {
+      query = query.filter((q) => q.lt(q.field("createdAt"), args.before));
+    }
+
+    const messages = await query.order("desc").take(limit);
 
     return {
       messages: messages.reverse(),
@@ -90,8 +95,12 @@ export const sendMessage = mutation({
     avatar: v.string(),
     texto: v.string(),
     imagenUrl: v.optional(v.string()),
+    audioUrl: v.optional(v.string()),
+    eventId: v.optional(v.string()),
     channelId: v.string(),
   },
+
+
   handler: async (ctx, args) => {
     const messageId = await ctx.db.insert("chat", {
       userId: args.userId,
@@ -99,9 +108,13 @@ export const sendMessage = mutation({
       avatar: args.avatar,
       texto: args.texto,
       imagenUrl: args.imagenUrl,
+      audioUrl: args.audioUrl,
+      eventId: args.eventId,
       channelId: args.channelId,
       createdAt: Date.now(),
     });
+
+
 
     return messageId;
   },

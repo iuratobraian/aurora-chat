@@ -9,7 +9,10 @@ interface User {
   avatar: string;
   bio?: string;
   phone?: string;
+  privacyMode?: 'everyone' | 'requests';
+  themeColor?: string;
 }
+
 
 interface UserState {
   user: User | null;

@@ -21,6 +21,7 @@ import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { parseFile } from './lib/fileParser';
 import imageCompression from 'browser-image-compression';
 import { encryptMessage, decryptMessage } from './lib/encryption';
+import { Html5Qrcode } from "html5-qrcode";
 import { persistenceService } from './lib/persistence';
 import CardContainer from './components/CardContainer';
 import RainbowButton from './components/RainbowButton';

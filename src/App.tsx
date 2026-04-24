@@ -44,6 +44,8 @@ export default function AuroraChat() {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [viewingProfileUser, setViewingProfileUser] = useState<any>(null);
   const [interimTranscript, setInterimTranscript] = useState('');
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [offlineQueue, setOfflineQueue] = useState<any[]>([]);
   
   useEffect(() => {
     const handleResize = () => {
@@ -51,9 +53,20 @@ export default function AuroraChat() {
       setIsMobile(mobile);
       if (!mobile) setIsSidebarOpen(true);
     };
+    
+    const updateOnlineStatus = () => setIsOnline(navigator.onLine);
+    
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('online', updateOnlineStatus);
+      window.removeEventListener('offline', updateOnlineStatus);
+    };
   }, []);
+
 
   
   // User state
@@ -178,6 +191,32 @@ export default function AuroraChat() {
     if (!user) return;
     setTyping({ channelId: currentChannel, userId: user._id, nombre: user.name });
   }, [setTyping, currentChannel, user]);
+
+  // Offline Queue Processor
+  useEffect(() => {
+    if (isOnline && offlineQueue.length > 0 && user) {
+      const processQueue = async () => {
+        const queueCopy = [...offlineQueue];
+        setOfflineQueue([]);
+        for (const msg of queueCopy) {
+          try {
+            await sendMessage({
+              channelId: msg.channelId,
+              userId: user._id,
+              nombre: user.name,
+              avatar: user.avatar,
+              texto: msg.texto,
+              imagenUrl: msg.imagenUrl
+            });
+          } catch (err) {
+            setOfflineQueue(prev => [...prev, msg]);
+          }
+        }
+      };
+      processQueue();
+    }
+  }, [isOnline, user, sendMessage, offlineQueue.length]);
+
 
   const handleUpdateProfile = async () => {
     if (!user) return;
@@ -316,8 +355,20 @@ export default function AuroraChat() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if ((!text.trim() && !attachedImage) || uploading || !user) return;
+
+    const encryptedText = encryptMessage(text.trim());
+
+    if (!isOnline) {
+      setOfflineQueue(prev => [...prev, {
+        channelId: currentChannel,
+        texto: encryptedText,
+        imagenUrl: attachedImage || undefined
+      }]);
+      setText(''); setAttachedImage(null); setShowEmoji(false);
+      return;
+    }
+
     try {
-      const encryptedText = encryptMessage(text.trim());
       await sendMessage({
         userId: user._id, nombre: user.name, avatar: user.avatar,
         texto: encryptedText, imagenUrl: attachedImage || undefined,
@@ -327,6 +378,7 @@ export default function AuroraChat() {
       if (isRecording) { recognitionRef.current?.stop(); }
     } catch (err) { setError('Error al enviar'); }
   };
+
 
   const startDM = async (targetUser: any) => {
     if (!user) return;
@@ -565,7 +617,13 @@ export default function AuroraChat() {
               {isMobile ? <Plus size={20} className={isSidebarOpen ? 'rotate-45' : ''} /> : <MoreVertical size={20} className={isSidebarOpen ? '' : 'rotate-90'} />}
             </button>
             <div className="flex items-center gap-3">
+              {!isOnline && (
+                <div className="bg-amber-500/20 text-amber-500 px-3 py-1 rounded-full text-[8px] font-black uppercase flex items-center gap-1">
+                  <Clock size={10} /> Sin Conexión (Modo Offline)
+                </div>
+              )}
               <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 text-primary">
+
                 <span className="material-symbols-outlined text-lg">smart_toy</span>
               </div>
               <div>

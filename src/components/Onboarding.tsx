@@ -1,8 +1,7 @@
-import { useState } from 'react';
-import { useMutation, useQuery } from 'convex/react';
 import { api } from '../api';
 import { useUserStore } from '../store';
 import { User, Mail, AtSign, Loader2 } from 'lucide-react';
+import { useConvex } from 'convex/react';
 
 export default function Onboarding() {
   const [email, setEmail] = useState('');
@@ -13,15 +12,16 @@ export default function Onboarding() {
   
   const setUser = useUserStore(state => state.setUser);
   const createUser = useMutation(api.users.createUser);
-  const getUserByEmail = useQuery(api.users.getUserByEmail, { email });
+  const convex = useConvex();
 
   const handleLogin = async () => {
     if (!email) return;
     setLoading(true);
     setError(null);
     try {
-      if (getUserByEmail) {
-        setUser(getUserByEmail);
+      const existingUser = await convex.query(api.users.getUserByEmail, { email });
+      if (existingUser) {
+        setUser(existingUser);
       } else {
         setError("Usuario no encontrado. Por favor regístrate.");
       }
@@ -31,6 +31,7 @@ export default function Onboarding() {
       setLoading(false);
     }
   };
+
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();

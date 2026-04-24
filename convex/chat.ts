@@ -201,3 +201,23 @@ export const getOrCreatePrivateChannel = mutation({
   },
 });
 
+export const deleteOldMessages = mutation({
+  args: { days: v.optional(v.number()) },
+  handler: async (ctx, args) => {
+    const days = args.days || 7;
+    const threshold = Date.now() - (days * 24 * 60 * 60 * 1000);
+    
+    const oldMessages = await ctx.db
+      .query("chat")
+      .withIndex("by_createdAt", (q) => q.lt("createdAt", threshold))
+      .take(100);
+
+    for (const msg of oldMessages) {
+      await ctx.db.delete(msg._id);
+    }
+    
+    return oldMessages.length;
+  },
+});
+
+

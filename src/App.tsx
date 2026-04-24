@@ -16,6 +16,8 @@ import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { parseFile } from './lib/fileParser';
+import imageCompression from 'browser-image-compression';
+import { encryptMessage, decryptMessage } from './lib/encryption';
 
 const EMOJIS = ['🚀', '📈', '📉', '🔥', '🧠', '💰', '❤️', '👍', '🎯', '⚡'];
 const NOTIFICATION_SOUND = 'https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3';
@@ -149,29 +151,43 @@ export default function AuroraChat() {
     }
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: 'chat' | 'profile' | 'status') => {
-    const file = e.target.files?.[0];
+  const handleImageUpload = async (fileOrEvent: any, target: 'chat' | 'profile' | 'status') => {
+    let file = fileOrEvent;
+    if (fileOrEvent.target) file = fileOrEvent.target.files?.[0];
     if (!file) return;
     
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      const result = reader.result as string;
-      if (target === 'chat') {
-        if (file.type.startsWith('image/')) {
-          setAttachedImage(result);
-        } else {
-          setParsingFile(true);
-          const text = await parseFile(file);
-          if (text) setText(prev => prev + (prev ? '\n' : '') + text);
-          setParsingFile(false);
-        }
-      } else if (target === 'profile') {
-        setEditAvatar(result);
-      } else if (target === 'status') {
-        handlePostStatus(result, 'image');
+    setUploading(true);
+    try {
+      let finalFile = file;
+      if (file.type.startsWith('image/')) {
+        const options = { maxSizeMB: 0.2, maxWidthOrHeight: 1280, useWebWorker: true };
+        finalFile = await imageCompression(file, options);
       }
-    };
-    reader.readAsDataURL(file);
+
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const result = reader.result as string;
+        if (target === 'chat') {
+          if (file.type.startsWith('image/')) {
+            setAttachedImage(result);
+          } else {
+            setParsingFile(true);
+            const text = await parseFile(file);
+            if (text) setText(prev => prev + (prev ? '\n' : '') + text);
+            setParsingFile(false);
+          }
+        } else if (target === 'profile') {
+          setEditAvatar(result);
+        } else if (target === 'status') {
+          handlePostStatus(result, 'image');
+        }
+      };
+      reader.readAsDataURL(finalFile);
+    } catch (err) {
+      console.error('Error al procesar imagen:', err);
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handlePaste = useCallback(async (e: React.ClipboardEvent) => {
@@ -179,13 +195,7 @@ export default function AuroraChat() {
     for (let i = 0; i < items.length; i++) {
       if (items[i].type.indexOf('image') !== -1) {
         const file = items[i].getAsFile();
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = (event) => {
-            setAttachedImage(event.target?.result as string);
-          };
-          reader.readAsDataURL(file);
-        }
+        if (file) handleImageUpload(file, 'chat');
       }
     }
   }, []);
@@ -210,11 +220,12 @@ export default function AuroraChat() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if ((!text.trim() && !attachedImage) || uploading || parsingFile || !user) return;
+    if ((!text.trim() && !attachedImage) || uploading || !user) return;
     try {
+      const encryptedText = encryptMessage(text.trim());
       await sendMessage({
         userId: user._id, nombre: user.name, avatar: user.avatar,
-        texto: text.trim(), imagenUrl: attachedImage || undefined,
+        texto: encryptedText, imagenUrl: attachedImage || undefined,
         channelId: currentChannel,
       });
       setText(''); setAttachedImage(null); setShowEmoji(false);
@@ -254,7 +265,6 @@ export default function AuroraChat() {
       
       {/* SIDEBAR */}
       <div className="w-80 border-r border-white/10 flex flex-col bg-black/20 shrink-0">
-        {/* User Profile Header */}
         <div className="p-4 border-b border-white/10 flex items-center justify-between bg-black/40">
           <button onClick={() => setShowProfileModal(true)} className="flex items-center gap-3 group text-left">
             <div className="relative">
@@ -273,7 +283,6 @@ export default function AuroraChat() {
           </div>
         </div>
 
-        {/* Statuses Row */}
         <div className="p-4 border-b border-white/5 bg-black/10 overflow-x-auto no-scrollbar flex gap-4">
           <button onClick={() => setShowStatusModal(true)} className="flex flex-col items-center gap-1 shrink-0 group">
             <div className="w-12 h-12 rounded-full border-2 border-dashed border-gray-600 flex items-center justify-center group-hover:border-primary transition-all">
@@ -291,7 +300,6 @@ export default function AuroraChat() {
           ))}
         </div>
 
-        {/* Channels & Chats List */}
         <div className="flex-1 overflow-y-auto custom-scrollbar">
           <div className="p-4">
             <div className="flex items-center justify-between mb-2">
@@ -334,7 +342,6 @@ export default function AuroraChat() {
 
       {/* MAIN CONTENT */}
       <div className="flex-1 flex flex-col relative bg-[#0f1115]">
-        {/* Chat Header */}
         <div className="h-16 px-6 border-b border-white/10 flex items-center justify-between bg-black/40 backdrop-blur-md z-10">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 text-primary">
@@ -354,7 +361,6 @@ export default function AuroraChat() {
           </div>
         </div>
 
-        {/* Messages Area */}
         <div ref={scrollRef} onScroll={handleScroll} className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')]">
           {messages.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center opacity-20">
@@ -372,13 +378,18 @@ export default function AuroraChat() {
                     <div className={`px-4 py-3 rounded-2xl shadow-xl ${isMe ? 'bg-primary/20 text-white rounded-br-none border border-primary/30' : 'bg-white/[0.04] text-gray-200 rounded-bl-none border border-white/5'}`}>
                       {m.imagenUrl && (
                         <div className="mb-3 rounded-xl overflow-hidden ring-1 ring-white/10 group relative">
-                          <img src={m.imagenUrl} className="max-w-full h-auto max-h-72 cursor-pointer group-hover:scale-105 transition-transform duration-500" alt="" onClick={() => setPreviewImage(m.imagenUrl!)} />
-                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <img 
+                            src={m.imagenUrl} 
+                            className="max-w-full h-auto max-h-72 cursor-pointer group-hover:scale-105 transition-transform duration-500" 
+                            alt="" 
+                            onClick={(e) => { e.stopPropagation(); setPreviewImage(m.imagenUrl!); }} 
+                          />
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
                             <Search className="text-white" />
                           </div>
                         </div>
                       )}
-                      <div className="text-[12px] leading-relaxed break-words">{formatText(m.texto || '')}</div>
+                      <div className="text-[12px] leading-relaxed break-words">{formatText(decryptMessage(m.texto || ''))}</div>
                     </div>
                     <span className="text-[9px] text-gray-600 px-1 font-mono">{new Date(m.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                   </div>
@@ -389,7 +400,6 @@ export default function AuroraChat() {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input Bar */}
         <div className="p-6 bg-black/40 border-t border-white/10 backdrop-blur-md">
            {attachedImage && (
              <div className="mb-4 flex items-center gap-3 p-2 bg-white/5 rounded-2xl border border-white/10 w-fit">
@@ -410,7 +420,7 @@ export default function AuroraChat() {
                  value={text}
                  onChange={e => { setText(e.target.value); handleTyping(); }}
                  onPaste={handlePaste}
-                 placeholder={isRecording ? "Capturando voz..." : "Escribe un mensaje... (Usa @ para mencionar)"}
+                 placeholder={isRecording ? "Capturando voz..." : "Escribe un mensaje..."}
                  className="bg-transparent text-sm text-white outline-none placeholder-gray-600 px-3 py-2 resize-none max-h-32 min-h-[44px]"
                  rows={1}
                  onKeyDown={e => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(e); } }}
@@ -449,20 +459,11 @@ export default function AuroraChat() {
               <h2 className="text-xl font-bold text-white uppercase tracking-[0.2em]">Editar Perfil</h2>
             </div>
             <div className="space-y-4">
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold text-gray-500 uppercase px-4">Nombre Completo</label>
-                <input value={editName} onChange={e => setEditName(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm focus:border-primary outline-none transition-all" />
-              </div>
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold text-gray-500 uppercase px-4">Biografía</label>
-                <textarea value={editBio} onChange={e => setEditBio(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm focus:border-primary outline-none transition-all resize-none h-24" />
-              </div>
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold text-gray-500 uppercase px-4">Teléfono</label>
-                <input value={editPhone} onChange={e => setEditPhone(e.target.value)} placeholder="+54 9..." className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm focus:border-primary outline-none transition-all" />
-              </div>
+              <input value={editName} onChange={e => setEditName(e.target.value)} placeholder="Nombre completo" className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm outline-none focus:border-primary" />
+              <textarea value={editBio} onChange={e => setEditBio(e.target.value)} placeholder="Biografía" className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm outline-none focus:border-primary resize-none h-24" />
+              <input value={editPhone} onChange={e => setEditPhone(e.target.value)} placeholder="Teléfono" className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm outline-none focus:border-primary" />
             </div>
-            <button onClick={handleUpdateProfile} className="w-full bg-primary hover:bg-primary-hover text-white py-5 rounded-[1.5rem] font-bold uppercase tracking-widest shadow-xl shadow-primary/20">Guardar Cambios</button>
+            <button onClick={handleUpdateProfile} className="w-full bg-primary hover:bg-primary-hover text-white py-5 rounded-[1.5rem] font-bold uppercase tracking-widest">Guardar Cambios</button>
           </div>
         </div>
       )}
@@ -471,50 +472,43 @@ export default function AuroraChat() {
         <div className="fixed inset-0 bg-black/80 backdrop-blur-xl z-[100] flex items-center justify-center p-4">
           <div className="bg-[#1a1a1a] rounded-[2rem] border border-white/10 p-8 w-full max-w-sm space-y-6 shadow-2xl">
             <h3 className="text-lg font-bold text-white text-center uppercase tracking-widest">Publicar Estado</h3>
-            <p className="text-xs text-gray-500 text-center">Tu estado desaparecerá automáticamente en 12 horas.</p>
             <div className="grid grid-cols-2 gap-4">
-              <button onClick={() => { const text = prompt('Escribe tu estado:'); if(text) handlePostStatus(text, 'text'); }} className="aspect-square bg-primary/10 rounded-3xl border border-primary/20 flex flex-col items-center justify-center gap-3 text-primary hover:bg-primary/20 transition-all">
-                <FileText size={32}/>
-                <span className="text-[10px] font-bold uppercase">Solo Texto</span>
+              <button onClick={() => { const text = prompt('Escribe tu estado:'); if(text) handlePostStatus(text, 'text'); }} className="aspect-square bg-primary/10 rounded-3xl border border-primary/20 flex flex-col items-center justify-center gap-3 text-primary">
+                <FileText size={32}/><span className="text-[10px] font-bold uppercase">Texto</span>
               </button>
-              <button onClick={() => { const input = document.createElement('input'); input.type='file'; input.accept='image/*'; input.onchange=(e:any)=>handleImageUpload(e, 'status'); input.click(); }} className="aspect-square bg-purple-500/10 rounded-3xl border border-purple-500/20 flex flex-col items-center justify-center gap-3 text-purple-400 hover:bg-purple-500/20 transition-all">
-                <Camera size={32}/>
-                <span className="text-[10px] font-bold uppercase">Con Foto</span>
+              <button onClick={() => { const input = document.createElement('input'); input.type='file'; input.accept='image/*'; input.onchange=(e:any)=>handleImageUpload(e, 'status'); input.click(); }} className="aspect-square bg-purple-500/10 rounded-3xl border border-purple-500/20 flex flex-col items-center justify-center gap-3 text-purple-400">
+                <Camera size={32}/><span className="text-[10px] font-bold uppercase">Foto</span>
               </button>
             </div>
-            <button onClick={() => setShowStatusModal(false)} className="w-full bg-white/5 text-gray-500 py-4 rounded-2xl font-bold uppercase text-[10px] tracking-widest">Cancelar</button>
+            <button onClick={() => setShowStatusModal(false)} className="w-full bg-white/5 text-gray-500 py-4 rounded-2xl font-bold uppercase text-[10px]">Cancelar</button>
           </div>
         </div>
       )}
 
-      {/* Lightbox Preview */}
       {previewImage && (
-        <div className="fixed inset-0 bg-black/95 z-[1000] flex items-center justify-center p-8 animate-fadeIn" onClick={() => setPreviewImage(null)}>
+        <div className="fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center p-8 animate-fadeIn" onClick={() => setPreviewImage(null)}>
           <button className="absolute top-8 right-8 text-white/40 hover:text-white transition-all"><X size={48}/></button>
           <img src={previewImage} className="max-w-full max-h-full rounded-2xl shadow-2xl object-contain ring-1 ring-white/10" alt="" onClick={e => e.stopPropagation()}/>
         </div>
       )}
 
-      {/* User Search & More Modals (Simplified for brevety, already implemented in previous steps) */}
       {showUserSearch && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center p-4">
           <div className="bg-[#1a1a1a] rounded-3xl border border-white/10 p-6 w-full max-w-sm space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider">Buscar Usuarios</h3>
-              <button onClick={() => setShowUserSearch(false)}><X size={20}/></button>
-            </div>
+            <h3 className="text-sm font-bold text-white uppercase tracking-wider">Buscar Usuarios</h3>
             <input value={userSearchQuery} onChange={e => setUserSearchQuery(e.target.value)} placeholder="Nombre o @usuario..." className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs outline-none focus:border-primary" autoFocus />
             <div className="space-y-2 max-h-64 overflow-y-auto">
               {searchedUsers?.filter(u => u._id !== user._id).map(u => (
-                <button key={u._id} onClick={() => startDM(u)} className="w-full flex items-center gap-3 p-3 rounded-2xl hover:bg-white/5 transition-all text-left">
+                <button key={u._id} onClick={() => startDM(u)} className="w-full flex items-center gap-3 p-3 rounded-2xl hover:bg-white/5 transition-all">
                   <img src={u.avatar} className="w-10 h-10 rounded-xl" alt="" />
-                  <div>
+                  <div className="text-left">
                     <div className="text-xs font-bold text-white">{u.name}</div>
                     <div className="text-[10px] text-gray-500">@{u.username}</div>
                   </div>
                 </button>
               ))}
             </div>
+            <button onClick={() => setShowUserSearch(false)} className="w-full text-xs text-gray-500 py-2 uppercase font-bold tracking-widest">Cerrar</button>
           </div>
         </div>
       )}

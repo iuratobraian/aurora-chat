@@ -141,7 +141,7 @@ npm run dev
 ```
 
 ## Notas Importantes
-- El chat usa Convex REAL (no localStorage)
+- El chat usa Convex REAL e INDEPENDIENTE (código en /convex)
 - Las imágenes se envían como base64 (data URLs)
 - El userId es hardcodeado a 'aurora-user' (pendiente autenticación)
 - El channelId es hardcodeado a 'global' (pendiente canales)

@@ -657,47 +657,46 @@ export default function AuroraChat() {
         </div>
       )}
 
-      {/* Viewing Other User Profile Popup */}
+      {/* Viewing Other User Profile Popup (Elegant & Subtle) */}
       {viewingProfileUser && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-xl z-[200] flex items-center justify-center p-4" onClick={() => setViewingProfileUser(null)}>
-          <div className="bg-[#1a1a1a] rounded-[2.5rem] border border-white/10 p-8 w-full max-w-sm space-y-6 shadow-2xl relative animate-fadeIn" onClick={e => e.stopPropagation()}>
-            <button onClick={() => setViewingProfileUser(null)} className="absolute top-6 right-6 text-gray-500 hover:text-white"><X size={24}/></button>
-            <div className="text-center space-y-4">
-              <img src={viewingProfileUser.avatar} className="w-32 h-32 mx-auto rounded-[3rem] object-cover shadow-2xl ring-4 ring-primary/20" alt="" />
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] flex items-center justify-center p-4" onClick={() => setViewingProfileUser(null)}>
+          <div className="bg-[#1a1a1a]/90 rounded-[2rem] border border-white/10 p-6 w-full max-w-[280px] space-y-5 shadow-2xl relative animate-fadeIn" onClick={e => e.stopPropagation()}>
+            <button onClick={() => setViewingProfileUser(null)} className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors"><X size={18}/></button>
+            
+            <div className="text-center space-y-3">
+              <div className="relative w-20 h-20 mx-auto">
+                <img src={viewingProfileUser.avatar} className="w-full h-full rounded-2xl object-cover shadow-lg ring-2 ring-primary/20" alt="" />
+                <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#1a1a1a]" />
+              </div>
               <div>
-                <h2 className="text-xl font-bold text-white uppercase tracking-widest">{viewingProfileUser.name}</h2>
-                <p className="text-xs text-gray-500 font-mono">USUARIO VERIFICADO</p>
+                <h2 className="text-sm font-black text-white uppercase tracking-widest">{viewingProfileUser.name}</h2>
+                <p className="text-[9px] text-gray-500 font-mono tracking-tighter">PERFIL AURORA</p>
               </div>
             </div>
             
-            <div className="bg-white/5 rounded-3xl p-4 border border-white/10 space-y-3">
-              <div className="flex items-center gap-3 text-xs text-gray-400">
-                <Info size={16} className="text-primary"/>
-                <span>Información del perfil lista para chat.</span>
-              </div>
-            </div>
-
-            <button 
-              onClick={() => startDM(viewingProfileUser)} 
-              className="w-full bg-primary hover:bg-primary-hover text-white py-5 rounded-[1.5rem] font-bold uppercase tracking-widest shadow-xl shadow-primary/20 flex items-center justify-center gap-2"
-            >
-              <MessageSquare size={20} /> Enviar Mensaje Directo
-            </button>
-
-            {user._id !== viewingProfileUser._id && !friendsList?.find((f:any) => f._id === viewingProfileUser._id) && (
+            <div className="space-y-2">
               <button 
-                onClick={() => sendFriendRequest({ fromId: user._id, toId: viewingProfileUser._id })}
-                className="w-full bg-white/5 hover:bg-white/10 text-gray-400 py-4 rounded-[1.5rem] font-bold uppercase tracking-widest text-[10px] border border-white/10 flex items-center justify-center gap-2"
+                onClick={() => { startDM(viewingProfileUser); setViewingProfileUser(null); }} 
+                className="w-full bg-primary/10 hover:bg-primary/20 text-primary py-3 rounded-xl font-bold uppercase tracking-widest text-[9px] border border-primary/20 flex items-center justify-center gap-2 transition-all active:scale-95"
               >
-                <Users size={16} /> Agregar a mis Amigos
+                <MessageSquare size={14} /> Mensaje Privado
               </button>
-            )}
-            
-            {friendsList?.find((f:any) => f._id === viewingProfileUser._id) && (
-              <div className="flex items-center justify-center gap-2 text-emerald-500 font-bold uppercase text-[10px]">
-                <Users size={16} /> ¡Ustedes son Amigos!
-              </div>
-            )}
+
+              {user._id !== viewingProfileUser._id && !friendsList?.find((f:any) => f._id === viewingProfileUser._id) && (
+                <button 
+                  onClick={() => sendFriendRequest({ fromId: user._id, toId: viewingProfileUser._id })}
+                  className="w-full bg-white/5 hover:bg-white/10 text-gray-400 py-3 rounded-xl font-bold uppercase tracking-widest text-[9px] border border-white/10 flex items-center justify-center gap-2 transition-all active:scale-95"
+                >
+                  <Users size={14} /> Añadir Amigo
+                </button>
+              )}
+              
+              {friendsList?.find((f:any) => f._id === viewingProfileUser._id) && (
+                <div className="py-2 flex items-center justify-center gap-2 text-emerald-500 font-black uppercase text-[8px] tracking-tighter opacity-80">
+                  <Users size={12} /> Amigo Confirmado
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

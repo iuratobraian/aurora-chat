@@ -9,6 +9,7 @@
  */
 
 import type * as chat from "../chat.js";
+import type * as friends from "../friends.js";
 import type * as statuses from "../statuses.js";
 import type * as users from "../users.js";
 
@@ -20,6 +21,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   chat: typeof chat;
+  friends: typeof friends;
   statuses: typeof statuses;
   users: typeof users;
 }>;

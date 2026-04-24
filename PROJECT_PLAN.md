@@ -4,8 +4,8 @@
 - **Repo PNA:** https://github.com/iuratobraian/PNA
 - **URL PNA:** https://app-pna.vercel.app/
 - **Aurora Chat (Vercel):** https://aurora-chat-seven.vercel.app/
-- **Convex URL:** https://optimistic-akita-410.convex.cloud
-- **Convex Token:** optimistic-akita-410|eyJ2MiI6ImVkOTA0MDhmMjA5MDQxNmNhMWNhYjgzMjA3MzhlMzY1In0=
+- **Convex URL:** https://confident-schnauzer-144.convex.cloud
+- **HTTP Actions URL:** https://confident-schnauzer-144.convex.site
 
 ## Estructura de Carpetas
 ```
@@ -44,7 +44,7 @@ C:\Users\iurato\Desktop\backup pc\COSAS BRAI\APP IA\PNA APP\APP PNA FUNCIONANDO\
 - ✅ Archivos aurora en public/aurora/ (iframe)
 - ✅ Botón de chat en header del Layout
 - ✅ Aurora Chat con código fuente completo
-- ✅ Conexión a Convex (optimistic-akita-410.convex.cloud)
+- ✅ Conexión a Convex (confident-schnauzer-144.convex.cloud)
 - ✅ Mensajes en tiempo real (useQuery)
 - ✅ Envío de mensajes (useMutation)
 - ✅ Indicador "escribiendo..."

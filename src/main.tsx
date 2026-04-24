@@ -4,7 +4,8 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./index.css";
 
-const CONVEX_URL = "https://optimistic-akita-410.convex.cloud";
+const CONVEX_URL = "https://confident-schnauzer-144.convex.cloud";
+const CONVEX_SITE_URL = "https://confident-schnauzer-144.convex.site";
 
 const convex = new ConvexReactClient(CONVEX_URL, { 
   unsavedChangesWarning: false

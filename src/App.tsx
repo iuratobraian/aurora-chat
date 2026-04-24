@@ -20,6 +20,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { parseFile } from './lib/fileParser';
 import imageCompression from 'browser-image-compression';
+import { encryptMessage, decryptMessage } from './lib/encryption';
 import { persistenceService } from './lib/persistence';
 import CardContainer from './components/CardContainer';
 import RainbowButton from './components/RainbowButton';

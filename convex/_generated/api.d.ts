@@ -9,7 +9,9 @@
  */
 
 import type * as chat from "../chat.js";
+import type * as events from "../events.js";
 import type * as friends from "../friends.js";
+import type * as polls from "../polls.js";
 import type * as statuses from "../statuses.js";
 import type * as users from "../users.js";
 
@@ -21,7 +23,9 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   chat: typeof chat;
+  events: typeof events;
   friends: typeof friends;
+  polls: typeof polls;
   statuses: typeof statuses;
   users: typeof users;
 }>;

@@ -168,3 +168,36 @@ export const getServerStats = query({
     };
   },
 });
+
+export const getOrCreatePrivateChannel = mutation({
+  args: {
+    user1Id: v.string(),
+    user2Id: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const participants = [args.user1Id, args.user2Id].sort();
+    const slug = `dm_${participants[0]}_${participants[1]}`;
+
+    const existing = await ctx.db
+      .query("chatChannels")
+      .withIndex("by_slug", (q) => q.eq("slug", slug))
+      .first();
+
+    if (existing) return existing;
+
+    const user2 = await ctx.db.get(args.user2Id as any); // Assuming ID or just string
+    const name = user2 ? `Chat con ${user2.name}` : "Chat Privado";
+
+    const channelId = await ctx.db.insert("chatChannels", {
+      name,
+      slug,
+      type: "direct",
+      participants,
+      createdBy: args.user1Id,
+      createdAt: Date.now(),
+    });
+
+    return { _id: channelId, slug, name };
+  },
+});
+

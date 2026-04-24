@@ -54,4 +54,13 @@ export default defineSchema({
     storagePercentage: v.number(),
     lastUpdated: v.number(),
   }),
+
+  users: defineTable({
+    email: v.string(),
+    username: v.string(),
+    name: v.string(),
+    avatar: v.string(),
+    createdAt: v.number(),
+  }).index("by_email", ["email"])
+    .index("by_username", ["username"]),
 });

@@ -60,7 +60,20 @@ export default defineSchema({
     username: v.string(),
     name: v.string(),
     avatar: v.string(),
+    bio: v.optional(v.string()),
+    phone: v.optional(v.string()),
     createdAt: v.number(),
   }).index("by_email", ["email"])
     .index("by_username", ["username"]),
+
+  statuses: defineTable({
+    userId: v.id("users"),
+    userName: v.string(),
+    userAvatar: v.string(),
+    content: v.string(), // Text or Image URL
+    type: v.union(v.literal("text"), v.literal("image")),
+    createdAt: v.number(),
+    expiresAt: v.number(),
+  }).index("by_expiresAt", ["expiresAt"])
+    .index("by_userId", ["userId"]),
 });

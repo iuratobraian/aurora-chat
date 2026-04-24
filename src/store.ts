@@ -7,6 +7,8 @@ interface User {
   username: string;
   name: string;
   avatar: string;
+  bio?: string;
+  phone?: string;
 }
 
 interface UserState {

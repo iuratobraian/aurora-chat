@@ -32,9 +32,21 @@ export default defineSchema({
     createdBy: v.string(),
     createdAt: v.number(),
     password: v.optional(v.string()), 
-    isPrivate: v.optional(v.boolean()), 
+    isPrivate: v.optional(v.boolean()),
+    user1Id: v.optional(v.id("users")),
+    user2Id: v.optional(v.id("users")),
   }).index("by_slug", ["slug"])
-    .index("by_type", ["type"]),
+    .index("by_type", ["type"])
+    .index("by_users", ["user1Id", "user2Id"]),
+
+  friends: defineTable({
+    user1Id: v.id("users"),
+    user2Id: v.id("users"),
+    status: v.union(v.literal("pending"), v.literal("accepted")),
+    createdAt: v.number(),
+  }).index("by_user1", ["user1Id"])
+    .index("by_user2", ["user2Id"])
+    .index("by_users", ["user1Id", "user2Id"]),
 
   chatTyping: defineTable({
     channelId: v.string(),

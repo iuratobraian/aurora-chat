@@ -22,16 +22,34 @@ export const postStatus = mutation({
 });
 
 export const getActiveStatuses = query({
-  args: {},
-  handler: async (ctx) => {
+  args: { userId: v.id("users") },
+  handler: async (ctx, args) => {
     const now = Date.now();
-    return await ctx.db
+    
+    // Get friend IDs
+    const friends1 = await ctx.db
+      .query("friends")
+      .withIndex("by_user1", (q) => q.eq("user1Id", args.userId))
+      .filter((q) => q.eq(q.field("status"), "accepted"))
+      .collect();
+    const friends2 = await ctx.db
+      .query("friends")
+      .withIndex("by_user2", (q) => q.eq("user2Id", args.userId))
+      .filter((q) => q.eq(q.field("status"), "accepted"))
+      .collect();
+    
+    const friendIds = new Set([...friends1.map(f => f.user2Id), ...friends2.map(f => f.user1Id), args.userId]);
+
+    const allStatuses = await ctx.db
       .query("statuses")
       .withIndex("by_expiresAt", (q) => q.gt("expiresAt", now))
       .order("desc")
-      .take(50);
+      .collect();
+
+    return allStatuses.filter(s => friendIds.has(s.userId));
   },
 });
+
 
 export const deleteExpiredStatuses = mutation({
   args: {},

@@ -65,7 +65,12 @@ export default function AuroraChat() {
   const getOrCreateDM = useMutation(api.chat.getOrCreatePrivateChannel);
   const updateProfile = useMutation(api.users.updateProfile);
   const postStatus = useMutation(api.statuses.postStatus);
-  const activeStatuses = useQuery(api.statuses.getActiveStatuses);
+  const activeStatuses = useQuery(api.statuses.getActiveStatuses, user ? { userId: user._id as any } : "skip");
+  
+  const sendFriendRequest = useMutation(api.friends.sendFriendRequest);
+  const acceptFriendRequest = useMutation(api.friends.acceptFriendRequest);
+  const pendingFriendRequests = useQuery(api.friends.getPendingRequests, user ? { userId: user._id as any } : "skip");
+  const friendsList = useQuery(api.friends.getFriends, user ? { userId: user._id as any } : "skip");
 
   // Safe Convex queries
   const rawChannels = useQuery(api.chat.getChannels);
@@ -305,6 +310,26 @@ export default function AuroraChat() {
             </button>
           ))}
         </div>
+
+        {/* Pending Friend Requests */}
+        {pendingFriendRequests && pendingFriendRequests.length > 0 && (
+          <div className="p-4 bg-primary/10 border-b border-primary/20">
+             <h4 className="text-[9px] font-black text-primary uppercase mb-2">Solicitudes de Amistad</h4>
+             <div className="space-y-2">
+               {pendingFriendRequests.map((req: any) => (
+                 <div key={req._id} className="flex items-center justify-between bg-black/20 p-2 rounded-xl border border-white/5">
+                   <span className="text-[10px] text-white">Nueva solicitud</span>
+                   <button 
+                    onClick={() => acceptFriendRequest({ friendId: req._id })}
+                    className="bg-primary text-white text-[9px] font-bold px-3 py-1 rounded-lg uppercase"
+                   >
+                     Aceptar
+                   </button>
+                 </div>
+               ))}
+             </div>
+          </div>
+        )}
 
         {/* Channels & Chats List */}
         <div className="flex-1 overflow-y-auto custom-scrollbar min-w-[320px]">
@@ -658,6 +683,21 @@ export default function AuroraChat() {
             >
               <MessageSquare size={20} /> Enviar Mensaje Directo
             </button>
+
+            {user._id !== viewingProfileUser._id && !friendsList?.find((f:any) => f._id === viewingProfileUser._id) && (
+              <button 
+                onClick={() => sendFriendRequest({ fromId: user._id, toId: viewingProfileUser._id })}
+                className="w-full bg-white/5 hover:bg-white/10 text-gray-400 py-4 rounded-[1.5rem] font-bold uppercase tracking-widest text-[10px] border border-white/10 flex items-center justify-center gap-2"
+              >
+                <Users size={16} /> Agregar a mis Amigos
+              </button>
+            )}
+            
+            {friendsList?.find((f:any) => f._id === viewingProfileUser._id) && (
+              <div className="flex items-center justify-center gap-2 text-emerald-500 font-bold uppercase text-[10px]">
+                <Users size={16} /> ¡Ustedes son Amigos!
+              </div>
+            )}
           </div>
         </div>
       )}

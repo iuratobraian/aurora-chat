@@ -191,8 +191,20 @@ export const getOrCreatePrivateChannel = mutation({
     const user1 = await ctx.db.get(user1Id);
     const user2 = await ctx.db.get(user2Id);
 
-    // Instagram style: if receiver has "requests" mode, channel is "pending"
-    const status = user2?.privacyMode === "requests" ? "pending" : "active";
+    // Check if they are already friends
+    const isFriend = await ctx.db
+      .query("friends")
+      .withIndex("by_users", (q) => q.eq("user1Id", user1Id).eq("user2Id", user2Id))
+      .filter((q) => q.eq(q.field("status"), "accepted"))
+      .first() || await ctx.db
+      .query("friends")
+      .withIndex("by_users", (q) => q.eq("user1Id", user2Id).eq("user2Id", user1Id))
+      .filter((q) => q.eq(q.field("status"), "accepted"))
+      .first();
+
+    // Instagram style: if receiver has "requests" mode AND NOT A FRIEND, channel is "pending"
+    const status = (user2?.privacyMode === "requests" && !isFriend) ? "pending" : "active";
+
 
     const channelId = await ctx.db.insert("chatChannels", {
       name: `${user2?.name || 'User'}`,

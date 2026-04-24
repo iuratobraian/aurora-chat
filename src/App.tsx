@@ -65,12 +65,12 @@ export default function AuroraChat() {
   const getOrCreateDM = useMutation(api.chat.getOrCreatePrivateChannel);
   const updateProfile = useMutation(api.users.updateProfile);
   const postStatus = useMutation(api.statuses.postStatus);
-  const activeStatuses = useQuery(api.statuses.getActiveStatuses, user ? { userId: user._id as any } : "skip");
+  const activeStatuses = useQuery(api.statuses.getActiveStatuses, user?._id ? { userId: user._id as any } : "skip");
   
   const sendFriendRequest = useMutation(api.friends.sendFriendRequest);
   const acceptFriendRequest = useMutation(api.friends.acceptFriendRequest);
-  const pendingFriendRequests = useQuery(api.friends.getPendingRequests, user ? { userId: user._id as any } : "skip");
-  const friendsList = useQuery(api.friends.getFriends, user ? { userId: user._id as any } : "skip");
+  const pendingFriendRequests = useQuery(api.friends.getPendingRequests, user?._id ? { userId: user._id as any } : "skip");
+  const friendsList = useQuery(api.friends.getFriends, user?._id ? { userId: user._id as any } : "skip");
 
   // Safe Convex queries
   const rawChannels = useQuery(api.chat.getChannels);
@@ -214,18 +214,39 @@ export default function AuroraChat() {
     if (!SpeechRecognition) return setError("Navegador no compatible");
     if (isRecording) { recognitionRef.current?.stop(); return; }
     const rec = new SpeechRecognition();
-    rec.lang = 'es-AR'; rec.continuous = true; rec.interimResults = true;
+    rec.lang = 'es-AR'; 
+    rec.continuous = true; 
+    rec.interimResults = true;
+    
     rec.onstart = () => setIsRecording(true);
     rec.onend = () => setIsRecording(false);
+    rec.onerror = (event: any) => {
+      console.error('Speech recognition error:', event.error);
+      setError(`Error de voz: ${event.error}`);
+      setIsRecording(false);
+    };
+
     rec.onresult = (e: any) => {
       let final = '';
       for (let i = e.resultIndex; i < e.results.length; ++i) {
-        if (e.results[i].isFinal) final += e.results[i][0].transcript;
+        if (e.results[i].isFinal) {
+          final += e.results[i][0].transcript;
+        }
       }
-      if (final) setText(p => p + (p ? ' ' : '') + final);
+      if (final) {
+        setText(p => p + (p ? ' ' : '') + final);
+      }
     };
-    rec.start(); recognitionRef.current = rec;
+
+    try {
+      rec.start();
+      recognitionRef.current = rec;
+    } catch (err) {
+      console.error('Failed to start speech recognition:', err);
+      setError("No se pudo iniciar el reconocimiento de voz");
+    }
   };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -241,6 +262,20 @@ export default function AuroraChat() {
       if (isRecording) { recognitionRef.current?.stop(); }
     } catch (err) { setError('Error al enviar'); }
   };
+
+  const startDM = async (targetUser: any) => {
+    if (!user) return;
+    try {
+      const channel = await getOrCreateDM({ user1Id: user._id as any, user2Id: targetUser._id });
+      if (channel) {
+        setCurrentChannel(channel.slug);
+        setShowUserSearch(false);
+      }
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
 
   const formatText = (content: string) => {
     return (

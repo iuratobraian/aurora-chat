@@ -116,19 +116,42 @@ export default function AuroraChat() {
   const rawServerStats = useQuery(api.chat.getServerStats);
   const serverStats = rawServerStats || null;
 
+  // Notification Helper
+  const showLocalNotification = useCallback((m: ChatMessage) => {
+    if (m.userId === user?._id) return;
+    if (document.visibilityState === 'visible') return;
+
+    if ('Notification' in window && Notification.permission === 'granted') {
+      const n = new Notification("Aurora Chat", {
+        body: `Mensaje de ${m.autor}: ${decryptMessage(m.texto || '')}`,
+        icon: 'https://cdn-icons-png.flaticon.com/512/2593/2593635.png'
+      });
+      n.onclick = () => { window.focus(); n.close(); };
+    }
+  }, [user?._id]);
+
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, []);
+
+
   // Notifications
   const lastMessageId = useRef<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  useEffect(() => {
+   useEffect(() => {
     if (messages.length > 0) {
       const lastMsg = messages[messages.length - 1];
       if (lastMessageId.current && lastMessageId.current !== lastMsg._id && lastMsg.userId !== user?._id) {
         audioRef.current?.play().catch(() => {});
+        showLocalNotification(lastMsg as any);
       }
       lastMessageId.current = lastMsg._id || null;
     }
-  }, [messages, user?._id]);
+  }, [messages, user?._id, showLocalNotification]);
+
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -661,15 +684,14 @@ export default function AuroraChat() {
              </div>
 
              <div className="flex flex-col gap-2 shrink-0">
-               {!isMobile && (
-                  <button type="button" onClick={startSpeechToText} className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${isRecording ? 'bg-red-500/20 text-red-500 border border-red-500/30' : 'bg-white/5 text-gray-400 hover:text-white border border-white/10'}`}>
-                    {isRecording ? <MicOff size={22}/> : <Mic size={22}/>}
-                  </button>
-               )}
+               <button type="button" onClick={startSpeechToText} className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${isRecording ? 'bg-red-500/20 text-red-500 border border-red-500/30' : 'bg-white/5 text-gray-400 hover:text-white border border-white/10'}`}>
+                 {isRecording ? <MicOff size={22}/> : <Mic size={22}/>}
+               </button>
                <button type="submit" disabled={!text.trim() && !attachedImage} className="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/30 active:scale-95 disabled:opacity-30 transition-all">
                  <Send size={22} />
                </button>
              </div>
+
            </form>
         </div>
         {isMobile && isSidebarOpen && (

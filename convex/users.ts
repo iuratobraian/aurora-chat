@@ -79,8 +79,10 @@ export const updateProfile = mutation({
     bio: v.optional(v.string()),
     phone: v.optional(v.string()),
     avatar: v.optional(v.string()),
+    password: v.optional(v.string()),
     privacyMode: v.optional(v.union(v.literal("everyone"), v.literal("requests"))),
   },
+
   handler: async (ctx, args) => {
     const { userId, ...updates } = args;
     await ctx.db.patch(userId, updates);

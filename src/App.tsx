@@ -174,6 +174,22 @@ export default function AuroraChat() {
     reader.readAsDataURL(file);
   };
 
+  const handlePaste = useCallback(async (e: React.ClipboardEvent) => {
+    const items = e.clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        const file = items[i].getAsFile();
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            setAttachedImage(event.target?.result as string);
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+    }
+  }, []);
+
   const startSpeechToText = () => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) return setError("Navegador no compatible");

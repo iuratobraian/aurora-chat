@@ -7,6 +7,12 @@ export default defineConfig({
   base: '/',
   build: {
     target: 'esnext',
-    minify: 'esbuild',
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        passes: 2,
+      },
+      mangle: true,
+    },
   },
 });

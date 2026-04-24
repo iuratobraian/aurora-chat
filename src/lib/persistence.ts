@@ -1,28 +1,44 @@
-import { get, set, del } from 'idb-keyval';
 import { ChatMessage } from '../types';
 
-const MSG_CACHE_PREFIX = 'aurora_msgs_';
+const DB_NAME = 'aurora_db';
+const STORE_NAME = 'messages';
+const DB_VERSION = 1;
+
+function openDB(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = () => req.result.createObjectStore(STORE_NAME);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
 
 export const persistenceService = {
   async saveMessages(channelId: string, messages: ChatMessage[]) {
     try {
-      await set(`${MSG_CACHE_PREFIX}${channelId}`, messages);
+      const db = await openDB();
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      tx.objectStore(STORE_NAME).put(messages, channelId);
+      db.close();
     } catch (err) {
-      console.error('Error saving messages to persistence:', err);
+      // Fallback to localStorage
+      try { localStorage.setItem(`aurora_msgs_${channelId}`, JSON.stringify(messages)); } catch {}
     }
   },
 
   async getMessages(channelId: string): Promise<ChatMessage[]> {
     try {
-      const msgs = await get(`${MSG_CACHE_PREFIX}${channelId}`);
-      return msgs || [];
-    } catch (err) {
-      console.error('Error getting messages from persistence:', err);
-      return [];
+      const db = await openDB();
+      return new Promise((resolve) => {
+        const tx = db.transaction(STORE_NAME, 'readonly');
+        const req = tx.objectStore(STORE_NAME).get(channelId);
+        req.onsuccess = () => { db.close(); resolve(req.result || []); };
+        req.onerror = () => { db.close(); resolve([]); };
+      });
+    } catch {
+      try {
+        return JSON.parse(localStorage.getItem(`aurora_msgs_${channelId}`) || '[]');
+      } catch { return []; }
     }
   },
-
-  async clearCache(channelId: string) {
-    await del(`${MSG_CACHE_PREFIX}${channelId}`);
-  }
 };

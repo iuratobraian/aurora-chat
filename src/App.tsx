@@ -831,39 +831,38 @@ export default function AuroraChat() {
              </div>
            )}
 
-           <form onSubmit={handleSubmit} className="flex items-end gap-3">
-             <input type="file" ref={fileInputRef} className="hidden" accept="image/*,.pdf,.docx,.xlsx,.xls,.csv" onChange={(e) => handleImageUpload(e, 'chat')} />
-             <button type="button" onClick={() => fileInputRef.current?.click()} className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white transition-all shrink-0 hover:bg-white/10"><Plus size={24}/></button>
-             
-             <div className="flex-1 bg-white/5 border border-white/10 rounded-2xl p-2 focus-within:border-primary/50 transition-all flex flex-col">
-               <textarea
-                 value={text + (interimTranscript ? (text ? ' ' : '') + interimTranscript : '')}
-                 onChange={e => { setText(e.target.value); handleTyping(); }}
-                 onPaste={handlePaste}
-                 placeholder={isRecording ? "Escuchando..." : "Escribe un mensaje..."}
-                 className={`bg-transparent text-sm text-white outline-none placeholder-gray-600 px-3 py-2 resize-none max-h-32 min-h-[44px] ${isRecording ? 'text-primary' : ''}`}
-                 rows={1}
-                 onKeyDown={e => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(e); } }}
-               />
-               <div className="flex justify-between items-center px-3 pt-1 border-t border-white/5">
-                 <button type="button" onClick={() => setShowEmoji(!showEmoji)} className="text-gray-500 hover:text-primary transition-colors"><Smile size={18}/></button>
-                 <div className="text-[10px] text-gray-600 font-mono uppercase tracking-widest">{text.length}/500</div>
-               </div>
-             </div>
+           <form onSubmit={handleSubmit} className="flex items-end gap-2">
+              <button type="button" onClick={() => fileInputRef.current?.click()} className="w-11 h-11 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-500 hover:text-white transition-all shrink-0"><Plus size={22}/></button>
+              
+              <div className="flex-1 bg-white/5 border border-white/10 rounded-[1.5rem] p-1 focus-within:border-primary/40 transition-all flex items-end">
+                <button type="button" onClick={() => setShowEmoji(!showEmoji)} className="p-2.5 text-gray-500 hover:text-primary transition-colors"><Smile size={20}/></button>
+                <textarea
+                  value={text + (interimTranscript ? (text ? ' ' : '') + interimTranscript : '')}
 
-             <div className="flex flex-col gap-2 shrink-0">
-               <button type="button" onClick={() => cameraInputRef.current?.click()} className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all bg-white/5 text-gray-400 hover:text-white border border-white/10">
-                 <Camera size={22}/>
-               </button>
-               <button type="button" onClick={startSpeechToText} className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${isRecording ? 'bg-red-500/20 text-red-500 border border-red-500/30' : 'bg-white/5 text-gray-400 hover:text-white border border-white/10'}`}>
-                 {isRecording ? <MicOff size={22}/> : <Mic size={22}/>}
-               </button>
-               <button type="submit" disabled={!text.trim() && !attachedImage} className="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/30 active:scale-95 disabled:opacity-30 transition-all">
-                 <Send size={22} />
-               </button>
-             </div>
+                  onChange={e => { setText(e.target.value); handleTyping(); }}
+                  onPaste={handlePaste}
+                  placeholder={isRecording ? "Escuchando..." : "Escribe un mensaje..."}
+                  className={`flex-1 bg-transparent text-sm text-white outline-none placeholder-gray-600 px-3 py-2.5 resize-none max-h-32 min-h-[44px] ${isRecording ? 'text-primary' : ''}`}
+                  rows={1}
+                  onKeyDown={e => { if(e.key === 'Enter' && !e.shiftKey && !isMobile) { e.preventDefault(); handleSubmit(e); } }}
+                />
+                <button type="submit" disabled={(!text.trim() && !attachedImage) || uploading} className="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20 disabled:opacity-20 transition-all active:scale-90 m-0.5">
+                  <Send size={18} />
+                </button>
+              </div>
 
-           </form>
+              <div className="flex flex-col gap-1.5">
+                <button type="button" onClick={() => cameraInputRef.current?.click()} className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-500 hover:text-white transition-all">
+                  <Camera size={20}/>
+                </button>
+                <button type="button" onClick={startSpeechToText} className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${isRecording ? 'bg-red-500/20 text-red-500 border border-red-500/30' : 'bg-white/5 text-gray-500 hover:text-white border border-white/10'}`}>
+                  {isRecording ? <MicOff size={20}/> : <Mic size={20}/>}
+                </button>
+              </div>
+
+              <input type="file" ref={fileInputRef} className="hidden" accept="image/*,.pdf,.docx,.xlsx,.xls,.csv" onChange={(e) => handleImageUpload(e, 'chat')} />
+              <input type="file" ref={cameraInputRef} className="hidden" accept="image/*" capture="environment" onChange={(e) => handleImageUpload(e, 'chat')} />
+            </form>
         </div>
         {isMobile && isSidebarOpen && (
            <div className="fixed inset-0 bg-black/40 z-[140] backdrop-blur-sm" onClick={() => setIsSidebarOpen(false)} />

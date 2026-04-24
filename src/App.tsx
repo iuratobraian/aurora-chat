@@ -49,6 +49,7 @@ export default function AuroraChat() {
   const [showUserSearch, setShowUserSearch] = useState(false);
   const [userSearchQuery, setUserSearchQuery] = useState('');
   const [parsingFile, setParsingFile] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
   
   // Audio/Speech
   const [isRecording, setIsRecording] = useState(false);
@@ -244,7 +245,14 @@ export default function AuroraChat() {
     recognition.onstart = () => setIsRecording(true);
     recognition.onerror = (e: any) => {
       console.error('Speech error', e);
+      let msg = "Error en el reconocimiento de voz";
+      if (e.error === 'not-allowed') msg = "Permiso de micrófono denegado";
+      if (e.error === 'network') msg = "Error de red en el reconocimiento";
+      if (e.error === 'no-speech') return; // Ignore if no speech detected
+      
+      setError(msg);
       setIsRecording(false);
+      setTimeout(() => setError(null), 3000);
     };
     recognition.onend = () => setIsRecording(false);
 
@@ -465,7 +473,12 @@ export default function AuroraChat() {
                   <div className={`px-4 py-2.5 rounded-2xl ${isMe ? 'bg-primary/20 text-white rounded-br-none border border-primary/20' : 'bg-white/[0.04] text-gray-200 rounded-bl-none border border-white/5'}`}>
                     {m.imagenUrl && (
                       <div className="mb-2 rounded-xl overflow-hidden ring-1 ring-white/10">
-                        <img src={m.imagenUrl} className="max-w-full h-auto max-h-64 cursor-pointer" alt="" onClick={() => window.open(m.imagenUrl!, '_blank')} />
+                        <img 
+                          src={m.imagenUrl} 
+                          className="max-w-full h-auto max-h-64 cursor-pointer hover:opacity-90 transition-opacity" 
+                          alt="" 
+                          onClick={() => setPreviewImage(m.imagenUrl!)} 
+                        />
                       </div>
                     )}
                     <div className="text-[11px] leading-relaxed break-words">{formatText(m.texto || '')}</div>
@@ -629,6 +642,29 @@ export default function AuroraChat() {
                 ))}
               </div>
             </div>
+          </div>
+        )}
+          </div>
+        )}
+
+        {/* Image Lightbox Preview */}
+        {previewImage && (
+          <div 
+            className="fixed inset-0 bg-black/95 z-[100] flex items-center justify-center p-4 animate-fadeIn"
+            onClick={() => setPreviewImage(null)}
+          >
+            <button 
+              className="absolute top-6 right-6 text-white/50 hover:text-white transition-colors p-2"
+              onClick={() => setPreviewImage(null)}
+            >
+              <X size={32} />
+            </button>
+            <img 
+              src={previewImage} 
+              className="max-w-full max-h-full rounded-lg shadow-2xl object-contain" 
+              alt="Preview"
+              onClick={(e) => e.stopPropagation()}
+            />
           </div>
         )}
     </div>

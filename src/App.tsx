@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useQuery, useMutation } from 'convex/react';
-import { api } from './api';
+import { api } from '../convex/_generated/api';
 import { ChatMessage } from './types';
 import { 
   Send, X, Smile, AlertCircle, Plus, Lock, Server, Users, 

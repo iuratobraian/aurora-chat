@@ -41,7 +41,9 @@ export default function AuroraChat() {
   const [showStats, setShowStats] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
+  const [viewingStatus, setViewingStatus] = useState<any>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [viewingProfileUser, setViewingProfileUser] = useState<any>(null);
@@ -386,7 +388,32 @@ export default function AuroraChat() {
   };
 
 
+  // Local Caching for Offline Support
+  useEffect(() => {
+    if (channelsList?.length > 0) localStorage.setItem('aurora_cache_channels', JSON.stringify(channelsList));
+    if (messages?.length > 0) localStorage.setItem(`aurora_cache_msgs_${currentChannel}`, JSON.stringify(messages));
+    if (activeStatuses?.length > 0) {
+      localStorage.setItem('aurora_cache_statuses', JSON.stringify(activeStatuses));
+      // Pre-download status images
+      activeStatuses.forEach((s: any) => {
+        if (s.contentUrl) {
+          const img = new Image();
+          img.src = s.contentUrl;
+        }
+      });
+    }
+  }, [channelsList, messages, activeStatuses, currentChannel]);
+
+  const cachedChannels = JSON.parse(localStorage.getItem('aurora_cache_channels') || '[]');
+  const cachedMessages = JSON.parse(localStorage.getItem(`aurora_cache_msgs_${currentChannel}`) || '[]');
+  const cachedStatuses = JSON.parse(localStorage.getItem('aurora_cache_statuses') || '[]');
+
+  const displayChannels = channelsList || cachedChannels;
+  const displayMessages = messages || cachedMessages;
+  const displayStatuses = activeStatuses || cachedStatuses;
+
   const handleSubmit = async (e: React.FormEvent) => {
+
     e.preventDefault();
     if ((!text.trim() && !attachedImage) || uploading || !user) return;
     
@@ -469,7 +496,8 @@ export default function AuroraChat() {
 
   if (!user) return <Onboarding />;
 
-  const currentChat = [...channelsList, ...(activeStatuses || [])].find(c => (c as any).slug === currentChannel) || { name: 'Chat' };
+  const currentChat = [...(displayChannels || []), ...(displayStatuses || [])].find(c => (c as any).slug === currentChannel) || { name: 'Chat' };
+
 
   return (
     <div className="flex h-screen bg-[#0f1115] overflow-hidden">
@@ -517,8 +545,8 @@ export default function AuroraChat() {
             </div>
             <span className="text-[9px] text-gray-500 font-bold uppercase">Mi Estado</span>
           </button>
-          {activeStatuses?.map((s: any) => (
-            <button key={s._id} className="flex flex-col items-center gap-1 shrink-0">
+          {displayStatuses?.map((s: any) => (
+            <button key={s._id} onClick={() => setViewingStatus(s)} className="flex flex-col items-center gap-1 shrink-0">
               <div className="w-12 h-12 rounded-full border-2 border-primary p-0.5 shadow-lg shadow-primary/20">
                 <img src={s.userAvatar} className="w-full h-full rounded-full object-cover" alt="" />
               </div>
@@ -526,6 +554,7 @@ export default function AuroraChat() {
             </button>
           ))}
         </div>
+
 
         {/* Pending Friend Requests */}
         {pendingFriendRequests && pendingFriendRequests.length > 0 && (
@@ -761,13 +790,14 @@ export default function AuroraChat() {
 
         {/* Messages Area */}
         <div ref={scrollRef} onScroll={handleScroll} className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')]">
-          {messages.length === 0 ? (
+          {displayMessages.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center opacity-20">
               <MessageSquare size={64} className="mb-4" />
               <h3 className="text-lg font-bold uppercase tracking-[0.2em]">Comienza la charla</h3>
             </div>
           ) : (
-            messages.map((m: ChatMessage, idx: number) => {
+            displayMessages.map((m: ChatMessage, idx: number) => {
+
               const isMe = m.userId === user._id;
               return (
                 <div key={m._id || idx} className={`flex items-end gap-3 ${isMe ? 'flex-reverse' : ''} message-enter`}>
@@ -821,7 +851,21 @@ export default function AuroraChat() {
         </div>
 
         <div className="p-6 bg-black/40 border-t border-white/10 backdrop-blur-md">
-           {attachedImage && (
+            {showEmoji && (
+              <div className="absolute bottom-24 left-6 bg-[#1a1a1a] border border-white/10 p-2 rounded-2xl shadow-2xl flex gap-2 z-[100] animate-in fade-in slide-in-from-bottom-2">
+                {EMOJIS.map(emoji => (
+                  <button 
+                    key={emoji} 
+                    onClick={() => { setText(text + emoji); setShowEmoji(false); }}
+                    className="text-xl hover:scale-125 transition-transform p-1"
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {attachedImage && (
              <div className="mb-4 flex items-center gap-3 p-2 bg-white/5 rounded-2xl border border-white/10 w-fit">
                <div className="relative w-20 h-20 rounded-xl overflow-hidden">
                  <img src={attachedImage} className="w-full h-full object-cover" alt="" />
@@ -1072,6 +1116,29 @@ export default function AuroraChat() {
           <img src={previewImage} className="max-w-full max-h-full rounded-2xl shadow-2xl object-contain ring-1 ring-white/10" alt="" onClick={e => e.stopPropagation()}/>
         </div>
       )}
+
+       {viewingStatus && (
+         <div className="fixed inset-0 bg-black z-[1000] flex flex-col items-center justify-center p-4 animate-in fade-in zoom-in duration-300">
+            <div className="absolute top-8 left-8 flex items-center gap-4">
+              <img src={viewingStatus.userAvatar} className="w-10 h-10 rounded-full border-2 border-primary" alt="" />
+              <div>
+                <p className="text-sm font-bold text-white">{viewingStatus.userName}</p>
+                <p className="text-[10px] text-gray-500">{new Date(viewingStatus.createdAt).toLocaleTimeString()}</p>
+              </div>
+            </div>
+            <button onClick={() => setViewingStatus(null)} className="absolute top-8 right-8 text-white/50 hover:text-white transition-all"><X size={32}/></button>
+            
+            <div className="w-full max-w-sm aspect-[9/16] bg-white/5 rounded-[2rem] overflow-hidden relative shadow-2xl">
+               {viewingStatus.type === 'text' ? (
+                 <div className="w-full h-full flex items-center justify-center p-8 text-center text-xl font-bold text-white bg-gradient-to-br from-primary/20 to-purple-500/20">
+                    {viewingStatus.text}
+                 </div>
+               ) : (
+                 <img src={viewingStatus.contentUrl} className="w-full h-full object-cover" alt="" />
+               )}
+            </div>
+         </div>
+       )}
 
       {showUserSearch && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center p-4">

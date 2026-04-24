@@ -239,6 +239,7 @@ export default function AuroraChat() {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) return setError("Navegador no compatible");
     if (isRecording) { recognitionRef.current?.stop(); return; }
+    if (typeof SpeechRecognition !== 'function') return setError("Error: El constructor de voz no es válido en este navegador.");
     const rec = new SpeechRecognition();
     rec.lang = 'es-AR'; 
     rec.continuous = true; 
@@ -619,7 +620,7 @@ export default function AuroraChat() {
                       )}
                       <div className="text-[12px] leading-relaxed break-words">{formatText(decryptMessage(m.texto || ''))}</div>
                     </div>
-                    <span className="text-[9px] text-gray-600 px-1 font-mono">{new Date(m.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                    <span className="text-[9px] text-gray-600 px-1 font-mono">{new Date(m.createdAt).toLocaleTimeString(undefined, {hour: '2-digit', minute:'2-digit'})}</span>
                   </div>
                 </div>
               );

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { api } from '../api';
 import { useUserStore } from '../store';
-import { User, Mail, AtSign, Loader2 } from 'lucide-react';
+import { User, Mail, AtSign, Loader2, Lock } from 'lucide-react';
 import { useConvex, useMutation } from 'convex/react';
 
 export default function Onboarding() {

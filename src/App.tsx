@@ -27,7 +27,7 @@ import { persistenceService } from './lib/persistence';
 import { expenseAgent } from './lib/expenseAgent';
 import ExpensesHub from './features/expenses/ExpensesHub';
 
-const APP_VERSION = '1.0.7'; // Increment this to force cache clear
+const APP_VERSION = '1.0.8'; // Increment this to force cache clear
 
 
 const EMOJIS = ['🚀', '📈', '📉', '🔥', '🧠', '💰', '❤️', '👍', '🎯', '⚡'];
@@ -182,11 +182,16 @@ export default function AuroraChat() {
 
   // 2. Lifecycle & Effects
   useEffect(() => {
-    // Cache buster
+    // Cache buster & Quota Management
     try {
       const currentVersion = localStorage.getItem('aurora_app_version');
       if (currentVersion !== APP_VERSION) {
-        localStorage.clear();
+        // Clear all legacy large cache keys
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('aurora_cache_') || key.startsWith('aurora_msgs_')) {
+            localStorage.removeItem(key);
+          }
+        });
         localStorage.setItem('aurora_app_version', APP_VERSION);
         window.location.reload();
         return;
@@ -524,10 +529,9 @@ export default function AuroraChat() {
 
   // Local Caching for Offline Support
   useEffect(() => {
-    if (channelsList?.length > 0) localStorage.setItem('aurora_cache_channels', JSON.stringify(channelsList));
-    if (messages?.length > 0) localStorage.setItem(`aurora_cache_msgs_${currentChannel}`, JSON.stringify(messages));
+    if (channelsList?.length > 0) persistenceService.saveChannels(channelsList);
+    if (messages?.length > 0) persistenceService.saveMessages(currentChannel, messages);
     if (activeStatuses?.length > 0) {
-      localStorage.setItem('aurora_cache_statuses', JSON.stringify(activeStatuses));
       // Pre-download status images
       activeStatuses.forEach((s: any) => {
         if (s.contentUrl) {
@@ -554,10 +558,13 @@ export default function AuroraChat() {
 
 
 
-  const cachedChannels = JSON.parse(localStorage.getItem('aurora_cache_channels') || '[]');
+  const [cachedChannels, setCachedChannels] = useState<any[]>([]);
+  const [cachedMessages, setCachedMessages] = useState<any[]>([]);
 
-  const cachedMessages = JSON.parse(localStorage.getItem(`aurora_cache_msgs_${currentChannel}`) || '[]');
-  const cachedStatuses = JSON.parse(localStorage.getItem('aurora_cache_statuses') || '[]');
+  useEffect(() => {
+    persistenceService.getChannels().then(setCachedChannels);
+    persistenceService.getMessages(currentChannel).then(setCachedMessages);
+  }, [currentChannel]);
 
   const displayChannels = channelsList || cachedChannels;
   

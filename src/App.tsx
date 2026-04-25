@@ -690,10 +690,10 @@ Nota: ${parsed.note}`;
   const currentChat = [...(displayChannels || []), ...(displayStatuses || [])].find(c => (c as any).slug === currentChannel) || { name: 'Chat' };
 
   return (
-    <div className="flex h-full w-full bg-[#0a0a0a] overflow-hidden text-white relative">
-      {/* Decorative blurs to match login feel */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
+    <div className="flex h-screen w-full bg-[#0a0a0a] text-white relative overflow-hidden selection:bg-primary/30">
+      {/* Dynamic Background Effects */}
+      <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-primary/10 blur-[150px] rounded-full pointer-events-none animate-pulse" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-primary/10 blur-[150px] rounded-full pointer-events-none animate-pulse" style={{ animationDelay: '2s' }} />
       
       <audio ref={audioRef} src={NOTIFICATION_SOUND} preload="auto" />
       
@@ -701,9 +701,9 @@ Nota: ${parsed.note}`;
       <aside className={`
         ${isSidebarOpen ? (isMobile ? 'w-80' : 'w-[320px]') : 'w-0'} 
         ${isMobile ? 'fixed inset-y-0 left-0 z-[150] shadow-2xl' : 'relative shrink-0'}
-        border-r border-white/10 flex flex-col bg-[#111111] transition-all duration-300 overflow-hidden
+        border-r border-white/10 flex flex-col bg-[#0d0d0d] transition-all duration-500 ease-in-out overflow-hidden
         ${!isSidebarOpen && !isMobile ? 'border-none' : ''}
-        safe-area-pt safe-area-pb
+        safe-area-pt
       `}>
 
         {isMobile && isSidebarOpen && (
@@ -918,10 +918,10 @@ Nota: ${parsed.note}`;
       </aside>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 flex flex-col relative bg-[#0a0a0a] overflow-hidden">
+      <main className="flex-1 flex flex-col relative bg-[#0a0a0a] overflow-hidden min-h-0">
 
         {/* Chat Header */}
-        <div className="min-h-[4rem] safe-area-pt px-4 border-b border-white/10 flex items-center justify-between bg-[#111111]/80 backdrop-blur-md z-10">
+        <div className="h-16 px-4 border-b border-white/10 flex items-center justify-between glass-panel z-10 safe-area-pt box-content">
 
           <div className="flex items-center gap-4">
             <button 
@@ -1160,19 +1160,15 @@ Nota: ${parsed.note}`;
               );
             })
           )}
-          <div ref={messagesEndRef} />
-        </div>
-
-
-        <div className="p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] bg-[#111111] border-t border-white/10 backdrop-blur-md">
+        <div className="p-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] bg-[#0d0d0d]/80 backdrop-blur-2xl border-t border-white/10 relative z-20">
 
             {showEmoji && (
-              <div className="absolute bottom-24 left-6 bg-[#111111] border border-white/10 p-2 rounded-lg shadow-2xl flex gap-2 z-[100] animate-in fade-in slide-in-from-bottom-2">
+              <div className="absolute bottom-28 left-6 bg-[#111111] border border-white/10 p-3 rounded-2xl shadow-2xl flex gap-2.5 z-[100] animate-in fade-in slide-in-from-bottom-4 zoom-in-95 duration-200">
                 {EMOJIS.map(emoji => (
                   <button 
                     key={emoji} 
                     onClick={() => { setText(text + emoji); setShowEmoji(false); }}
-                    className="text-xl hover:scale-125 transition-transform p-1"
+                    className="text-2xl hover:scale-150 transition-transform p-1 active:scale-90"
                   >
                     {emoji}
                   </button>
@@ -1181,59 +1177,64 @@ Nota: ${parsed.note}`;
             )}
 
             {attachedAudio && (
-              <div className="mb-4 flex items-center gap-3 p-3 bg-white/5 rounded-lg border border-white/10 w-fit animate-in slide-in-from-left duration-300">
-                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white">
-                  <Volume2 size={20} className="animate-pulse" />
+              <div className="mb-4 flex items-center gap-3 p-4 glass-panel border border-primary/20 w-fit animate-in slide-in-from-bottom-4 duration-500 rounded-2xl shadow-xl shadow-primary/5">
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                  <Volume2 size={24} className="animate-pulse" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-black text-white uppercase tracking-widest">Nota de Voz Lista</span>
-                  <span className="text-[9px] text-gray-500">Haz clic en enviar para compartir</span>
+                  <span className="text-[10px] font-black text-white uppercase tracking-widest">Cápsula de Voz</span>
+                  <span className="text-[9px] text-gray-500 uppercase tracking-tighter">Lista para transmisión</span>
                 </div>
-                <button onClick={() => { setAttachedAudio(null); setAudioBlob(null); }} className="ml-2 text-gray-500 hover:text-red-400 p-1"><X size={18}/></button>
+                <button onClick={() => { setAttachedAudio(null); setAudioBlob(null); }} className="ml-4 text-gray-500 hover:text-red-400 p-2 hover:bg-white/5 rounded-lg transition-colors"><X size={20}/></button>
               </div>
             )}
 
             {attachedImage && (
-             <div className="mb-4 flex items-center gap-3 p-2 bg-white/5 rounded-lg border border-white/10 w-fit">
-               <div className="relative w-20 h-20 rounded-lg overflow-hidden">
+             <div className="mb-4 flex items-center gap-4 p-3 glass-panel border border-white/10 w-fit animate-in slide-in-from-bottom-4 duration-500 rounded-2xl shadow-xl">
+               <div className="relative w-24 h-24 rounded-xl overflow-hidden border border-white/10 shadow-inner">
                  <img src={attachedImage} className="w-full h-full object-cover" alt="" />
-                 <button onClick={() => setAttachedImage(null)} className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-lg"><X size={14}/></button>
+                 <div className="absolute inset-0 bg-black/20" />
+                 <button onClick={() => setAttachedImage(null)} className="absolute top-1 right-1 bg-black/60 text-white p-1.5 rounded-lg backdrop-blur-md hover:bg-red-500 transition-colors"><X size={14}/></button>
+               </div>
+               <div className="flex flex-col pr-4">
+                  <span className="text-[10px] font-black text-white uppercase tracking-widest">Archivo Visual</span>
+                  <span className="text-[9px] text-gray-500 uppercase">Procesado y optimizado</span>
                </div>
              </div>
             )}
 
-             <form onSubmit={handleSubmit} className="flex items-center gap-3 max-w-5xl mx-auto">
-              <button type="button" onClick={() => fileInputRef.current?.click()} className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-all shrink-0"><Plus size={22}/></button>
+             <form onSubmit={handleSubmit} className="flex items-end gap-3 max-w-6xl mx-auto">
+              <button type="button" onClick={() => fileInputRef.current?.click()} className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-all shrink-0 active:scale-90"><Plus size={24}/></button>
               
-              <div className="flex-1 bg-white/[0.03] border border-white/10 rounded-[1.5rem] px-3 py-1 focus-within:border-white/20 transition-all flex items-end gap-1 shadow-inner backdrop-blur-xl">
-                <button type="button" onClick={() => setShowEmoji(!showEmoji)} className="p-3 text-gray-500 hover:text-white transition-colors shrink-0"><Smile size={22}/></button>
+              <div className="flex-1 bg-white/[0.03] border border-white/10 rounded-[1.75rem] px-4 py-1.5 focus-within:border-primary/50 focus-within:bg-white/[0.05] transition-all flex items-end gap-1 shadow-inner backdrop-blur-xl">
+                <button type="button" onClick={() => setShowEmoji(!showEmoji)} className="p-3 text-gray-500 hover:text-white transition-colors shrink-0 active:scale-90"><Smile size={24}/></button>
                 <textarea
                   value={text + (interimTranscript ? (text ? ' ' : '') + interimTranscript : '')}
                   onChange={e => { setText(e.target.value); handleTyping(); }}
                   onPaste={handlePaste}
-                  placeholder={isRecording ? "Escuchando voz..." : "Escribe un mensaje..."}
-                  className={`flex-1 bg-transparent text-sm text-white outline-none placeholder-gray-700 px-2 py-3 resize-none max-h-40 min-h-[48px] leading-relaxed ${isRecording ? 'text-primary' : ''}`}
+                  placeholder={isRecording ? "Escuchando..." : "Escribe un mensaje..."}
+                  className={`flex-1 bg-transparent text-[15px] text-white outline-none placeholder-gray-700 px-2 py-3.5 resize-none max-h-48 min-h-[52px] leading-relaxed ${isRecording ? 'text-primary' : ''}`}
                   rows={1}
                   onKeyDown={e => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(e); } }}
                 />
                 
-                 <button type="button" onClick={() => cameraInputRef.current?.click()} className="p-3 text-gray-500 hover:text-white transition-all">
-                   <Camera size={22}/>
+                 <button type="button" onClick={() => cameraInputRef.current?.click()} className="p-3 text-gray-500 hover:text-white transition-all active:scale-90">
+                   <Camera size={24}/>
                  </button>
                </div>
 
                <div className="shrink-0">
                   { (text.trim() || attachedImage || audioBlob) ? (
-                    <button type="submit" disabled={uploading} className="w-12 h-12 bg-white text-black rounded-2xl flex items-center justify-center transition-all active:scale-95 shadow-2xl hover:bg-gray-100">
-                      <Send size={22} fill="currentColor" />
+                    <button type="submit" disabled={uploading} className="w-12 h-12 bg-white text-black rounded-2xl flex items-center justify-center transition-all active:scale-90 shadow-2xl hover:bg-gray-200">
+                      <Send size={24} fill="currentColor" />
                     </button>
                   ) : (
                     <button 
                       type="button" 
                       onClick={() => isRecording ? stopRecording() : startRecording()}
-                      className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${isRecording ? 'bg-red-500 text-white animate-pulse shadow-red-500/50' : 'bg-white/5 text-white hover:bg-white/10 border border-white/5 shadow-lg'}`}
+                      className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all active:scale-90 ${isRecording ? 'bg-red-500 text-white animate-pulse shadow-red-500/30' : 'bg-white/5 text-white hover:bg-white/10 border border-white/5 shadow-lg'}`}
                     >
-                      {isRecording ? <MicOff size={22}/> : <Mic size={22}/>}
+                      {isRecording ? <MicOff size={24}/> : <Mic size={24}/>}
                     </button>
                   )}
                </div>

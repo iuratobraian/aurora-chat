@@ -148,43 +148,45 @@ export default function Onboarding() {
 
 
   return (
-    <div className="fixed inset-0 bg-[#0a0a0a] z-[100] flex items-center justify-center p-4 safe-area-pt safe-area-pb">
-      <div className="w-full max-w-md bg-[#111111] rounded-xl border border-white/10 p-8 space-y-8 shadow-2xl relative overflow-hidden">
-        {/* Decorative blur */}
-        <div className="absolute -top-24 -left-24 w-48 h-48 bg-primary/10 blur-[80px] rounded-full" />
+    <div className="fixed inset-0 bg-[#0a0a0a] z-[100] flex items-center justify-center p-4 safe-area-pt safe-area-pb selection:bg-primary/30">
+      <div className="w-full max-w-md glass-panel rounded-[2rem] p-8 md:p-10 space-y-10 shadow-[0_32px_64px_rgba(0,0,0,0.5)] relative overflow-hidden animate-in fade-in zoom-in-95 duration-500">
         
-        <div className="text-center space-y-2 relative">
-          <div className="w-16 h-16 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 mx-auto mb-4">
-            <span className="material-symbols-outlined text-3xl text-white/50">smart_toy</span>
+        {/* Dynamic decorative elements */}
+        <div className="absolute -top-32 -left-32 w-64 h-64 bg-primary/20 blur-[100px] rounded-full animate-pulse" />
+        <div className="absolute -bottom-32 -right-32 w-64 h-64 bg-primary/10 blur-[100px] rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
+        
+        <div className="text-center space-y-4 relative">
+          <div className="w-20 h-20 bg-white/[0.03] rounded-[2rem] flex items-center justify-center border border-white/10 mx-auto mb-6 shadow-inner group hover:border-primary/50 transition-all duration-500">
+            <span className="material-symbols-outlined text-4xl text-white/40 group-hover:text-primary group-hover:scale-110 transition-all">smart_toy</span>
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight uppercase">Aurora Chat</h1>
-          <p className="text-gray-500 text-[10px] uppercase tracking-widest font-black">Standalone Premium Client</p>
+          <h1 className="text-3xl font-black text-white tracking-[-0.05em] uppercase italic">Aurora</h1>
+          <p className="text-gray-500 text-[10px] uppercase tracking-[0.4em] font-black opacity-60">Neural Messaging System</p>
         </div>
 
-        <div className="flex bg-white/5 p-1 rounded-xl border border-white/5 relative z-10">
+        <div className="flex bg-white/[0.03] p-1.5 rounded-2xl border border-white/5 relative z-10 backdrop-blur-md">
           <button 
             onClick={() => { setIsRegistering(false); setError(null); }}
-            className={`flex-1 py-3 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all ${!isRegistering ? 'bg-white text-black' : 'text-gray-500'}`}
+            className={`flex-1 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${!isRegistering ? 'bg-white text-black shadow-xl scale-100' : 'text-gray-500 hover:text-white scale-95'}`}
           >
-            Entrar
+            Acceder
           </button>
           <button 
             onClick={() => { setIsRegistering(true); setError(null); }}
-            className={`flex-1 py-3 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all ${isRegistering ? 'bg-white text-black' : 'text-gray-500'}`}
+            className={`flex-1 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${isRegistering ? 'bg-white text-black shadow-xl scale-100' : 'text-gray-500 hover:text-white scale-95'}`}
           >
-            Registrarse
+            Registrar
           </button>
         </div>
 
-        <form onSubmit={isRegistering ? handleRegister : (e) => { e.preventDefault(); handleLogin(); }} className="space-y-4 relative">
+        <form onSubmit={isRegistering ? handleRegister : (e) => { e.preventDefault(); handleLogin(); }} className="space-y-6 relative">
           {isRegistering && (
-            <div className="flex flex-col items-center gap-4 mb-6">
+            <div className="flex flex-col items-center gap-4 mb-8">
               <div className="relative group">
-                <div className="w-24 h-24 rounded-xl border-2 border-dashed border-white/20 flex items-center justify-center overflow-hidden bg-white/5 group-hover:border-primary/50 transition-colors">
+                <div className="w-28 h-28 rounded-[2rem] border-2 border-dashed border-white/10 flex items-center justify-center overflow-hidden bg-white/[0.02] group-hover:border-primary/50 transition-all duration-500 shadow-inner">
                   {avatar ? (
                     <img src={avatar} className="w-full h-full object-cover" alt="Avatar" />
                   ) : (
-                    <Camera className="text-white/20" size={32} />
+                    <Camera className="text-white/10 group-hover:text-primary/40 transition-colors" size={40} />
                   )}
                 </div>
                 <input 
@@ -194,120 +196,122 @@ export default function Onboarding() {
                   onChange={handleImageUpload}
                 />
               </div>
-              <span className="text-[9px] text-gray-500 uppercase font-black">Sube tu foto de perfil</span>
+              <span className="text-[9px] text-gray-500 uppercase font-black tracking-widest">Identidad Visual</span>
             </div>
           )}
 
           <div className="space-y-4">
-            <div className="relative">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+            <div className="relative group">
+              <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-primary transition-colors" size={20} />
               <input
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                placeholder="Tu email"
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-12 py-4 text-white text-sm outline-none focus:border-white transition-all placeholder:text-gray-700"
+                placeholder="Email corporativo"
+                className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-14 py-5 text-white text-sm outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all placeholder:text-gray-700"
                 required
               />
             </div>
             
             {isRegistering && (
               <>
-                <div className="relative">
-                  <AtSign className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                <div className="relative group">
+                  <AtSign className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-primary transition-colors" size={20} />
                   <input
                     type="text"
                     value={username}
                     onChange={e => setUsername(e.target.value)}
-                    placeholder="Nombre de usuario (@usuario)"
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-12 py-4 text-white text-sm outline-none focus:border-white transition-all placeholder:text-gray-700"
+                    placeholder="Alias de red"
+                    className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-14 py-5 text-white text-sm outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all placeholder:text-gray-700"
                     required
                   />
                 </div>
-                <div className="relative">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                <div className="relative group">
+                  <User className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-primary transition-colors" size={20} />
                   <input
                     type="text"
                     value={name}
                     onChange={e => setName(e.target.value)}
                     placeholder="Nombre completo"
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-12 py-4 text-white text-sm outline-none focus:border-white transition-all placeholder:text-gray-700"
+                    className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-14 py-5 text-white text-sm outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all placeholder:text-gray-700"
                     required
                   />
                 </div>
               </>
             )}
 
-            <div className="relative">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+            <div className="relative group">
+              <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-primary transition-colors" size={20} />
               <input
                 type="password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                placeholder="Contraseña"
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-12 py-4 text-white text-sm outline-none focus:border-white transition-all placeholder:text-gray-700"
+                placeholder="Llave de acceso"
+                className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-14 py-5 text-white text-sm outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all placeholder:text-gray-700"
                 required
               />
             </div>
           </div>
 
           {error && (
-            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-[10px] text-center uppercase font-black tracking-widest">
+            <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-[10px] text-center uppercase font-black tracking-[0.2em] animate-in slide-in-from-top-2">
               {error}
             </div>
           )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-white text-black py-5 rounded-lg font-black text-[10px] uppercase tracking-[0.2em] transition-all shadow-xl shadow-white/5 flex items-center justify-center gap-2"
-          >
-            {loading ? <Loader2 className="animate-spin" size={18} /> : (isRegistering ? 'Crear Cuenta' : 'Iniciar Sesión')}
-          </button>
+          <div className="space-y-3">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-white text-black py-5 rounded-2xl font-black text-[11px] uppercase tracking-[0.3em] transition-all shadow-2xl hover:bg-gray-100 active:scale-[0.98] flex items-center justify-center gap-3"
+            >
+              {loading ? <Loader2 className="animate-spin" size={20} /> : (isRegistering ? 'Inyectar Datos' : 'Autenticar')}
+            </button>
 
-          {!isRegistering && hasBiometrics && (
-             <button
-                type="button"
-                onClick={handleBiometricLogin}
-                className="w-full bg-white text-black py-5 rounded-lg font-black text-[10px] transition-all flex items-center justify-center gap-2 uppercase tracking-[0.2em] shadow-xl shadow-white/10"
-             >
-                <span className="material-symbols-outlined text-lg">fingerprint</span>
-                Entrar con Biometría
-             </button>
-          )}
+            {!isRegistering && hasBiometrics && (
+               <button
+                  type="button"
+                  onClick={handleBiometricLogin}
+                  className="w-full bg-primary/10 text-primary py-5 rounded-2xl font-black text-[11px] transition-all border border-primary/20 flex items-center justify-center gap-3 uppercase tracking-[0.3em] hover:bg-primary/20 active:scale-[0.98] shadow-lg shadow-primary/5"
+               >
+                  <span className="material-symbols-outlined text-xl">fingerprint</span>
+                  Biometría
+               </button>
+            )}
+          </div>
 
           {!isRegistering && !hasBiometrics && localStorage.getItem('aurora_last_user') && (
             <button
               type="button"
               onClick={handleRegisterBiometrics}
-              className="w-full bg-white/5 hover:bg-white/10 text-gray-400 py-3 rounded-lg font-black text-[8px] transition-all flex items-center justify-center gap-2 uppercase tracking-[0.2em]"
+              className="w-full bg-white/[0.01] hover:bg-white/[0.04] text-gray-600 py-3 rounded-xl font-black text-[8px] transition-all flex items-center justify-center gap-2 uppercase tracking-[0.3em] border border-white/5"
             >
                <span className="material-symbols-outlined text-sm">fingerprint</span>
-               Activar FaceID / Huella
+               Activar Acceso Biométrico
             </button>
           )}
         </form>
 
-        {isScanning && (
-          <div className="fixed inset-0 bg-black/90 z-[500] backdrop-blur-xl flex flex-col items-center justify-center animate-in fade-in duration-300">
-            <div className="relative">
-              <div className="w-32 h-32 rounded-full border-2 border-white/20 flex items-center justify-center">
-                 <span className="material-symbols-outlined text-6xl text-white animate-pulse">fingerprint</span>
-              </div>
-              <div className="absolute inset-0 border-2 border-primary rounded-full animate-ping opacity-20" />
-              <div className="absolute top-0 left-0 w-full h-1 bg-primary shadow-[0_0_15px_rgba(99,102,241,1)] animate-[scan_2s_infinite]" />
-            </div>
-            <h3 className="text-white font-black text-xs uppercase tracking-[0.3em] mt-12 animate-pulse">Verificando Identidad</h3>
-            <p className="text-gray-500 text-[10px] uppercase mt-2">Usa tu huella o reconocimiento facial</p>
-          </div>
-        )}
-
-
-
-        <p className="text-center text-[10px] text-gray-500 uppercase tracking-widest relative">
-          Aurora Chat • Standalone Edition
+        <p className="text-center text-[10px] text-gray-600 uppercase tracking-[0.5em] font-black relative opacity-40">
+          Aurora Neural • v1.0.0
         </p>
       </div>
+
+      {isScanning && (
+        <div className="fixed inset-0 bg-black/95 z-[500] backdrop-blur-2xl flex flex-col items-center justify-center animate-in fade-in duration-500">
+          <div className="relative">
+            <div className="w-40 h-40 rounded-full border border-white/5 flex items-center justify-center bg-white/[0.02]">
+               <span className="material-symbols-outlined text-7xl text-white/20 animate-pulse">fingerprint</span>
+            </div>
+            <div className="absolute inset-0 border-2 border-primary rounded-full animate-ping opacity-10" />
+            <div className="absolute top-0 left-0 w-full h-0.5 bg-primary shadow-[0_0_20px_rgba(99,102,241,1)] animate-[scan_2s_infinite]" />
+          </div>
+          <h3 className="text-white font-black text-xs uppercase tracking-[0.4em] mt-16 animate-pulse">Verificando Neuronas</h3>
+          <p className="text-gray-500 text-[9px] uppercase mt-4 tracking-[0.2em] font-bold">Escaneo de seguridad en curso</p>
+        </div>
+      )}
     </div>
+  );
+}
   );
 }

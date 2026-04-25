@@ -790,7 +790,7 @@ Nota: ${parsed.note}`;
                     <div className="w-16 h-16 rounded-full p-0.5 border-2 border-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]">
                       <img src={s.userAvatar} className="w-full h-full rounded-full object-cover" alt="" />
                     </div>
-                    <span className="text-[10px] font-bold text-white truncate w-16 text-center">{s.nombre.split(' ')[0]}</span>
+                    <span className="text-[10px] font-bold text-white truncate w-16 text-center">{s.userName?.split(' ')[0] || 'Usuario'}</span>
                   </button>
                 ))}
               </div>

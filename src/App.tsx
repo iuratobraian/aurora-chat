@@ -142,8 +142,6 @@ export default function AuroraChat() {
   const channelData = useQuery(api.chat.getChannelBySlug, { slug: currentChannel });
   const events = useQuery(api.events.getEventsByChannel, { channelId: currentChannel });
   const polls = useQuery(api.polls.getPollsByChannel, { channelId: currentChannel });
-  
-  const recentStatuses = activeStatuses; // Fix for potential ReferenceError if used elsewhere
 
   // Convex Mutations
   const getOrCreateDM = useMutation(api.chat.getOrCreatePrivateChannel);
@@ -690,7 +688,7 @@ Nota: ${parsed.note}`;
   const currentChat = [...(displayChannels || []), ...(displayStatuses || [])].find(c => (c as any).slug === currentChannel) || { name: 'Chat' };
 
   return (
-    <div className="flex h-[100dvh] w-full bg-[#0a0a0a] overflow-hidden text-white relative safe-area-pt safe-area-pb">
+    <div className={`flex h-[100dvh] w-full bg-[#0a0a0a] overflow-hidden text-white relative ${isMobile ? 'safe-area-pt safe-area-pb' : ''}`}>
       {/* Decorative blurs to match login feel */}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
@@ -699,9 +697,10 @@ Nota: ${parsed.note}`;
       
       {/* SIDEBAR */}
       <aside className={`
-        ${isSidebarOpen ? 'w-80 translate-x-0' : 'w-0 -translate-x-full'} 
+        ${isSidebarOpen ? (isMobile ? 'w-80' : 'w-[320px]') : 'w-0'} 
         ${isMobile ? 'fixed inset-y-0 left-0 z-[150] shadow-2xl' : 'relative shrink-0'}
         border-r border-white/10 flex flex-col bg-[#111111] transition-all duration-300 overflow-hidden
+        ${!isSidebarOpen && !isMobile ? 'border-none' : ''}
       `}>
 
         {isMobile && isSidebarOpen && (
@@ -916,7 +915,7 @@ Nota: ${parsed.note}`;
       </aside>
 
       {/* MAIN CONTENT */}
-      <div className="flex-1 flex flex-col relative bg-[#0a0a0a] overflow-hidden md:rounded-none">
+      <main className="flex-1 flex flex-col relative bg-[#0a0a0a] overflow-hidden">
 
         {/* Chat Header */}
         <div className="h-16 px-4 border-b border-white/10 flex items-center justify-between bg-[#111111]/80 backdrop-blur-md z-10">

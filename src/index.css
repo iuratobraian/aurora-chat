@@ -127,13 +127,13 @@ button[title]:hover::after {
   animation-play-state: paused;
 }
 
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+@keyframes scan {
+  0% { top: 0; }
+  100% { top: 100%; }
 }
 
-.animate-spin-slow {
-  animation: spin-slow 8s linear infinite;
+.animate-scan {
+  animation: scan 2s infinite;
 }
 
 /* Custom Scrollbar */

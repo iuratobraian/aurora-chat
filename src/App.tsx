@@ -58,6 +58,7 @@ export default function AuroraChat() {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isReady, setIsReady] = useState(false);
   const [viewingProfileUser, setViewingProfileUser] = useState<any>(null);
   const [interimTranscript, setInterimTranscript] = useState('');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -120,6 +121,7 @@ export default function AuroraChat() {
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const profileImageInputRef = useRef<HTMLInputElement>(null);
   const isAtBottom = useRef(true);
+  const hasInitiallyScrolled = useRef<string | null>(null);
 
   // Convex Queries
   const searchedUsers = useQuery(api.users.searchUsers, { query: userSearchQuery });
@@ -258,10 +260,17 @@ export default function AuroraChat() {
   }, [messages, user?._id, currentChannel]);
 
   useEffect(() => {
-    if (isAtBottom.current && messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    setIsReady(false);
+  }, [currentChannel]);
+
+  useEffect(() => {
+    if (messages.length > 0 && messagesEndRef.current) {
+      const shouldSmooth = hasInitiallyScrolled.current === currentChannel && isAtBottom.current;
+      messagesEndRef.current.scrollIntoView({ behavior: shouldSmooth ? 'smooth' : 'auto' });
+      hasInitiallyScrolled.current = currentChannel;
+      if (!isReady) setIsReady(true);
     }
-  }, [messages.length]);
+  }, [messages.length, currentChannel, isReady]);
 
   useEffect(() => {
     if (isOnline && offlineQueue.length > 0 && user) {
@@ -1011,9 +1020,17 @@ Nota: ${parsed.note}`;
         )}
 
         {/* Messages Area */}
-        <div ref={scrollRef} onScroll={handleScroll} className="flex-1 overflow-y-auto p-4 md:p-8 space-y-8 custom-scrollbar">
+        <div 
+          ref={scrollRef} 
+          onScroll={handleScroll} 
+          className={`flex-1 overflow-y-auto p-4 md:p-8 space-y-8 custom-scrollbar transition-opacity duration-300 ${isReady ? 'opacity-100' : 'opacity-0'}`}
+        >
 
-          {displayMessages.length === 0 ? (
+          {rawMessagesData === undefined ? (
+            <div className="h-full flex flex-col items-center justify-center text-center opacity-0">
+               <Loader2 size={32} className="animate-spin text-white/20" />
+            </div>
+          ) : displayMessages.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center opacity-20">
               <MessageSquare size={64} className="mb-4" />
               <h3 className="text-lg font-bold uppercase tracking-[0.2em]">Comienza la charla</h3>

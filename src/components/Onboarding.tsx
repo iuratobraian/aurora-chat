@@ -148,7 +148,7 @@ export default function Onboarding() {
 
 
   return (
-    <div className="fixed inset-0 bg-[#0a0a0a] z-[100] flex items-center justify-center p-4 safe-area-pt safe-area-pb selection:bg-primary/30">
+    <div className="fixed inset-0 bg-[#0a0a0a] z-[100] flex items-center justify-center p-4 safe-area-pt safe-area-pb selection:bg-primary/30 overflow-y-auto">
       <div className="w-full max-w-md glass-panel rounded-[2rem] p-8 md:p-10 space-y-10 shadow-[0_32px_64px_rgba(0,0,0,0.5)] relative overflow-hidden animate-in fade-in zoom-in-95 duration-500">
         
         {/* Dynamic decorative elements */}

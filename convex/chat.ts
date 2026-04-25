@@ -231,6 +231,8 @@ export const getOrCreatePrivateChannel = mutation({
       status,
       user1Id,
       user2Id,
+      participants: [user1Id, user2Id],
+      createdAt: Date.now(),
     });
     
     // Send automated welcome message if exists

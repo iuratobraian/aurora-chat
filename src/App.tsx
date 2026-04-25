@@ -418,49 +418,7 @@ export default function AuroraChat() {
     }
   }, []);
 
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
-      audioChunksRef.current = [];
-      
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) audioChunksRef.current.push(e.data);
-      };
-      
-      recorder.onstop = async () => {
-        const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        setAudioBlob(blob);
-        stream.getTracks().forEach(track => track.stop());
-      };
-      
-      recorder.start();
-      mediaRecorderRef.current = recorder;
-      setIsRecording(true);
-    } catch (err) {
-      console.error('Error starting recording:', err);
-      setError('No se pudo acceder al micrófono');
-    }
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-      
-      mediaRecorderRef.current.onstop = async () => {
-        const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setAudioBlob(blob);
-          setAttachedAudio(reader.result as string);
-        };
-        reader.readAsDataURL(blob);
-        
-        mediaRecorderRef.current?.stream.getTracks().forEach(track => track.stop());
-      };
-    }
-  };  const startSpeechRecognition = () => {
+  const startRecording = () => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
       setError("Tu navegador no soporta reconocimiento de voz");
@@ -468,17 +426,39 @@ export default function AuroraChat() {
     }
     const rec = new SpeechRecognition();
     rec.lang = 'es-ES';
+    rec.interimResults = true;
+    rec.continuous = true;
     rec.onresult = (event: any) => {
-      const result = event.results[0][0].transcript;
-      setText(prev => prev + (prev ? ' ' : '') + result);
+      let interim = '';
+      let final = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          final += event.results[i][0].transcript;
+        } else {
+          interim += event.results[i][0].transcript;
+        }
+      }
+      if (final) {
+        setText(prev => prev + (prev ? ' ' : '') + final);
+      }
+      setInterimTranscript(interim);
     };
 
     try {
       rec.start();
       recognitionRef.current = rec;
+      setIsRecording(true);
     } catch (err) {
-      console.error('Failed to start speech recognition:', err);
-      setError("No se pudo iniciar el reconocimiento de voz");
+      console.error('Error starting speech recognition:', err);
+      setError('No se pudo acceder al micrófono para dictado');
+    }
+  };
+
+  const stopRecording = () => {
+    if (recognitionRef.current && isRecording) {
+      recognitionRef.current.stop();
+      setIsRecording(false);
+      setInterimTranscript('');
     }
   };
 
@@ -990,8 +970,6 @@ Nota: ${parsed.note}`;
           </div>
         )}
 
-        </div>
-
         {/* Message Request Banner */}
         {channelsList.find((c:any) => c.slug === currentChannel && c.status === 'pending' && c.user2Id === user._id) && (
           <div className="bg-primary/10 border-b border-primary/20 p-4 flex flex-col items-center gap-3 text-center">
@@ -1229,6 +1207,7 @@ Nota: ${parsed.note}`;
         {isMobile && isSidebarOpen && (
            <div className="fixed inset-0 bg-black/40 z-[140] backdrop-blur-sm" onClick={() => setIsSidebarOpen(false)} />
         )}
+      </div>
       </div>
 
       {/* MODALS */}

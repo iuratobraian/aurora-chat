@@ -73,40 +73,24 @@ body {
 }
 
 /* Mobile App Optimization */
-html, body {
+html, body, #root {
   overscroll-behavior: none;
-  height: 100%;
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
-  width: 100%;
-  -webkit-user-select: none;
-  user-select: none;
-  touch-action: manipulation;
   background: #0a0a0a;
 }
 
 #root {
-  height: 100%;
-  height: -webkit-fill-available;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
-}
-
-/* Desktop optimization */
-@media (min-width: 1024px) {
-  html, body {
-    position: static;
-  }
 }
 
 input, textarea {
   -webkit-user-select: text;
   user-select: text;
-}
-
-@supports (padding: env(safe-area-inset-top)) {
-  .safe-area-pt { padding-top: env(safe-area-inset-top); }
-  .safe-area-pb { padding-bottom: env(safe-area-inset-bottom); }
 }
 
 /* Premium Button Hover */

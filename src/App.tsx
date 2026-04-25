@@ -690,7 +690,7 @@ Nota: ${parsed.note}`;
   const currentChat = [...(displayChannels || []), ...(displayStatuses || [])].find(c => (c as any).slug === currentChannel) || { name: 'Chat' };
 
   return (
-    <div className={`flex h-[100dvh] w-full bg-[#0a0a0a] overflow-hidden text-white relative ${isMobile ? 'safe-area-pt safe-area-pb' : ''}`}>
+    <div className="flex h-screen w-full bg-[#0a0a0a] overflow-hidden text-white relative">
       {/* Decorative blurs to match login feel */}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />

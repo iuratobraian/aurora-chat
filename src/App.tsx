@@ -661,7 +661,7 @@ Nota: ${parsed.note}`;
   const currentChat = [...(displayChannels || []), ...(displayStatuses || [])].find(c => (c as any).slug === currentChannel) || { name: 'Chat' };
 
   return (
-    <div className="flex h-screen w-full bg-[#0f1115] overflow-hidden text-white">
+    <div className="flex h-full w-full bg-[#0f1115] overflow-hidden text-white">
       <div className="flex h-full w-full overflow-hidden">
       <audio ref={audioRef} src={NOTIFICATION_SOUND} preload="auto" />
       
@@ -1047,7 +1047,19 @@ Nota: ${parsed.note}`;
                     <div className={`flex-1 flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
                       { (idx === 0 || displayMessages[idx-1].userId !== m.userId) && (
                         <div className={`flex items-center gap-2 mb-1 ${isMe ? 'flex-row-reverse' : ''}`}>
-                          <span className="text-[10px] font-black text-white uppercase tracking-widest">{m.nombre}</span>
+                          <button 
+                            onClick={() => {
+                              const userStatus = recentStatuses?.find((s:any) => s.userId === m.userId);
+                              if(userStatus) {
+                                setViewingStatus(userStatus);
+                              } else {
+                                setViewingProfileUser({ _id: m.userId, name: m.nombre, avatar: m.avatar });
+                              }
+                            }}
+                            className="text-[10px] font-black text-white uppercase tracking-widest hover:text-primary transition-colors text-left"
+                          >
+                            {m.nombre}
+                          </button>
                           <span className="text-[8px] text-gray-600 font-bold uppercase tracking-tighter">{new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                         </div>
                       )}

@@ -37,6 +37,7 @@ export default defineSchema({
     createdAt: v.number(),
     password: v.optional(v.string()), 
     isPrivate: v.optional(v.boolean()),
+    status: v.optional(v.string()),
     user1Id: v.optional(v.id("users")),
     user2Id: v.optional(v.id("users")),
   }).index("by_slug", ["slug"])

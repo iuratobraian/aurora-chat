@@ -156,7 +156,6 @@ html, body {
   overscroll-behavior: none;
   height: 100%;
   overflow: hidden;
-  position: fixed;
   width: 100%;
   -webkit-user-select: none;
   user-select: none;

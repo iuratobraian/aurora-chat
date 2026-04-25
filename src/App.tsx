@@ -171,6 +171,8 @@ export default function AuroraChat() {
   const voteInPoll = useMutation(api.polls.voteInPoll);
   const updateChannelStatus = useMutation(api.chat.updateChannelStatus);
   const deleteChannel = useMutation(api.chat.deleteChannel);
+  const addModerator = useMutation(api.chat.addModerator);
+  const removeModerator = useMutation(api.chat.removeModerator);
 
   // Computed Values
   const channelsList = Array.isArray(rawChannels) ? rawChannels : [];
@@ -682,13 +684,13 @@ Nota: ${parsed.note}`;
   };
 
   if (!user) return (
-    <Onboarding onComplete={(u) => setUser(u as any)} />
+    <Onboarding />
   );
 
   const currentChat = [...(displayChannels || []), ...(displayStatuses || [])].find(c => (c as any).slug === currentChannel) || { name: 'Chat' };
 
   return (
-    <div className={`flex h-[100dvh] w-full bg-[#0a0a0a] overflow-hidden text-white relative ${isMobile ? 'safe-area-pt safe-area-pb' : ''}`}>
+    <div className={`flex h-full w-full bg-[#0a0a0a] overflow-hidden text-white relative`}>
       {/* Decorative blurs to match login feel */}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
@@ -713,35 +715,35 @@ Nota: ${parsed.note}`;
         )}
 
         {/* Coordination Tools */}
-        <div className="p-4 space-y-2 border-t border-white/10 bg-white/[0.02]">
-           <h4 className="text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2 px-2">Coordinación Personal</h4>
-           <div className="grid grid-cols-3 gap-2">
-              <button onClick={() => setShowReminders(true)} className="flex flex-col items-center gap-1.5 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-all border border-white/5">
-                <Clock size={18} className="text-amber-500"/>
-                <span className="text-[8px] font-bold text-gray-400 uppercase">Alertas</span>
+        <div className="p-6 space-y-4 border-t border-white/5 bg-white/[0.01]">
+           <h4 className="text-[9px] font-black text-gray-600 uppercase tracking-[0.3em] mb-4 px-1">Gestión Central</h4>
+           <div className="grid grid-cols-3 gap-3">
+              <button onClick={() => setShowReminders(true)} className="flex flex-col items-center gap-2.5 p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] transition-all border border-white/5 group">
+                <Clock size={20} className="text-amber-500 group-hover:scale-110 transition-transform"/>
+                <span className="text-[8px] font-black text-gray-500 uppercase tracking-widest">Alertas</span>
               </button>
-              <button onClick={() => setShowNotes(true)} className="flex flex-col items-center gap-1.5 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-all border border-white/5">
-                <FileText size={18} className="text-emerald-500"/>
-                <span className="text-[8px] font-bold text-gray-400 uppercase">Notas</span>
+              <button onClick={() => setShowNotes(true)} className="flex flex-col items-center gap-2.5 p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] transition-all border border-white/5 group">
+                <FileText size={20} className="text-emerald-500 group-hover:scale-110 transition-transform"/>
+                <span className="text-[8px] font-black text-gray-500 uppercase tracking-widest">Notas</span>
               </button>
-              <button onClick={() => setShowPasswords(true)} className="flex flex-col items-center gap-1.5 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-all border border-white/5">
-                <Lock size={18} className="text-primary"/>
-                <span className="text-[8px] font-bold text-gray-400 uppercase">Claves</span>
+              <button onClick={() => setShowPasswords(true)} className="flex flex-col items-center gap-2.5 p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] transition-all border border-white/5 group">
+                <Lock size={20} className="text-primary group-hover:scale-110 transition-transform"/>
+                <span className="text-[8px] font-black text-gray-500 uppercase tracking-widest">Llaves</span>
               </button>
            </div>
            
            <button 
              onClick={() => setShowExpenses(true)}
-             className="w-full flex items-center justify-center gap-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 py-4 rounded-lg border border-emerald-500/20 transition-all font-black text-[10px] uppercase tracking-widest mt-2"
+             className="w-full flex items-center justify-center gap-3 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 py-4.5 rounded-2xl border border-emerald-500/20 transition-all font-black text-[10px] uppercase tracking-[0.2em] mt-2 shadow-lg shadow-emerald-500/5"
            >
-             <Wallet size={16}/> Control de Gastos
+             <Wallet size={18}/> Finanzas Aurora
            </button>
 
            <button 
              onClick={() => setShowFriendsModal(true)}
-             className="w-full flex items-center justify-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary py-4 rounded-lg border border-primary/20 transition-all font-black text-[10px] uppercase tracking-widest mt-2"
+             className="w-full flex items-center justify-center gap-3 bg-primary/10 hover:bg-primary/20 text-primary py-4.5 rounded-2xl border border-primary/20 transition-all font-black text-[10px] uppercase tracking-[0.2em] mt-2 shadow-lg shadow-primary/5"
            >
-             <Users size={16}/> Mis Amigos
+             <Users size={18}/> Red de Contactos
            </button>
         </div>
 
@@ -964,10 +966,10 @@ Nota: ${parsed.note}`;
                  <HardDrive size={20}/>
                </button>
 
-               {channelData?.createdBy === user?._id && (
+               { (channelData?.createdBy === user?._id || channelData?.moderators?.includes(user?._id)) && (
                 <button 
-                 onClick={() => togglePause({ channelId: channelData._id, isPaused: !channelData.isPaused })}
-                 className={`p-2 rounded-lg transition-all ${channelData?.isPaused ? 'bg-amber-500 text-white' : 'text-gray-500 hover:text-white bg-white/5'}`}
+                 onClick={() => togglePause({ channelId: channelData._id, isPaused: !channelData.isPaused, userId: user?._id as any })}
+                 className={`p-2.5 rounded-xl transition-all ${channelData?.isPaused ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20' : 'text-gray-500 hover:text-white bg-white/5'}`}
                  title={channelData?.isPaused ? "Reanudar Chat" : "Pausar Chat"}
                 >
                   {channelData?.isPaused ? <Play size={20}/> : <Pause size={20}/>}
@@ -1062,90 +1064,93 @@ Nota: ${parsed.note}`;
               const showSeparator = idx > 0 && displayMessages[idx - 1].userId !== m.userId;
               const isMe = m.userId === user?._id;
 
-              
               return (
-                <div key={m._id || idx} className={`flex flex-col ${showSeparator ? 'mt-6 pt-4 border-t border-white/5' : 'mt-1'}`}>
-                  <div className={`flex gap-4 group ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
+                <div key={m._id || idx} className={`flex flex-col ${showSeparator ? 'mt-8 pt-8 border-t border-white/5' : 'mt-2'}`}>
+                  <div className={`flex gap-5 group ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
                     <button 
                       onClick={() => {
                         setViewingProfileUser({ _id: m.userId, name: m.nombre, avatar: m.avatar });
                       }}
-                      className={`shrink-0 transition-transform hover:scale-110 ${idx > 0 && displayMessages[idx-1].userId === m.userId ? 'opacity-0 h-0 pointer-events-none' : 'opacity-100'}`}
+                      className={`shrink-0 transition-all hover:scale-110 ${idx > 0 && displayMessages[idx-1].userId === m.userId ? 'opacity-0 h-0 pointer-events-none' : 'opacity-100'}`}
                     >
-                      <div className={`relative p-0.5 rounded-lg ${recentStatuses?.find((s:any) => s.userId === m.userId) ? 'bg-gradient-to-tr from-primary to-purple-500' : ''}`}>
-                        <img src={m.avatar} className="w-9 h-9 rounded-[10px] shadow-lg border border-white/10 bg-[#111111]" alt="" />
+                      <div className={`relative p-[1px] rounded-xl ${recentStatuses?.find((s:any) => s.userId === m.userId) ? 'bg-gradient-to-tr from-primary to-purple-500' : 'bg-white/10'}`}>
+                        <img src={m.avatar} className="w-10 h-10 rounded-xl shadow-2xl border border-white/5 bg-[#111111] object-cover" alt="" />
                       </div>
                     </button>
 
-                    
-                    <div className={`flex-1 flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
-                      { (idx === 0 || displayMessages[idx-1].userId !== m.userId) && (
-                        <div className={`flex items-center gap-2 mb-1 ${isMe ? 'flex-row-reverse' : ''}`}>
+                    <div className={`flex-1 flex flex-col ${isMe ? 'items-end' : 'items-start'} max-w-[85%]`}>
+                      {(idx === 0 || displayMessages[idx-1].userId !== m.userId) && (
+                        <div className={`flex items-center gap-3 mb-2 ${isMe ? 'flex-row-reverse text-right' : 'text-left'}`}>
                           <button 
                             onClick={() => {
                               setViewingProfileUser({ _id: m.userId, name: m.nombre, avatar: m.avatar });
                             }}
-                            className="text-[10px] font-black text-white uppercase tracking-widest hover:text-primary transition-colors text-left"
+                            className="text-[10px] font-black text-white uppercase tracking-[0.2em] hover:text-primary transition-colors"
                           >
                             {m.nombre}
                           </button>
-                          <span className="text-[8px] text-gray-600 font-bold uppercase tracking-tighter">{new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                          {channelData?.moderators?.includes(m.userId) && (
+                            <span className="text-[7px] font-black bg-primary/10 text-primary px-1.5 py-0.5 rounded uppercase tracking-widest border border-primary/20">Mod</span>
+                          )}
+                          <span className="text-[8px] text-gray-600 font-bold uppercase tracking-widest">{new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                         </div>
                       )}
                       
                       <div className={`
-                        max-w-[85%] text-[13px] leading-relaxed transition-all relative group p-3 rounded-lg
-                        ${isMe ? 'bg-white/5 text-right rounded-tr-none' : 'bg-white/10 text-left rounded-tl-none'}
-                        ${m.isPinned ? 'border-l-2 border-primary pl-3' : ''}
+                        w-full text-[14px] leading-[1.6] transition-all relative group
+                        ${isMe ? 'text-right' : 'text-left'}
+                        ${m.isPinned ? 'border-l-2 border-primary pl-4 my-2' : ''}
                       `}>
                         {m.imagenUrl && (
-                          <div className={`mb-3 rounded-lg overflow-hidden ring-1 ring-white/10 group/img relative inline-block max-w-sm`}>
-                            <img src={m.imagenUrl} className="w-full h-auto max-h-96 cursor-zoom-in group-hover/img:scale-105 transition-transform duration-500" alt="" onClick={() => setPreviewImage(m.imagenUrl!)} />
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
-                              <Search className="text-white" />
+                          <div className={`mb-4 rounded-2xl overflow-hidden ring-1 ring-white/10 group/img relative inline-block max-w-md shadow-2xl`}>
+                            <img src={m.imagenUrl} className="w-full h-auto max-h-[500px] cursor-zoom-in group-hover/img:scale-[1.02] transition-transform duration-700" alt="" onClick={() => setPreviewImage(m.imagenUrl!)} />
+                            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center pointer-events-none backdrop-blur-[2px]">
+                              <Search className="text-white w-8 h-8" />
                             </div>
                           </div>
                         )}
                         
                         {m.audioUrl && (
-                          <div className={`mb-3 flex items-center gap-4 bg-black/20 p-3 rounded-lg border border-white/5 w-fit ${isMe ? 'flex-row-reverse text-right' : ''}`}>
+                          <div className={`mb-4 flex items-center gap-4 bg-white/[0.03] backdrop-blur-md p-4 rounded-2xl border border-white/5 w-fit shadow-xl ${isMe ? 'flex-row-reverse text-right ml-auto' : ''}`}>
                              <button onClick={(e) => {
                                const audio = e.currentTarget.nextElementSibling as HTMLAudioElement;
                                if(audio.paused) audio.play(); else audio.pause();
-                             }} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white shrink-0 hover:scale-110 transition-transform shadow-lg">
-                               <Volume2 size={18}/>
+                             }} className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center shrink-0 hover:scale-105 transition-transform shadow-xl">
+                               <Volume2 size={20}/>
                              </button>
                              <audio src={m.audioUrl} className="hidden" />
-                             <div className="flex flex-col gap-1">
-                                <span className="text-[8px] font-black uppercase text-gray-500">Nota de Voz</span>
-                                <div className="w-24 h-1 bg-white/10 rounded-full overflow-hidden">
-                                   <div className="h-full bg-white/40 animate-progress w-full" />
+                             <div className="flex flex-col gap-1.5">
+                                <span className="text-[8px] font-black uppercase text-gray-500 tracking-widest">Mensaje de Voz</span>
+                                <div className="w-32 h-1 bg-white/10 rounded-full overflow-hidden">
+                                   <div className="h-full bg-white/40 animate-pulse w-full" />
                                 </div>
                              </div>
                           </div>
                         )}
 
                         {m.eventId && (
-                          <div className={`mb-4 bg-white/5 border border-white/10 rounded-xl p-5 space-y-4 max-w-xs ${isMe ? 'ml-auto' : ''}`}>
-                             <div className="flex items-center gap-2 text-white font-black text-[10px] uppercase tracking-[0.2em]">
-                                <Calendar size={14}/> Evento Sugerido
+                          <div className={`mb-6 bg-[#111111] border border-white/10 rounded-[2rem] p-6 space-y-5 max-w-sm shadow-2xl ${isMe ? 'ml-auto' : ''}`}>
+                             <div className="flex items-center gap-3 text-white font-black text-[9px] uppercase tracking-[0.2em]">
+                                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center border border-white/10"><Calendar size={14}/></div> 
+                                Invitación de Equipo
                              </div>
-                             <h4 className="text-xs font-bold text-white uppercase tracking-tight">Invitación Interactiva</h4>
+                             <h4 className="text-sm font-bold text-white uppercase tracking-tight leading-snug">Evento Interactivo en curso</h4>
                              <button 
                               onClick={() => { setShowEvents(true); }}
-                              className="w-full bg-white text-black py-3 rounded-lg text-[9px] font-black uppercase shadow-xl hover:scale-[1.02] transition-transform"
+                              className="w-full bg-white text-black py-4 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] shadow-xl hover:bg-gray-200 transition-all active:scale-[0.98]"
                              >
-                               Ver y Anotarme
+                               Confirmar Asistencia
                              </button>
                           </div>
                         )}
 
-                        <div className="whitespace-pre-wrap break-words">{formatText(decryptMessage(m.texto || '', currentChannel))}</div>
+                        <div className="whitespace-pre-wrap break-words text-white/90 selection:bg-primary/30">
+                          {formatText(decryptMessage(m.texto || '', currentChannel))}
+                        </div>
                         
-                        {/* Status indicators */}
-                        <div className={`flex items-center gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-all ${isMe ? 'justify-end' : 'justify-start'}`}>
-                           { (m as any).isOffline && <span className="text-[7px] font-black text-amber-500 uppercase">En Cola</span> }
-                           <span className="text-[8px] text-gray-500 font-bold">{new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        <div className={`flex items-center gap-3 mt-2 opacity-0 group-hover:opacity-100 transition-all duration-300 ${isMe ? 'justify-end' : 'justify-start'}`}>
+                           {(m as any).isOffline && <span className="text-[7px] font-black text-amber-500 uppercase tracking-widest">Pendiente</span>}
+                           <span className="text-[8px] text-gray-700 font-bold uppercase tracking-widest">{new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                         </div>
                       </div>
                     </div>
@@ -1188,56 +1193,53 @@ Nota: ${parsed.note}`;
             )}
 
             {attachedImage && (
-
              <div className="mb-4 flex items-center gap-3 p-2 bg-white/5 rounded-lg border border-white/10 w-fit">
                <div className="relative w-20 h-20 rounded-lg overflow-hidden">
                  <img src={attachedImage} className="w-full h-full object-cover" alt="" />
                  <button onClick={() => setAttachedImage(null)} className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-lg"><X size={14}/></button>
                </div>
-               <span className="text-xs text-gray-400 pr-4">Imagen lista para enviar</span>
              </div>
-           )}
+            )}
 
-           <form onSubmit={handleSubmit} className="flex items-center gap-2 max-w-5xl mx-auto">
-              <button type="button" onClick={() => fileInputRef.current?.click()} className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-500 hover:text-white transition-all shrink-0"><Plus size={20}/></button>
+             <form onSubmit={handleSubmit} className="flex items-center gap-3 max-w-5xl mx-auto">
+              <button type="button" onClick={() => fileInputRef.current?.click()} className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-all shrink-0"><Plus size={22}/></button>
               
-              <div className="flex-1 bg-white/5 border border-white/10 rounded-[2rem] px-2 py-1 focus-within:border-white/20 transition-all flex items-end gap-1">
-                <button type="button" onClick={() => setShowEmoji(!showEmoji)} className="p-2 text-gray-500 hover:text-white transition-colors shrink-0"><Smile size={20}/></button>
+              <div className="flex-1 bg-white/[0.03] border border-white/10 rounded-[1.5rem] px-3 py-1 focus-within:border-white/20 transition-all flex items-end gap-1 shadow-inner backdrop-blur-xl">
+                <button type="button" onClick={() => setShowEmoji(!showEmoji)} className="p-3 text-gray-500 hover:text-white transition-colors shrink-0"><Smile size={22}/></button>
                 <textarea
                   value={text + (interimTranscript ? (text ? ' ' : '') + interimTranscript : '')}
                   onChange={e => { setText(e.target.value); handleTyping(); }}
                   onPaste={handlePaste}
-                  placeholder={isRecording ? "Escuchando..." : "Escribe un mensaje..."}
-                  className={`flex-1 bg-transparent text-sm text-white outline-none placeholder-gray-600 px-2 py-2 resize-none max-h-32 min-h-[40px] leading-tight ${isRecording ? 'text-white' : ''}`}
+                  placeholder={isRecording ? "Escuchando voz..." : "Escribe un mensaje..."}
+                  className={`flex-1 bg-transparent text-sm text-white outline-none placeholder-gray-700 px-2 py-3 resize-none max-h-40 min-h-[48px] leading-relaxed ${isRecording ? 'text-primary' : ''}`}
                   rows={1}
                   onKeyDown={e => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(e); } }}
                 />
                 
-                 <button type="button" onClick={() => cameraInputRef.current?.click()} className="p-2 text-gray-500 hover:text-white transition-all">
-                   <Camera size={20}/>
+                 <button type="button" onClick={() => cameraInputRef.current?.click()} className="p-3 text-gray-500 hover:text-white transition-all">
+                   <Camera size={22}/>
                  </button>
                </div>
 
                <div className="shrink-0">
                   { (text.trim() || attachedImage || audioBlob) ? (
-                    <button type="submit" disabled={uploading} className="w-11 h-11 bg-white text-black rounded-full flex items-center justify-center transition-all active:scale-90 shadow-lg">
-                      <Send size={20} fill="currentColor" />
+                    <button type="submit" disabled={uploading} className="w-12 h-12 bg-white text-black rounded-2xl flex items-center justify-center transition-all active:scale-95 shadow-2xl hover:bg-gray-100">
+                      <Send size={22} fill="currentColor" />
                     </button>
                   ) : (
                     <button 
                       type="button" 
                       onClick={() => isRecording ? stopRecording() : startRecording()}
-                      className={`w-11 h-11 rounded-full flex items-center justify-center transition-all ${isRecording ? 'bg-red-500 text-white animate-pulse' : 'bg-white/10 text-white hover:bg-white/20'}`}
+                      className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${isRecording ? 'bg-red-500 text-white animate-pulse shadow-red-500/50' : 'bg-white/5 text-white hover:bg-white/10 border border-white/5 shadow-lg'}`}
                     >
-                      {isRecording ? <MicOff size={20}/> : <Mic size={20}/>}
+                      {isRecording ? <MicOff size={22}/> : <Mic size={22}/>}
                     </button>
                   )}
                </div>
 
-
-              <input type="file" ref={fileInputRef} className="hidden" accept="image/*,.pdf,.docx,.xlsx,.xls,.csv" onChange={(e) => handleImageUpload(e, 'chat')} />
-              <input type="file" ref={cameraInputRef} className="hidden" accept="image/*" capture="environment" onChange={(e) => handleImageUpload(e, 'chat')} />
-            </form>
+               <input type="file" ref={fileInputRef} className="hidden" accept="image/*,.pdf,.docx,.xlsx,.xls,.csv" onChange={(e) => handleImageUpload(e, 'chat')} />
+               <input type="file" ref={cameraInputRef} className="hidden" accept="image/*" capture="environment" onChange={(e) => handleImageUpload(e, 'chat')} />
+             </form>
 
         </div>
         {isMobile && isSidebarOpen && (
@@ -1877,9 +1879,25 @@ Nota: ${parsed.note}`;
                 {user._id !== viewingProfileUser._id && !friendsList?.find((f:any) => f._id === viewingProfileUser._id) && !sentFriendRequests?.find((r:any) => r.user2Id === viewingProfileUser._id) && (
                   <button 
                     onClick={() => sendFriendRequest({ fromId: user._id as any, toId: viewingProfileUser._id })}
-                    className="w-full bg-white/5 hover:bg-white/10 text-white/60 py-4 rounded-lg font-bold uppercase tracking-widest text-[10px] border border-white/10 flex items-center justify-center gap-2 transition-all active:scale-95"
+                    className="w-full bg-white text-black py-4 rounded-lg font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 transition-all active:scale-95 shadow-xl"
                   >
                     <Users size={16} /> Agregar Amigo
+                  </button>
+                )}
+
+                {channelData?.createdBy === user?._id && user?._id !== viewingProfileUser._id && (
+                  <button 
+                    onClick={async () => {
+                      const isMod = channelData.moderators?.includes(viewingProfileUser._id);
+                      if (isMod) {
+                        await removeModerator({ channelId: channelData._id, userId: viewingProfileUser._id, ownerId: user?._id as any });
+                      } else {
+                        await addModerator({ channelId: channelData._id, userId: viewingProfileUser._id, ownerId: user?._id as any });
+                      }
+                    }}
+                    className={`w-full py-4 rounded-lg font-black uppercase tracking-widest text-[10px] border transition-all ${channelData.moderators?.includes(viewingProfileUser._id) ? 'bg-red-500/10 text-red-500 border-red-500/20' : 'bg-white/5 text-white border-white/10'}`}
+                  >
+                    {channelData.moderators?.includes(viewingProfileUser._id) ? 'Quitar Moderador' : 'Hacer Moderador'}
                   </button>
                 )}
 

@@ -40,6 +40,9 @@ export default defineSchema({
     status: v.optional(v.string()),
     user1Id: v.optional(v.id("users")),
     user2Id: v.optional(v.id("users")),
+    moderators: v.optional(v.array(v.string())),
+    isPaused: v.optional(v.boolean()),
+    welcomeMessage: v.optional(v.string()),
   }).index("by_slug", ["slug"])
     .index("by_type", ["type"])
     .index("by_users", ["user1Id", "user2Id"]),

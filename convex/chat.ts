@@ -297,9 +297,53 @@ export const togglePinMessage = mutation({
 });
 
 export const togglePauseChannel = mutation({
-  args: { channelId: v.id("chatChannels"), isPaused: v.boolean() },
+  args: { channelId: v.id("chatChannels"), isPaused: v.boolean(), userId: v.string() },
   handler: async (ctx, args) => {
+    const channel = await ctx.db.get(args.channelId);
+    if (!channel) throw new Error("Canal no encontrado");
+    
+    const isOwner = channel.createdBy === args.userId;
+    const isModerator = channel.moderators?.includes(args.userId);
+    
+    if (!isOwner && !isModerator) {
+      throw new Error("No tienes permisos para realizar esta acción");
+    }
+    
     await ctx.db.patch(args.channelId, { isPaused: args.isPaused });
+  },
+});
+
+export const addModerator = mutation({
+  args: { channelId: v.id("chatChannels"), userId: v.string(), ownerId: v.string() },
+  handler: async (ctx, args) => {
+    const channel = await ctx.db.get(args.channelId);
+    if (!channel) throw new Error("Canal no encontrado");
+    
+    if (channel.createdBy !== args.ownerId) {
+      throw new Error("Solo el creador puede agregar moderadores");
+    }
+    
+    const moderators = channel.moderators || [];
+    if (!moderators.includes(args.userId)) {
+      moderators.push(args.userId);
+      await ctx.db.patch(args.channelId, { moderators });
+    }
+  },
+});
+
+export const removeModerator = mutation({
+  args: { channelId: v.id("chatChannels"), userId: v.string(), ownerId: v.string() },
+  handler: async (ctx, args) => {
+    const channel = await ctx.db.get(args.channelId);
+    if (!channel) throw new Error("Canal no encontrado");
+    
+    if (channel.createdBy !== args.ownerId) {
+      throw new Error("Solo el creador puede eliminar moderadores");
+    }
+    
+    const moderators = channel.moderators || [];
+    const updatedModerators = moderators.filter(id => id !== args.userId);
+    await ctx.db.patch(args.channelId, { moderators: updatedModerators });
   },
 });
 

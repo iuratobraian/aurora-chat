@@ -735,54 +735,7 @@ Nota: ${parsed.note}`;
       
       <audio ref={audioRef} src={NOTIFICATION_SOUND} preload="auto" />
       
-      {/* PORTAL / SIDEBAR */}
-      <aside className={`
-        ${isMobile ? (mobileView === 'list' ? 'w-full' : 'w-0 hidden') : (isSidebarOpen ? 'w-[320px]' : 'w-0')} 
-        ${isMobile ? 'relative z-[150]' : 'relative shrink-0'}
-        border-r border-white/10 flex flex-col bg-[#0d0d0d] transition-all duration-300 ease-in-out overflow-hidden
-        ${!isSidebarOpen && !isMobile ? 'border-none' : ''}
-      `}>
-        {isMobile && isSidebarOpen && (
-          <button 
-            onClick={() => setIsSidebarOpen(false)}
-            className="absolute top-4 right-4 text-gray-500 hover:text-white z-50 p-2 bg-white/5 rounded-lg"
-          >
-            <X size={20}/>
-          </button>
-        )}
-
-        {/* Coordination Tools */}
-        <div className="p-6 space-y-4 border-t border-white/5 bg-white/[0.01]">
-           <h4 className="text-[9px] font-black text-gray-600 uppercase tracking-[0.3em] mb-4 px-1">Gestión Central</h4>
-           <div className="grid grid-cols-3 gap-3">
-              <button onClick={() => setShowReminders(true)} className="flex flex-col items-center gap-2.5 p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] transition-all border border-white/5 group">
-                <Clock size={20} className="text-amber-500 group-hover:scale-110 transition-transform"/>
-                <span className="text-[8px] font-black text-gray-500 uppercase tracking-widest">Alertas</span>
-              </button>
-              <button onClick={() => setShowNotes(true)} className="flex flex-col items-center gap-2.5 p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] transition-all border border-white/5 group">
-                <FileText size={20} className="text-emerald-500 group-hover:scale-110 transition-transform"/>
-                <span className="text-[8px] font-black text-gray-500 uppercase tracking-widest">Notas</span>
-              </button>
-              <button onClick={() => setShowPasswords(true)} className="flex flex-col items-center gap-2.5 p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] transition-all border border-white/5 group">
-                <Lock size={20} className="text-primary group-hover:scale-110 transition-transform"/>
-                <span className="text-[8px] font-black text-gray-500 uppercase tracking-widest">Llaves</span>
-              </button>
-           </div>
-           
-           <button 
-             onClick={() => setShowExpenses(true)}
-             className="w-full flex items-center justify-center gap-3 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 py-4.5 rounded-2xl border border-emerald-500/20 transition-all font-black text-[10px] uppercase tracking-[0.2em] mt-2 shadow-lg shadow-emerald-500/5"
-           >
-             <Wallet size={18}/> Finanzas Aurora
-           </button>
-
-           <button 
-             onClick={() => setShowFriendsModal(true)}
-             className="w-full flex items-center justify-center gap-3 bg-primary/10 hover:bg-primary/20 text-primary py-4.5 rounded-2xl border border-primary/20 transition-all font-black text-[10px] uppercase tracking-[0.2em] mt-2 shadow-lg shadow-primary/5"
-           >
-             <Users size={18}/> Red de Contactos
-           </button>
-        </div>
+ 
 
         {/* PORTAL / SIDEBAR */}
         <aside className={`

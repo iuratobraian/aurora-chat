@@ -24,10 +24,9 @@ import imageCompression from 'browser-image-compression';
 import { encryptMessage, decryptMessage } from './lib/encryption';
 import { Html5Qrcode } from "html5-qrcode";
 import { persistenceService } from './lib/persistence';
-import CardContainer from './components/CardContainer';
-import RainbowButton from './components/RainbowButton';
-import ExpensesHub from './features/expenses/ExpensesHub';
 import { expenseAgent } from './lib/expenseAgent';
+
+const APP_VERSION = '1.0.5'; // Increment this to force cache clear
 
 
 const EMOJIS = ['🚀', '📈', '📉', '🔥', '🧠', '💰', '❤️', '👍', '🎯', '⚡'];
@@ -176,6 +175,15 @@ export default function AuroraChat() {
 
   // 2. Lifecycle & Effects
   useEffect(() => {
+    // Cache buster
+    const currentVersion = localStorage.getItem('aurora_app_version');
+    if (currentVersion !== APP_VERSION) {
+      localStorage.clear();
+      localStorage.setItem('aurora_app_version', APP_VERSION);
+      window.location.reload();
+      return;
+    }
+
     const handleResize = () => {
       const mobile = window.innerWidth <= 768;
       setIsMobile(mobile);
@@ -787,7 +795,7 @@ Nota: ${parsed.note}`;
         )}
 
         {/* Channels & Chats List */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar min-w-[320px]">
+        <div className="flex-1 overflow-y-auto custom-scrollbar w-full">
           {/* SECCIÓN SALAS PÚBLICAS */}
           <div className="p-4 border-b border-white/5">
             <div className="flex items-center justify-between mb-3">

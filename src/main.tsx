@@ -29,7 +29,7 @@ class ErrorBoundary extends React.Component<any, any> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="w-full h-screen bg-[#0f1115] flex items-center justify-center flex-col gap-4 text-center p-4">
+        <div className="fixed inset-0 bg-[#0a0a0a] z-[100] flex items-center justify-center flex-col gap-4 text-center p-4">
           <div className="text-red-400 text-lg font-bold">Error al cargar Aurora Chat</div>
           <p className="text-gray-400 text-sm max-w-xs">{this.state.error?.message || 'Ha ocurrido un error desconocido'}</p>
           <button 

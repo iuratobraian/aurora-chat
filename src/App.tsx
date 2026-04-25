@@ -590,7 +590,7 @@ export default function AuroraChat() {
   const recentStatuses = activeStatuses?.filter((s: any) => {
     const isExpired = s.expiresAt < Date.now();
     return !isExpired;
-  }) || cachedStatuses;
+  }) || [];
 
   const displayStatuses = recentStatuses;
 

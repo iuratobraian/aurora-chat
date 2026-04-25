@@ -75,12 +75,21 @@ body {
 /* Mobile App Optimization */
 html, body, #root {
   overscroll-behavior: none;
-  height: 100vh;
+  min-height: 100dvh;
+  height: 100dvh;
   width: 100vw;
   margin: 0;
   padding: 0;
   overflow: hidden;
   background: #0a0a0a;
+}
+
+.safe-area-pt {
+  padding-top: env(safe-area-inset-top, 0);
+}
+
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
 #root {

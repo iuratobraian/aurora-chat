@@ -690,7 +690,7 @@ Nota: ${parsed.note}`;
   const currentChat = [...(displayChannels || []), ...(displayStatuses || [])].find(c => (c as any).slug === currentChannel) || { name: 'Chat' };
 
   return (
-    <div className="flex h-screen w-full bg-[#0a0a0a] overflow-hidden text-white relative">
+    <div className="flex h-full w-full bg-[#0a0a0a] overflow-hidden text-white relative">
       {/* Decorative blurs to match login feel */}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
@@ -703,6 +703,7 @@ Nota: ${parsed.note}`;
         ${isMobile ? 'fixed inset-y-0 left-0 z-[150] shadow-2xl' : 'relative shrink-0'}
         border-r border-white/10 flex flex-col bg-[#111111] transition-all duration-300 overflow-hidden
         ${!isSidebarOpen && !isMobile ? 'border-none' : ''}
+        safe-area-pt safe-area-pb
       `}>
 
         {isMobile && isSidebarOpen && (
@@ -920,7 +921,7 @@ Nota: ${parsed.note}`;
       <main className="flex-1 flex flex-col relative bg-[#0a0a0a] overflow-hidden">
 
         {/* Chat Header */}
-        <div className="h-16 px-4 border-b border-white/10 flex items-center justify-between bg-[#111111]/80 backdrop-blur-md z-10">
+        <div className="min-h-[4rem] safe-area-pt px-4 border-b border-white/10 flex items-center justify-between bg-[#111111]/80 backdrop-blur-md z-10">
 
           <div className="flex items-center gap-4">
             <button 
@@ -1163,7 +1164,7 @@ Nota: ${parsed.note}`;
         </div>
 
 
-        <div className="p-3 bg-[#111111] border-t border-white/10 backdrop-blur-md">
+        <div className="p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] bg-[#111111] border-t border-white/10 backdrop-blur-md">
 
             {showEmoji && (
               <div className="absolute bottom-24 left-6 bg-[#111111] border border-white/10 p-2 rounded-lg shadow-2xl flex gap-2 z-[100] animate-in fade-in slide-in-from-bottom-2">

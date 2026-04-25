@@ -681,14 +681,14 @@ Nota: ${parsed.note}`;
   const currentChat = [...(displayChannels || []), ...(displayStatuses || [])].find(c => (c as any).slug === currentChannel) || { name: 'Chat' };
 
   return (
-    <CardContainer>
-      <div className="flex h-full overflow-hidden">
+    <div className="flex h-screen w-full bg-[#0f1115] overflow-hidden text-white">
+      <div className="flex h-full w-full overflow-hidden">
       <audio ref={audioRef} src={NOTIFICATION_SOUND} preload="auto" />
       
       {/* SIDEBAR */}
       <div className={`
         ${isSidebarOpen ? 'w-80 translate-x-0' : 'w-0 -translate-x-full'} 
-        ${isMobile ? 'fixed inset-y-0 left-0 z-[150] shadow-2xl rounded-r-[2.5rem]' : 'relative shrink-0 rounded-r-[2rem]'}
+        ${isMobile ? 'fixed inset-y-0 left-0 z-[150] shadow-2xl' : 'relative shrink-0'}
         border-r border-white/10 flex flex-col bg-black/95 transition-all duration-300 overflow-hidden
       `}>
 
@@ -907,7 +907,7 @@ Nota: ${parsed.note}`;
       <div className="flex-1 flex flex-col relative bg-[#0f1115] overflow-hidden md:rounded-none">
 
         {/* Chat Header */}
-        <div className="h-16 px-4 border-b border-white/10 flex items-center justify-between bg-black/40 backdrop-blur-md z-10 rounded-t-[2.5rem] md:rounded-t-none">
+        <div className="h-16 px-4 border-b border-white/10 flex items-center justify-between bg-black/40 backdrop-blur-md z-10">
 
           <div className="flex items-center gap-4">
             <button 
@@ -1033,7 +1033,7 @@ Nota: ${parsed.note}`;
         )}
 
         {/* Messages Area */}
-        <div ref={scrollRef} onScroll={handleScroll} className="flex-1 overflow-y-auto p-4 md:p-8 space-y-8 custom-scrollbar bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] rounded-b-[2.5rem] md:rounded-b-none mb-2 mx-1 md:mx-0">
+        <div ref={scrollRef} onScroll={handleScroll} className="flex-1 overflow-y-auto p-4 md:p-8 space-y-8 custom-scrollbar">
 
           {displayMessages.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center opacity-20">
@@ -1894,6 +1894,6 @@ Nota: ${parsed.note}`;
           </div>
         </div>
       )}
-    </CardContainer>
+    </div>
   );
 }

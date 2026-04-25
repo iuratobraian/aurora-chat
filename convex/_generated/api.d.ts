@@ -10,8 +10,10 @@
 
 import type * as chat from "../chat.js";
 import type * as events from "../events.js";
+import type * as expenses from "../expenses.js";
 import type * as friends from "../friends.js";
 import type * as polls from "../polls.js";
+import type * as productivity from "../productivity.js";
 import type * as statuses from "../statuses.js";
 import type * as users from "../users.js";
 
@@ -24,8 +26,10 @@ import type {
 declare const fullApi: ApiFromModules<{
   chat: typeof chat;
   events: typeof events;
+  expenses: typeof expenses;
   friends: typeof friends;
   polls: typeof polls;
+  productivity: typeof productivity;
   statuses: typeof statuses;
   users: typeof users;
 }>;

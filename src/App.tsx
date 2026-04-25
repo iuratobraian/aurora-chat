@@ -690,7 +690,7 @@ Nota: ${parsed.note}`;
   const currentChat = [...(displayChannels || []), ...(displayStatuses || [])].find(c => (c as any).slug === currentChannel) || { name: 'Chat' };
 
   return (
-    <div className="flex h-screen w-full bg-[#0a0a0a] text-white relative overflow-hidden selection:bg-primary/30">
+    <div className="flex h-full w-full bg-[#0a0a0a] text-white relative overflow-hidden selection:bg-primary/30">
       {/* Dynamic Background Effects */}
       <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-primary/10 blur-[150px] rounded-full pointer-events-none animate-pulse" />
       <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-primary/10 blur-[150px] rounded-full pointer-events-none animate-pulse" style={{ animationDelay: '2s' }} />

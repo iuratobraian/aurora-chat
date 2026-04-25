@@ -179,12 +179,16 @@ export default function AuroraChat() {
   // 2. Lifecycle & Effects
   useEffect(() => {
     // Cache buster
-    const currentVersion = localStorage.getItem('aurora_app_version');
-    if (currentVersion !== APP_VERSION) {
-      localStorage.clear();
-      localStorage.setItem('aurora_app_version', APP_VERSION);
-      window.location.reload();
-      return;
+    try {
+      const currentVersion = localStorage.getItem('aurora_app_version');
+      if (currentVersion !== APP_VERSION) {
+        localStorage.clear();
+        localStorage.setItem('aurora_app_version', APP_VERSION);
+        window.location.reload();
+        return;
+      }
+    } catch (e) {
+      console.warn("Storage access denied or failed", e);
     }
 
     const handleResize = () => {
@@ -269,8 +273,19 @@ export default function AuroraChat() {
       messagesEndRef.current.scrollIntoView({ behavior: shouldSmooth ? 'smooth' : 'auto' });
       hasInitiallyScrolled.current = currentChannel;
       if (!isReady) setIsReady(true);
+    } else if (rawMessagesData !== undefined && messages.length === 0 && !isReady) {
+      // Empty channel case
+      setIsReady(true);
     }
-  }, [messages.length, currentChannel, isReady]);
+  }, [messages.length, currentChannel, isReady, rawMessagesData]);
+
+  // Emergency visibility fallback
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!isReady) setIsReady(true);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [isReady]);
 
   useEffect(() => {
     if (isOnline && offlineQueue.length > 0 && user) {
@@ -679,10 +694,10 @@ Nota: ${parsed.note}`;
       <audio ref={audioRef} src={NOTIFICATION_SOUND} preload="auto" />
       
       {/* SIDEBAR */}
-      <div className={`
+      <aside className={`
         ${isSidebarOpen ? 'w-80 translate-x-0' : 'w-0 -translate-x-full'} 
         ${isMobile ? 'fixed inset-y-0 left-0 z-[150] shadow-2xl' : 'relative shrink-0'}
-        border-r border-white/10 flex flex-col bg-black/95 transition-all duration-300 overflow-hidden
+        border-r border-white/10 flex flex-col bg-[#111111] transition-all duration-300 overflow-hidden
       `}>
 
         {isMobile && isSidebarOpen && (
@@ -695,7 +710,7 @@ Nota: ${parsed.note}`;
         )}
 
         {/* Coordination Tools */}
-        <div className="p-4 space-y-2 border-t border-white/5 bg-black/20">
+        <div className="p-4 space-y-2 border-t border-white/10 bg-white/[0.02]">
            <h4 className="text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2 px-2">Coordinación Personal</h4>
            <div className="grid grid-cols-3 gap-2">
               <button onClick={() => setShowReminders(true)} className="flex flex-col items-center gap-1.5 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-all border border-white/5">
@@ -730,7 +745,7 @@ Nota: ${parsed.note}`;
 
         {/* User Profile Header */}
 
-        <div className="p-4 border-b border-white/10 flex items-center justify-between bg-black/40 w-full">
+        <div className="p-4 border-b border-white/10 flex items-center justify-between bg-white/[0.02] w-full">
           <button onClick={() => setShowProfileModal(true)} className="flex items-center gap-3 group text-left">
             <div className="relative">
               <img src={user.avatar} className="w-10 h-10 rounded-lg shadow-lg border border-white/10 group-hover:border-primary/50 transition-all" alt="" />
@@ -894,18 +909,18 @@ Nota: ${parsed.note}`;
             </div>
           )}
         </div>
-      </div>
+      </aside>
 
       {/* MAIN CONTENT */}
       <div className="flex-1 flex flex-col relative bg-[#0a0a0a] overflow-hidden md:rounded-none">
 
         {/* Chat Header */}
-        <div className="h-16 px-4 border-b border-white/10 flex items-center justify-between bg-black/40 backdrop-blur-md z-10">
+        <div className="h-16 px-4 border-b border-white/10 flex items-center justify-between bg-[#111111]/80 backdrop-blur-md z-10">
 
           <div className="flex items-center gap-4">
             <button 
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="p-2 text-gray-500 hover:text-white transition-all bg-white/5 rounded-lg border border-white/10"
+              className="p-2 text-gray-400 hover:text-white transition-all bg-white/5 rounded-lg border border-white/10"
             >
               {isMobile ? <Plus size={20} className={isSidebarOpen ? 'rotate-45' : ''} /> : <MoreVertical size={20} className={isSidebarOpen ? '' : 'rotate-90'} />}
             </button>
@@ -1140,7 +1155,7 @@ Nota: ${parsed.note}`;
         </div>
 
 
-        <div className="p-3 bg-black/40 border-t border-white/10 backdrop-blur-md">
+        <div className="p-3 bg-[#111111] border-t border-white/10 backdrop-blur-md">
 
             {showEmoji && (
               <div className="absolute bottom-24 left-6 bg-[#111111] border border-white/10 p-2 rounded-lg shadow-2xl flex gap-2 z-[100] animate-in fade-in slide-in-from-bottom-2">

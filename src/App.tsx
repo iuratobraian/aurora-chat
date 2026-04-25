@@ -1160,6 +1160,9 @@ Nota: ${parsed.note}`;
               );
             })
           )}
+          <div ref={messagesEndRef} />
+        </div>
+
         <div className="p-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] bg-[#0d0d0d]/80 backdrop-blur-2xl border-t border-white/10 relative z-20">
 
             {showEmoji && (

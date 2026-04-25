@@ -230,7 +230,5 @@ const ExpensesHub: React.FC<ExpensesHubProps> = ({ userId, onClose }) => {
     </div>
   );
 };
-  );
-};
 
 export default ExpensesHub;

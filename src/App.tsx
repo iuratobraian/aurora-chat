@@ -206,7 +206,14 @@ export default function AuroraChat() {
     window.addEventListener('online', updateOnlineStatus);
     window.addEventListener('offline', updateOnlineStatus);
     
-    // Force document scroll lock
+    // Aggressive Viewport Stabilization
+    const preventShift = () => {
+      if (window.scrollY !== 0) {
+        window.scrollTo(0, 0);
+      }
+    };
+    window.addEventListener('scroll', preventShift);
+    
     const lockScroll = (e: Event) => {
       if ((e.target as HTMLElement).closest('.overflow-y-auto')) return;
       e.preventDefault();
@@ -217,6 +224,7 @@ export default function AuroraChat() {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('online', updateOnlineStatus);
       window.removeEventListener('offline', updateOnlineStatus);
+      window.removeEventListener('scroll', preventShift);
       document.removeEventListener('touchmove', lockScroll);
     };
   }, []);
@@ -281,13 +289,18 @@ export default function AuroraChat() {
   }, [currentChannel]);
 
   useEffect(() => {
-    if (messages.length > 0 && messagesEndRef.current) {
+    if (messages.length > 0 && scrollRef.current) {
       const shouldSmooth = hasInitiallyScrolled.current === currentChannel && isAtBottom.current;
-      messagesEndRef.current.scrollIntoView({ behavior: shouldSmooth ? 'smooth' : 'auto' });
+      
+      // Use scrollTop instead of scrollIntoView to prevent viewport shifting
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: shouldSmooth ? 'smooth' : 'auto'
+      });
+      
       hasInitiallyScrolled.current = currentChannel;
       if (!isReady) setIsReady(true);
     } else if (rawMessagesData !== undefined && messages.length === 0 && !isReady) {
-      // Empty channel case
       setIsReady(true);
     }
   }, [messages.length, currentChannel, isReady, rawMessagesData]);
@@ -699,7 +712,7 @@ Nota: ${parsed.note}`;
   const currentChat = [...(displayChannels || []), ...(displayStatuses || [])].find(c => (c as any).slug === currentChannel) || { name: 'Chat' };
 
   return (
-    <div className="flex h-full w-full bg-[#0a0a0a] text-white relative overflow-hidden selection:bg-primary/30 overscroll-none">
+    <div className="fixed inset-0 flex h-full w-full bg-[#0a0a0a] text-white overflow-hidden selection:bg-primary/30 overscroll-none">
       {/* Dynamic Background Effects */}
       <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-primary/10 blur-[150px] rounded-full pointer-events-none animate-pulse" />
       <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-primary/10 blur-[150px] rounded-full pointer-events-none animate-pulse" style={{ animationDelay: '2s' }} />

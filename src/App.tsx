@@ -25,8 +25,9 @@ import { encryptMessage, decryptMessage } from './lib/encryption';
 import { Html5Qrcode } from "html5-qrcode";
 import { persistenceService } from './lib/persistence';
 import { expenseAgent } from './lib/expenseAgent';
+import ExpensesHub from './features/expenses/ExpensesHub';
 
-const APP_VERSION = '1.0.6'; // Increment this to force cache clear
+const APP_VERSION = '1.0.7'; // Increment this to force cache clear
 
 
 const EMOJIS = ['🚀', '📈', '📉', '🔥', '🧠', '💰', '❤️', '👍', '🎯', '⚡'];

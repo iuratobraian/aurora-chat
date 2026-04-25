@@ -1243,7 +1243,7 @@ Nota: ${parsed.note}`;
         {isMobile && isSidebarOpen && (
            <div className="fixed inset-0 bg-black/40 z-[140] backdrop-blur-sm" onClick={() => setIsSidebarOpen(false)} />
         )}
-      </div>
+      </main>
 
       {/* MODALS */}
        {showEvents && (

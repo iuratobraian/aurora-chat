@@ -8,7 +8,7 @@ import {
   FileSpreadsheet, FileCode, Mic, MicOff, Loader2, Volume2, 
   Settings, User, Phone, Info, Camera, Clock, ChevronRight,
   MoreVertical, Hash, QrCode, ScanLine, Copy, Wallet, Mail,
-  AtSign, Play, Pause
+  AtSign, Play, Pause, MessageCircle, PieChart, ChevronLeft
 } from 'lucide-react';
 
 import { useUserStore } from './store';

@@ -4,7 +4,19 @@ import { v } from "convex/values";
 export const getChannels = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db.query("chatChannels").take(100);
+    const channels = await ctx.db.query("chatChannels").take(100);
+    
+    // Enrich with last message
+    const enriched = await Promise.all(channels.map(async (c) => {
+      const lastMsg = await ctx.db
+        .query("chat")
+        .withIndex("by_channel", (q) => q.eq("channelId", c.slug))
+        .order("desc")
+        .first();
+      return { ...c, lastMessage: lastMsg };
+    }));
+
+    return enriched;
   },
 });
 

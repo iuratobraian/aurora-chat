@@ -672,6 +672,10 @@ Nota: ${parsed.note}`;
 
   return (
     <div className="flex h-[100dvh] w-full bg-[#0a0a0a] overflow-hidden text-white relative safe-area-pt safe-area-pb">
+      {/* Decorative blurs to match login feel */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
+      
       <audio ref={audioRef} src={NOTIFICATION_SOUND} preload="auto" />
       
       {/* SIDEBAR */}
@@ -745,7 +749,7 @@ Nota: ${parsed.note}`;
         </div>
 
         {/* Statuses Row */}
-        <div className="p-4 border-b border-white/5 bg-black/10 overflow-x-auto no-scrollbar flex gap-4 w-full">
+        <div className="p-4 border-b border-white/10 bg-[#111111]/30 overflow-x-auto no-scrollbar flex gap-4 w-full">
           <button onClick={() => setShowStatusModal(true)} className="flex flex-col items-center gap-1 shrink-0 group">
             <div className="w-12 h-12 rounded-full border-2 border-dashed border-gray-600 flex items-center justify-center group-hover:border-primary transition-all">
               <Plus size={20} className="text-gray-500 group-hover:text-primary" />
@@ -1179,7 +1183,7 @@ Nota: ${parsed.note}`;
            <form onSubmit={handleSubmit} className="flex items-center gap-2 max-w-5xl mx-auto">
               <button type="button" onClick={() => fileInputRef.current?.click()} className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-500 hover:text-white transition-all shrink-0"><Plus size={20}/></button>
               
-              <div className="flex-1 bg-white/5 border border-white/10 rounded-[2rem] px-2 py-1 focus-within:border-white/20 transition-all flex items-center gap-1">
+              <div className="flex-1 bg-white/5 border border-white/10 rounded-[2rem] px-2 py-1 focus-within:border-white/20 transition-all flex items-end gap-1">
                 <button type="button" onClick={() => setShowEmoji(!showEmoji)} className="p-2 text-gray-500 hover:text-white transition-colors shrink-0"><Smile size={20}/></button>
                 <textarea
                   value={text + (interimTranscript ? (text ? ' ' : '') + interimTranscript : '')}
@@ -1188,32 +1192,30 @@ Nota: ${parsed.note}`;
                   placeholder={isRecording ? "Escuchando..." : "Escribe un mensaje..."}
                   className={`flex-1 bg-transparent text-sm text-white outline-none placeholder-gray-600 px-2 py-2 resize-none max-h-32 min-h-[40px] leading-tight ${isRecording ? 'text-white' : ''}`}
                   rows={1}
-                  onKeyDown={e => { if(e.key === 'Enter' && !e.shiftKey && !isMobile) { e.preventDefault(); handleSubmit(e); } }}
+                  onKeyDown={e => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(e); } }}
                 />
                 
-                <div className="flex items-center gap-1 shrink-0 pr-1">
-                   <button type="button" onClick={() => cameraInputRef.current?.click()} className="p-2 text-gray-500 hover:text-white transition-all">
-                     <Camera size={20}/>
-                   </button>
-                   <button 
-                     type="button" 
-                     onClick={() => isRecording ? stopRecording() : startRecording()}
-                     className={`p-2 transition-all ${isRecording ? 'text-white animate-pulse scale-125' : 'text-gray-500 hover:text-white'}`}
-                   >
-                     {isRecording ? <MicOff size={20}/> : <Mic size={20}/>}
-                   </button>
-                   {(text.trim() || attachedImage || audioBlob) ? (
-                     <button type="submit" disabled={uploading} className="p-2.5 bg-white text-black rounded-full transition-all active:scale-90">
-                       <Send size={16} />
-                     </button>
-                   ) : (
-                     <div className="w-10 h-10 flex items-center justify-center text-gray-700">
-                        <Send size={16} />
-                     </div>
-                   )}
-                </div>
+                 <button type="button" onClick={() => cameraInputRef.current?.click()} className="p-2 text-gray-500 hover:text-white transition-all">
+                   <Camera size={20}/>
+                 </button>
+               </div>
 
-              </div>
+               <div className="shrink-0">
+                  { (text.trim() || attachedImage || audioBlob) ? (
+                    <button type="submit" disabled={uploading} className="w-11 h-11 bg-white text-black rounded-full flex items-center justify-center transition-all active:scale-90 shadow-lg">
+                      <Send size={20} fill="currentColor" />
+                    </button>
+                  ) : (
+                    <button 
+                      type="button" 
+                      onClick={() => isRecording ? stopRecording() : startRecording()}
+                      className={`w-11 h-11 rounded-full flex items-center justify-center transition-all ${isRecording ? 'bg-red-500 text-white animate-pulse' : 'bg-white/10 text-white hover:bg-white/20'}`}
+                    >
+                      {isRecording ? <MicOff size={20}/> : <Mic size={20}/>}
+                    </button>
+                  )}
+               </div>
+
 
               <input type="file" ref={fileInputRef} className="hidden" accept="image/*,.pdf,.docx,.xlsx,.xls,.csv" onChange={(e) => handleImageUpload(e, 'chat')} />
               <input type="file" ref={cameraInputRef} className="hidden" accept="image/*" capture="environment" onChange={(e) => handleImageUpload(e, 'chat')} />

@@ -123,23 +123,27 @@ export default function AuroraChat() {
   const isAtBottom = useRef(true);
   const hasInitiallyScrolled = useRef<string | null>(null);
 
+  const isValidUser = user?._id && typeof user._id === 'string' && user._id.length > 5 && user._id !== 'guest';
+
   // Convex Queries
   const searchedUsers = useQuery(api.users.searchUsers, { query: userSearchQuery });
-  const activeStatuses = useQuery(api.statuses.getActiveStatuses, (user?._id && user._id !== 'guest') ? { userId: user._id as any } : "skip");
-  const pendingFriendRequests = useQuery(api.friends.getPendingRequests, (user?._id && user._id !== 'guest') ? { userId: user._id as any } : "skip");
-  const sentFriendRequests = useQuery(api.friends.getSentRequests, (user?._id && user._id !== 'guest') ? { userId: user._id as any } : "skip");
-  const friendsList = useQuery(api.friends.getFriends, (user?._id && user._id !== 'guest') ? { userId: user._id as any } : "skip");
+  const activeStatuses = useQuery(api.statuses.getActiveStatuses, isValidUser ? { userId: user._id as any } : "skip");
+  const pendingFriendRequests = useQuery(api.friends.getPendingRequests, isValidUser ? { userId: user._id as any } : "skip");
+  const sentFriendRequests = useQuery(api.friends.getSentRequests, isValidUser ? { userId: user._id as any } : "skip");
+  const friendsList = useQuery(api.friends.getFriends, isValidUser ? { userId: user._id as any } : "skip");
   const rawChannels = useQuery(api.chat.getChannels);
   const rawMessagesData = useQuery(api.chat.getMessagesByChannel, { channelId: currentChannel, limit: 100 });
-  const rawTypingUsers = useQuery(api.chat.getTypingUsers, { channelId: currentChannel, excludeUserId: user?._id || 'guest' });
-  const reminders = useQuery(api.productivity.getReminders, (user?._id && user._id !== 'guest') ? { userId: user._id as any } : "skip");
-  const notes = useQuery(api.productivity.getNotes, (user?._id && user._id !== 'guest') ? { userId: user._id as any } : "skip");
-  const storedPasswords = useQuery(api.productivity.getPasswords, (user?._id && user._id !== 'guest') ? { userId: user._id as any } : "skip");
+  const rawTypingUsers = useQuery(api.chat.getTypingUsers, { channelId: currentChannel, excludeUserId: (user?._id && typeof user._id === 'string') ? user._id : 'guest' });
+  const reminders = useQuery(api.productivity.getReminders, isValidUser ? { userId: user._id as any } : "skip");
+  const notes = useQuery(api.productivity.getNotes, isValidUser ? { userId: user._id as any } : "skip");
+  const storedPasswords = useQuery(api.productivity.getPasswords, isValidUser ? { userId: user._id as any } : "skip");
   const rawServerStats = useQuery(api.chat.getServerStats);
   const pinnedMessages = useQuery(api.chat.getPinnedMessages, { channelId: currentChannel });
   const channelData = useQuery(api.chat.getChannelBySlug, { slug: currentChannel });
   const events = useQuery(api.events.getEventsByChannel, { channelId: currentChannel });
   const polls = useQuery(api.polls.getPollsByChannel, { channelId: currentChannel });
+  
+  const recentStatuses = activeStatuses; // Fix for potential ReferenceError if used elsewhere
 
   // Convex Mutations
   const getOrCreateDM = useMutation(api.chat.getOrCreatePrivateChannel);

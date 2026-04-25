@@ -228,13 +228,6 @@ export default function Onboarding() {
              </button>
           )}
 
-          <button
-            type="button"
-            onClick={() => setUser({ _id: 'guest', name: 'Explorador', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=guest' } as any)}
-            className="w-full text-gray-700 hover:text-white py-2 text-[8px] font-black uppercase tracking-[0.3em] transition-all"
-          >
-            Entrar como Explorador (Sin Cuenta)
-          </button>
         </form>
 
 

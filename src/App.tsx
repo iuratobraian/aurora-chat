@@ -661,7 +661,7 @@ Nota: ${parsed.note}`;
   const currentChat = [...(displayChannels || []), ...(displayStatuses || [])].find(c => (c as any).slug === currentChannel) || { name: 'Chat' };
 
   return (
-    <div className="flex h-[100dvh] w-full bg-[#0a0a0a] overflow-hidden text-white relative">
+    <div className="flex h-[100dvh] w-full bg-[#0a0a0a] overflow-hidden text-white relative safe-area-pt safe-area-pb">
       <audio ref={audioRef} src={NOTIFICATION_SOUND} preload="auto" />
       
       {/* SIDEBAR */}

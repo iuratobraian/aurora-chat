@@ -728,7 +728,7 @@ Nota: ${parsed.note}`;
       
       {/* SIDEBAR */}
       <aside className={`
-        ${isSidebarOpen ? (isMobile ? 'w-80' : 'w-[320px]') : 'w-0'} 
+        ${isSidebarOpen ? (isMobile ? 'w-[280px]' : 'w-[320px]') : 'w-0'} 
         ${isMobile ? 'fixed inset-y-0 left-0 z-[150] shadow-2xl' : 'relative shrink-0'}
         border-r border-white/10 flex flex-col bg-[#0d0d0d] transition-all duration-500 ease-in-out overflow-hidden
         ${!isSidebarOpen && !isMobile ? 'border-none' : ''}
@@ -950,7 +950,7 @@ Nota: ${parsed.note}`;
       <main className="flex-1 flex flex-col relative bg-[#0a0a0a] overflow-hidden min-h-0">
 
         {/* Chat Header */}
-        <div className="h-16 px-4 border-b border-white/10 flex items-center justify-between glass-panel z-10 safe-area-pt box-content">
+        <div className="min-h-[4rem] px-4 border-b border-white/10 flex items-center justify-between glass-panel z-10 safe-area-pt">
 
           <div className="flex items-center gap-4">
             <button 
@@ -1192,7 +1192,7 @@ Nota: ${parsed.note}`;
           <div ref={messagesEndRef} />
         </div>
 
-        <div className="p-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] bg-[#0d0d0d]/80 backdrop-blur-2xl border-t border-white/10 relative z-20">
+        <div className="p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] bg-[#0d0d0d]/80 backdrop-blur-2xl border-t border-white/10 relative z-20">
 
             {showEmoji && (
               <div className="absolute bottom-28 left-6 bg-[#111111] border border-white/10 p-3 rounded-2xl shadow-2xl flex gap-2.5 z-[100] animate-in fade-in slide-in-from-bottom-4 zoom-in-95 duration-200">

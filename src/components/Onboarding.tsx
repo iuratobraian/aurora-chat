@@ -148,8 +148,8 @@ export default function Onboarding() {
 
 
   return (
-    <div className="fixed inset-0 bg-[#0a0a0a] z-[100] flex items-center justify-center p-4 safe-area-pt safe-area-pb selection:bg-primary/30 overflow-y-auto">
-      <div className="w-full max-w-md glass-panel rounded-[2rem] p-8 md:p-10 space-y-10 shadow-[0_32px_64px_rgba(0,0,0,0.5)] relative overflow-hidden animate-in fade-in zoom-in-95 duration-500">
+    <div className="fixed inset-0 bg-[#0a0a0a] z-[100] flex flex-col items-center justify-center p-4 safe-area-pt safe-area-pb selection:bg-primary/30 overflow-y-auto">
+      <div className="w-full max-w-md glass-panel rounded-[2rem] p-6 md:p-10 space-y-6 md:space-y-10 shadow-[0_32px_64px_rgba(0,0,0,0.5)] relative overflow-hidden animate-in fade-in zoom-in-95 duration-500 my-auto">
         
         {/* Dynamic decorative elements */}
         <div className="absolute -top-32 -left-32 w-64 h-64 bg-primary/20 blur-[100px] rounded-full animate-pulse" />

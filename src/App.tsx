@@ -784,226 +784,191 @@ Nota: ${parsed.note}`;
            </button>
         </div>
 
-
+        {/* PORTAL / SIDEBAR */}
+        <aside className={`
+          ${isMobile ? (mobileView === 'list' ? 'w-full' : 'w-0 hidden') : (isSidebarOpen ? 'w-[320px]' : 'w-0')} 
+          ${isMobile ? 'relative z-[150]' : 'relative shrink-0'}
+          border-r border-white/10 flex flex-col bg-[#0d0d0d] transition-all duration-300 ease-in-out overflow-hidden
+          ${!isSidebarOpen && !isMobile ? 'border-none' : ''}
+        `}>
+          
           {/* Minimalist User Header (WhatsApp Style) */}
-        <div className="pt-14 pb-6 px-6 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
-          <div className="flex items-center gap-4">
-            <button onClick={() => setShowProfileModal(true)} className="relative group">
-              <img src={user.avatar} className="w-14 h-14 rounded-full border-2 border-primary/20 group-hover:border-primary/50 transition-all object-cover shadow-xl" alt="" />
-              <div className="absolute bottom-1 right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-[#0d0d0d]" />
-            </button>
-            <div>
-              <h2 className="text-xl font-black text-white tracking-tighter">Aurora</h2>
-              <p className="text-[10px] text-primary font-black uppercase tracking-widest">Portal de Red</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <button onClick={() => setShowUserSearch(true)} className="p-3 bg-white/5 rounded-full text-gray-400 hover:text-white transition-all"><Search size={20}/></button>
-            <div className="w-12 h-12 rounded-full border-2 border-dashed border-gray-600 flex items-center justify-center group-hover:border-primary transition-all">
-              <Plus size={20} className="text-gray-500 group-hover:text-primary" />
-            </div>
-            <span className="text-[9px] text-gray-500 font-bold uppercase">Mi Estado</span>
-          </button>
-          {displayStatuses?.map((s: any) => (
-            <button key={s._id} onClick={() => setViewingStatus(s)} className="flex flex-col items-center gap-1 shrink-0">
-              <div className="w-12 h-12 rounded-full border-2 border-primary p-0.5 shadow-lg shadow-primary/20">
-                <img src={s.userAvatar} className="w-full h-full rounded-full object-cover" alt="" />
-              </div>
-              <span className="text-[9px] text-white font-medium truncate w-12 text-center">{s.userName.split(' ')[0]}</span>
-            </button>
-          ))}
-        </div>
-
-
-        {/* Pending Friend Requests */}
-        {pendingFriendRequests && pendingFriendRequests.length > 0 && (
-          <div className="p-4 bg-primary/10 border-b border-primary/20">
-             <h4 className="text-[9px] font-black text-primary uppercase mb-2">Solicitudes de Amistad</h4>
-             <div className="space-y-2">
-               {pendingFriendRequests.map((req: any) => (
-                 <div key={req._id} className="flex items-center justify-between bg-black/20 p-2 rounded-lg border border-white/5">
-                   <div className="flex items-center gap-2">
-                     <img src={req.user?.avatar} className="w-6 h-6 rounded-lg" alt="" />
-                     <span className="text-[10px] text-white font-bold">{req.user?.name}</span>
-                   </div>
-                   <button 
-                    onClick={() => acceptFriendRequest({ friendId: req._id })}
-                    className="bg-primary text-white text-[8px] font-bold px-3 py-1.5 rounded-lg uppercase transition-all active:scale-95"
-                   >
-                     Aceptar
-                   </button>
-                 </div>
-               ))}
-             </div>
-          </div>
-        )}
-
-        {/* Sent Friend Requests */}
-        {sentFriendRequests && sentFriendRequests.length > 0 && (
-          <div className="p-4 border-b border-white/5">
-             <h4 className="text-[9px] font-black text-gray-500 uppercase mb-2">Solicitudes Enviadas</h4>
-             <div className="space-y-2">
-               {sentFriendRequests.map((req: any) => (
-                 <div key={req._id} className="flex items-center justify-between bg-black/10 p-2 rounded-lg">
-                   <div className="flex items-center gap-2 opacity-60">
-                     <img src={req.user?.avatar} className="w-6 h-6 rounded-lg" alt="" />
-                     <span className="text-[10px] text-white">{req.user?.name}</span>
-                   </div>
-                   <span className="text-[8px] text-gray-600 font-bold uppercase">Pendiente</span>
-                 </div>
-               ))}
-             </div>
-          </div>
-        )}
-
-        {/* Channels & Chats List */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar w-full">
-          {/* SECCIÓN SALAS PÚBLICAS */}
-          <div className="p-4 border-b border-white/5">
-            <div className="flex items-center justify-between mb-3">
-              <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] flex items-center gap-2">
-                <Hash size={12} /> SALAS PÚBLICAS
-              </h4>
-              <button onClick={() => setShowCreateChannel(true)} className="p-1 hover:bg-primary/10 rounded transition-all text-primary"><Plus size={16}/></button>
-            </div>
-            <div className="space-y-1">
-              <button
-                onClick={() => setCurrentChannel('global')}
-                className={`w-full flex items-center gap-3 p-3 rounded-lg transition-all ${currentChannel === 'global' ? 'bg-primary/20 border-primary/20 text-white' : 'text-gray-400 hover:bg-white/5 border-transparent'} border`}
-              >
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Hash size={16} className="text-primary"/></div>
-                <div className="flex-1 text-left text-sm font-bold">General</div>
+          <div className="pt-14 pb-6 px-6 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
+            <div className="flex items-center gap-4">
+              <button onClick={() => setShowProfileModal(true)} className="relative group">
+                <img src={user.avatar} className="w-14 h-14 rounded-full border-2 border-primary/20 group-hover:border-primary/50 transition-all object-cover shadow-xl" alt="" />
+                <div className="absolute bottom-1 right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-[#0d0d0d]" />
               </button>
-              {channelsList.filter((c: any) => c.slug !== 'global' && !c.type).map((c: any) => (
-                <button
-                  key={c._id}
-                  onClick={() => handleSelectChannel(c.slug)}
-                  className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all ${currentChannel === c.slug ? 'bg-primary/10 border-primary/20' : 'hover:bg-white/5 border-transparent'} border mb-2`}
-                >
-                  <div className="w-14 h-14 rounded-full bg-primary/5 flex items-center justify-center text-primary relative shrink-0">
-                    {c.isPrivate ? <Lock size={24}/> : <Hash size={24}/>}
-                  </div>
-                  <div className="flex-1 text-left min-w-0">
-                    <div className="flex justify-between items-center mb-1">
-                      <div className="text-base font-black text-white truncate pr-2">{c.name}</div>
-                      {c.lastMessage && (
-                        <div className="text-[10px] text-gray-500 font-bold">
-                          {new Date(c.lastMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </div>
-                      )}
-                    </div>
-                    <div className="text-sm text-gray-400 truncate font-medium">
-                      {c.lastMessage ? decryptMessage(c.lastMessage.texto, c.slug) : 'No hay mensajes aún'}
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* SECCIÓN CHATS PRIVADOS */}
-          <div className="p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h4 className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] flex items-center gap-2">
-                <MessageSquare size={12} /> CHATS PRIVADOS
-              </h4>
-              <button onClick={() => setShowUserSearch(true)} className="p-1 hover:bg-emerald-500/10 rounded transition-all text-emerald-500"><Plus size={16}/></button>
-            </div>
-            <div className="space-y-1">
-              {channelsList.filter((c: any) => c.type === 'direct').length === 0 && (
-                <p className="text-[10px] text-gray-600 text-center py-4">No hay chats privados aún</p>
-              )}
-              {channelsList.filter((c: any) => c.type === 'direct').map((c: any) => (
-                <button
-                  key={c._id}
-                  onClick={() => handleSelectChannel(c.slug)}
-                  className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all ${currentChannel === c.slug ? 'bg-emerald-500/10 border-emerald-500/20' : 'hover:bg-white/5 border-transparent'} border mb-2`}
-                >
-                  <div className="w-14 h-14 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
-                    <User size={24}/>
-                  </div>
-                  <div className="flex-1 text-left min-w-0">
-                    <div className="flex justify-between items-center mb-1">
-                      <div className="text-base font-black text-white truncate pr-2">{c.name}</div>
-                      {c.lastMessage && (
-                        <div className="text-[10px] text-gray-500 font-bold">
-                          {new Date(c.lastMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </div>
-                      )}
-                    </div>
-                    <div className="text-sm text-gray-400 truncate font-medium">
-                      {c.lastMessage ? decryptMessage(c.lastMessage.texto, c.slug) : 'Inicia una conversación'}
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* SECCIÓN SOLICITUDES */}
-          {channelsList.filter((c: any) => c.status === 'pending' && c.user2Id === user._id).length > 0 && (
-            <div className="p-4 bg-primary/5">
-              <div className="flex items-center justify-between mb-3">
-                <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] flex items-center gap-2">
-                  <Mail size={12} /> SOLICITUDES
-                </h4>
+              <div>
+                <h2 className="text-xl font-black text-white tracking-tighter">Aurora</h2>
+                <p className="text-[10px] text-primary font-black uppercase tracking-widest">Portal de Red</p>
               </div>
-              <div className="space-y-1">
-                {channelsList.filter((c: any) => c.status === 'pending' && c.user2Id === user._id).map((c: any) => (
-                  <button
-                    key={c._id}
-                    onClick={() => setCurrentChannel(c.slug)}
-                    className={`w-full flex items-center gap-3 p-3 rounded-lg transition-all ${currentChannel === c.slug ? 'bg-primary/20 border-primary/20 text-white' : 'text-gray-400 hover:bg-white/5 border-transparent'} border`}
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setShowUserSearch(true)} className="p-3 bg-white/5 rounded-full text-gray-400 hover:text-white transition-all"><Search size={20}/></button>
+            </div>
+          </div>
+
+          <div className="flex-1 overflow-y-auto custom-scrollbar w-full pb-24">
+            
+            {/* Instagram Style Statuses */}
+            <div className="py-6 border-b border-white/5">
+              <div className="flex items-center justify-between px-6 mb-4">
+                <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">Estados Recientes</h4>
+                <button onClick={() => setShowStatusModal(true)} className="text-[10px] font-black text-primary uppercase tracking-widest">+ Publicar</button>
+              </div>
+              <div className="flex gap-4 overflow-x-auto px-6 no-scrollbar pb-2">
+                <button 
+                  onClick={() => setShowStatusModal(true)}
+                  className="flex flex-col items-center gap-2 shrink-0 group"
+                >
+                  <div className="w-16 h-16 rounded-full border-2 border-dashed border-white/20 flex items-center justify-center bg-white/5 group-hover:border-primary transition-all">
+                    <Plus size={24} className="text-gray-500 group-hover:text-primary" />
+                  </div>
+                  <span className="text-[10px] font-bold text-gray-500">Mi Estado</span>
+                </button>
+                
+                {displayStatuses?.map((s: any) => (
+                  <button 
+                    key={s._id}
+                    onClick={() => setViewingStatus(s)}
+                    className="flex flex-col items-center gap-2 shrink-0 group"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                      <AtSign size={16}/>
+                    <div className="w-16 h-16 rounded-full p-0.5 border-2 border-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]">
+                      <img src={s.userAvatar} className="w-full h-full rounded-full object-cover" alt="" />
                     </div>
-                    <div className="flex-1 text-left text-[11px] font-bold truncate">Solicitud de {c.name}</div>
+                    <span className="text-[10px] font-bold text-white truncate w-16 text-center">{s.nombre.split(' ')[0]}</span>
                   </button>
                 ))}
               </div>
-        </div>
-
-        {/* Bottom Navigation Menu (WhatsApp/Instagram Style) */}
-        <div className="absolute bottom-0 left-0 right-0 h-20 bg-[#0d0d0d]/80 backdrop-blur-2xl border-t border-white/10 flex items-center justify-around px-4 pb-6 z-[160]">
-          <button 
-            onClick={() => { setMobileView('list'); setShowExpenses(false); }}
-            className={`flex flex-col items-center gap-1 ${!showExpenses ? 'text-primary' : 'text-gray-500'}`}
-          >
-            <MessageCircle size={24} />
-            <span className="text-[10px] font-black uppercase tracking-tighter">Chats</span>
-          </button>
-          <button 
-            onClick={() => { setShowExpenses(true); setMobileView('chat'); }}
-            className={`flex flex-col items-center gap-1 ${showExpenses ? 'text-primary' : 'text-gray-500'}`}
-          >
-            <PieChart size={24} />
-            <span className="text-[10px] font-black uppercase tracking-tighter">Finanzas</span>
-          </button>
-          <button 
-            onClick={() => setShowUserSearch(true)}
-            className="w-14 h-14 bg-primary text-white rounded-full flex items-center justify-center -translate-y-6 shadow-2xl shadow-primary/40 border-4 border-[#0d0d0d] active:scale-90 transition-transform"
-          >
-            <Plus size={28} />
-          </button>
-          <button 
-            onClick={() => { /* Potential Community View */ }}
-            className="flex flex-col items-center gap-1 text-gray-500"
-          >
-            <Users size={24} />
-            <span className="text-[10px] font-black uppercase tracking-tighter">Gente</span>
-          </button>
-          <button 
-            onClick={() => setShowProfileModal(true)}
-            className="flex flex-col items-center gap-1 text-gray-500"
-          >
-            <div className="w-6 h-6 rounded-full border border-white/20 overflow-hidden">
-               <img src={user.avatar} className="w-full h-full object-cover" alt="" />
             </div>
-            <span className="text-[10px] font-black uppercase tracking-tighter">Tú</span>
-          </button>
-        </div>
-      </aside>
+
+            {/* Channels & Chats List */}
+            <div className="p-4 border-b border-white/5">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] flex items-center gap-2">
+                  <Hash size={12} /> SALAS PÚBLICAS
+                </h4>
+                <button onClick={() => setShowCreateChannel(true)} className="p-1 hover:bg-primary/10 rounded transition-all text-primary"><Plus size={16}/></button>
+              </div>
+              <div className="space-y-1">
+                <button
+                  onClick={() => handleSelectChannel('global')}
+                  className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all ${currentChannel === 'global' ? 'bg-primary/10 border-primary/20' : 'hover:bg-white/5 border-transparent'} border mb-2`}
+                >
+                  <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary relative shrink-0">
+                    <Hash size={24}/>
+                  </div>
+                  <div className="flex-1 text-left min-w-0">
+                    <div className="flex justify-between items-center mb-1">
+                      <div className="text-base font-black text-white truncate pr-2">General</div>
+                    </div>
+                    <div className="text-sm text-gray-400 truncate font-medium">Conversación global</div>
+                  </div>
+                </button>
+                {channelsList.filter((c: any) => c.slug !== 'global' && !c.type).map((c: any) => (
+                  <button
+                    key={c._id}
+                    onClick={() => handleSelectChannel(c.slug)}
+                    className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all ${currentChannel === c.slug ? 'bg-primary/10 border-primary/20' : 'hover:bg-white/5 border-transparent'} border mb-2`}
+                  >
+                     <div className="w-14 h-14 rounded-full bg-primary/5 flex items-center justify-center text-primary relative shrink-0">
+                       {c.isPrivate ? <Lock size={24}/> : <Hash size={24}/>}
+                     </div>
+                     <div className="flex-1 text-left min-w-0">
+                       <div className="flex justify-between items-center mb-1">
+                         <div className="text-base font-black text-white truncate pr-2">{c.name}</div>
+                         {c.lastMessage && (
+                           <div className="text-[10px] text-gray-500 font-bold">
+                             {new Date(c.lastMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                           </div>
+                         )}
+                       </div>
+                       <div className="text-sm text-gray-400 truncate font-medium">
+                         {c.lastMessage ? decryptMessage(c.lastMessage.texto, c.slug) : 'No hay mensajes aún'}
+                       </div>
+                     </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] flex items-center gap-2">
+                  <MessageSquare size={12} /> CHATS PRIVADOS
+                </h4>
+                <button onClick={() => setShowUserSearch(true)} className="p-1 hover:bg-emerald-500/10 rounded transition-all text-emerald-500"><Plus size={16}/></button>
+              </div>
+              <div className="space-y-1">
+                {channelsList.filter((c: any) => c.type === 'direct').map((c: any) => (
+                  <button
+                    key={c._id}
+                    onClick={() => handleSelectChannel(c.slug)}
+                    className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all ${currentChannel === c.slug ? 'bg-emerald-500/10 border-emerald-500/20' : 'hover:bg-white/5 border-transparent'} border mb-2`}
+                  >
+                    <div className="w-14 h-14 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
+                      <User size={24}/>
+                    </div>
+                    <div className="flex-1 text-left min-w-0">
+                      <div className="flex justify-between items-center mb-1">
+                        <div className="text-base font-black text-white truncate pr-2">{c.name}</div>
+                        {c.lastMessage && (
+                          <div className="text-[10px] text-gray-500 font-bold">
+                            {new Date(c.lastMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-sm text-gray-400 truncate font-medium">
+                        {c.lastMessage ? decryptMessage(c.lastMessage.texto, c.slug) : 'Inicia una conversación'}
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Navigation Menu (WhatsApp/Instagram Style) */}
+          <div className="absolute bottom-0 left-0 right-0 h-20 bg-[#0d0d0d]/80 backdrop-blur-2xl border-t border-white/10 flex items-center justify-around px-4 pb-6 z-[160]">
+            <button 
+              onClick={() => { setMobileView('list'); setShowExpenses(false); }}
+              className={`flex flex-col items-center gap-1 ${!showExpenses ? 'text-primary' : 'text-gray-500'}`}
+            >
+              <MessageCircle size={24} />
+              <span className="text-[10px] font-black uppercase tracking-tighter">Chats</span>
+            </button>
+            <button 
+              onClick={() => { setShowExpenses(true); setMobileView('chat'); }}
+              className={`flex flex-col items-center gap-1 ${showExpenses ? 'text-primary' : 'text-gray-500'}`}
+            >
+              <PieChart size={24} />
+              <span className="text-[10px] font-black uppercase tracking-tighter">Finanzas</span>
+            </button>
+            <button 
+              onClick={() => setShowUserSearch(true)}
+              className="w-14 h-14 bg-primary text-white rounded-full flex items-center justify-center -translate-y-6 shadow-2xl shadow-primary/40 border-4 border-[#0d0d0d] active:scale-90 transition-transform"
+            >
+              <Plus size={28} />
+            </button>
+            <button 
+              onClick={() => { /* Potential Community View */ }}
+              className="flex flex-col items-center gap-1 text-gray-500"
+            >
+              <Users size={24} />
+              <span className="text-[10px] font-black uppercase tracking-tighter">Gente</span>
+            </button>
+            <button 
+              onClick={() => setShowProfileModal(true)}
+              className="flex flex-col items-center gap-1 text-gray-500"
+            >
+              <div className="w-6 h-6 rounded-full border border-white/20 overflow-hidden">
+                 <img src={user.avatar} className="w-full h-full object-cover" alt="" />
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-tighter">Tú</span>
+            </button>
+          </div>
+        </aside>
 
       {/* MAIN CONTENT AREA */}
       <main className={`

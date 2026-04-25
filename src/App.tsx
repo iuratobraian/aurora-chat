@@ -123,7 +123,7 @@ export default function AuroraChat() {
 
   // Convex Queries
   const searchedUsers = useQuery(api.users.searchUsers, { query: userSearchQuery });
-  const activeStatuses = useQuery(api.statuses.getActiveStatuses, user?._id ? { userId: user._id as any } : "skip");
+  const activeStatuses = useQuery(api.statuses.getActiveStatuses, (user?._id && user._id !== 'guest') ? { userId: user._id as any } : "skip");
   const pendingFriendRequests = useQuery(api.friends.getPendingRequests, user?._id ? { userId: user._id as any } : "skip");
   const sentFriendRequests = useQuery(api.friends.getSentRequests, user?._id ? { userId: user._id as any } : "skip");
   const friendsList = useQuery(api.friends.getFriends, user?._id ? { userId: user._id as any } : "skip");
@@ -172,7 +172,6 @@ export default function AuroraChat() {
   const channelsList = Array.isArray(rawChannels) ? rawChannels : [];
   const messages = (rawMessagesData?.messages && Array.isArray(rawMessagesData.messages)) ? rawMessagesData.messages as ChatMessage[] : [];
   const typingUsers = Array.isArray(rawTypingUsers) ? rawTypingUsers : [];
-  const recentStatuses = Array.isArray(activeStatuses) ? activeStatuses : [];
   const serverStats = rawServerStats || null;
 
   // 2. Lifecycle & Effects
@@ -521,7 +520,12 @@ export default function AuroraChat() {
     return decrypted.includes(searchQuery.toLowerCase());
   });
 
-  const displayStatuses = activeStatuses || cachedStatuses;
+  const recentStatuses = activeStatuses?.filter((s: any) => {
+    const isExpired = s.expiresAt < Date.now();
+    return !isExpired;
+  }) || cachedStatuses;
+
+  const displayStatuses = recentStatuses;
 
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -642,9 +646,9 @@ Nota: ${parsed.note}`;
   };
 
   if (!user) return (
-    <div className="h-screen bg-[#0f1115] flex items-center justify-center p-6">
+    <div className="h-screen bg-[#0a0a0a] flex items-center justify-center p-6">
       <div className="text-center space-y-8 animate-in fade-in zoom-in duration-700">
-        <div className="w-32 h-32 bg-primary/20 rounded-[2.5rem] flex items-center justify-center mx-auto shadow-2xl shadow-primary/20 border border-primary/20">
+        <div className="w-32 h-32 bg-primary/20 rounded-xl flex items-center justify-center mx-auto shadow-2xl shadow-primary/20 border border-primary/20">
           <MessageSquare size={64} className="text-primary" />
         </div>
         <div className="space-y-2">
@@ -661,8 +665,7 @@ Nota: ${parsed.note}`;
   const currentChat = [...(displayChannels || []), ...(displayStatuses || [])].find(c => (c as any).slug === currentChannel) || { name: 'Chat' };
 
   return (
-    <div className="flex h-full w-full bg-[#0f1115] overflow-hidden text-white">
-      <div className="flex h-full w-full overflow-hidden">
+    <div className="flex h-full w-full bg-[#0a0a0a] overflow-hidden text-white relative">
       <audio ref={audioRef} src={NOTIFICATION_SOUND} preload="auto" />
       
       {/* SIDEBAR */}
@@ -685,15 +688,15 @@ Nota: ${parsed.note}`;
         <div className="p-4 space-y-2 border-t border-white/5 bg-black/20">
            <h4 className="text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2 px-2">Coordinación Personal</h4>
            <div className="grid grid-cols-3 gap-2">
-              <button onClick={() => setShowReminders(true)} className="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-all border border-white/5">
+              <button onClick={() => setShowReminders(true)} className="flex flex-col items-center gap-1.5 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-all border border-white/5">
                 <Clock size={18} className="text-amber-500"/>
                 <span className="text-[8px] font-bold text-gray-400 uppercase">Alertas</span>
               </button>
-              <button onClick={() => setShowNotes(true)} className="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-all border border-white/5">
+              <button onClick={() => setShowNotes(true)} className="flex flex-col items-center gap-1.5 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-all border border-white/5">
                 <FileText size={18} className="text-emerald-500"/>
                 <span className="text-[8px] font-bold text-gray-400 uppercase">Notas</span>
               </button>
-              <button onClick={() => setShowPasswords(true)} className="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-all border border-white/5">
+              <button onClick={() => setShowPasswords(true)} className="flex flex-col items-center gap-1.5 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-all border border-white/5">
                 <Lock size={18} className="text-primary"/>
                 <span className="text-[8px] font-bold text-gray-400 uppercase">Claves</span>
               </button>
@@ -701,14 +704,14 @@ Nota: ${parsed.note}`;
            
            <button 
              onClick={() => setShowExpenses(true)}
-             className="w-full flex items-center justify-center gap-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 py-4 rounded-2xl border border-emerald-500/20 transition-all font-black text-[10px] uppercase tracking-widest mt-2"
+             className="w-full flex items-center justify-center gap-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 py-4 rounded-lg border border-emerald-500/20 transition-all font-black text-[10px] uppercase tracking-widest mt-2"
            >
              <Wallet size={16}/> Control de Gastos
            </button>
 
            <button 
              onClick={() => setShowFriendsModal(true)}
-             className="w-full flex items-center justify-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary py-4 rounded-2xl border border-primary/20 transition-all font-black text-[10px] uppercase tracking-widest mt-2"
+             className="w-full flex items-center justify-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary py-4 rounded-lg border border-primary/20 transition-all font-black text-[10px] uppercase tracking-widest mt-2"
            >
              <Users size={16}/> Mis Amigos
            </button>
@@ -720,7 +723,7 @@ Nota: ${parsed.note}`;
         <div className="p-4 border-b border-white/10 flex items-center justify-between bg-black/40 min-w-[320px]">
           <button onClick={() => setShowProfileModal(true)} className="flex items-center gap-3 group text-left">
             <div className="relative">
-              <img src={user.avatar} className="w-10 h-10 rounded-xl shadow-lg border border-white/10 group-hover:border-primary/50 transition-all" alt="" />
+              <img src={user.avatar} className="w-10 h-10 rounded-lg shadow-lg border border-white/10 group-hover:border-primary/50 transition-all" alt="" />
               <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#0f1115]" />
             </div>
             <div>
@@ -760,7 +763,7 @@ Nota: ${parsed.note}`;
              <h4 className="text-[9px] font-black text-primary uppercase mb-2">Solicitudes de Amistad</h4>
              <div className="space-y-2">
                {pendingFriendRequests.map((req: any) => (
-                 <div key={req._id} className="flex items-center justify-between bg-black/20 p-2 rounded-xl border border-white/5">
+                 <div key={req._id} className="flex items-center justify-between bg-black/20 p-2 rounded-lg border border-white/5">
                    <div className="flex items-center gap-2">
                      <img src={req.user?.avatar} className="w-6 h-6 rounded-lg" alt="" />
                      <span className="text-[10px] text-white font-bold">{req.user?.name}</span>
@@ -783,7 +786,7 @@ Nota: ${parsed.note}`;
              <h4 className="text-[9px] font-black text-gray-500 uppercase mb-2">Solicitudes Enviadas</h4>
              <div className="space-y-2">
                {sentFriendRequests.map((req: any) => (
-                 <div key={req._id} className="flex items-center justify-between bg-black/10 p-2 rounded-xl">
+                 <div key={req._id} className="flex items-center justify-between bg-black/10 p-2 rounded-lg">
                    <div className="flex items-center gap-2 opacity-60">
                      <img src={req.user?.avatar} className="w-6 h-6 rounded-lg" alt="" />
                      <span className="text-[10px] text-white">{req.user?.name}</span>
@@ -808,7 +811,7 @@ Nota: ${parsed.note}`;
             <div className="space-y-1">
               <button
                 onClick={() => setCurrentChannel('global')}
-                className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${currentChannel === 'global' ? 'bg-primary/20 border-primary/20 text-white' : 'text-gray-400 hover:bg-white/5 border-transparent'} border`}
+                className={`w-full flex items-center gap-3 p-3 rounded-lg transition-all ${currentChannel === 'global' ? 'bg-primary/20 border-primary/20 text-white' : 'text-gray-400 hover:bg-white/5 border-transparent'} border`}
               >
                 <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Hash size={16} className="text-primary"/></div>
                 <div className="flex-1 text-left text-sm font-bold">General</div>
@@ -817,7 +820,7 @@ Nota: ${parsed.note}`;
                 <button
                   key={c._id}
                   onClick={() => setCurrentChannel(c.slug)}
-                  className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${currentChannel === c.slug ? 'bg-primary/20 border-primary/20 text-white' : 'text-gray-400 hover:bg-white/5 border-transparent'} border`}
+                  className={`w-full flex items-center gap-3 p-3 rounded-lg transition-all ${currentChannel === c.slug ? 'bg-primary/20 border-primary/20 text-white' : 'text-gray-400 hover:bg-white/5 border-transparent'} border`}
                 >
                   <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
                     {c.isPrivate ? <Lock size={14}/> : <Hash size={16}/>}
@@ -844,7 +847,7 @@ Nota: ${parsed.note}`;
                 <button
                   key={c._id}
                   onClick={() => setCurrentChannel(c.slug)}
-                  className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${currentChannel === c.slug ? 'bg-emerald-500/20 border-emerald-500/20 text-white' : 'text-gray-400 hover:bg-white/5 border-transparent'} border`}
+                  className={`w-full flex items-center gap-3 p-3 rounded-lg transition-all ${currentChannel === c.slug ? 'bg-emerald-500/20 border-emerald-500/20 text-white' : 'text-gray-400 hover:bg-white/5 border-transparent'} border`}
                 >
                   <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500">
                     <User size={16}/>
@@ -869,7 +872,7 @@ Nota: ${parsed.note}`;
                   <button
                     key={c._id}
                     onClick={() => setCurrentChannel(c.slug)}
-                    className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${currentChannel === c.slug ? 'bg-primary/20 border-primary/20 text-white' : 'text-gray-400 hover:bg-white/5 border-transparent'} border`}
+                    className={`w-full flex items-center gap-3 p-3 rounded-lg transition-all ${currentChannel === c.slug ? 'bg-primary/20 border-primary/20 text-white' : 'text-gray-400 hover:bg-white/5 border-transparent'} border`}
                   >
                     <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                       <AtSign size={16}/>
@@ -884,7 +887,7 @@ Nota: ${parsed.note}`;
       </div>
 
       {/* MAIN CONTENT */}
-      <div className="flex-1 flex flex-col relative bg-[#0f1115] overflow-hidden md:rounded-none">
+      <div className="flex-1 flex flex-col relative bg-[#0a0a0a] overflow-hidden md:rounded-none">
 
         {/* Chat Header */}
         <div className="h-16 px-4 border-b border-white/10 flex items-center justify-between bg-black/40 backdrop-blur-md z-10">
@@ -892,7 +895,7 @@ Nota: ${parsed.note}`;
           <div className="flex items-center gap-4">
             <button 
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="p-2 text-gray-500 hover:text-white transition-all bg-white/5 rounded-xl border border-white/10"
+              className="p-2 text-gray-500 hover:text-white transition-all bg-white/5 rounded-lg border border-white/10"
             >
               {isMobile ? <Plus size={20} className={isSidebarOpen ? 'rotate-45' : ''} /> : <MoreVertical size={20} className={isSidebarOpen ? '' : 'rotate-90'} />}
             </button>
@@ -902,7 +905,7 @@ Nota: ${parsed.note}`;
                   <Clock size={10} /> Sin Conexión (Modo Offline)
                 </div>
               )}
-              <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 text-primary">
+              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 text-primary">
 
                 <span className="material-symbols-outlined text-lg">smart_toy</span>
               </div>
@@ -920,14 +923,14 @@ Nota: ${parsed.note}`;
           <div className="flex items-center gap-3">
                <button 
                 onClick={() => setShowEvents(!showEvents)}
-                className={`p-2 rounded-xl transition-all ${showEvents ? 'bg-primary text-white' : 'text-gray-500 hover:text-white bg-white/5'}`}
+                className={`p-2 rounded-lg transition-all ${showEvents ? 'bg-primary text-white' : 'text-gray-500 hover:text-white bg-white/5'}`}
                 title="Eventos del Equipo"
                >
                  <Calendar size={20}/>
                </button>
                <button 
                 onClick={() => setShowPolls(!showPolls)}
-                className={`p-2 rounded-xl transition-all ${showPolls ? 'bg-indigo-500 text-white' : 'text-gray-500 hover:text-white bg-white/5'}`}
+                className={`p-2 rounded-lg transition-all ${showPolls ? 'bg-indigo-500 text-white' : 'text-gray-500 hover:text-white bg-white/5'}`}
                 title="Encuestas"
                >
                  <HardDrive size={20}/>
@@ -936,13 +939,13 @@ Nota: ${parsed.note}`;
                {channelData?.createdBy === user?._id && (
                 <button 
                  onClick={() => togglePause({ channelId: channelData._id, isPaused: !channelData.isPaused })}
-                 className={`p-2 rounded-xl transition-all ${channelData?.isPaused ? 'bg-amber-500 text-white' : 'text-gray-500 hover:text-white bg-white/5'}`}
+                 className={`p-2 rounded-lg transition-all ${channelData?.isPaused ? 'bg-amber-500 text-white' : 'text-gray-500 hover:text-white bg-white/5'}`}
                  title={channelData?.isPaused ? "Reanudar Chat" : "Pausar Chat"}
                 >
                   {channelData?.isPaused ? <Play size={20}/> : <Pause size={20}/>}
                 </button>
               )}
-             <button onClick={() => setShowSearch(!showSearch)} className={`p-2 rounded-xl transition-all ${showSearch ? 'bg-primary text-white' : 'text-gray-500 hover:text-white bg-white/5'}`}>
+             <button onClick={() => setShowSearch(!showSearch)} className={`p-2 rounded-lg transition-all ${showSearch ? 'bg-primary text-white' : 'text-gray-500 hover:text-white bg-white/5'}`}>
                <Search size={20}/>
              </button>
              <button className="p-2 text-gray-500 hover:text-white transition-all"><MoreVertical size={20}/></button>
@@ -958,7 +961,7 @@ Nota: ${parsed.note}`;
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder="Buscar en la conversación..."
-                className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-10 py-2 text-xs text-white outline-none focus:border-primary/50"
+                className="w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-10 py-2 text-xs text-white outline-none focus:border-primary/50"
                 autoFocus
               />
               {searchQuery && (
@@ -977,13 +980,13 @@ Nota: ${parsed.note}`;
             <div className="flex gap-2">
               <button 
                 onClick={() => updateChannelStatus({ channelId: (currentChat as any)._id, status: 'active' })} 
-                className="bg-primary text-white px-6 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider"
+                className="bg-primary text-white px-6 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider"
               >
                 Aceptar
               </button>
               <button 
                 onClick={() => deleteChannel({ channelId: (currentChat as any)._id })} 
-                className="bg-white/5 text-gray-400 px-6 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider border border-white/10"
+                className="bg-white/5 text-gray-400 px-6 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-white/10"
               >
                 Rechazar
               </button>
@@ -1029,17 +1032,12 @@ Nota: ${parsed.note}`;
                   <div className={`flex gap-4 group ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
                     <button 
                       onClick={() => {
-                        const userStatus = recentStatuses?.find((s:any) => s.userId === m.userId);
-                        if(userStatus) {
-                          setViewingStatus(userStatus);
-                        } else {
-                          setViewingProfileUser({ _id: m.userId, name: m.nombre, avatar: m.avatar });
-                        }
+                        setViewingProfileUser({ _id: m.userId, name: m.nombre, avatar: m.avatar });
                       }}
                       className={`shrink-0 transition-transform hover:scale-110 ${idx > 0 && displayMessages[idx-1].userId === m.userId ? 'opacity-0 h-0 pointer-events-none' : 'opacity-100'}`}
                     >
-                      <div className={`relative p-0.5 rounded-xl ${recentStatuses?.find((s:any) => s.userId === m.userId) ? 'bg-gradient-to-tr from-primary to-purple-500' : ''}`}>
-                        <img src={m.avatar} className="w-9 h-9 rounded-[10px] shadow-lg border border-white/10 bg-[#1a1a1a]" alt="" />
+                      <div className={`relative p-0.5 rounded-lg ${recentStatuses?.find((s:any) => s.userId === m.userId) ? 'bg-gradient-to-tr from-primary to-purple-500' : ''}`}>
+                        <img src={m.avatar} className="w-9 h-9 rounded-[10px] shadow-lg border border-white/10 bg-[#111111]" alt="" />
                       </div>
                     </button>
 
@@ -1049,12 +1047,7 @@ Nota: ${parsed.note}`;
                         <div className={`flex items-center gap-2 mb-1 ${isMe ? 'flex-row-reverse' : ''}`}>
                           <button 
                             onClick={() => {
-                              const userStatus = recentStatuses?.find((s:any) => s.userId === m.userId);
-                              if(userStatus) {
-                                setViewingStatus(userStatus);
-                              } else {
-                                setViewingProfileUser({ _id: m.userId, name: m.nombre, avatar: m.avatar });
-                              }
+                              setViewingProfileUser({ _id: m.userId, name: m.nombre, avatar: m.avatar });
                             }}
                             className="text-[10px] font-black text-white uppercase tracking-widest hover:text-primary transition-colors text-left"
                           >
@@ -1065,12 +1058,12 @@ Nota: ${parsed.note}`;
                       )}
                       
                       <div className={`
-                        max-w-[85%] text-[13px] leading-relaxed transition-all relative group
-                        ${isMe ? 'text-right' : 'text-left'}
-                        ${m.isPinned ? 'border-l-2 border-primary pl-3 bg-primary/5 rounded-r-xl py-1' : ''}
+                        max-w-[85%] text-[13px] leading-relaxed transition-all relative group p-3 rounded-lg
+                        ${isMe ? 'bg-white/5 text-right rounded-tr-none' : 'bg-white/10 text-left rounded-tl-none'}
+                        ${m.isPinned ? 'border-l-2 border-primary pl-3' : ''}
                       `}>
                         {m.imagenUrl && (
-                          <div className={`mb-3 rounded-2xl overflow-hidden ring-1 ring-white/10 group/img relative inline-block max-w-sm`}>
+                          <div className={`mb-3 rounded-lg overflow-hidden ring-1 ring-white/10 group/img relative inline-block max-w-sm`}>
                             <img src={m.imagenUrl} className="w-full h-auto max-h-96 cursor-zoom-in group-hover/img:scale-105 transition-transform duration-500" alt="" onClick={() => setPreviewImage(m.imagenUrl!)} />
                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
                               <Search className="text-white" />
@@ -1079,32 +1072,32 @@ Nota: ${parsed.note}`;
                         )}
                         
                         {m.audioUrl && (
-                          <div className={`mb-3 flex items-center gap-4 bg-white/5 p-3 rounded-2xl border border-white/5 w-fit ${isMe ? 'flex-row-reverse text-right' : ''}`}>
+                          <div className={`mb-3 flex items-center gap-4 bg-black/20 p-3 rounded-lg border border-white/5 w-fit ${isMe ? 'flex-row-reverse text-right' : ''}`}>
                              <button onClick={(e) => {
                                const audio = e.currentTarget.nextElementSibling as HTMLAudioElement;
                                if(audio.paused) audio.play(); else audio.pause();
-                             }} className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white shrink-0 hover:scale-110 transition-transform shadow-lg shadow-primary/20">
+                             }} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white shrink-0 hover:scale-110 transition-transform shadow-lg">
                                <Volume2 size={18}/>
                              </button>
                              <audio src={m.audioUrl} className="hidden" />
                              <div className="flex flex-col gap-1">
                                 <span className="text-[8px] font-black uppercase text-gray-500">Nota de Voz</span>
                                 <div className="w-24 h-1 bg-white/10 rounded-full overflow-hidden">
-                                   <div className="h-full bg-primary/40 animate-progress w-full" />
+                                   <div className="h-full bg-white/40 animate-progress w-full" />
                                 </div>
                              </div>
                           </div>
                         )}
 
                         {m.eventId && (
-                          <div className={`mb-4 bg-primary/5 border border-primary/10 rounded-3xl p-5 space-y-4 max-w-xs ${isMe ? 'ml-auto' : ''}`}>
-                             <div className="flex items-center gap-2 text-primary font-black text-[10px] uppercase tracking-[0.2em]">
+                          <div className={`mb-4 bg-white/5 border border-white/10 rounded-xl p-5 space-y-4 max-w-xs ${isMe ? 'ml-auto' : ''}`}>
+                             <div className="flex items-center gap-2 text-white font-black text-[10px] uppercase tracking-[0.2em]">
                                 <Calendar size={14}/> Evento Sugerido
                              </div>
                              <h4 className="text-xs font-bold text-white uppercase tracking-tight">Invitación Interactiva</h4>
                              <button 
                               onClick={() => { setShowEvents(true); }}
-                              className="w-full bg-primary text-white py-3 rounded-2xl text-[9px] font-black uppercase shadow-xl shadow-primary/20 hover:scale-[1.02] transition-transform"
+                              className="w-full bg-white text-black py-3 rounded-lg text-[9px] font-black uppercase shadow-xl hover:scale-[1.02] transition-transform"
                              >
                                Ver y Anotarme
                              </button>
@@ -1116,7 +1109,7 @@ Nota: ${parsed.note}`;
                         {/* Status indicators */}
                         <div className={`flex items-center gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-all ${isMe ? 'justify-end' : 'justify-start'}`}>
                            { (m as any).isOffline && <span className="text-[7px] font-black text-amber-500 uppercase">En Cola</span> }
-                           <span className="text-[8px] text-gray-700 font-bold">{new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                           <span className="text-[8px] text-gray-500 font-bold">{new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                         </div>
                       </div>
                     </div>
@@ -1132,7 +1125,7 @@ Nota: ${parsed.note}`;
         <div className="p-3 bg-black/40 border-t border-white/10 backdrop-blur-md">
 
             {showEmoji && (
-              <div className="absolute bottom-24 left-6 bg-[#1a1a1a] border border-white/10 p-2 rounded-2xl shadow-2xl flex gap-2 z-[100] animate-in fade-in slide-in-from-bottom-2">
+              <div className="absolute bottom-24 left-6 bg-[#111111] border border-white/10 p-2 rounded-lg shadow-2xl flex gap-2 z-[100] animate-in fade-in slide-in-from-bottom-2">
                 {EMOJIS.map(emoji => (
                   <button 
                     key={emoji} 
@@ -1146,12 +1139,12 @@ Nota: ${parsed.note}`;
             )}
 
             {attachedAudio && (
-              <div className="mb-4 flex items-center gap-3 p-3 bg-primary/10 rounded-2xl border border-primary/20 w-fit animate-in slide-in-from-left duration-300">
-                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white">
+              <div className="mb-4 flex items-center gap-3 p-3 bg-white/5 rounded-lg border border-white/10 w-fit animate-in slide-in-from-left duration-300">
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white">
                   <Volume2 size={20} className="animate-pulse" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-black text-primary uppercase tracking-widest">Nota de Voz Lista</span>
+                  <span className="text-[10px] font-black text-white uppercase tracking-widest">Nota de Voz Lista</span>
                   <span className="text-[9px] text-gray-500">Haz clic en enviar para compartir</span>
                 </div>
                 <button onClick={() => { setAttachedAudio(null); setAudioBlob(null); }} className="ml-2 text-gray-500 hover:text-red-400 p-1"><X size={18}/></button>
@@ -1160,8 +1153,8 @@ Nota: ${parsed.note}`;
 
             {attachedImage && (
 
-             <div className="mb-4 flex items-center gap-3 p-2 bg-white/5 rounded-2xl border border-white/10 w-fit">
-               <div className="relative w-20 h-20 rounded-xl overflow-hidden">
+             <div className="mb-4 flex items-center gap-3 p-2 bg-white/5 rounded-lg border border-white/10 w-fit">
+               <div className="relative w-20 h-20 rounded-lg overflow-hidden">
                  <img src={attachedImage} className="w-full h-full object-cover" alt="" />
                  <button onClick={() => setAttachedImage(null)} className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-lg"><X size={14}/></button>
                </div>
@@ -1172,14 +1165,14 @@ Nota: ${parsed.note}`;
            <form onSubmit={handleSubmit} className="flex items-center gap-2 max-w-5xl mx-auto">
               <button type="button" onClick={() => fileInputRef.current?.click()} className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-500 hover:text-white transition-all shrink-0"><Plus size={20}/></button>
               
-              <div className="flex-1 bg-white/5 border border-white/10 rounded-[2rem] px-2 py-1 focus-within:border-primary/40 transition-all flex items-center gap-1">
-                <button type="button" onClick={() => setShowEmoji(!showEmoji)} className="p-2 text-gray-500 hover:text-primary transition-colors shrink-0"><Smile size={20}/></button>
+              <div className="flex-1 bg-white/5 border border-white/10 rounded-[2rem] px-2 py-1 focus-within:border-white/20 transition-all flex items-center gap-1">
+                <button type="button" onClick={() => setShowEmoji(!showEmoji)} className="p-2 text-gray-500 hover:text-white transition-colors shrink-0"><Smile size={20}/></button>
                 <textarea
                   value={text + (interimTranscript ? (text ? ' ' : '') + interimTranscript : '')}
                   onChange={e => { setText(e.target.value); handleTyping(); }}
                   onPaste={handlePaste}
                   placeholder={isRecording ? "Escuchando..." : "Escribe un mensaje..."}
-                  className={`flex-1 bg-transparent text-sm text-white outline-none placeholder-gray-600 px-2 py-2 resize-none max-h-32 min-h-[40px] leading-tight ${isRecording ? 'text-primary' : ''}`}
+                  className={`flex-1 bg-transparent text-sm text-white outline-none placeholder-gray-600 px-2 py-2 resize-none max-h-32 min-h-[40px] leading-tight ${isRecording ? 'text-white' : ''}`}
                   rows={1}
                   onKeyDown={e => { if(e.key === 'Enter' && !e.shiftKey && !isMobile) { e.preventDefault(); handleSubmit(e); } }}
                 />
@@ -1190,16 +1183,13 @@ Nota: ${parsed.note}`;
                    </button>
                    <button 
                      type="button" 
-                     onMouseDown={startRecording}
-                     onMouseUp={stopRecording}
-                     onTouchStart={startRecording}
-                     onTouchEnd={stopRecording}
-                     className={`p-2 transition-all ${isRecording ? 'text-red-500 animate-pulse scale-125' : 'text-gray-500 hover:text-white'}`}
+                     onClick={() => isRecording ? stopRecording() : startRecording()}
+                     className={`p-2 transition-all ${isRecording ? 'text-white animate-pulse scale-125' : 'text-gray-500 hover:text-white'}`}
                    >
                      {isRecording ? <MicOff size={20}/> : <Mic size={20}/>}
                    </button>
                    {(text.trim() || attachedImage || audioBlob) ? (
-                     <button type="submit" disabled={uploading} className="p-2.5 bg-primary text-white rounded-full shadow-lg shadow-primary/20 transition-all active:scale-90">
+                     <button type="submit" disabled={uploading} className="p-2.5 bg-white text-black rounded-full transition-all active:scale-90">
                        <Send size={16} />
                      </button>
                    ) : (
@@ -1220,22 +1210,21 @@ Nota: ${parsed.note}`;
            <div className="fixed inset-0 bg-black/40 z-[140] backdrop-blur-sm" onClick={() => setIsSidebarOpen(false)} />
         )}
       </div>
-      </div>
 
       {/* MODALS */}
        {showEvents && (
-         <div className="fixed inset-y-0 right-0 w-80 bg-[#1a1a1a] border-l border-white/10 z-[150] shadow-2xl p-6 flex flex-col gap-6 overflow-y-auto">
+         <div className="fixed inset-y-0 right-0 w-80 bg-[#111111] border-l border-white/10 z-[150] shadow-2xl p-6 flex flex-col gap-6 overflow-y-auto">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2"><Calendar size={18} className="text-primary"/> Eventos</h2>
+              <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2"><Calendar size={18} className="text-white"/> Eventos</h2>
               <button onClick={() => setShowEvents(false)} className="text-gray-500 hover:text-white"><X size={20}/></button>
             </div>
-            <button onClick={() => setShowCreateEvent(true)} className="w-full bg-primary/10 border border-primary/20 text-primary py-3 rounded-xl text-[10px] font-black uppercase hover:bg-primary/20 transition-all">Crear Nuevo Evento</button>
+            <button onClick={() => setShowCreateEvent(true)} className="w-full bg-white/5 border border-white/10 text-white py-3 rounded-lg text-[10px] font-black uppercase hover:bg-white/10 transition-all">Crear Nuevo Evento</button>
             <div className="space-y-4">
               {events?.map((ev: any) => (
-                <div key={ev._id} className="bg-white/5 border border-white/5 p-4 rounded-2xl space-y-3">
+                <div key={ev._id} className="bg-white/5 border border-white/5 p-4 rounded-lg space-y-3">
                   <h3 className="text-xs font-bold text-white">{ev.title}</h3>
                   <p className="text-[10px] text-gray-500 line-clamp-2">{ev.description}</p>
-                  <div className="flex items-center gap-2 text-[9px] font-mono text-primary bg-primary/5 px-2 py-1 rounded w-fit">
+                  <div className="flex items-center gap-2 text-[9px] font-mono text-white bg-white/5 px-2 py-1 rounded w-fit">
                     <Clock size={10}/> {new Date(ev.date).toLocaleDateString()}
                   </div>
                   <div className="flex items-center justify-between pt-2 border-t border-white/5">
@@ -1243,7 +1232,7 @@ Nota: ${parsed.note}`;
                     {ev.participants.includes(user?._id) ? (
                       <button onClick={() => leaveEvent({ eventId: ev._id, userId: user?._id as any })} className="text-[9px] font-black text-red-400 uppercase">Salir</button>
                     ) : (
-                      <button onClick={() => joinEvent({ eventId: ev._id, userId: user?._id as any })} className="text-[9px] font-black text-emerald-400 uppercase">Anotarme</button>
+                      <button onClick={() => joinEvent({ eventId: ev._id, userId: user?._id as any })} className="text-[9px] font-black text-white uppercase">Anotarme</button>
                     )}
                   </div>
                 </div>
@@ -1253,15 +1242,15 @@ Nota: ${parsed.note}`;
        )}
 
        {showPolls && (
-         <div className="fixed inset-y-0 right-0 w-80 bg-[#1a1a1a] border-l border-white/10 z-[150] shadow-2xl p-6 flex flex-col gap-6 overflow-y-auto">
+         <div className="fixed inset-y-0 right-0 w-80 bg-[#111111] border-l border-white/10 z-[150] shadow-2xl p-6 flex flex-col gap-6 overflow-y-auto">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2"><HardDrive size={18} className="text-indigo-500"/> Encuestas</h2>
+              <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2"><HardDrive size={18} className="text-white"/> Encuestas</h2>
               <button onClick={() => setShowPolls(false)} className="text-gray-500 hover:text-white"><X size={20}/></button>
             </div>
-            <button onClick={() => setShowCreatePoll(true)} className="w-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-500 py-3 rounded-xl text-[10px] font-black uppercase hover:bg-indigo-500/20 transition-all">Crear Encuesta</button>
+            <button onClick={() => setShowCreatePoll(true)} className="w-full bg-white/5 border border-white/10 text-white py-3 rounded-lg text-[10px] font-black uppercase hover:bg-white/10 transition-all">Crear Encuesta</button>
             <div className="space-y-4">
               {polls?.map((poll: any) => (
-                <div key={poll._id} className="bg-white/5 border border-white/5 p-4 rounded-2xl space-y-4">
+                <div key={poll._id} className="bg-white/5 border border-white/5 p-4 rounded-lg space-y-4">
                   <h3 className="text-xs font-bold text-white">{poll.question}</h3>
                   <div className="space-y-2">
                     {poll.options.map((opt: any, idx: number) => {
@@ -1280,7 +1269,7 @@ Nota: ${parsed.note}`;
                             <span className="font-bold">{percentage}%</span>
                           </button>
                           <div className="h-1 bg-white/5 rounded-full overflow-hidden">
-                            <div className="h-full bg-indigo-500 transition-all duration-1000" style={{ width: `${percentage}%` }} />
+                            <div className="h-full bg-white transition-all duration-1000" style={{ width: `${percentage}%` }} />
                           </div>
                         </div>
                       );
@@ -1294,12 +1283,12 @@ Nota: ${parsed.note}`;
 
        {showCreateEvent && (
          <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[200] flex items-center justify-center p-4">
-            <div className="bg-[#1a1a1a] border border-white/10 rounded-[2rem] p-8 w-full max-w-sm space-y-6">
+            <div className="bg-[#111111] border border-white/10 rounded-[2rem] p-8 w-full max-w-sm space-y-6">
               <h2 className="text-sm font-black text-white uppercase tracking-widest text-center">Nuevo Evento</h2>
               <div className="space-y-4">
-                <input value={newEventTitle} onChange={e => setNewEventTitle(e.target.value)} placeholder="Título del evento" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs outline-none focus:border-primary" />
-                <textarea value={newEventDesc} onChange={e => setNewEventDesc(e.target.value)} placeholder="Descripción..." className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs outline-none focus:border-primary h-20 resize-none" />
-                <input type="date" value={newEventDate} onChange={e => setNewEventDate(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs outline-none focus:border-primary" />
+                <input value={newEventTitle} onChange={e => setNewEventTitle(e.target.value)} placeholder="Título del evento" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-xs outline-none focus:border-white" />
+                <textarea value={newEventDesc} onChange={e => setNewEventDesc(e.target.value)} placeholder="Descripción..." className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-xs outline-none focus:border-white h-20 resize-none" />
+                <input type="date" value={newEventDate} onChange={e => setNewEventDate(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-xs outline-none focus:border-white" />
               </div>
               <div className="flex gap-3">
                 <button onClick={() => setShowCreateEvent(false)} className="flex-1 py-3 text-[10px] font-black uppercase text-gray-500">Cancelar</button>
@@ -1310,7 +1299,7 @@ Nota: ${parsed.note}`;
                      setNewEventTitle(''); setNewEventDesc(''); setNewEventDate('');
                      setSharingEventId(eventId as any);
                    }}
-                   className="flex-1 bg-primary text-white py-3 rounded-xl text-[10px] font-black uppercase"
+                   className="flex-1 bg-white text-black py-3 rounded-lg text-[10px] font-black uppercase"
                  >
                    Crear
                  </button>
@@ -1322,19 +1311,19 @@ Nota: ${parsed.note}`;
 
        {showCreatePoll && (
          <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[200] flex items-center justify-center p-4">
-            <div className="bg-[#1a1a1a] border border-white/10 rounded-[2rem] p-8 w-full max-w-sm space-y-6">
+            <div className="bg-[#111111] border border-white/10 rounded-[2rem] p-8 w-full max-w-sm space-y-6">
               <h2 className="text-sm font-black text-white uppercase tracking-widest text-center">Nueva Encuesta</h2>
               <div className="space-y-4">
-                <input value={newPollQuestion} onChange={e => setNewPollQuestion(e.target.value)} placeholder="¿Qué quieres preguntar?" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs outline-none focus:border-indigo-500" />
+                <input value={newPollQuestion} onChange={e => setNewPollQuestion(e.target.value)} placeholder="¿Qué quieres preguntar?" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-xs outline-none focus:border-white" />
                 <div className="space-y-2">
                   {newPollOptions.map((opt, idx) => (
                     <input key={idx} value={opt} onChange={e => {
                       const copy = [...newPollOptions];
                       copy[idx] = e.target.value;
                       setNewPollOptions(copy);
-                    }} placeholder={`Opción ${idx + 1}`} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs outline-none focus:border-indigo-500" />
+                    }} placeholder={`Opción ${idx + 1}`} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-xs outline-none focus:border-white" />
                   ))}
-                  <button onClick={() => setNewPollOptions([...newPollOptions, ''])} className="text-[9px] font-black text-indigo-400 uppercase">+ Agregar Opción</button>
+                  <button onClick={() => setNewPollOptions([...newPollOptions, ''])} className="text-[9px] font-black text-white uppercase">+ Agregar Opción</button>
                 </div>
               </div>
               <div className="flex gap-3">
@@ -1345,7 +1334,7 @@ Nota: ${parsed.note}`;
                     setShowCreatePoll(false);
                     setNewPollQuestion(''); setNewPollOptions(['', '']);
                   }}
-                  className="flex-1 bg-indigo-500 text-white py-3 rounded-xl text-[10px] font-black uppercase"
+                  className="flex-1 bg-white text-black py-3 rounded-lg text-[10px] font-black uppercase"
                 >
                   Crear
                 </button>
@@ -1356,9 +1345,9 @@ Nota: ${parsed.note}`;
 
        {sharingEventId && (
          <div className="fixed inset-0 bg-black/90 backdrop-blur-xl z-[300] flex items-center justify-center p-4">
-           <div className="bg-[#1a1a1a] border border-white/10 rounded-[3rem] p-8 w-full max-w-sm space-y-6 shadow-2xl">
+           <div className="bg-[#111111] border border-white/10 rounded-xl p-8 w-full max-w-sm space-y-6 shadow-2xl">
               <div className="text-center">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto text-primary mb-4">
+                <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mx-auto text-white mb-4">
                   <Calendar size={32}/>
                 </div>
                 <h2 className="text-sm font-black text-white uppercase tracking-widest">¿Compartir Evento?</h2>
@@ -1373,9 +1362,9 @@ Nota: ${parsed.note}`;
                       await sendMessage({ userId: user._id, nombre: user.name, avatar: user.avatar, texto: encrypted, channelId: c.slug, eventId: sharingEventId });
                       setSharingEventId(null);
                     }}
-                    className="w-full flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-all border border-white/5"
+                    className="w-full flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-all border border-white/5"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary"><Hash size={14}/></div>
+                    <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-white"><Hash size={14}/></div>
                     <span className="text-xs text-white font-bold">{c.name}</span>
                   </button>
                 ))}
@@ -1389,29 +1378,29 @@ Nota: ${parsed.note}`;
 
        {showReminders && (
          <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[200] flex items-center justify-center p-4">
-           <div className="bg-[#1a1a1a] border border-white/10 rounded-[2.5rem] p-8 w-full max-w-sm space-y-6 animate-in slide-in-from-bottom duration-300">
+           <div className="bg-[#111111] border border-white/10 rounded-xl p-8 w-full max-w-sm space-y-6 animate-in slide-in-from-bottom duration-300">
               <div className="flex items-center justify-between">
-                <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2"><Clock size={18} className="text-amber-500"/> Recordatorios</h2>
+                <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2"><Clock size={18} className="text-white"/> Recordatorios</h2>
                 <button onClick={() => setShowReminders(false)} className="text-gray-500 hover:text-white"><X size={20}/></button>
               </div>
               <div className="space-y-3">
-                <input value={newReminderText} onChange={e => setNewReminderText(e.target.value)} placeholder="¿Qué quieres recordar?" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs outline-none focus:border-amber-500" />
-                <input type="datetime-local" value={newReminderDate} onChange={e => setNewReminderDate(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs outline-none focus:border-amber-500" />
+                <input value={newReminderText} onChange={e => setNewReminderText(e.target.value)} placeholder="¿Qué quieres recordar?" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-xs outline-none focus:border-white" />
+                <input type="datetime-local" value={newReminderDate} onChange={e => setNewReminderDate(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-xs outline-none focus:border-white" />
                 <button onClick={async () => {
                   await createReminder({ userId: user?._id as any, text: newReminderText, date: new Date(newReminderDate).getTime() });
                   setNewReminderText(''); setNewReminderDate('');
-                }} className="w-full bg-amber-500 text-white py-3 rounded-xl text-[10px] font-black uppercase">Agregar Alerta</button>
+                }} className="w-full bg-white text-black py-3 rounded-lg text-[10px] font-black uppercase">Agregar Alerta</button>
               </div>
               <div className="max-h-60 overflow-y-auto space-y-2 no-scrollbar">
                 {reminders?.map((r: any) => (
-                  <div key={r._id} className={`p-3 rounded-xl border border-white/5 flex items-center justify-between ${r.completed ? 'bg-white/5 opacity-50' : 'bg-white/[0.02]'}`}>
+                  <div key={r._id} className={`p-3 rounded-lg border border-white/5 flex items-center justify-between ${r.completed ? 'bg-white/5 opacity-50' : 'bg-white/[0.02]'}`}>
                     <div>
                       <p className={`text-xs text-white ${r.completed ? 'line-through' : ''}`}>{r.text}</p>
                       <p className="text-[8px] text-gray-500 uppercase font-black">{new Date(r.date).toLocaleString()}</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <button onClick={() => toggleReminder({ reminderId: r._id })} className="text-amber-500"><Clock size={14}/></button>
-                      <button onClick={() => deleteReminder({ reminderId: r._id })} className="text-red-500/50"><X size={14}/></button>
+                      <button onClick={() => toggleReminder({ reminderId: r._id })} className="text-white"><Clock size={14}/></button>
+                      <button onClick={() => deleteReminder({ reminderId: r._id })} className="text-white/50"><X size={14}/></button>
                     </div>
                   </div>
                 ))}
@@ -1422,14 +1411,14 @@ Nota: ${parsed.note}`;
 
        {showNotes && (
          <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[200] flex items-center justify-center p-4">
-           <div className="bg-[#1a1a1a] border border-white/10 rounded-[2.5rem] p-8 w-full max-w-sm space-y-6 animate-in slide-in-from-bottom duration-300">
+           <div className="bg-[#111111] border border-white/10 rounded-xl p-8 w-full max-w-sm space-y-6 animate-in slide-in-from-bottom duration-300">
               <div className="flex items-center justify-between">
-                <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2"><FileText size={18} className="text-emerald-500"/> Mis Notas</h2>
+                <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2"><FileText size={18} className="text-white"/> Mis Notas</h2>
                 <button onClick={() => setShowNotes(false)} className="text-gray-500 hover:text-white"><X size={20}/></button>
               </div>
               <div className="space-y-3">
-                <input value={newNoteTitle} onChange={e => setNewNoteTitle(e.target.value)} placeholder="Título..." className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs font-bold outline-none focus:border-emerald-500" />
-                <textarea value={newNoteContent} onChange={e => setNewNoteContent(e.target.value)} placeholder="Contenido de la nota..." className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs outline-none focus:border-emerald-500 h-24 resize-none" />
+                <input value={newNoteTitle} onChange={e => setNewNoteTitle(e.target.value)} placeholder="Título..." className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-xs font-bold outline-none focus:border-white" />
+                <textarea value={newNoteContent} onChange={e => setNewNoteContent(e.target.value)} placeholder="Contenido de la nota..." className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-xs outline-none focus:border-white h-24 resize-none" />
                 <div className="flex gap-2">
                   <button onClick={async () => {
                     if (editingNoteId) {
@@ -1438,17 +1427,17 @@ Nota: ${parsed.note}`;
                       await createNote({ userId: user?._id as any, title: newNoteTitle, content: newNoteContent });
                     }
                     setNewNoteTitle(''); setNewNoteContent(''); setEditingNoteId(null);
-                  }} className="flex-1 bg-emerald-500 text-white py-3 rounded-xl text-[10px] font-black uppercase">
+                  }} className="flex-1 bg-white text-black py-3 rounded-lg text-[10px] font-black uppercase">
                     {editingNoteId ? 'Actualizar Nota' : 'Guardar Nota'}
                   </button>
                   {editingNoteId && (
-                    <button onClick={() => { setEditingNoteId(null); setNewNoteTitle(''); setNewNoteContent(''); }} className="px-4 bg-white/5 text-gray-500 rounded-xl"><X size={16}/></button>
+                    <button onClick={() => { setEditingNoteId(null); setNewNoteTitle(''); setNewNoteContent(''); }} className="px-4 bg-white/5 text-gray-500 rounded-lg"><X size={16}/></button>
                   )}
                 </div>
               </div>
               <div className="max-h-60 overflow-y-auto space-y-2 no-scrollbar">
                 {notes?.map((n: any) => (
-                  <div key={n._id} className="p-3 rounded-xl border border-white/5 bg-white/[0.02] group">
+                  <div key={n._id} className="p-3 rounded-lg border border-white/5 bg-white/[0.02] group">
                     <div className="flex items-center justify-between mb-1">
                       <h4 className="text-[10px] font-black text-white uppercase">{n.title}</h4>
                       <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -1456,13 +1445,13 @@ Nota: ${parsed.note}`;
                           setEditingNoteId(n._id);
                           setNewNoteTitle(n.title);
                           setNewNoteContent(n.content);
-                        }} className="text-emerald-500"><Plus size={12} className="rotate-45"/></button>
+                        }} className="text-white"><Plus size={12} className="rotate-45"/></button>
                         <button onClick={async () => {
                           const encrypted = encryptMessage(`📒 *Nota compartida:* ${n.title}\n\n${n.content}`, currentChannel);
                           await sendMessage({ userId: user._id, nombre: user.name, avatar: user.avatar, texto: encrypted, channelId: currentChannel });
                           setShowNotes(false);
-                        }} className="text-primary"><Send size={12}/></button>
-                        <button onClick={() => deleteNote({ noteId: n._id })} className="text-red-500"><X size={12}/></button>
+                        }} className="text-white"><Send size={12}/></button>
+                        <button onClick={() => deleteNote({ noteId: n._id })} className="text-white"><X size={12}/></button>
                       </div>
                     </div>
                     <p className="text-[11px] text-gray-500 line-clamp-3">{n.content}</p>
@@ -1476,9 +1465,9 @@ Nota: ${parsed.note}`;
 
        {showFriendsModal && (
          <div className="fixed inset-0 bg-black/90 backdrop-blur-xl z-[250] flex items-center justify-center p-4">
-           <div className="bg-[#1a1a1a] border border-white/10 rounded-[3rem] p-8 w-full max-w-sm space-y-6 shadow-2xl">
+           <div className="bg-[#111111] border border-white/10 rounded-xl p-8 w-full max-w-sm space-y-6 shadow-2xl">
               <div className="flex items-center justify-between">
-                <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2"><Users size={18} className="text-primary"/> Contactos</h2>
+                <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2"><Users size={18} className="text-white"/> Contactos</h2>
                 <button onClick={() => setShowFriendsModal(false)} className="text-gray-500 hover:text-white"><X size={20}/></button>
               </div>
               <div className="max-h-80 overflow-y-auto space-y-2 no-scrollbar">
@@ -1489,16 +1478,16 @@ Nota: ${parsed.note}`;
                     <button 
                       key={friend._id} 
                       onClick={() => { startDM(friend); setShowFriendsModal(false); }}
-                      className="w-full flex items-center justify-between p-4 rounded-2xl bg-white/5 hover:bg-white/10 transition-all border border-white/5 group"
+                      className="w-full flex items-center justify-between p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-all border border-white/5 group"
                     >
                       <div className="flex items-center gap-3">
-                        <img src={friend.avatar} className="w-10 h-10 rounded-xl border border-white/10" alt="" />
+                        <img src={friend.avatar} className="w-10 h-10 rounded-lg border border-white/10" alt="" />
                         <div className="text-left">
                           <p className="text-xs font-bold text-white">{friend.name}</p>
                           <p className="text-[9px] text-gray-500 uppercase font-black">@{friend.username}</p>
                         </div>
                       </div>
-                      <div className="bg-primary/20 p-2 rounded-xl text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="bg-white/10 p-2 rounded-lg text-white opacity-0 group-hover:opacity-100 transition-opacity">
                         <MessageSquare size={14}/>
                       </div>
                     </button>
@@ -1507,7 +1496,7 @@ Nota: ${parsed.note}`;
               </div>
               <button 
                 onClick={() => { setShowUserSearch(true); setShowFriendsModal(false); }}
-                className="w-full bg-white/5 hover:bg-white/10 text-white/40 py-4 rounded-2xl font-bold uppercase text-[10px] tracking-widest border border-white/10 transition-all"
+                className="w-full bg-white/5 hover:bg-white/10 text-white/40 py-4 rounded-lg font-bold uppercase text-[10px] tracking-widest border border-white/10 transition-all"
               >
                 Buscar más personas
               </button>
@@ -1518,16 +1507,16 @@ Nota: ${parsed.note}`;
        {showPasswords && (
 
          <div className="fixed inset-0 bg-black/90 backdrop-blur-xl z-[200] flex items-center justify-center p-4">
-           <div className="bg-[#101010] border border-white/5 rounded-[3rem] p-8 w-full max-w-sm space-y-6 shadow-2xl relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-purple-500" />
+           <div className="bg-[#101010] border border-white/5 rounded-xl p-8 w-full max-w-sm space-y-6 shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-white" />
               <div className="flex items-center justify-between">
-                <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2"><Lock size={18} className="text-primary"/> Key Manager</h2>
+                <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2"><Lock size={18} className="text-white"/> Key Manager</h2>
                 <button onClick={() => { setShowPasswords(false); setIsBiometricVerified(false); }} className="text-gray-500 hover:text-white"><X size={20}/></button>
               </div>
 
               {!isBiometricVerified ? (
                 <div className="text-center space-y-6 py-8">
-                  <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto text-primary animate-pulse">
+                  <div className="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center mx-auto text-white animate-pulse">
                     <User size={40}/>
                   </div>
                   <div>
@@ -1536,12 +1525,11 @@ Nota: ${parsed.note}`;
                   </div>
                   <button 
                     onClick={async () => {
-                      // Mock Biometric / WebAuthn call
                       if (window.confirm('¿Deseas usar la autenticación biométrica de este dispositivo?')) {
                         setIsBiometricVerified(true);
                       }
                     }}
-                    className="w-full bg-primary text-white py-4 rounded-2xl text-[10px] font-black uppercase shadow-lg shadow-primary/20"
+                    className="w-full bg-white text-black py-4 rounded-lg text-[10px] font-black uppercase shadow-lg shadow-white/20"
                   >
                     Verificar Identidad
                   </button>
@@ -1551,7 +1539,7 @@ Nota: ${parsed.note}`;
                   <div className="flex items-center gap-2">
                     <button 
                       onClick={() => setShowQRScanner(true)}
-                      className="flex-1 bg-primary/10 border border-primary/20 text-primary py-3 rounded-2xl text-[10px] font-black uppercase flex items-center justify-center gap-2"
+                      className="flex-1 bg-white/10 border border-white/20 text-white py-3 rounded-lg text-[10px] font-black uppercase flex items-center justify-center gap-2"
                     >
                       <ScanLine size={16}/> Escanear QR
                     </button>
@@ -1561,31 +1549,31 @@ Nota: ${parsed.note}`;
                   {showQRScanner && (
                     <div className="fixed inset-0 bg-black/95 z-[500] flex flex-col items-center justify-center p-6">
                        <button onClick={() => setShowQRScanner(false)} className="absolute top-8 right-8 text-white/50"><X size={32}/></button>
-                       <div id="qr-reader" className="w-full max-w-sm rounded-3xl overflow-hidden border-4 border-primary/30" />
+                       <div id="qr-reader" className="w-full max-w-sm rounded-xl overflow-hidden border-4 border-white/30" />
                        <p className="text-white/50 text-[10px] font-black uppercase tracking-widest mt-6">Apunta al código QR de acceso</p>
                     </div>
                   )}
 
-                  <div className="space-y-3 bg-white/5 p-4 rounded-3xl border border-white/5">
+                  <div className="space-y-3 bg-white/5 p-4 rounded-xl border border-white/5">
 
-                    <input value={newPassSite} onChange={e => setNewPassSite(e.target.value)} placeholder="Sitio Web / App" className="w-full bg-transparent border-b border-white/10 px-1 py-2 text-white text-xs outline-none focus:border-primary" />
-                    <input value={newPassUser} onChange={e => setNewPassUser(e.target.value)} placeholder="Usuario" className="w-full bg-transparent border-b border-white/10 px-1 py-2 text-white text-xs outline-none focus:border-primary" />
-                    <input type="password" value={newPassVal} onChange={e => setNewPassVal(e.target.value)} placeholder="Contraseña" className="w-full bg-transparent border-b border-white/10 px-1 py-2 text-white text-xs outline-none focus:border-primary" />
+                    <input value={newPassSite} onChange={e => setNewPassSite(e.target.value)} placeholder="Sitio Web / App" className="w-full bg-transparent border-b border-white/10 px-1 py-2 text-white text-xs outline-none focus:border-white" />
+                    <input value={newPassUser} onChange={e => setNewPassUser(e.target.value)} placeholder="Usuario" className="w-full bg-transparent border-b border-white/10 px-1 py-2 text-white text-xs outline-none focus:border-white" />
+                    <input type="password" value={newPassVal} onChange={e => setNewPassVal(e.target.value)} placeholder="Contraseña" className="w-full bg-transparent border-b border-white/10 px-1 py-2 text-white text-xs outline-none focus:border-white" />
                     <button onClick={async () => {
-                      await createPassword({ userId: user?._id as any, site: newPassSite, username: newPassUser, encryptedPassword: newPassVal }); // Encriptación real pendiente en v2
+                      await createPassword({ userId: user?._id as any, site: newPassSite, username: newPassUser, encryptedPassword: newPassVal });
                       setNewPassSite(''); setNewPassUser(''); setNewPassVal('');
-                    }} className="w-full bg-white/10 text-white py-3 rounded-2xl text-[9px] font-black uppercase hover:bg-white/20 transition-all mt-2">Guardar Llave</button>
+                    }} className="w-full bg-white/10 text-white py-3 rounded-lg text-[9px] font-black uppercase hover:bg-white/20 transition-all mt-2">Guardar Llave</button>
                   </div>
                   <div className="max-h-64 overflow-y-auto space-y-3 no-scrollbar pr-1">
                     {storedPasswords?.map((p: any) => (
-                      <div key={p._id} className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 space-y-2 relative group">
-                        <button onClick={() => deletePassword({ passwordId: p._id })} className="absolute top-4 right-4 text-red-500/30 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"><X size={14}/></button>
-                        <h4 className="text-[10px] font-black text-primary uppercase tracking-widest">{p.site}</h4>
+                      <div key={p._id} className="p-4 rounded-lg bg-white/[0.03] border border-white/5 space-y-2 relative group">
+                        <button onClick={() => deletePassword({ passwordId: p._id })} className="absolute top-4 right-4 text-white/30 hover:text-white opacity-0 group-hover:opacity-100 transition-all"><X size={14}/></button>
+                        <h4 className="text-[10px] font-black text-white uppercase tracking-widest">{p.site}</h4>
                         <div className="flex flex-col gap-1">
                           <span className="text-[9px] text-gray-500 uppercase font-bold">Usuario: {p.username}</span>
                           <div className="flex items-center justify-between">
                             <span className="text-xs text-white font-mono">••••••••</span>
-                            <button onClick={() => alert(`Contraseña: ${p.encryptedPassword}`)} className="text-primary text-[9px] font-black uppercase">Revelar</button>
+                            <button onClick={() => alert(`Contraseña: ${p.encryptedPassword}`)} className="text-white text-[9px] font-black uppercase">Revelar</button>
                           </div>
                         </div>
                       </div>
@@ -1601,12 +1589,12 @@ Nota: ${parsed.note}`;
         <div className="fixed inset-0 bg-black/80 backdrop-blur-xl z-[100] flex items-center justify-center p-4">
 
 
-          <div className="bg-[#1a1a1a] rounded-[2rem] border border-white/10 p-8 w-full max-w-md space-y-8 shadow-2xl relative">
+          <div className="bg-[#111111] rounded-[2rem] border border-white/10 p-8 w-full max-w-md space-y-8 shadow-2xl relative">
             <button onClick={() => setShowProfileModal(false)} className="absolute top-6 right-6 text-gray-500 hover:text-white"><X size={24}/></button>
             <div className="text-center space-y-4">
               <div className="relative w-32 h-32 mx-auto group">
-                <img src={editAvatar} className="w-full h-full rounded-[2.5rem] object-cover shadow-2xl ring-4 ring-primary/20" alt="" />
-                <button onClick={() => profileImageInputRef.current?.click()} className="absolute inset-0 bg-black/60 rounded-[2.5rem] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                <img src={editAvatar} className="w-full h-full rounded-xl object-cover shadow-2xl ring-4 ring-white/10" alt="" />
+                <button onClick={() => profileImageInputRef.current?.click()} className="absolute inset-0 bg-black/60 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
                   <Camera size={32}/>
                 </button>
                 <input type="file" ref={profileImageInputRef} className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'profile')} />
@@ -1614,15 +1602,15 @@ Nota: ${parsed.note}`;
               <h2 className="text-xl font-bold text-white uppercase tracking-[0.2em]">Editar Perfil</h2>
             </div>
             <div className="space-y-4">
-              <input value={editName} onChange={e => setEditName(e.target.value)} placeholder="Nombre completo" className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm outline-none focus:border-primary" />
-              <textarea value={editBio} onChange={e => setEditBio(e.target.value)} placeholder="Biografía" className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm outline-none focus:border-primary resize-none h-24" />
+              <input value={editName} onChange={e => setEditName(e.target.value)} placeholder="Nombre completo" className="w-full bg-white/5 border border-white/10 rounded-lg px-5 py-4 text-white text-sm outline-none focus:border-white" />
+              <textarea value={editBio} onChange={e => setEditBio(e.target.value)} placeholder="Biografía" className="w-full bg-white/5 border border-white/10 rounded-lg px-5 py-4 text-white text-sm outline-none focus:border-white resize-none h-24" />
               <div className="space-y-1">
                 <label className="text-[10px] font-bold text-gray-500 uppercase px-4">Teléfono</label>
-                <input value={editPhone} onChange={e => setEditPhone(e.target.value)} placeholder="+54 9..." className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm focus:border-primary outline-none transition-all" />
+                <input value={editPhone} onChange={e => setEditPhone(e.target.value)} placeholder="+54 9..." className="w-full bg-white/5 border border-white/10 rounded-lg px-5 py-4 text-white text-sm focus:border-white outline-none transition-all" />
               </div>
               <div className="space-y-1">
                 <label className="text-[10px] font-bold text-gray-500 uppercase px-4">Contraseña</label>
-                <input type="password" value={editPassword} onChange={e => setEditPassword(e.target.value)} placeholder="Nueva contraseña" className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-sm focus:border-primary outline-none transition-all" />
+                <input type="password" value={editPassword} onChange={e => setEditPassword(e.target.value)} placeholder="Nueva contraseña" className="w-full bg-white/5 border border-white/10 rounded-lg px-5 py-4 text-white text-sm focus:border-white outline-none transition-all" />
               </div>
 
               <div className="space-y-1">
@@ -1630,13 +1618,13 @@ Nota: ${parsed.note}`;
                 <div className="flex gap-2 px-1">
                   <button 
                     onClick={() => setEditPrivacy('everyone')}
-                    className={`flex-1 py-3 rounded-xl text-[10px] font-bold uppercase transition-all ${editPrivacy === 'everyone' ? 'bg-primary text-white' : 'bg-white/5 text-gray-500'}`}
+                    className={`flex-1 py-3 rounded-lg text-[10px] font-bold uppercase transition-all ${editPrivacy === 'everyone' ? 'bg-white text-black' : 'bg-white/5 text-gray-500'}`}
                   >
                     Todos
                   </button>
                   <button 
                     onClick={() => setEditPrivacy('requests')}
-                    className={`flex-1 py-3 rounded-xl text-[10px] font-bold uppercase transition-all ${editPrivacy === 'requests' ? 'bg-emerald-500 text-white' : 'bg-white/5 text-gray-500'}`}
+                    className={`flex-1 py-3 rounded-lg text-[10px] font-bold uppercase transition-all ${editPrivacy === 'requests' ? 'bg-white text-black' : 'bg-white/5 text-gray-500'}`}
                   >
                     Solicitudes
                   </button>
@@ -1645,7 +1633,7 @@ Nota: ${parsed.note}`;
               <div className="space-y-1">
                 <label className="text-[10px] font-bold text-gray-500 uppercase px-4">Color de Tema</label>
                 <div className="flex gap-2 px-1">
-                   {['#6366f1', '#ec4899', '#f59e0b', '#10b981', '#06b6d4', '#8b5cf6'].map(color => (
+                   {['#ffffff', '#ec4899', '#f59e0b', '#10b981', '#06b6d4', '#8b5cf6'].map(color => (
                      <button 
                         key={color} 
                         onClick={() => setEditThemeColor(color)}
@@ -1669,7 +1657,7 @@ Nota: ${parsed.note}`;
                 if (updated) setUser(updated as any);
                 setShowProfileModal(false);
               }} 
-              className="w-full bg-primary hover:bg-primary-hover text-white py-5 rounded-[1.5rem] font-bold uppercase tracking-widest shadow-xl shadow-primary/20"
+              className="w-full bg-white hover:bg-gray-200 text-black py-5 rounded-lg font-bold uppercase tracking-widest shadow-xl"
             >
               Guardar Cambios
             </button>
@@ -1681,17 +1669,17 @@ Nota: ${parsed.note}`;
 
       {showStatusModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-xl z-[100] flex items-center justify-center p-4">
-          <div className="bg-[#1a1a1a] rounded-[2rem] border border-white/10 p-8 w-full max-w-sm space-y-6 shadow-2xl">
+          <div className="bg-[#111111] rounded-[2rem] border border-white/10 p-8 w-full max-w-sm space-y-6 shadow-2xl">
             <h3 className="text-lg font-bold text-white text-center uppercase tracking-widest">Publicar Estado</h3>
             <div className="grid grid-cols-2 gap-4">
-              <button onClick={() => { const text = prompt('Escribe tu estado:'); if(text) handlePostStatus(text, 'text'); }} className="aspect-square bg-primary/10 rounded-3xl border border-primary/20 flex flex-col items-center justify-center gap-3 text-primary">
+              <button onClick={() => { const text = prompt('Escribe tu estado:'); if(text) handlePostStatus(text, 'text'); }} className="aspect-square bg-white/5 border border-white/5 flex flex-col items-center justify-center gap-3 text-white">
                 <FileText size={32}/><span className="text-[10px] font-bold uppercase">Texto</span>
               </button>
-              <button onClick={() => { const input = document.createElement('input'); input.type='file'; input.accept='image/*'; input.onchange=(e:any)=>handleImageUpload(e, 'status'); input.click(); }} className="aspect-square bg-purple-500/10 rounded-3xl border border-purple-500/20 flex flex-col items-center justify-center gap-3 text-purple-400">
+              <button onClick={() => { const input = document.createElement('input'); input.type='file'; input.accept='image/*'; input.onchange=(e:any)=>handleImageUpload(e, 'status'); input.click(); }} className="aspect-square bg-white/5 border border-white/5 flex flex-col items-center justify-center gap-3 text-white">
                 <Camera size={32}/><span className="text-[10px] font-bold uppercase">Foto</span>
               </button>
             </div>
-            <button onClick={() => setShowStatusModal(false)} className="w-full bg-white/5 text-gray-500 py-4 rounded-2xl font-bold uppercase text-[10px]">Cancelar</button>
+            <button onClick={() => setShowStatusModal(false)} className="w-full bg-white/5 text-gray-500 py-4 rounded-lg font-bold uppercase text-[10px]">Cancelar</button>
           </div>
         </div>
       )}
@@ -1699,7 +1687,7 @@ Nota: ${parsed.note}`;
       {previewImage && (
         <div className="fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center p-8 animate-fadeIn" onClick={() => setPreviewImage(null)}>
           <button className="absolute top-8 right-8 text-white/40 hover:text-white transition-all"><X size={48}/></button>
-          <img src={previewImage} className="max-w-full max-h-full rounded-2xl shadow-2xl object-contain ring-1 ring-white/10" alt="" onClick={e => e.stopPropagation()}/>
+          <img src={previewImage} className="max-w-full max-h-full rounded-lg shadow-2xl object-contain ring-1 ring-white/10" alt="" onClick={e => e.stopPropagation()}/>
         </div>
       )}
 
@@ -1743,7 +1731,7 @@ Nota: ${parsed.note}`;
                   <div className="flex gap-2">
                     <input 
                       placeholder="Responder historia..." 
-                      className="flex-1 bg-white/10 border border-white/10 rounded-xl px-4 py-3 text-white text-[11px] outline-none focus:border-primary"
+                      className="flex-1 bg-white/10 border border-white/10 rounded-lg px-4 py-3 text-white text-[11px] outline-none focus:border-primary"
                       onKeyDown={async (e) => {
                         if(e.key === 'Enter') {
                           const val = (e.target as HTMLInputElement).value;
@@ -1764,13 +1752,13 @@ Nota: ${parsed.note}`;
 
       {showUserSearch && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center p-4">
-          <div className="bg-[#1a1a1a] rounded-3xl border border-white/10 p-6 w-full max-w-sm space-y-4">
+          <div className="bg-[#111111] rounded-xl border border-white/10 p-6 w-full max-w-sm space-y-4">
             <h3 className="text-sm font-bold text-white uppercase tracking-wider">Buscar Usuarios</h3>
-            <input value={userSearchQuery} onChange={e => setUserSearchQuery(e.target.value)} placeholder="Nombre o @usuario..." className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs outline-none focus:border-primary" autoFocus />
+            <input value={userSearchQuery} onChange={e => setUserSearchQuery(e.target.value)} placeholder="Nombre o @usuario..." className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-xs outline-none focus:border-primary" autoFocus />
             <div className="space-y-2 max-h-64 overflow-y-auto">
               {searchedUsers?.filter((u: any) => u._id !== user._id).map((u: any) => (
-                <button key={u._id} onClick={() => startDM(u)} className="w-full flex items-center gap-3 p-3 rounded-2xl hover:bg-white/5 transition-all">
-                  <img src={u.avatar} className="w-10 h-10 rounded-xl" alt="" />
+                <button key={u._id} onClick={() => startDM(u)} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition-all">
+                  <img src={u.avatar} className="w-10 h-10 rounded-lg" alt="" />
                   <div className="text-left">
                     <div className="text-xs font-bold text-white">{u.name}</div>
                     <div className="text-[10px] text-gray-500">@{u.username}</div>
@@ -1786,13 +1774,13 @@ Nota: ${parsed.note}`;
       {/* Viewing Other User Profile Popup (Premium WhatsApp/Telegram Style) */}
       {viewingProfileUser && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-[200] flex items-center justify-center p-4 animate-fadeIn" onClick={() => setViewingProfileUser(null)}>
-          <div className="bg-[#1a1a1a] rounded-[2.5rem] border border-white/10 w-full max-w-[320px] overflow-hidden shadow-[0_32px_64px_-12px_rgba(0,0,0,0.8)] relative" onClick={e => e.stopPropagation()}>
+          <div className="bg-[#111111] rounded-xl border border-white/10 w-full max-w-[320px] overflow-hidden shadow-[0_32px_64px_-12px_rgba(0,0,0,0.8)] relative" onClick={e => e.stopPropagation()}>
             
             {/* Header / Avatar */}
             <div className="bg-gradient-to-b from-primary/20 to-transparent p-8 text-center relative">
               <button onClick={() => setViewingProfileUser(null)} className="absolute top-6 right-6 text-white/40 hover:text-white transition-colors"><X size={20}/></button>
               <div className="relative w-28 h-28 mx-auto mb-4 group">
-                <img src={viewingProfileUser.avatar} className="w-full h-full rounded-[2.5rem] object-cover shadow-2xl ring-4 ring-primary/10 transition-transform group-hover:scale-105 duration-500" alt="" />
+                <img src={viewingProfileUser.avatar} className="w-full h-full rounded-xl object-cover shadow-2xl ring-4 ring-primary/10 transition-transform group-hover:scale-105 duration-500" alt="" />
                 <div className="absolute bottom-1 right-1 w-5 h-5 bg-emerald-500 rounded-full border-4 border-[#1a1a1a]" title="En línea" />
               </div>
               <h2 className="text-xl font-black text-white uppercase tracking-tight">{viewingProfileUser.name}</h2>
@@ -1801,7 +1789,7 @@ Nota: ${parsed.note}`;
 
             {/* Info Sections */}
             <div className="px-6 pb-8 space-y-4">
-              <div className="space-y-1 bg-white/5 rounded-2xl p-4 border border-white/5">
+              <div className="space-y-1 bg-white/5 rounded-lg p-4 border border-white/5">
                 <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2 mb-1">
                   <Info size={12} className="text-primary"/> Información y Bio
                 </label>
@@ -1818,8 +1806,8 @@ Nota: ${parsed.note}`;
               )}
               
               {channelData?.isPaused && channelData.createdBy !== user?._id && (
-                <div className="flex items-center gap-3 bg-amber-500/10 border border-amber-500/20 p-4 rounded-2xl">
-                  <div className="w-8 h-8 bg-amber-500/20 rounded-xl flex items-center justify-center text-amber-500">
+                <div className="flex items-center gap-3 bg-amber-500/10 border border-amber-500/20 p-4 rounded-lg">
+                  <div className="w-8 h-8 bg-amber-500/20 rounded-lg flex items-center justify-center text-amber-500">
                     <AlertCircle size={18} className="animate-bounce" />
                   </div>
                   <div>
@@ -1830,8 +1818,8 @@ Nota: ${parsed.note}`;
               )}
 
               {viewingProfileUser.phone && (
-                <div className="flex items-center gap-4 bg-white/5 rounded-2xl p-4 border border-white/5">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                <div className="flex items-center gap-4 bg-white/5 rounded-lg p-4 border border-white/5">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                     <Phone size={18} />
                   </div>
                   <div>
@@ -1845,7 +1833,7 @@ Nota: ${parsed.note}`;
               <div className="grid grid-cols-1 gap-2 pt-2">
                 <button 
                   onClick={() => { startDM(viewingProfileUser); setViewingProfileUser(null); }} 
-                  className="w-full bg-primary hover:bg-primary-hover text-white py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 shadow-lg shadow-primary/20 transition-all active:scale-95"
+                  className="w-full bg-primary hover:bg-primary-hover text-white py-4 rounded-lg font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 shadow-lg shadow-primary/20 transition-all active:scale-95"
                 >
                   <MessageSquare size={16} /> Chatear ahora
                 </button>
@@ -1853,14 +1841,14 @@ Nota: ${parsed.note}`;
                 {user._id !== viewingProfileUser._id && !friendsList?.find((f:any) => f._id === viewingProfileUser._id) && !sentFriendRequests?.find((r:any) => r.user2Id === viewingProfileUser._id) && (
                   <button 
                     onClick={() => sendFriendRequest({ fromId: user._id as any, toId: viewingProfileUser._id })}
-                    className="w-full bg-white/5 hover:bg-white/10 text-white/60 py-4 rounded-2xl font-bold uppercase tracking-widest text-[10px] border border-white/10 flex items-center justify-center gap-2 transition-all active:scale-95"
+                    className="w-full bg-white/5 hover:bg-white/10 text-white/60 py-4 rounded-lg font-bold uppercase tracking-widest text-[10px] border border-white/10 flex items-center justify-center gap-2 transition-all active:scale-95"
                   >
                     <Users size={16} /> Agregar Amigo
                   </button>
                 )}
 
                 {sentFriendRequests?.find((r:any) => r.user2Id === viewingProfileUser._id) && (
-                  <div className="w-full bg-emerald-500/10 text-emerald-500 py-4 rounded-2xl font-black uppercase tracking-widest text-[9px] border border-emerald-500/20 flex items-center justify-center gap-2">
+                  <div className="w-full bg-emerald-500/10 text-emerald-500 py-4 rounded-lg font-black uppercase tracking-widest text-[9px] border border-emerald-500/20 flex items-center justify-center gap-2">
                     <Clock size={16} /> Solicitud Enviada
                   </div>
                 )}
@@ -1880,7 +1868,7 @@ Nota: ${parsed.note}`;
 
       {showExpenses && (
         <div className="fixed inset-0 z-[300] bg-black/90 backdrop-blur-xl md:p-12">
-          <div className="w-full h-full md:rounded-[3rem] overflow-hidden border border-white/10 shadow-2xl animate-in slide-in-from-bottom duration-500">
+          <div className="w-full h-full md:rounded-xl overflow-hidden border border-white/10 shadow-2xl animate-in slide-in-from-bottom duration-500">
              <ExpensesHub userId={user._id} onClose={() => setShowExpenses(false)} />
           </div>
         </div>

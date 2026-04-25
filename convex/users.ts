@@ -7,6 +7,7 @@ export const createUser = mutation({
     username: v.string(),
     name: v.string(),
     password: v.optional(v.string()),
+    avatar: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db
@@ -24,7 +25,7 @@ export const createUser = mutation({
       throw new Error("El nombre de usuario ya existe");
     }
 
-    const avatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${args.username}`;
+    const avatar = args.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${args.username}`;
 
     const userId = await ctx.db.insert("users", {
       email: args.email,

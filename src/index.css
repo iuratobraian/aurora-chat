@@ -73,35 +73,29 @@ body {
 }
 
 /* Mobile App Optimization */
-html {
-  height: -webkit-fill-available;
+html, body {
   overscroll-behavior: none;
-}
-
-body {
-  height: -webkit-fill-available;
-  min-height: 100vh;
-  min-height: -webkit-fill-available;
-  width: 100vw;
-  margin: 0;
-  padding: 0;
+  height: 100%;
   overflow: hidden;
+  width: 100%;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
   background: #0a0a0a;
 }
 
 #root {
-  position: fixed;
-  inset: 0;
+  height: 100%;
+  height: -webkit-fill-available;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  background: #0a0a0a;
 }
 
 /* Desktop optimization */
 @media (min-width: 1024px) {
-  html, body, #root {
-    height: 100vh;
+  html, body {
+    position: static;
   }
 }
 

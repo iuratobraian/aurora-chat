@@ -148,7 +148,7 @@ export default function Onboarding() {
 
 
   return (
-    <div className="fixed inset-0 bg-[#0a0a0a] z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-[#0a0a0a] z-[100] flex items-center justify-center p-4 safe-area-pt safe-area-pb">
       <div className="w-full max-w-md bg-[#111111] rounded-xl border border-white/10 p-8 space-y-8 shadow-2xl relative overflow-hidden">
         {/* Decorative blur */}
         <div className="absolute -top-24 -left-24 w-48 h-48 bg-primary/10 blur-[80px] rounded-full" />

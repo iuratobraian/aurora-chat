@@ -1268,7 +1268,6 @@ Nota: ${parsed.note}`;
 
                <input type="file" ref={fileInputRef} className="hidden" accept="image/*,.pdf,.docx,.xlsx,.xls,.csv" onChange={(e) => handleImageUpload(e, 'chat')} />
                <input type="file" ref={cameraInputRef} className="hidden" accept="image/*" capture="environment" onChange={(e) => handleImageUpload(e, 'chat')} />
-             </form>
 
         </div>
         {isMobile && isSidebarOpen && (

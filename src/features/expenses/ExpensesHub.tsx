@@ -36,12 +36,12 @@ const ExpensesHub: React.FC<ExpensesHubProps> = ({ userId, onClose }) => {
   const addExpense = useMutation(api.expenses.addExpense);
 
   const totalSpent = expenses
-    .filter(e => e.type === 'expense')
-    .reduce((acc, curr) => acc + curr.amount, 0);
+    .filter((e: any) => e.type === 'expense')
+    .reduce((acc: number, curr: any) => acc + curr.amount, 0);
 
   const totalIncome = expenses
-    .filter(e => e.type === 'income')
-    .reduce((acc, curr) => acc + curr.amount, 0);
+    .filter((e: any) => e.type === 'income')
+    .reduce((acc: number, curr: any) => acc + curr.amount, 0);
 
   return (
     <div className="flex flex-col h-full bg-[#1a1a1a] text-white">
@@ -124,7 +124,7 @@ const ExpensesHub: React.FC<ExpensesHubProps> = ({ userId, onClose }) => {
             <div className="space-y-4">
               <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest px-2">Movimientos Recientes</h4>
               <div className="space-y-2">
-                {expenses.slice(0, 5).map(e => (
+                {expenses.slice(0, 5).map((e: any) => (
                   <div key={e._id} className="bg-white/[0.02] border border-white/5 p-4 rounded-2xl flex items-center justify-between hover:bg-white/[0.05] transition-all">
                     <div className="flex items-center gap-4">
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${CATEGORIES.find(c => c.id === e.category)?.color || 'bg-gray-500'} bg-opacity-20`}>
@@ -157,7 +157,7 @@ const ExpensesHub: React.FC<ExpensesHubProps> = ({ userId, onClose }) => {
                 </div>
               </div>
               <div className="space-y-2">
-                {expenses.map(e => (
+                {expenses.map((e: any) => (
                   <div key={e._id} className="bg-white/[0.02] border border-white/5 p-4 rounded-2xl flex items-center justify-between">
                     <div className="flex items-center gap-4">
                        <div className="text-[10px] font-mono text-gray-600">{e.date.split('-')[2]}</div>

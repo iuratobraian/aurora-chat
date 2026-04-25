@@ -7,7 +7,8 @@ import {
   MessageSquare, HardDrive, Search, LogOut, FileText, 
   FileSpreadsheet, FileCode, Mic, MicOff, Loader2, Volume2, 
   Settings, User, Phone, Info, Camera, Clock, ChevronRight,
-  MoreVertical, Hash, QrCode, ScanLine, Copy
+  MoreVertical, Hash, QrCode, ScanLine, Copy, Wallet, Mail,
+  AtSign, Play, Pause
 } from 'lucide-react';
 
 import { useUserStore } from './store';
@@ -93,6 +94,9 @@ export default function AuroraChat() {
   const [showSearch, setShowSearch] = useState(false);
   const [newPollQuestion, setNewPollQuestion] = useState('');
   const [newPollOptions, setNewPollOptions] = useState(['', '']);
+  const [newEventTitle, setNewEventTitle] = useState('');
+  const [newEventDesc, setNewEventDesc] = useState('');
+  const [newEventDate, setNewEventDate] = useState('');
 
   // Profile Edit State
   const [editName, setEditName] = useState(user?.name || '');
@@ -168,6 +172,7 @@ export default function AuroraChat() {
   const channelsList = Array.isArray(rawChannels) ? rawChannels : [];
   const messages = (rawMessagesData?.messages && Array.isArray(rawMessagesData.messages)) ? rawMessagesData.messages as ChatMessage[] : [];
   const typingUsers = Array.isArray(rawTypingUsers) ? rawTypingUsers : [];
+  const recentStatuses = Array.isArray(activeStatuses) ? activeStatuses : [];
   const serverStats = rawServerStats || null;
 
   // 2. Lifecycle & Effects
@@ -1772,7 +1777,7 @@ Nota: ${parsed.note}`;
             <h3 className="text-sm font-bold text-white uppercase tracking-wider">Buscar Usuarios</h3>
             <input value={userSearchQuery} onChange={e => setUserSearchQuery(e.target.value)} placeholder="Nombre o @usuario..." className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-xs outline-none focus:border-primary" autoFocus />
             <div className="space-y-2 max-h-64 overflow-y-auto">
-              {searchedUsers?.filter(u => u._id !== user._id).map(u => (
+              {searchedUsers?.filter((u: any) => u._id !== user._id).map((u: any) => (
                 <button key={u._id} onClick={() => startDM(u)} className="w-full flex items-center gap-3 p-3 rounded-2xl hover:bg-white/5 transition-all">
                   <img src={u.avatar} className="w-10 h-10 rounded-xl" alt="" />
                   <div className="text-left">

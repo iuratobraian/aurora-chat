@@ -8,6 +8,9 @@ export interface ChatMessage {
   isAi?: boolean;
   channelId?: string;
   createdAt: number;
+  isPinned?: boolean;
+  audioUrl?: string;
+  eventId?: string;
 }
 
 export interface Channel {

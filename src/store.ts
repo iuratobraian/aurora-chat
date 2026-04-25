@@ -11,6 +11,7 @@ interface User {
   phone?: string;
   privacyMode?: 'everyone' | 'requests';
   themeColor?: string;
+  password?: string;
 }
 
 

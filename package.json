@@ -36,6 +36,7 @@
     "@tailwindcss/vite": "^4.2.1",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
+    "@types/react-syntax-highlighter": "^15.5.13",
     "@vitejs/plugin-react": "^5.0.0",
     "tailwindcss": "^4.2.1",
     "terser": "^5.46.2",

@@ -56,7 +56,7 @@ export default function AuroraChat() {
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [viewingStatus, setViewingStatus] = useState<any>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [isReady, setIsReady] = useState(false);
   const [viewingProfileUser, setViewingProfileUser] = useState<any>(null);
@@ -780,21 +780,15 @@ Nota: ${parsed.note}`;
 
         {/* User Profile Header */}
 
-        <div className="p-4 border-b border-white/10 flex items-center justify-between bg-white/[0.02] w-full">
-          <button onClick={() => setShowProfileModal(true)} className="flex items-center gap-3 group text-left">
-            <div className="relative">
-              <img src={user.avatar} className="w-10 h-10 rounded-lg shadow-lg border border-white/10 group-hover:border-primary/50 transition-all" alt="" />
-              <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#0f1115]" />
-            </div>
-            <div>
-              <div className="text-sm font-bold text-white group-hover:text-primary transition-colors">{user.name}</div>
-              <div className="text-[10px] text-gray-500">@{user.username}</div>
-            </div>
+        {/* Minimalist User Header (WhatsApp Style) */}
+        <div className="p-4 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
+          <button onClick={() => setShowProfileModal(true)} className="relative group">
+            <img src={user.avatar} className="w-10 h-10 rounded-full border border-white/10 group-hover:border-primary/50 transition-all object-cover" alt="" />
+            <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#0d0d0d]" />
           </button>
-          <div className="flex items-center gap-1">
-            <button onClick={() => setShowUserSearch(true)} className="p-2 text-gray-500 hover:text-white transition-colors"><Search size={18}/></button>
-            <button onClick={() => setShowStats(!showStats)} className="p-2 text-gray-500 hover:text-white transition-colors"><Server size={18}/></button>
-            <button onClick={() => logout()} className="p-2 text-gray-500 hover:text-red-400 transition-colors"><LogOut size={18}/></button>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setShowUserSearch(true)} className="p-2 text-gray-400 hover:text-white transition-colors"><Search size={20}/></button>
+            <button onClick={() => logout()} className="p-2 text-gray-400 hover:text-red-400 transition-colors"><LogOut size={20}/></button>
           </div>
         </div>
 
@@ -1189,10 +1183,11 @@ Nota: ${parsed.note}`;
               );
             })
           )}
-          <div ref={messagesEndRef} />
+          <div ref={messagesEndRef} className="h-4" />
         </div>
 
-        <div className="p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] bg-[#0d0d0d]/80 backdrop-blur-2xl border-t border-white/10 relative z-20">
+        {/* Flat Input Area (WhatsApp Style) */}
+        <div className="bg-[#0a0a0a] border-t border-white/10 px-3 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))] relative z-20">
 
             {showEmoji && (
               <div className="absolute bottom-28 left-6 bg-[#111111] border border-white/10 p-3 rounded-2xl shadow-2xl flex gap-2.5 z-[100] animate-in fade-in slide-in-from-bottom-4 zoom-in-95 duration-200">
@@ -1235,41 +1230,41 @@ Nota: ${parsed.note}`;
              </div>
             )}
 
-             <form onSubmit={handleSubmit} className="flex items-end gap-3 max-w-6xl mx-auto">
-              <button type="button" onClick={() => fileInputRef.current?.click()} className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-all shrink-0 active:scale-90"><Plus size={24}/></button>
+            <form onSubmit={handleSubmit} className="flex items-end gap-2 max-w-6xl mx-auto">
+              <button type="button" onClick={() => fileInputRef.current?.click()} className="p-3 text-gray-400 hover:text-white transition-all active:scale-90 shrink-0"><Plus size={24}/></button>
               
-              <div className="flex-1 bg-white/[0.03] border border-white/10 rounded-[1.75rem] px-4 py-1.5 focus-within:border-primary/50 focus-within:bg-white/[0.05] transition-all flex items-end gap-1 shadow-inner backdrop-blur-xl">
+              <div className="flex-1 bg-white/[0.05] rounded-3xl px-2 py-1 flex items-end gap-1 transition-all border border-white/5 focus-within:border-white/10">
                 <button type="button" onClick={() => setShowEmoji(!showEmoji)} className="p-3 text-gray-500 hover:text-white transition-colors shrink-0 active:scale-90"><Smile size={24}/></button>
                 <textarea
                   value={text + (interimTranscript ? (text ? ' ' : '') + interimTranscript : '')}
                   onChange={e => { setText(e.target.value); handleTyping(); }}
                   onPaste={handlePaste}
-                  placeholder={isRecording ? "Escuchando..." : "Escribe un mensaje..."}
-                  className={`flex-1 bg-transparent text-[15px] text-white outline-none placeholder-gray-700 px-2 py-3.5 resize-none max-h-48 min-h-[52px] leading-relaxed ${isRecording ? 'text-primary' : ''}`}
+                  placeholder="Escribe un mensaje..."
+                  className="flex-1 bg-transparent text-[15px] text-white outline-none placeholder-gray-600 px-1 py-3 resize-none max-h-32 min-h-[48px] leading-relaxed"
                   rows={1}
                   onKeyDown={e => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(e); } }}
                 />
-                
                  <button type="button" onClick={() => cameraInputRef.current?.click()} className="p-3 text-gray-500 hover:text-white transition-all active:scale-90">
                    <Camera size={24}/>
                  </button>
                </div>
 
-               <div className="shrink-0">
+               <div className="shrink-0 pb-1">
                   { (text.trim() || attachedImage || audioBlob) ? (
-                    <button type="submit" disabled={uploading} className="w-12 h-12 bg-white text-black rounded-2xl flex items-center justify-center transition-all active:scale-90 shadow-2xl hover:bg-gray-200">
-                      <Send size={24} fill="currentColor" />
+                    <button type="submit" disabled={uploading} className="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center transition-all active:scale-90 shadow-lg">
+                      <Send size={22} fill="currentColor" />
                     </button>
                   ) : (
                     <button 
                       type="button" 
                       onClick={() => isRecording ? stopRecording() : startRecording()}
-                      className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all active:scale-90 ${isRecording ? 'bg-red-500 text-white animate-pulse shadow-red-500/30' : 'bg-white/5 text-white hover:bg-white/10 border border-white/5 shadow-lg'}`}
+                      className={`w-12 h-12 rounded-full flex items-center justify-center transition-all active:scale-90 ${isRecording ? 'bg-red-500 text-white animate-pulse' : 'text-gray-400 hover:text-white'}`}
                     >
                       {isRecording ? <MicOff size={24}/> : <Mic size={24}/>}
                     </button>
                   )}
                </div>
+            </form>
 
                <input type="file" ref={fileInputRef} className="hidden" accept="image/*,.pdf,.docx,.xlsx,.xls,.csv" onChange={(e) => handleImageUpload(e, 'chat')} />
                <input type="file" ref={cameraInputRef} className="hidden" accept="image/*" capture="environment" onChange={(e) => handleImageUpload(e, 'chat')} />

@@ -34,9 +34,24 @@ class ErrorBoundary extends React.Component<any, any> {
           <p className="text-gray-400 text-sm max-w-xs">{this.state.error?.message || 'Ha ocurrido un error desconocido'}</p>
           <button 
             onClick={() => window.location.reload()}
-            className="mt-4 px-4 py-2 bg-primary text-white rounded-lg text-sm font-bold hover:bg-primary-hover transition-colors"
+            className="mt-4 w-full px-4 py-3 bg-white text-black rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-gray-200 transition-colors"
           >
             Reintentar
+          </button>
+          <button 
+            onClick={() => {
+              localStorage.clear();
+              if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(registrations => {
+                  for (let registration of registrations) registration.unregister();
+                });
+              }
+              indexedDB.deleteDatabase('aurora_db');
+              window.location.href = window.location.origin + '?reset=' + Date.now();
+            }}
+            className="w-full px-4 py-3 bg-red-500/10 text-red-500 border border-red-500/20 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-red-500/20 transition-colors"
+          >
+            Limpiar Todo y Reiniciar
           </button>
         </div>
       );

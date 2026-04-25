@@ -26,7 +26,7 @@ import { Html5Qrcode } from "html5-qrcode";
 import { persistenceService } from './lib/persistence';
 import { expenseAgent } from './lib/expenseAgent';
 
-const APP_VERSION = '1.0.5'; // Increment this to force cache clear
+const APP_VERSION = '1.0.6'; // Increment this to force cache clear
 
 
 const EMOJIS = ['🚀', '📈', '📉', '🔥', '🧠', '💰', '❤️', '👍', '🎯', '⚡'];
@@ -1647,6 +1647,8 @@ Nota: ${parsed.note}`;
                   name: editName,
                   bio: editBio,
                   phone: editPhone,
+                  avatar: editAvatar,
+                  password: editPassword,
                   privacyMode: editPrivacy as any,
                   themeColor: editThemeColor
                 });

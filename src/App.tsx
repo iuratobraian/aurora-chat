@@ -124,15 +124,15 @@ export default function AuroraChat() {
   // Convex Queries
   const searchedUsers = useQuery(api.users.searchUsers, { query: userSearchQuery });
   const activeStatuses = useQuery(api.statuses.getActiveStatuses, (user?._id && user._id !== 'guest') ? { userId: user._id as any } : "skip");
-  const pendingFriendRequests = useQuery(api.friends.getPendingRequests, user?._id ? { userId: user._id as any } : "skip");
-  const sentFriendRequests = useQuery(api.friends.getSentRequests, user?._id ? { userId: user._id as any } : "skip");
-  const friendsList = useQuery(api.friends.getFriends, user?._id ? { userId: user._id as any } : "skip");
+  const pendingFriendRequests = useQuery(api.friends.getPendingRequests, (user?._id && user._id !== 'guest') ? { userId: user._id as any } : "skip");
+  const sentFriendRequests = useQuery(api.friends.getSentRequests, (user?._id && user._id !== 'guest') ? { userId: user._id as any } : "skip");
+  const friendsList = useQuery(api.friends.getFriends, (user?._id && user._id !== 'guest') ? { userId: user._id as any } : "skip");
   const rawChannels = useQuery(api.chat.getChannels);
   const rawMessagesData = useQuery(api.chat.getMessagesByChannel, { channelId: currentChannel, limit: 100 });
   const rawTypingUsers = useQuery(api.chat.getTypingUsers, { channelId: currentChannel, excludeUserId: user?._id || 'guest' });
-  const reminders = useQuery(api.productivity.getReminders, user?._id ? { userId: user._id as any } : "skip");
-  const notes = useQuery(api.productivity.getNotes, user?._id ? { userId: user._id as any } : "skip");
-  const storedPasswords = useQuery(api.productivity.getPasswords, user?._id ? { userId: user._id as any } : "skip");
+  const reminders = useQuery(api.productivity.getReminders, (user?._id && user._id !== 'guest') ? { userId: user._id as any } : "skip");
+  const notes = useQuery(api.productivity.getNotes, (user?._id && user._id !== 'guest') ? { userId: user._id as any } : "skip");
+  const storedPasswords = useQuery(api.productivity.getPasswords, (user?._id && user._id !== 'guest') ? { userId: user._id as any } : "skip");
   const rawServerStats = useQuery(api.chat.getServerStats);
   const pinnedMessages = useQuery(api.chat.getPinnedMessages, { channelId: currentChannel });
   const channelData = useQuery(api.chat.getChannelBySlug, { slug: currentChannel });
@@ -181,6 +181,7 @@ export default function AuroraChat() {
       setIsMobile(mobile);
       if (!mobile) setIsSidebarOpen(true);
     };
+    handleResize();
     const updateOnlineStatus = () => setIsOnline(navigator.onLine);
     window.addEventListener('resize', handleResize);
     window.addEventListener('online', updateOnlineStatus);
@@ -646,26 +647,13 @@ Nota: ${parsed.note}`;
   };
 
   if (!user) return (
-    <div className="h-screen bg-[#0a0a0a] flex items-center justify-center p-6">
-      <div className="text-center space-y-8 animate-in fade-in zoom-in duration-700">
-        <div className="w-32 h-32 bg-primary/20 rounded-xl flex items-center justify-center mx-auto shadow-2xl shadow-primary/20 border border-primary/20">
-          <MessageSquare size={64} className="text-primary" />
-        </div>
-        <div className="space-y-2">
-          <h1 className="text-4xl font-black text-white uppercase tracking-tighter italic">Aurora Chat</h1>
-          <p className="text-gray-500 text-sm font-bold uppercase tracking-widest">Standalone Premium Client</p>
-        </div>
-        <RainbowButton onClick={() => setUser({ _id: 'guest', name: 'Explorador', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=guest' } as any)}>
-          Entrar al Nexo
-        </RainbowButton>
-      </div>
-    </div>
+    <Onboarding onComplete={(u) => setUser(u as any)} />
   );
 
   const currentChat = [...(displayChannels || []), ...(displayStatuses || [])].find(c => (c as any).slug === currentChannel) || { name: 'Chat' };
 
   return (
-    <div className="flex h-full w-full bg-[#0a0a0a] overflow-hidden text-white relative">
+    <div className="flex h-[100dvh] w-full bg-[#0a0a0a] overflow-hidden text-white relative">
       <audio ref={audioRef} src={NOTIFICATION_SOUND} preload="auto" />
       
       {/* SIDEBAR */}
@@ -720,7 +708,7 @@ Nota: ${parsed.note}`;
 
         {/* User Profile Header */}
 
-        <div className="p-4 border-b border-white/10 flex items-center justify-between bg-black/40 min-w-[320px]">
+        <div className="p-4 border-b border-white/10 flex items-center justify-between bg-black/40 w-full">
           <button onClick={() => setShowProfileModal(true)} className="flex items-center gap-3 group text-left">
             <div className="relative">
               <img src={user.avatar} className="w-10 h-10 rounded-lg shadow-lg border border-white/10 group-hover:border-primary/50 transition-all" alt="" />
@@ -739,7 +727,7 @@ Nota: ${parsed.note}`;
         </div>
 
         {/* Statuses Row */}
-        <div className="p-4 border-b border-white/5 bg-black/10 overflow-x-auto no-scrollbar flex gap-4 min-w-[320px]">
+        <div className="p-4 border-b border-white/5 bg-black/10 overflow-x-auto no-scrollbar flex gap-4 w-full">
           <button onClick={() => setShowStatusModal(true)} className="flex flex-col items-center gap-1 shrink-0 group">
             <div className="w-12 h-12 rounded-full border-2 border-dashed border-gray-600 flex items-center justify-center group-hover:border-primary transition-all">
               <Plus size={20} className="text-gray-500 group-hover:text-primary" />

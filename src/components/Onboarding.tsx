@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { api } from '../api';
 import { useUserStore } from '../store';
-import { User, Mail, AtSign, Loader2, Lock } from 'lucide-react';
+import { User, Mail, AtSign, Loader2, Lock, Camera } from 'lucide-react';
 import { useConvex, useMutation } from 'convex/react';
 
 export default function Onboarding() {
@@ -13,6 +13,18 @@ export default function Onboarding() {
   const [error, setError] = useState<string | null>(null);
   const [isRegistering, setIsRegistering] = useState(false);
   const [hasBiometrics, setHasBiometrics] = useState(!!localStorage.getItem('aurora_last_user'));
+  const [avatar, setAvatar] = useState<string | null>(null);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatar(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   
   const setUser = useUserStore(state => state.setUser);
@@ -215,6 +227,14 @@ export default function Onboarding() {
                 Entrar con Biometría
              </button>
           )}
+
+          <button
+            type="button"
+            onClick={() => setUser({ _id: 'guest', name: 'Explorador', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=guest' } as any)}
+            className="w-full text-gray-700 hover:text-white py-2 text-[8px] font-black uppercase tracking-[0.3em] transition-all"
+          >
+            Entrar como Explorador (Sin Cuenta)
+          </button>
         </form>
 
 

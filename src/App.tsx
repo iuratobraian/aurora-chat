@@ -33,6 +33,10 @@ const EMOJIS = ['🚀', '📈', '📉', '🔥', '🧠', '💰', '❤️', '👍'
 const NOTIFICATION_SOUND = 'https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3';
 
 export default function AuroraChat() {
+  // 1. Hooks & State Declarations (Top Level)
+  const { user, setUser, logout } = useUserStore();
+  
+  // Basic UI State
   const [text, setText] = useState('');
   const [attachedImage, setAttachedImage] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -51,27 +55,132 @@ export default function AuroraChat() {
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [viewingStatus, setViewingStatus] = useState<any>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [viewingProfileUser, setViewingProfileUser] = useState<any>(null);
   const [interimTranscript, setInterimTranscript] = useState('');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [offlineQueue, setOfflineQueue] = useState<any[]>([]);
-  
+  const [showUserSearch, setShowUserSearch] = useState(false);
+  const [userSearchQuery, setUserSearchQuery] = useState('');
+  const [parsingFile, setParsingFile] = useState(false);
+  const [showEvents, setShowEvents] = useState(false);
+  const [showPolls, setShowPolls] = useState(false);
+  const [showCreateEvent, setShowCreateEvent] = useState(false);
+  const [showCreatePoll, setShowCreatePoll] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [attachedAudio, setAttachedAudio] = useState<string | null>(null);
+  const [showReminders, setShowReminders] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
+  const [showPasswords, setShowPasswords] = useState(false);
+  const [sharingEventId, setSharingEventId] = useState<string | null>(null);
+  const [masterKey, setMasterKey] = useState(localStorage.getItem('aurora_master_key') || '');
+  const [isBiometricVerified, setIsBiometricVerified] = useState(false);
+  const [newReminderText, setNewReminderText] = useState('');
+  const [newReminderDate, setNewReminderDate] = useState('');
+  const [newNoteTitle, setNewNoteTitle] = useState('');
+  const [newNoteContent, setNewNoteContent] = useState('');
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
+  const [newPassSite, setNewPassSite] = useState('');
+  const [newPassUser, setNewPassUser] = useState('');
+  const [newPassVal, setNewPassVal] = useState('');
+  const [showQRScanner, setShowQRScanner] = useState(false);
+  const [scannedResult, setScannedResult] = useState<string | null>(null);
+  const [showFriendsModal, setShowFriendsModal] = useState(false);
+  const [showExpenses, setShowExpenses] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showSearch, setShowSearch] = useState(false);
+  const [newPollQuestion, setNewPollQuestion] = useState('');
+  const [newPollOptions, setNewPollOptions] = useState(['', '']);
+
+  // Profile Edit State
+  const [editName, setEditName] = useState(user?.name || '');
+  const [editBio, setEditBio] = useState(user?.bio || '');
+  const [editPhone, setEditPhone] = useState(user?.phone || '');
+  const [editAvatar, setEditAvatar] = useState(user?.avatar || '');
+  const [editPrivacy, setEditPrivacy] = useState(user?.privacyMode || 'everyone');
+  const [editThemeColor, setEditThemeColor] = useState(user?.themeColor || '#6366f1');
+  const [editPassword, setEditPassword] = useState(user?.password || '');
+
+  // Refs
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const recognitionRef = useRef<any>(null);
+  const qrScannerRef = useRef<any>(null);
+  const lastMessageId = useRef<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const profileImageInputRef = useRef<HTMLInputElement>(null);
+  const isAtBottom = useRef(true);
+
+  // Convex Queries
+  const searchedUsers = useQuery(api.users.searchUsers, { query: userSearchQuery });
+  const activeStatuses = useQuery(api.statuses.getActiveStatuses, user?._id ? { userId: user._id as any } : "skip");
+  const pendingFriendRequests = useQuery(api.friends.getPendingRequests, user?._id ? { userId: user._id as any } : "skip");
+  const sentFriendRequests = useQuery(api.friends.getSentRequests, user?._id ? { userId: user._id as any } : "skip");
+  const friendsList = useQuery(api.friends.getFriends, user?._id ? { userId: user._id as any } : "skip");
+  const rawChannels = useQuery(api.chat.getChannels);
+  const rawMessagesData = useQuery(api.chat.getMessagesByChannel, { channelId: currentChannel, limit: 100 });
+  const rawTypingUsers = useQuery(api.chat.getTypingUsers, { channelId: currentChannel, excludeUserId: user?._id || 'guest' });
+  const reminders = useQuery(api.productivity.getReminders, user?._id ? { userId: user._id as any } : "skip");
+  const notes = useQuery(api.productivity.getNotes, user?._id ? { userId: user._id as any } : "skip");
+  const storedPasswords = useQuery(api.productivity.getPasswords, user?._id ? { userId: user._id as any } : "skip");
+  const rawServerStats = useQuery(api.chat.getServerStats);
+  const pinnedMessages = useQuery(api.chat.getPinnedMessages, { channelId: currentChannel });
+  const channelData = useQuery(api.chat.getChannelBySlug, { slug: currentChannel });
+  const events = useQuery(api.events.getEventsByChannel, { channelId: currentChannel });
+  const polls = useQuery(api.polls.getPollsByChannel, { channelId: currentChannel });
+
+  // Convex Mutations
+  const getOrCreateDM = useMutation(api.chat.getOrCreatePrivateChannel);
+  const updateProfile = useMutation(api.users.updateProfile);
+  const postStatus = useMutation(api.statuses.postStatus);
+  const sendFriendRequest = useMutation(api.friends.sendFriendRequest);
+  const acceptFriendRequest = useMutation(api.friends.acceptFriendRequest);
+  const addExpenseMutation = useMutation(api.expenses.addExpense);
+  const sendMessage = useMutation(api.chat.sendMessage);
+  const setTyping = useMutation(api.chat.setTyping);
+  const createChannel = useMutation(api.chat.createChannel);
+  const verifyPasswordMutation = useMutation(api.chat.verifyChannelPasswordMutation);
+  const createReminder = useMutation(api.productivity.createReminder);
+  const toggleReminder = useMutation(api.productivity.toggleReminder);
+  const deleteReminder = useMutation(api.productivity.deleteReminder);
+  const createNote = useMutation(api.productivity.createNote);
+  const updateNote = useMutation(api.productivity.updateNote);
+  const deleteNote = useMutation(api.productivity.deleteNote);
+  const createPassword = useMutation(api.productivity.createPassword);
+  const deletePassword = useMutation(api.productivity.deletePassword);
+  const togglePin = useMutation(api.chat.togglePinMessage);
+  const togglePause = useMutation(api.chat.togglePauseChannel);
+  const createEvent = useMutation(api.events.createEvent);
+  const joinEvent = useMutation(api.events.joinEvent);
+  const leaveEvent = useMutation(api.events.leaveEvent);
+  const createPoll = useMutation(api.polls.createPoll);
+  const voteInPoll = useMutation(api.polls.voteInPoll);
+  const updateChannelStatus = useMutation(api.chat.updateChannelStatus);
+  const deleteChannel = useMutation(api.chat.deleteChannel);
+
+  // Computed Values
+  const channelsList = Array.isArray(rawChannels) ? rawChannels : [];
+  const messages = (rawMessagesData?.messages && Array.isArray(rawMessagesData.messages)) ? rawMessagesData.messages as ChatMessage[] : [];
+  const typingUsers = Array.isArray(rawTypingUsers) ? rawTypingUsers : [];
+  const serverStats = rawServerStats || null;
+
+  // 2. Lifecycle & Effects
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth <= 768;
       setIsMobile(mobile);
       if (!mobile) setIsSidebarOpen(true);
     };
-    
     const updateOnlineStatus = () => setIsOnline(navigator.onLine);
-    
     window.addEventListener('resize', handleResize);
     window.addEventListener('online', updateOnlineStatus);
     window.addEventListener('offline', updateOnlineStatus);
-    
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('online', updateOnlineStatus);
@@ -79,77 +188,6 @@ export default function AuroraChat() {
     };
   }, []);
 
-
-  
-  // User state
-  const { user, setUser, logout } = useUserStore();
-  const [showUserSearch, setShowUserSearch] = useState(false);
-  const [userSearchQuery, setUserSearchQuery] = useState('');
-  const [parsingFile, setParsingFile] = useState(false);
-  
-  // Profile editing state
-  const [editName, setEditName] = useState(user?.name || '');
-  const [editBio, setEditBio] = useState(user?.bio || '');
-  const [editPhone, setEditPhone] = useState(user?.phone || '');
-  const [editAvatar, setEditAvatar] = useState(user?.avatar || '');
-  const [editPrivacy, setEditPrivacy] = useState(user?.privacyMode || 'everyone');
-  const [editThemeColor, setEditThemeColor] = useState(user?.themeColor || '#6366f1');
-
-  const [editPassword, setEditPassword] = useState(user?.password || '');
-
-
-  // Audio/Speech
-  const [showEvents, setShowEvents] = useState(false);
-  const [showPolls, setShowPolls] = useState(false);
-  const [showCreateEvent, setShowCreateEvent] = useState(false);
-  const [showCreatePoll, setShowCreatePoll] = useState(false);
-  
-  // QR Logic
-  useEffect(() => {
-    if (showQRScanner) {
-      const html5QrCode = new Html5Qrcode("qr-reader");
-      html5QrCode.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: { width: 250, height: 250 } },
-        (decodedText) => {
-          // Success!
-          setScannedResult(decodedText);
-          setShowQRScanner(false);
-          html5QrCode.stop();
-          
-          // Try to find matching password
-          const match = storedPasswords?.find((p: any) => 
-            decodedText.toLowerCase().includes(p.site.toLowerCase()) || 
-            decodedText.toLowerCase().includes(p.username.toLowerCase())
-          );
-          if (match) {
-            alert(`Llave encontrada para ${match.site}: ${match.encryptedPassword}`);
-          } else {
-            alert(`Contenido del QR: ${decodedText}`);
-          }
-        },
-        () => {} // Silent error
-      ).catch(err => {
-        console.error("QR Error", err);
-        setError("No se pudo iniciar la cámara");
-        setShowQRScanner(false);
-      });
-      return () => {
-        if (html5QrCode.isScanning) html5QrCode.stop();
-      };
-    }
-  }, [showQRScanner, storedPasswords]);
-
-
-  const [isRecording, setIsRecording] = useState(false);
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
-  const [attachedAudio, setAttachedAudio] = useState<string | null>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
-  const recognitionRef = useRef<any>(null);
-
-
-  // Sync edit states with user
   useEffect(() => {
     if (user) {
       setEditName(user.name || '');
@@ -161,129 +199,37 @@ export default function AuroraChat() {
     }
   }, [user]);
 
-
-
-  // Convex
-  const searchedUsers = useQuery(api.users.searchUsers, { query: userSearchQuery });
-  const getOrCreateDM = useMutation(api.chat.getOrCreatePrivateChannel);
-  const updateProfile = useMutation(api.users.updateProfile);
-  const postStatus = useMutation(api.statuses.postStatus);
-  const activeStatuses = useQuery(api.statuses.getActiveStatuses, user?._id ? { userId: user._id as any } : "skip");
-  
-  const sendFriendRequest = useMutation(api.friends.sendFriendRequest);
-  const acceptFriendRequest = useMutation(api.friends.acceptFriendRequest);
-  const pendingFriendRequests = useQuery(api.friends.getPendingRequests, user?._id ? { userId: user._id as any } : "skip");
-  const sentFriendRequests = useQuery(api.friends.getSentRequests, user?._id ? { userId: user._id as any } : "skip");
-  const friendsList = useQuery(api.friends.getFriends, user?._id ? { userId: user._id as any } : "skip");
-
-  // Safe Convex queries
-  const rawChannels = useQuery(api.chat.getChannels);
-  const channelsList = Array.isArray(rawChannels) ? rawChannels : [];
-  
-  const rawMessagesData = useQuery(api.chat.getMessagesByChannel, { channelId: currentChannel, limit: 100 });
-  const messages = (rawMessagesData?.messages && Array.isArray(rawMessagesData.messages)) ? rawMessagesData.messages as ChatMessage[] : [];
-  
-  const addExpenseMutation = useMutation(api.expenses.addExpense);
-  
-  const rawTypingUsers = useQuery(api.chat.getTypingUsers, { channelId: currentChannel, excludeUserId: user?._id || 'guest' });
-  const typingUsers = Array.isArray(rawTypingUsers) ? rawTypingUsers : [];
-  
-  const sendMessage = useMutation(api.chat.sendMessage);
-  const setTyping = useMutation(api.chat.setTyping);
-  const createChannel = useMutation(api.chat.createChannel);
-  const verifyPasswordMutation = useMutation(api.chat.verifyChannelPasswordMutation);
-  
-  // Productivity State
-  const [showReminders, setShowReminders] = useState(false);
-  const [showNotes, setShowNotes] = useState(false);
-  const [showPasswords, setShowPasswords] = useState(false);
-  const [sharingEventId, setSharingEventId] = useState<string | null>(null);
-  const [masterKey, setMasterKey] = useState(localStorage.getItem('aurora_master_key') || '');
-
-  const [isBiometricVerified, setIsBiometricVerified] = useState(false);
-
-  const qrScannerRef = useRef<any>(null);
-
-
-  const reminders = useQuery(api.productivity.getReminders, user?._id ? { userId: user._id as any } : "skip");
-  const notes = useQuery(api.productivity.getNotes, user?._id ? { userId: user._id as any } : "skip");
-  const storedPasswords = useQuery(api.productivity.getPasswords, user?._id ? { userId: user._id as any } : "skip");
-
-  const createReminder = useMutation(api.productivity.createReminder);
-  const toggleReminder = useMutation(api.productivity.toggleReminder);
-  const deleteReminder = useMutation(api.productivity.deleteReminder);
-  const createNote = useMutation(api.productivity.createNote);
-  const updateNote = useMutation(api.productivity.updateNote);
-  const deleteNote = useMutation(api.productivity.deleteNote);
-
-  const createPassword = useMutation(api.productivity.createPassword);
-  const deletePassword = useMutation(api.productivity.deletePassword);
-
-  const [newReminderText, setNewReminderText] = useState('');
-  const [newReminderDate, setNewReminderDate] = useState('');
-  const [newNoteTitle, setNewNoteTitle] = useState('');
-  const [newNoteContent, setNewNoteContent] = useState('');
-  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
-
-  const [newPassSite, setNewPassSite] = useState('');
-  const [newPassUser, setNewPassUser] = useState('');
-  const [newPassVal, setNewPassVal] = useState('');
-  const [showQRScanner, setShowQRScanner] = useState(false);
-  const [scannedResult, setScannedResult] = useState<string | null>(null);
-  const [showFriendsModal, setShowFriendsModal] = useState(false);
-  const [showExpenses, setShowExpenses] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showSearch, setShowSearch] = useState(false);
-
-
-
-  const serverStats = rawServerStats || null;
-
-  const pinnedMessages = useQuery(api.chat.getPinnedMessages, { channelId: currentChannel });
-  const channelData = useQuery(api.chat.getChannelBySlug, { slug: currentChannel });
-  
-  const togglePin = useMutation(api.chat.togglePinMessage);
-  const togglePause = useMutation(api.chat.togglePauseChannel);
-
-  const events = useQuery(api.events.getEventsByChannel, { channelId: currentChannel });
-  const createEvent = useMutation(api.events.createEvent);
-  const joinEvent = useMutation(api.events.joinEvent);
-  const leaveEvent = useMutation(api.events.leaveEvent);
-
-  const polls = useQuery(api.polls.getPollsByChannel, { channelId: currentChannel });
-  const createPoll = useMutation(api.polls.createPoll);
-  const voteInPoll = useMutation(api.polls.voteInPoll);
-
-  const [newPollQuestion, setNewPollQuestion] = useState('');
-  const [newPollOptions, setNewPollOptions] = useState(['', '']);
-
-
-
-
-  // Notification Helper
-  const showLocalNotification = useCallback((m: ChatMessage) => {
-    if (m.userId === user?._id) return;
-    if (document.visibilityState === 'visible') return;
-
-    if ('Notification' in window && Notification.permission === 'granted') {
-      const n = new Notification("Aurora Chat", {
-        body: `Mensaje de ${m.autor}: ${decryptMessage(m.texto || '')}`,
-        icon: 'https://cdn-icons-png.flaticon.com/512/2593/2593635.png'
-      });
-      n.onclick = () => { window.focus(); n.close(); };
-    }
-  }, [user?._id]);
-
   useEffect(() => {
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission();
+    if (showQRScanner) {
+      const html5QrCode = new Html5Qrcode("qr-reader");
+      html5QrCode.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        (decodedText) => {
+          setScannedResult(decodedText);
+          setShowQRScanner(false);
+          html5QrCode.stop();
+          const match = storedPasswords?.find((p: any) => 
+            decodedText.toLowerCase().includes(p.site.toLowerCase()) || 
+            decodedText.toLowerCase().includes(p.username.toLowerCase())
+          );
+          if (match) {
+            alert(`Llave encontrada para ${match.site}: ${match.encryptedPassword}`);
+          } else {
+            alert(`Contenido del QR: ${decodedText}`);
+          }
+        },
+        () => {}
+      ).catch(err => {
+        console.error("QR Error", err);
+        setError("No se pudo iniciar la cámara");
+        setShowQRScanner(false);
+      });
+      return () => {
+        if (html5QrCode.isScanning) html5QrCode.stop();
+      };
     }
-  }, []);
-
-
-  // Notifications
-  const lastMessageId = useRef<string | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  }, [showQRScanner, storedPasswords]);
 
   useEffect(() => {
     if (messages.length > 0) {
@@ -293,37 +239,58 @@ export default function AuroraChat() {
         showLocalNotification(lastMsg as any);
       }
       lastMessageId.current = lastMsg._id || null;
-      
-      // Save to local persistence
       persistenceService.saveMessages(currentChannel, messages);
     }
-  }, [messages, user?._id, showLocalNotification, currentChannel]);
-
-  // Load from local persistence on channel change
-  useEffect(() => {
-    const loadLocal = async () => {
-      const localMsgs = await persistenceService.getMessages(currentChannel);
-      if (localMsgs.length > 0 && messages.length === 0) {
-        // This is handled by displayMessages logic below
-      }
-    };
-    loadLocal();
-  }, [currentChannel]);
-
-
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const cameraInputRef = useRef<HTMLInputElement>(null);
-  const profileImageInputRef = useRef<HTMLInputElement>(null);
-
-  const isAtBottom = useRef(true);
+  }, [messages, user?._id, currentChannel]);
 
   useEffect(() => {
     if (isAtBottom.current && messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages.length]);
+
+  useEffect(() => {
+    if (isOnline && offlineQueue.length > 0 && user) {
+      const processQueue = async () => {
+        const queueCopy = [...offlineQueue];
+        setOfflineQueue([]);
+        for (const msg of queueCopy) {
+          try {
+            await sendMessage({
+              channelId: msg.channelId,
+              userId: user._id,
+              nombre: user.name,
+              avatar: user.avatar,
+              texto: msg.texto,
+              imagenUrl: msg.imagenUrl
+            });
+          } catch (err) {
+            setOfflineQueue(prev => [...prev, msg]);
+          }
+        }
+      };
+      processQueue();
+    }
+  }, [isOnline, user, sendMessage, offlineQueue.length]);
+
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  // 3. Callbacks
+  const showLocalNotification = useCallback((m: ChatMessage) => {
+    if (m.userId === user?._id) return;
+    if (document.visibilityState === 'visible') return;
+    if ('Notification' in window && Notification.permission === 'granted') {
+      const n = new Notification("Aurora Chat", {
+        body: `Mensaje de ${m.nombre}: ${decryptMessage(m.texto || '', currentChannel)}`,
+        icon: 'https://cdn-icons-png.flaticon.com/512/2593/2593635.png'
+      });
+      n.onclick = () => { window.focus(); n.close(); };
+    }
+  }, [user?._id, currentChannel]);
 
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
@@ -1026,13 +993,13 @@ Nota: ${parsed.note}`;
             <p className="text-xs text-white">¿Quieres aceptar la solicitud de mensaje de <span className="font-bold">{(currentChat as any).name}</span>?</p>
             <div className="flex gap-2">
               <button 
-                onClick={() => useMutation(api.chat.updateChannelStatus)({ channelId: (currentChat as any)._id, status: 'active' })} 
+                onClick={() => updateChannelStatus({ channelId: (currentChat as any)._id, status: 'active' })} 
                 className="bg-primary text-white px-6 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider"
               >
                 Aceptar
               </button>
               <button 
-                onClick={() => useMutation(api.chat.deleteChannel)({ channelId: (currentChat as any)._id })} 
+                onClick={() => deleteChannel({ channelId: (currentChat as any)._id })} 
                 className="bg-white/5 text-gray-400 px-6 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider border border-white/10"
               >
                 Rechazar

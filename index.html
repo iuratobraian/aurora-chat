@@ -2,7 +2,7 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#0a0a0a" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -12,31 +12,9 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
     <title>Aurora Chat | Neural Messaging</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
-    <style>
-      :root {
-        --app-height: 100vh;
-      }
-      html, body {
-        height: var(--app-height);
-        overflow: hidden;
-        margin: 0;
-        padding: 0;
-        position: fixed;
-        width: 100%;
-      }
-    </style>
-    <script>
-      const setAppHeight = () => {
-        const doc = document.documentElement;
-        doc.style.setProperty('--app-height', `${window.innerHeight}px`);
-      };
-      window.addEventListener('resize', setAppHeight);
-      window.addEventListener('orientationchange', setAppHeight);
-      setAppHeight();
-    </script>
   </head>
-  <body class="bg-[#0a0a0a] text-white">
-    <div id="root" style="height: 100%;"></div>
+  <body class="bg-[#0a0a0a] text-white overflow-hidden">
+    <div id="root" class="h-full w-full"></div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
       // Force unregister old service workers to avoid "old version" issues

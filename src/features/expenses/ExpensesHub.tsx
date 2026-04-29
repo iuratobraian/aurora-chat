@@ -44,6 +44,7 @@ const ExpensesHub: React.FC<ExpensesHubProps> = ({ userId, onClose }) => {
   
   // Edit state
   const [editingExpense, setEditingExpense] = useState<any>(null);
+  const [showSettings, setShowSettings] = useState(false);
   
   // Voice/Text input state
   const [naturalInput, setNaturalInput] = useState('');
@@ -305,7 +306,7 @@ const spentToday = expenses
           </div>
 
           <button onClick={() => setActiveTab('accounts')} className={`p-3 ${activeTab === 'accounts' ? 'text-gray-900' : 'text-gray-300'}`}><Wallet size={22}/></button>
-          <button onClick={onClose} className="p-3 text-gray-400 hover:text-gray-600"><X size={22}/></button>
+          <button onClick={() => setShowSettings(true)} className="p-3 text-gray-400 hover:text-gray-600"><Settings size={22}/></button>
        </div>
 
       {/* Add Movement Modal Neto Style */}
@@ -446,36 +447,60 @@ const spentToday = expenses
         </div>
       )}
 
-      {/* Accounts Management View */}
-      {activeTab === 'accounts' && (
-        <div className="fixed inset-0 bg-[#f1f3f4] z-[400] flex flex-col animate-in fade-in duration-300">
-           <div className="p-6 flex items-center justify-between border-b border-gray-50">
-              <button onClick={() => setActiveTab('dashboard')} className="p-2 bg-gray-100 rounded-full text-gray-500"><ChevronLeft size={20}/></button>
-              <h2 className="text-sm font-black uppercase tracking-widest">Mis Cuentas</h2>
-              <button 
-                onClick={() => addAccount({ userId, name: 'Nueva Cuenta', type: 'bank', balance: 0 })}
-                className="p-2 bg-emerald-50 rounded-full text-emerald-500"><Plus size={20}/></button>
-           </div>
-           <div className="flex-1 overflow-y-auto p-6 space-y-4">
-               {accounts.map((acc: { _id: string; name: string; type: string; balance: number }) => (
-                  <div key={acc._id} className="bg-[#f1f3f4] p-6 rounded-[2.5rem] border border-gray-100 flex items-center justify-between shadow-sm">
-                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-400">
-                           <CreditCard size={24}/>
-                        </div>
-                        <div>
-                           <h4 className="text-sm font-black">{acc.name}</h4>
-                           <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">{acc.type}</p>
-                        </div>
-                     </div>
-                     <div className="text-right">
-                        <p className="text-lg font-black tracking-tight">{acc.balance.toLocaleString('es-ES', { minimumFractionDigits: 2 })} {currency}</p>
-                     </div>
+       {/* Accounts Management View */}
+       {activeTab === 'accounts' && (
+         <div className="fixed inset-0 bg-[#f1f3f4] z-[400] flex flex-col animate-in fade-in duration-300">
+            <div className="p-6 flex items-center justify-between border-b border-gray-50">
+               <button onClick={() => setActiveTab('dashboard')} className="p-2 bg-gray-100 rounded-full text-gray-500"><ChevronLeft size={20}/></button>
+               <h2 className="text-sm font-black uppercase tracking-widest">Mis Cuentas</h2>
+               <button 
+                 onClick={() => addAccount({ userId, name: 'Nueva Cuenta', type: 'bank', balance: 0 })}
+                 className="p-2 bg-emerald-50 rounded-full text-emerald-500"><Plus size={20}/></button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                {accounts.map((acc: { _id: string; name: string; type: string; balance: number }) => (
+                   <div key={acc._id} className="bg-[#f1f3f4] p-6 rounded-[2.5rem] border border-gray-100 flex items-center justify-between shadow-sm">
+                      <div className="flex items-center gap-4">
+                         <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-400">
+                            <CreditCard size={24}/>
+                         </div>
+                         <div>
+                            <h4 className="text-sm font-black">{acc.name}</h4>
+                            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">{acc.type}</p>
+                         </div>
+                      </div>
+                      <div className="text-right">
+                         <p className="text-lg font-black tracking-tight">{acc.balance.toLocaleString('es-ES', { minimumFractionDigits: 2 })} {currency}</p>
+                      </div>
+                   </div>
+                ))}
+            </div>
+         </div>
+       )}
+
+       {/* Settings Modal */}
+       {showSettings && (
+         <div className="fixed inset-0 bg-[#f1f3f4] z-[500] flex flex-col animate-in slide-in-from-right duration-300">
+            <div className="p-6 flex items-center justify-between border-b border-gray-50">
+               <button onClick={() => setShowSettings(false)} className="p-2 bg-gray-100 rounded-full text-gray-500"><X size={20}/></button>
+               <h2 className="text-sm font-black uppercase tracking-widest">Configuración</h2>
+               <div className="w-10"></div>
+            </div>
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+               <div className="space-y-4">
+                  <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">General</h3>
+                  <div className="bg-white p-4 rounded-2xl border border-gray-100 flex items-center justify-between">
+                     <span className="text-sm font-bold">Notificaciones</span>
+                      <button className="p-2 bg-gray-100 rounded-lg"><Settings size={18}/></button>
                   </div>
-               ))}
-           </div>
-        </div>
-      )}
+                  <div className="bg-white p-4 rounded-2xl border border-gray-100 flex items-center justify-between">
+                     <span className="text-sm font-bold">Privacidad</span>
+                      <button className="p-2 bg-gray-100 rounded-lg"><Settings size={18}/></button>
+                  </div>
+               </div>
+            </div>
+         </div>
+       )}
     </div>
   );
 };

@@ -46,6 +46,8 @@ const ExpensesHub: React.FC<ExpensesHubProps> = ({ userId, onClose }) => {
   
   const [naturalInput, setNaturalInput] = useState('');
   const [interimTranscript, setInterimTranscript] = useState('');
+  const [isRecording, setIsRecording] = useState(false);
+  const recognitionRef = useRef<any>(null);
 
   // Voice recognition
   useEffect(() => {
@@ -101,6 +103,25 @@ const ExpensesHub: React.FC<ExpensesHubProps> = ({ userId, onClose }) => {
       console.error("Mic error:", err);
       setIsRecording(false);
       alert("Error al iniciar el micrófono.");
+    }
+  };
+
+  const handleNaturalInput = async () => {
+    if (!naturalInput.trim()) return;
+    const parsed = expenseAgent.parse(naturalInput);
+    if (parsed) {
+      await addExpense({
+        userId,
+        amount: parsed.amount,
+        type: parsed.type,
+        category: parsed.category,
+        date: new Date().toISOString().split('T')[0],
+        note: parsed.note,
+        accountId: selectedAccountId || undefined,
+        paymentMethod: 'app',
+        isRecurring: false
+      });
+      setNaturalInput('');
     }
   };
 

@@ -174,7 +174,7 @@ function AuroraChat() {
   const pendingFriendRequests = useQuery(api.friends.getPendingRequests, isValidUser ? { userId: user._id as any } : "skip");
   const sentFriendRequests = useQuery(api.friends.getSentRequests, isValidUser ? { userId: user._id as any } : "skip");
   const friendsList = useQuery(api.friends.getFriends, isValidUser ? { userId: user._id as any } : "skip");
-  const rawChannels = useQuery(api.chat.getChannels, isValidUser ? { userId: user._id as string } : "skip");
+  const rawChannels = useQuery(api.chat.getChannels, user?._id ? { userId: user._id as string } : "skip");
   const rawMessagesData = useQuery(api.chat.getMessagesByChannel, { channelId: currentChannel, limit: 100 });
   const rawTypingUsers = useQuery(api.chat.getTypingUsers, { channelId: currentChannel, excludeUserId: (user?._id && typeof user._id === 'string') ? user._id : 'guest' });
   const reminders = useQuery(api.productivity.getReminders, isValidUser ? { userId: user._id as any } : "skip");

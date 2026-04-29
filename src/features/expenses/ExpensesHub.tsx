@@ -7,11 +7,11 @@ import {
   PieChart, History, PlusCircle, X, ChevronRight,
   ShoppingCart, Utensils, Home, Car, Coffee, 
   Heart, ShoppingBag, Settings, MoreHorizontal,
-  ChevronLeft, Check, Smartphone, Mic, MicOff, Edit2, Trash2
+  ChevronLeft, Check, Smartphone, Mic, MicOff, Edit2, Trash2, Home as HomeIcon, MessageSquare
 } from 'lucide-react';
 import { format, isToday, isYesterday, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { expenseAgent, ParsedExpense } from '../../lib/expenseAgent';
+import { expenseAgent } from '../../lib/expenseAgent';
 
 interface ExpensesHubProps {
   userId: string;
@@ -22,7 +22,7 @@ const CATEGORIES = [
   { id: 'supermarket', name: 'Supermercado', icon: <ShoppingCart size={20}/>, color: 'bg-emerald-100 text-emerald-600' },
   { id: 'restaurants', name: 'Restaurantes', icon: <Utensils size={20}/>, color: 'bg-orange-100 text-orange-600' },
   { id: 'vivienda', name: 'Vivienda', icon: <Home size={20}/>, color: 'bg-blue-100 text-blue-600' },
-  { id: 'coche', name: 'Coche', icon: <Car size={20}/>, color: 'bg-gray-100 text-gray-600' },
+  { id: 'coche', name: 'Coche', icon: <Car size={20}/>, color: 'theme-input theme-text-sec' },
   { id: 'ocio', name: 'Ocio', icon: <Coffee size={20}/>, color: 'bg-purple-100 text-purple-600' },
   { id: 'salud', name: 'Salud', icon: <Heart size={20}/>, color: 'bg-red-100 text-red-600' },
   { id: 'compras', name: 'Compras', icon: <ShoppingBag size={20}/>, color: 'bg-pink-100 text-pink-600' },
@@ -33,7 +33,6 @@ const ExpensesHub: React.FC<ExpensesHubProps> = ({ userId, onClose }) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showCalendarView, setShowCalendarView] = useState(false);
   
-  // Convex data
   const expenses = useQuery(api.expenses.getExpenses, { userId }) || [];
   const accounts = useQuery(api.expenses.getAccounts, { userId }) || [];
   
@@ -42,16 +41,13 @@ const ExpensesHub: React.FC<ExpensesHubProps> = ({ userId, onClose }) => {
   const updateExpense = useMutation(api.expenses.updateExpense);
   const deleteExpense = useMutation(api.expenses.deleteExpense);
   
-  // Edit state
   const [editingExpense, setEditingExpense] = useState<any>(null);
   const [showSettings, setShowSettings] = useState(false);
   
-  // Voice/Text input state
   const [naturalInput, setNaturalInput] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const recognitionRef = useRef<any>(null);
   
-  // Natural language expense handler
   const handleNaturalInput = async () => {
     if (!naturalInput.trim()) return;
     const parsed = expenseAgent.parse(naturalInput);
@@ -71,7 +67,6 @@ const ExpensesHub: React.FC<ExpensesHubProps> = ({ userId, onClose }) => {
     }
   };
   
-  // Voice recognition
   useEffect(() => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
@@ -88,16 +83,24 @@ const ExpensesHub: React.FC<ExpensesHubProps> = ({ userId, onClose }) => {
   }, []);
   
   const toggleRecording = () => {
-    if (isRecording) {
-      recognitionRef.current?.stop();
+    if (!recognitionRef.current) {
+      alert("Tu navegador no soporta reconocimiento de voz.");
+      return;
+    }
+    try {
+      if (isRecording) {
+        recognitionRef.current.stop();
+        setIsRecording(false);
+      } else {
+        recognitionRef.current.start();
+        setIsRecording(true);
+      }
+    } catch (err) {
       setIsRecording(false);
-    } else {
-      recognitionRef.current?.start();
-      setIsRecording(true);
+      alert("Error al iniciar el micrófono.");
     }
   };
 
-  // Form State
   const [amount, setAmount] = useState('0,00');
   const [note, setNote] = useState('');
   const [type, setType] = useState<'expense' | 'income'>('expense');
@@ -110,38 +113,25 @@ const ExpensesHub: React.FC<ExpensesHubProps> = ({ userId, onClose }) => {
 
   const CURRENCIES = ['€', '$', 'ARS', 'MXN', 'COP', 'CLP', 'PEN', 'UYU'];
 
-const totalBalance = accounts.reduce((acc: number, curr: { balance: number }) => acc + curr.balance, 0);
-const spentToday = expenses
-  .filter((e: { createdAt: string; type: string }) => isToday(new Date(e.createdAt)) && e.type === 'expense')
-  .reduce((acc: number, curr: { amount: number }) => acc + curr.amount, 0);
+  const totalBalance = accounts.reduce((acc: number, curr: any) => acc + curr.balance, 0);
+  const spentToday = expenses
+    .filter((e: any) => isToday(new Date(e.createdAt)) && e.type === 'expense')
+    .reduce((acc: number, curr: any) => acc + curr.amount, 0);
 
   const handleAddMovement = async () => {
     const numAmount = parseFloat(amount.replace(',', '.'));
     if (isNaN(numAmount) || numAmount <= 0) return;
-
-    try {
-      await addExpense({
-        userId,
-        amount: numAmount,
-        type,
-        category,
-        date,
-        note,
-        accountId: selectedAccountId || undefined,
-        paymentMethod: 'app',
-        isRecurring
-      });
-      setShowAddModal(false);
-      setAmount('0,00');
-      setNote('');
-    } catch (err) {
-      console.error("Error adding movement", err);
-    }
+    await addExpense({
+      userId, amount: numAmount, type, category, date, note,
+      accountId: selectedAccountId || undefined, paymentMethod: 'app', isRecurring
+    });
+    setShowAddModal(false);
+    setAmount('0,00'); setNote('');
   };
 
   const groupExpensesByDate = () => {
     const groups: { [key: string]: any[] } = {};
-    expenses.forEach((e: { createdAt: string }) => {
+    expenses.forEach((e: any) => {
       const d = format(new Date(e.createdAt), 'yyyy-MM-dd');
       if (!groups[d]) groups[d] = [];
       groups[d].push(e);
@@ -152,355 +142,170 @@ const spentToday = expenses
   const groupedExpenses = groupExpensesByDate();
 
   return (
-    <div className="flex flex-col h-full bg-[#f8f9fa] text-[#1a1a1a] font-sans selection:bg-emerald-100">
-      {/* Header Neto Style */}
-      <div className="px-6 pt-12 pb-6 flex flex-col items-center relative bg-[#f1f3f4] border-b border-gray-100">
+    <div className="flex flex-col h-full theme-bg theme-text font-sans selection:bg-emerald-100">
+      <div className="px-6 pt-[env(safe-area-inset-top,40px)] pb-6 flex flex-col items-center relative theme-surface border-b theme-border">
          <div className="w-full flex justify-between items-center mb-4">
             <h1 className="text-2xl font-black tracking-tighter">finanzas<span className="text-emerald-500">.</span></h1>
-           <button className="p-2 bg-gray-50 rounded-full text-gray-400 hover:text-gray-600"><Settings size={18}/></button>
+            <button onClick={() => setShowSettings(true)} className="p-2 theme-input rounded-full theme-text-sec hover:theme-text transition-colors"><Settings size={18}/></button>
          </div>
-         
          <div className="text-center mt-2">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total en cuentas</p>
+            <p className="text-[10px] font-bold theme-text-muted uppercase tracking-widest mb-1">Total en cuentas</p>
             <div className="relative inline-block">
               <h2 className="text-4xl font-black tracking-tight cursor-pointer hover:text-emerald-500 transition-colors" onClick={() => setShowCurrencySelector(!showCurrencySelector)}>
                 {totalBalance.toLocaleString('es-ES', { minimumFractionDigits: 2 })} {currency}
               </h2>
               {showCurrencySelector && (
-                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-[#f1f3f4] border border-gray-100 rounded-2xl shadow-2xl p-2 grid grid-cols-4 gap-1 z-[100] animate-in zoom-in duration-200">
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 theme-surface border theme-border rounded-2xl shadow-2xl p-2 grid grid-cols-4 gap-1 z-[100] animate-in zoom-in duration-200">
                   {CURRENCIES.map(c => (
-                    <button key={c} onClick={() => { setCurrency(c); setShowCurrencySelector(false); }} className={`w-10 h-10 rounded-xl text-[10px] font-black transition-all ${currency === c ? 'bg-black theme-text' : 'hover:bg-gray-50 text-gray-400'}`}>
-                      {c}
-                    </button>
+                    <button key={c} onClick={() => { setCurrency(c); setShowCurrencySelector(false); }} className={`w-10 h-10 rounded-xl text-[10px] font-black transition-all ${currency === c ? 'bg-primary text-white' : 'hover:theme-input theme-text-sec'}`}>{c}</button>
                   ))}
                 </div>
               )}
             </div>
             <div className="mt-2 flex items-center justify-center gap-1.5">
-               <div className="bg-gray-50 px-3 py-1 rounded-full flex items-center gap-1.5 border border-gray-100">
-                   <TrendingDown size={10} className="text-gray-400"/>
-                   <span className="text-[10px] font-bold text-gray-500">{spentToday.toLocaleString('es-ES', { minimumFractionDigits: 2 })} {currency} gastado hoy</span>
+               <div className="theme-input px-3 py-1 rounded-full flex items-center gap-1.5 border theme-border">
+                   <TrendingDown size={10} className="theme-text-muted"/>
+                   <span className="text-[10px] font-bold theme-text-sec">{spentToday.toLocaleString('es-ES', { minimumFractionDigits: 2 })} {currency} hoy</span>
                </div>
             </div>
          </div>
-
-         <div className="absolute top-6 left-6 md:hidden">
-            <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600"><X size={20}/></button>
+         <div className="absolute top-[env(safe-area-inset-top,24px)] left-6 md:hidden">
+            <button onClick={onClose} className="p-2 theme-text-sec hover:theme-text transition-colors"><X size={20}/></button>
          </div>
       </div>
 
-       {/* Main Content */}
-       <div className="flex-1 overflow-y-auto no-scrollbar px-6 py-6 space-y-8">
-         
-         {/* Natural Language Input */}
-         <div className="bg-[#f1f3f4] p-4 rounded-3xl border border-gray-100 shadow-sm space-y-3">
-            <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.3em]">Agregar por voz o texto</p>
+      <div className="flex-1 overflow-y-auto no-scrollbar px-6 py-6 space-y-8">
+         <div className="theme-surface p-4 rounded-3xl border theme-border shadow-sm space-y-3">
+            <p className="text-[9px] font-black theme-text-muted uppercase tracking-[0.3em]">Agregar por voz o texto</p>
             <div className="flex items-center gap-2">
-               <input 
-                 type="text" 
-                 value={naturalInput}
-                 onChange={(e) => setNaturalInput(e.target.value)}
-                 onKeyDown={(e) => { if(e.key === 'Enter') handleNaturalInput(); }}
-                 placeholder="Ej: Gasté 1000 en combustible"
-                 className="flex-1 bg-transparent text-sm font-medium outline-none"
-               />
-               <button 
-                 onClick={toggleRecording}
-                 className={`p-2 rounded-xl transition-all ${isRecording ? 'bg-red-500 text-white animate-pulse' : 'bg-gray-100 text-gray-400 hover:text-gray-600'}`}>
+               <input type="text" value={naturalInput} onChange={(e) => setNaturalInput(e.target.value)} onKeyDown={(e) => { if(e.key === 'Enter') handleNaturalInput(); }} placeholder="Ej: Gasté 1000 en comida" className="flex-1 bg-transparent text-sm font-medium outline-none"/>
+               <button onClick={toggleRecording} className={`p-2 rounded-xl transition-all ${isRecording ? 'bg-red-500 text-white animate-pulse' : 'theme-input theme-text-sec hover:theme-text'}`}>
                  {isRecording ? <MicOff size={18}/> : <Mic size={18}/>}
                </button>
-               <button 
-                 onClick={handleNaturalInput}
-                 className="bg-black text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest">
-                 Agregar
-               </button>
+               <button onClick={handleNaturalInput} className="bg-primary text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest">Agregar</button>
             </div>
          </div>
-         
-         {/* Promoted Section */}
-         <div className="bg-[#f1f3f4] p-4 rounded-3xl border border-gray-100 flex items-center gap-4 shadow-sm">
-           <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-500 shrink-0">
-              <DollarSign size={24}/>
-           </div>
-           <div className="flex-1">
-              <div className="flex items-center justify-between">
-                 <h3 className="text-[11px] font-bold">Ahorra más con nuestros socios</h3>
-                 <span className="text-[8px] bg-gray-100 text-gray-400 px-1.5 py-0.5 rounded uppercase font-black">Socios Promocionados</span>
-              </div>
-              <p className="text-[10px] text-gray-500 mt-0.5">Descubre planes de ahorro exclusivos para usuarios de Neto.</p>
-           </div>
-           <button className="bg-emerald-50 text-emerald-600 px-3 py-2 rounded-xl text-[10px] font-bold">Ver ofertas</button>
-        </div>
 
-        {/* Recent Activity */}
-        <div className="space-y-6">
-           <div className="flex items-center justify-between">
-              <h3 className="text-sm font-black tracking-tight">Actividad reciente</h3>
-              <button className="p-1.5 bg-gray-100 rounded-lg text-gray-400"><Search size={14}/></button>
-           </div>
-
-           <div className="space-y-8">
-              {Object.keys(groupedExpenses).sort((a, b) => b.localeCompare(a)).map(dateStr => {
-                 const dayExpenses = groupedExpenses[dateStr];
-                 const dayTotal = dayExpenses.reduce((acc, curr) => curr.type === 'income' ? acc + curr.amount : acc - curr.amount, 0);
-                 const dateObj = parseISO(dateStr);
-                 
-                 let label = format(dateObj, 'd MMMM', { locale: es });
-                 if (isToday(dateObj)) label = 'Hoy';
-                 if (isYesterday(dateObj)) label = 'Ayer';
-
-                 return (
-                    <div key={dateStr} className="space-y-3">
-                       <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-gray-400">
-                          <span>{label}</span>
-                          <span className={dayTotal >= 0 ? 'text-emerald-500' : 'text-gray-900'}>
-                             {dayTotal >= 0 ? '+' : ''}{dayTotal.toLocaleString('es-ES', { minimumFractionDigits: 2 })} {currency}
-                          </span>
-                       </div>
-                        <div className="space-y-2">
-                           {dayExpenses.map(e => {
-                              const cat = CATEGORIES.find(c => c.id === e.category) || CATEGORIES[0];
-                              return (
-                                 <div key={e._id} className="bg-[#f1f3f4] p-4 rounded-2xl border border-gray-100 flex items-center gap-4 transition-all hover:border-emerald-200 group relative">
-                                    <div className={`w-11 h-11 rounded-2xl flex items-center justify-center ${cat.color} shrink-0 shadow-sm`}>
-                                       {cat.icon}
-                                    </div>
-                                    <div className="flex-1">
-                                       <h4 className="text-xs font-bold capitalize">{e.note || cat.name}</h4>
-                                       <p className="text-[9px] text-gray-400 font-bold uppercase tracking-wide mt-0.5">{format(new Date(e.createdAt), 'HH:mm')}</p>
-                                    </div>
-                                    <div className={`text-sm font-black tracking-tight ${e.type === 'income' ? 'text-emerald-500' : 'text-gray-900'}`}>
-                                       {e.type === 'income' ? '+' : '-'}{e.amount.toLocaleString('es-ES', { minimumFractionDigits: 2 })} {currency}
-                                    </div>
-                                    {/* Edit/Delete buttons - visible on hover */}
-                                    <div className="absolute right-2 top-2 hidden group-hover:flex gap-1">
-                                       <button onClick={() => { setEditingExpense(e); setAmount(e.amount.toString()); setType(e.type); setCategory(e.category); setNote(e.note || ''); setDate(new Date(e.createdAt).toISOString().split('T')[0]); setSelectedAccountId(e.accountId || null); setShowAddModal(true); }} className="p-1 bg-blue-50 rounded-lg text-blue-500 hover:bg-blue-100">
-                                          <Edit2 size={12}/>
-                                       </button>
-                                       <button onClick={async () => { if(confirm('¿Eliminar este movimiento?')) await deleteExpense({ id: e._id, userId }); }} className="p-1 bg-red-50 rounded-lg text-red-500 hover:bg-red-100">
-                                          <Trash2 size={12}/>
-                                       </button>
-                                    </div>
+         <div className="space-y-6">
+            <div className="flex items-center justify-between">
+               <h3 className="text-sm font-black tracking-tight uppercase">Actividad</h3>
+               <button className="p-1.5 theme-input rounded-lg theme-text-sec"><Search size={14}/></button>
+            </div>
+            <div className="space-y-8">
+               {Object.keys(groupedExpenses).sort((a, b) => b.localeCompare(a)).map(dateStr => (
+                  <div key={dateStr} className="space-y-3">
+                     <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest theme-text-muted">
+                        <span>{isToday(parseISO(dateStr)) ? 'Hoy' : isYesterday(parseISO(dateStr)) ? 'Ayer' : format(parseISO(dateStr), 'd MMMM', { locale: es })}</span>
+                     </div>
+                     <div className="space-y-2">
+                        {groupedExpenses[dateStr].map(e => {
+                           const cat = CATEGORIES.find(c => c.id === e.category) || CATEGORIES[0];
+                           return (
+                              <div key={e._id} className="theme-surface p-4 rounded-2xl border theme-border flex items-center gap-4 transition-all hover:border-primary/30 group relative">
+                                 <div className={`w-11 h-11 rounded-2xl flex items-center justify-center ${cat.color} shrink-0 shadow-sm`}>{cat.icon}</div>
+                                 <div className="flex-1">
+                                    <h4 className="text-xs font-bold capitalize">{e.note || cat.name}</h4>
+                                    <p className="text-[9px] theme-text-muted font-bold uppercase tracking-wide mt-0.5">{format(new Date(e.createdAt), 'HH:mm')}</p>
                                  </div>
-                              );
-                           })}
-                        </div>
-                    </div>
-                 );
-              })}
-           </div>
-        </div>
-
-        <p className="text-center text-[9px] text-gray-400 font-bold uppercase tracking-widest pt-4">Consejo: desliza a la izquierda para editar o eliminar.</p>
+                                 <div className={`text-sm font-black tracking-tight ${e.type === 'income' ? 'text-emerald-500' : 'theme-text'}`}>
+                                    {e.type === 'income' ? '+' : '-'}{e.amount.toLocaleString('es-ES', { minimumFractionDigits: 2 })} {currency}
+                                 </div>
+                                 <div className="absolute right-2 top-2 hidden group-hover:flex gap-1">
+                                    <button onClick={() => { setEditingExpense(e); setAmount(e.amount.toString()); setType(e.type); setCategory(e.category); setNote(e.note || ''); setDate(new Date(e.createdAt).toISOString().split('T')[0]); setSelectedAccountId(e.accountId || null); setShowAddModal(true); }} className="p-1 bg-primary/10 text-primary rounded-lg hover:bg-primary/20"><Edit2 size={12}/></button>
+                                    <button onClick={async () => { if(confirm('¿Eliminar?')) await deleteExpense({ id: e._id, userId }); }} className="p-1 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500/20"><Trash2 size={12}/></button>
+                                 </div>
+                              </div>
+                           );
+                        })}
+                     </div>
+                  </div>
+               ))}
+            </div>
+         </div>
       </div>
 
-       {/* Bottom Nav - Full width, safe area */}
-       <div className="px-6 pb-[calc(2rem+env(safe-area-inset-bottom,0px))] pt-4 bg-[#f1f3f4] border-t border-gray-100 flex items-center justify-between relative">
-          <button onClick={() => setActiveTab('dashboard')} className={`p-3 ${activeTab === 'dashboard' ? 'text-gray-900' : 'text-gray-300'}`}><Home size={22}/></button>
-          <button onClick={() => { setShowCalendarView(true); setActiveTab('calendar'); }} className={`p-3 ${activeTab === 'calendar' ? 'text-gray-900' : 'text-gray-300'}`}><Calendar size={22}/></button>
-          
-          <div className="absolute left-1/2 -translate-x-1/2 -top-7">
-             <button onClick={() => { setEditingExpense(null); setShowAddModal(true); }} className="w-16 h-16 bg-black theme-text rounded-full flex items-center justify-center shadow-2xl active:scale-90 transition-all">
-                <Plus size={32}/>
-             </button>
-          </div>
+      <div className="px-6 pb-[max(2rem,env(safe-area-inset-bottom))] pt-4 theme-surface border-t theme-border flex items-center justify-between relative">
+         <button onClick={() => setActiveTab('dashboard')} className={`p-3 ${activeTab === 'dashboard' ? 'text-primary' : 'theme-text-sec'}`}><HomeIcon size={22}/></button>
+         <button onClick={() => setActiveTab('calendar')} className={`p-3 ${activeTab === 'calendar' ? 'text-primary' : 'theme-text-sec'}`}><Calendar size={22}/></button>
+         <div className="absolute left-1/2 -translate-x-1/2 -top-7">
+            <button onClick={() => { setEditingExpense(null); setShowAddModal(true); }} className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center shadow-2xl active:scale-90 transition-all border-4 theme-bg"><Plus size={32}/></button>
+         </div>
+         <button onClick={() => setActiveTab('accounts')} className={`p-3 ${activeTab === 'accounts' ? 'text-primary' : 'theme-text-sec'}`}><Wallet size={22}/></button>
+         <button onClick={() => setShowSettings(true)} className="p-3 theme-text-sec hover:text-primary"><Settings size={22}/></button>
+      </div>
 
-          <button onClick={() => setActiveTab('accounts')} className={`p-3 ${activeTab === 'accounts' ? 'text-gray-900' : 'text-gray-300'}`}><Wallet size={22}/></button>
-          <button onClick={() => setShowSettings(true)} className="p-3 text-gray-400 hover:text-gray-600"><Settings size={22}/></button>
-       </div>
-
-      {/* Add Movement Modal Neto Style */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-[#f1f3f4] z-[500] flex flex-col animate-in slide-in-from-bottom duration-300">
-           {/* Modal Header */}
+        <div className="fixed inset-0 theme-bg z-[1000] flex flex-col animate-in slide-in-from-bottom duration-300">
            <div className="p-6 flex items-center justify-between">
-              <button onClick={() => setShowAddModal(false)} className="p-2 bg-gray-100 rounded-full text-gray-500"><X size={20}/></button>
-              <div className="bg-gray-100 p-1 rounded-xl flex gap-1">
-                 <button 
-                   onClick={() => setType('expense')}
-                   className={`px-8 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${type === 'expense' ? 'bg-black theme-text shadow-lg' : 'text-gray-400'}`}>Gasto</button>
-                 <button 
-                   onClick={() => setType('income')}
-                   className={`px-8 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${type === 'income' ? 'bg-black theme-text shadow-lg' : 'text-gray-400'}`}>Ingreso</button>
+              <button onClick={() => setShowAddModal(false)} className="p-2 theme-input rounded-full theme-text-sec"><X size={20}/></button>
+              <div className="theme-input p-1 rounded-xl flex gap-1">
+                 <button onClick={() => setType('expense')} className={`px-8 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${type === 'expense' ? 'bg-primary text-white' : 'theme-text-muted'}`}>Gasto</button>
+                 <button onClick={() => setType('income')} className={`px-8 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${type === 'income' ? 'bg-primary text-white' : 'theme-text-muted'}`}>Ingreso</button>
               </div>
-              <button className="p-2 bg-gray-100 rounded-full text-gray-500"><MoreHorizontal size={20}/></button>
+              <div className="w-10"></div>
            </div>
-
            <div className="flex-1 overflow-y-auto px-6 space-y-10 pt-4">
-              {/* Amount Input */}
               <div className="text-center">
-                 <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.3em] mb-2">Cantidad</p>
-                 <input 
-                   type="text"
-                   value={amount}
-                   onChange={e => setAmount(e.target.value)}
-                   className="w-full text-6xl font-black text-center outline-none bg-transparent tracking-tighter"
-                   autoFocus
-                 />
+                 <p className="text-[9px] font-black theme-text-muted uppercase tracking-[0.3em] mb-2">Cantidad</p>
+                 <input type="text" value={amount} onChange={e => setAmount(e.target.value)} className="w-full text-6xl font-black text-center outline-none bg-transparent tracking-tighter" autoFocus/>
               </div>
-
-              {/* Date & Recurrent */}
               <div className="grid grid-cols-2 gap-4">
-                 <div className="bg-gray-50 p-4 rounded-3xl border border-gray-100 flex items-center gap-3">
-                    <div className="p-2 bg-[#f1f3f4] rounded-xl shadow-sm text-gray-400"><Calendar size={18}/></div>
-                    <div>
-                       <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Fecha</p>
-                       <input type="date" value={date} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDate(e.target.value)} className="bg-transparent text-[11px] font-bold outline-none w-full"/>
+                 <div className="theme-surface p-4 rounded-3xl border theme-border flex items-center gap-3">
+                    <div className="p-2 theme-bg rounded-xl theme-text-muted"><Calendar size={18}/></div>
+                    <div className="flex-1 min-w-0">
+                       <p className="text-[8px] font-black theme-text-muted uppercase">Fecha</p>
+                       <input type="date" value={date} onChange={e => setDate(e.target.value)} className="bg-transparent text-[11px] font-bold outline-none w-full"/>
                     </div>
                  </div>
-                 <div className="bg-gray-50 p-4 rounded-3xl border border-gray-100 flex items-center justify-between">
+                 <div className="theme-surface p-4 rounded-3xl border theme-border flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                       <div className="p-2 bg-[#f1f3f4] rounded-xl shadow-sm text-gray-400"><Clock size={18}/></div>
-                       <p className="text-[10px] font-bold text-gray-500">Recurrente 👑</p>
+                       <div className="p-2 theme-bg rounded-xl theme-text-muted"><Clock size={18}/></div>
+                       <p className="text-[10px] font-bold theme-text-sec">Fijo</p>
                     </div>
-                    <button 
-                      onClick={() => setIsRecurring(!isRecurring)}
-                      className={`w-10 h-5 rounded-full transition-all relative ${isRecurring ? 'bg-emerald-500' : 'bg-gray-200'}`}>
-                       <div className={`absolute top-1 w-3 h-3 bg-[#f1f3f4] rounded-full transition-all ${isRecurring ? 'right-1' : 'left-1'}`}/>
+                    <button onClick={() => setIsRecurring(!isRecurring)} className={`w-10 h-5 rounded-full transition-all relative ${isRecurring ? 'bg-primary' : 'bg-gray-300'}`}>
+                       <div className={`absolute top-1 w-3 h-3 theme-bg rounded-full transition-all ${isRecurring ? 'right-1' : 'left-1'}`}/>
                     </button>
                  </div>
               </div>
-
-              {/* Account Selection */}
               <div className="space-y-4">
-                 <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.3em]">Cuenta</p>
-                 {accounts.length === 0 ? (
-                    <div className="bg-gray-50 p-10 rounded-[2.5rem] border border-dashed border-gray-200 text-center space-y-4">
-                       <p className="text-xs text-gray-400 font-medium px-4">Aún no tienes cuentas. Crea una para poder asignar el movimiento.</p>
-                       <button onClick={async () => {
-                         await addAccount({ userId, name: 'Efectivo', type: 'cash', balance: 0 });
-                       }} className="bg-black theme-text px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all">Ir a Cuentas</button>
-                    </div>
-                 ) : (
-                    <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
-                       {accounts.map((acc: { _id: string; type: string; name: string }) => (
-                          <button
-                            key={acc._id}
-                            onClick={() => setSelectedAccountId(acc._id)}
-                            className={`px-6 py-4 rounded-3xl border transition-all whitespace-nowrap flex flex-col items-start gap-1 ${selectedAccountId === acc._id ? 'border-emerald-500 bg-emerald-50/50' : 'border-gray-100 bg-[#f1f3f4]'}`}>
-                             <span className="text-[9px] font-bold text-gray-400 uppercase">{acc.type}</span>
-                             <span className="text-sm font-black">{acc.name}</span>
-                          </button>
-                       ))}
-                    </div>
-                 )}
-              </div>
-
-              {/* Category Selection */}
-              <div className="space-y-4">
-                 <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.3em]">Categoría</p>
+                 <p className="text-[9px] font-black theme-text-muted uppercase tracking-[0.3em]">Categoría</p>
                  <div className="flex gap-6 overflow-x-auto no-scrollbar pb-4">
                     {CATEGORIES.map(cat => (
-                       <button 
-                         key={cat.id}
-                         onClick={() => setCategory(cat.id)}
-                         className="flex flex-col items-center gap-3 shrink-0 group">
-                          <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all ${category === cat.id ? 'bg-gray-900 theme-text shadow-xl scale-110' : 'bg-gray-50 text-gray-400 hover:bg-gray-100'}`}>
-                             {cat.icon}
-                          </div>
-                          <span className={`text-[9px] font-black uppercase tracking-widest ${category === cat.id ? 'text-gray-900' : 'text-gray-400'}`}>{cat.name}</span>
+                       <button key={cat.id} onClick={() => setCategory(cat.id)} className="flex flex-col items-center gap-3 shrink-0">
+                          <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all ${category === cat.id ? 'bg-primary text-white scale-110 shadow-lg' : 'theme-input theme-text-muted'}`}>{cat.icon}</div>
+                          <span className={`text-[9px] font-black uppercase tracking-widest ${category === cat.id ? 'text-primary' : 'theme-text-muted'}`}>{cat.name}</span>
                        </button>
                     ))}
                  </div>
               </div>
-
-              {/* Notes */}
               <div className="space-y-2">
-                 <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.3em]">Notas (Opcional)</p>
-                 <input 
-                   type="text" 
-                   value={note}
-                   onChange={e => setNote(e.target.value)}
-                   placeholder="Añade una descripción..." 
-                   className="w-full bg-transparent border-b border-gray-100 py-3 text-sm outline-none focus:border-gray-900 transition-all"
-                 />
+                 <p className="text-[9px] font-black theme-text-muted uppercase tracking-[0.3em]">Descripción</p>
+                 <input type="text" value={note} onChange={e => setNote(e.target.value)} placeholder="Nota..." className="w-full bg-transparent border-b theme-border py-3 text-sm outline-none focus:border-primary transition-all"/>
               </div>
            </div>
-
-            {/* Save Button */}
-            <div className="p-6">
-               <button 
-                 onClick={async () => {
-                   if (editingExpense) {
-                     await updateExpense({
-                       id: editingExpense._id,
-                       userId,
-                       amount: parseFloat(amount.replace(',', '.')),
-                       type,
-                       category,
-                       date,
-                       note,
-                       accountId: selectedAccountId || undefined,
-                       paymentMethod: 'app',
-                       isRecurring
-                     });
-                     setEditingExpense(null);
-                   } else {
-                     await handleAddMovement();
-                   }
-                   setShowAddModal(false);
-                 }}
-                 className="w-full bg-black theme-text py-5 rounded-[2rem] text-sm font-black uppercase tracking-widest active:scale-[0.98] transition-all shadow-2xl">
-                  {editingExpense ? 'Actualizar' : 'Guardar movimiento'}
-               </button>
-            </div>
+           <div className="p-6">
+              <button onClick={handleAddMovement} className="w-full bg-primary text-white py-5 rounded-[2rem] text-sm font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all">
+                {editingExpense ? 'Actualizar' : 'Guardar'}
+              </button>
+           </div>
         </div>
       )}
 
-       {/* Accounts Management View */}
-       {activeTab === 'accounts' && (
-         <div className="fixed inset-0 bg-[#f1f3f4] z-[400] flex flex-col animate-in fade-in duration-300">
-            <div className="p-6 flex items-center justify-between border-b border-gray-50">
-               <button onClick={() => setActiveTab('dashboard')} className="p-2 bg-gray-100 rounded-full text-gray-500"><ChevronLeft size={20}/></button>
-               <h2 className="text-sm font-black uppercase tracking-widest">Mis Cuentas</h2>
-               <button 
-                 onClick={() => addAccount({ userId, name: 'Nueva Cuenta', type: 'bank', balance: 0 })}
-                 className="p-2 bg-emerald-50 rounded-full text-emerald-500"><Plus size={20}/></button>
-            </div>
-            <div className="flex-1 overflow-y-auto p-6 space-y-4">
-                {accounts.map((acc: { _id: string; name: string; type: string; balance: number }) => (
-                   <div key={acc._id} className="bg-[#f1f3f4] p-6 rounded-[2.5rem] border border-gray-100 flex items-center justify-between shadow-sm">
-                      <div className="flex items-center gap-4">
-                         <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-400">
-                            <CreditCard size={24}/>
-                         </div>
-                         <div>
-                            <h4 className="text-sm font-black">{acc.name}</h4>
-                            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">{acc.type}</p>
-                         </div>
-                      </div>
-                      <div className="text-right">
-                         <p className="text-lg font-black tracking-tight">{acc.balance.toLocaleString('es-ES', { minimumFractionDigits: 2 })} {currency}</p>
-                      </div>
-                   </div>
-                ))}
-            </div>
-         </div>
-       )}
-
-       {/* Settings Modal */}
-       {showSettings && (
-         <div className="fixed inset-0 bg-[#f1f3f4] z-[500] flex flex-col animate-in slide-in-from-right duration-300">
-            <div className="p-6 flex items-center justify-between border-b border-gray-50">
-               <button onClick={() => setShowSettings(false)} className="p-2 bg-gray-100 rounded-full text-gray-500"><X size={20}/></button>
-               <h2 className="text-sm font-black uppercase tracking-widest">Configuración</h2>
-               <div className="w-10"></div>
-            </div>
-            <div className="flex-1 overflow-y-auto p-6 space-y-6">
-               <div className="space-y-4">
-                  <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">General</h3>
-                  <div className="bg-white p-4 rounded-2xl border border-gray-100 flex items-center justify-between">
-                     <span className="text-sm font-bold">Notificaciones</span>
-                      <button className="p-2 bg-gray-100 rounded-lg"><Settings size={18}/></button>
-                  </div>
-                  <div className="bg-white p-4 rounded-2xl border border-gray-100 flex items-center justify-between">
-                     <span className="text-sm font-bold">Privacidad</span>
-                      <button className="p-2 bg-gray-100 rounded-lg"><Settings size={18}/></button>
-                  </div>
-               </div>
-            </div>
-         </div>
-       )}
+      {showSettings && (
+        <div className="fixed inset-0 theme-bg z-[1000] flex flex-col animate-in slide-in-from-right duration-300">
+           <div className="p-6 flex items-center justify-between border-b theme-border">
+              <button onClick={() => setShowSettings(false)} className="p-2 theme-input rounded-full theme-text-sec"><X size={20}/></button>
+              <h2 className="text-sm font-black uppercase tracking-widest">Ajustes</h2>
+              <div className="w-10"></div>
+           </div>
+           <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              <div className="theme-surface p-5 rounded-[2rem] border theme-border flex items-center justify-between">
+                 <span className="text-sm font-bold">Moneda Principal</span>
+                 <span className="text-primary font-black">{currency}</span>
+              </div>
+           </div>
+        </div>
+      )}
     </div>
   );
 };

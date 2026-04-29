@@ -86,9 +86,9 @@ const CalendarView: React.FC<CalendarViewProps> = ({ userId, channelId, onClose 
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#0d0d0d]">
+    <div className="flex flex-col h-full theme-bg">
       {/* Header */}
-      <div className="pt-[env(safe-area-inset-top,12px)] pb-3 px-4 border-b border-white/[0.06] flex items-center justify-between">
+      <div className="pt-[env(safe-area-inset-top,12px)] pb-3 px-4 border-b theme-border flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button onClick={onClose} className="p-1.5 rounded-lg transition-all theme-hover">
             <ChevronLeft size={18} className="theme-text" />
@@ -104,7 +104,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ userId, channelId, onClose 
       </div>
 
       {/* Navegación del mes */}
-      <div className="px-4 py-3 flex items-center justify-between border-b border-white/[0.06]">
+      <div className="px-4 py-3 flex items-center justify-between border-b theme-border">
         <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} className="p-1 rounded theme-hover">
           <ChevronLeft size={16} className="theme-text" />
         </button>
@@ -117,7 +117,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ userId, channelId, onClose 
       </div>
 
       {/* Días de la semana */}
-      <div className="grid grid-cols-7 px-4 py-2 border-b border-white/[0.06]">
+      <div className="grid grid-cols-7 px-4 py-2 border-b theme-border">
         {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map(day => (
           <div key={day} className="text-center text-[9px] font-bold theme-text-muted uppercase">
             {day}
@@ -156,7 +156,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ userId, channelId, onClose 
 
       {/* Lista de eventos del día seleccionado */}
       {selectedDate && (
-        <div className="border-t border-white/[0.06] p-4 flex-1 overflow-y-auto">
+        <div className="border-t theme-border p-4 flex-1 overflow-y-auto">
           <h4 className="text-[10px] font-bold theme-text-sec uppercase tracking-widest mb-3">
             Eventos {format(selectedDate, 'd MMM', { locale: es })}
           </h4>
@@ -170,7 +170,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ userId, channelId, onClose 
                 const eventDate = new Date(event.date);
 
                 return (
-                  <div key={event._id} className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-3 space-y-2">
+                  <div key={event._id} className="theme-surface border theme-border rounded-xl p-3 space-y-2">
                     <div className="flex items-start justify-between">
                       <h5 className="text-xs font-bold theme-text flex-1">{event.title}</h5>
                       {isCreator && (
@@ -218,32 +218,32 @@ const CalendarView: React.FC<CalendarViewProps> = ({ userId, channelId, onClose 
 
       {/* Formulario crear evento */}
       {showCreateForm && (
-        <div className="border-t border-white/[0.06] p-4 space-y-3">
+        <div className="border-t theme-border p-4 space-y-3">
           <h4 className="text-[10px] font-bold theme-text uppercase tracking-widest">Nuevo Evento</h4>
           <input
             value={newEventTitle}
             onChange={e => setNewEventTitle(e.target.value)}
             placeholder="Título del evento"
-            className="w-full bg-sidebar/5 border border-white/10 rounded-lg px-3 py-2 theme-text text-xs outline-none focus:border-primary/50"
+            className="w-full theme-sidebar/5 border border-white/10 rounded-lg px-3 py-2 theme-text text-xs outline-none focus:border-primary/50"
           />
           <textarea
             value={newEventDesc}
             onChange={e => setNewEventDesc(e.target.value)}
             placeholder="Descripción..."
-            className="w-full bg-sidebar/5 border border-white/10 rounded-lg px-3 py-2 theme-text text-xs outline-none focus:border-primary/50 h-16 resize-none"
+            className="w-full theme-sidebar/5 border border-white/10 rounded-lg px-3 py-2 theme-text text-xs outline-none focus:border-primary/50 h-16 resize-none"
           />
           <div className="grid grid-cols-2 gap-2">
             <input
               type="date"
               value={newEventDate}
               onChange={e => setNewEventDate(e.target.value)}
-              className="bg-sidebar/5 border border-white/10 rounded-lg px-3 py-2 theme-text text-xs outline-none"
+              className="theme-sidebar/5 border border-white/10 rounded-lg px-3 py-2 theme-text text-xs outline-none"
             />
             <input
               type="time"
               value={newEventTime}
               onChange={e => setNewEventTime(e.target.value)}
-              className="bg-sidebar/5 border border-white/10 rounded-lg px-3 py-2 theme-text text-xs outline-none"
+              className="theme-sidebar/5 border border-white/10 rounded-lg px-3 py-2 theme-text text-xs outline-none"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -251,7 +251,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ userId, channelId, onClose 
             <select
               value={notificationMinutes}
               onChange={e => setNotificationMinutes(parseInt(e.target.value))}
-              className="flex-1 bg-sidebar/5 border border-white/10 rounded-lg px-3 py-2 theme-text text-xs outline-none"
+              className="flex-1 theme-sidebar/5 border border-white/10 rounded-lg px-3 py-2 theme-text text-xs outline-none"
             >
               <option value={5}>5 min antes</option>
               <option value={15}>15 min antes</option>

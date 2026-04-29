@@ -238,7 +238,19 @@ function AuroraChat() {
   }, [rawChannels]);
 
   useEffect(() => {
-    if (rawMessagesData) localStorage.setItem('aurora_msgs_' + currentChannel, JSON.stringify(rawMessagesData));
+    if (rawMessagesData) {
+      try {
+        localStorage.setItem('aurora_msgs_' + currentChannel, JSON.stringify(rawMessagesData));
+      } catch (e) {
+        // Clear all message caches if full
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('aurora_msgs_')) localStorage.removeItem(key);
+        });
+        // Try again for the current one
+        try { localStorage.setItem('aurora_msgs_' + currentChannel, JSON.stringify(rawMessagesData)); } catch(e2) {}
+      }
+    }
+
   }, [rawMessagesData, currentChannel]);
 
   // Computed Values
@@ -880,7 +892,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                   <CodeBlock lang={lang} code={codeStr} />
                 );
               }
-              return <code className="bg-sidebar/10 px-1.5 py-0.5 rounded text-[11px] font-mono text-primary/90">{children}</code>;
+              return <code className="theme-sidebar/10 px-1.5 py-0.5 rounded text-[11px] font-mono text-primary/90">{children}</code>;
             },
             a: ({ children, href, ...props }: any) => (
               <a className="text-primary hover:underline font-semibold break-all" target="_blank" rel="noopener noreferrer" href={href} {...props}>{children}</a>
@@ -957,7 +969,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
           ${isMobile ? 'relative z-[150]' : 'relative shrink-0'}
           border-r flex flex-col transition-all duration-300 ease-in-out overflow-hidden
           ${!isSidebarOpen && !isMobile ? 'border-none' : ''}
-        `} style={{ background: 'var(--bg-sidebar)', borderColor: 'var(--border-glass)' }}>
+        `} style={{ background: 'var(--theme-sidebar)', borderColor: 'var(--border-glass)' }}>
 
         {/* Compact User Header */}
         <div className="pt-[env(safe-area-inset-top,12px)] pb-3 px-4 border-b border-white/[0.06] flex items-center justify-between">
@@ -1005,7 +1017,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
         </div>
 
         {showFontSettings && (
-          <div className="px-4 py-3 border-b border-white/[0.06] bg-sidebar/50 animate-in slide-in-from-top duration-200">
+          <div className="px-4 py-3 border-b border-white/[0.06] theme-sidebar/50 animate-in slide-in-from-top duration-200">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-bold theme-text-sec uppercase tracking-widest">Tamaño de Texto: {fontSize}px</span>
               <button onClick={() => setShowFontSettings(false)} className="theme-text-muted"><X size={14}/></button>
@@ -1028,7 +1040,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
           <div className="pt-2 pb-1 px-3">
             <div className="flex items-center justify-between mb-1 px-1">
               <span className="text-[9px] font-bold text-gray-600 uppercase tracking-widest">Salas</span>
-              <button onClick={() => setShowCreateChannel(true)} className="text-gray-600 hover:text-primary transition-all p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-sidebar/5 active:scale-95"><Plus size={18} /></button>
+              <button onClick={() => setShowCreateChannel(true)} className="text-gray-600 hover:text-primary transition-all p-2 rounded-lg hover:bg-gray-100 dark:hover:theme-sidebar/5 active:scale-95"><Plus size={18} /></button>
             </div>
             {/* Global */}
             <button onClick={() => handleSelectChannel('global')}
@@ -1045,7 +1057,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
             </button>
             {channelsList.filter((c: any) => c.slug !== 'global' && !c.type).map((c: any) => (
               <button key={c._id} onClick={() => handleSelectChannel(c.slug)}
-                className={`chat-item w-full ${currentChannel === c.slug ? 'bg-primary/10' : 'hover:bg-sidebar/[0.04]'}`}>
+                className={`chat-item w-full ${currentChannel === c.slug ? 'bg-primary/10' : 'hover:theme-sidebar/[0.04]'}`}>
                 <div className="w-9 h-9 rounded-full bg-primary/5 flex items-center justify-center text-primary shrink-0">
                   {c.isPrivate ? <Lock size={15} /> : <Hash size={15} />}
                 </div>
@@ -1065,7 +1077,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
             <div className="pt-2 pb-1 px-3">
               <div className="flex items-center justify-between mb-1 px-1">
                 <span className="text-[9px] font-bold text-gray-600 uppercase tracking-widest">Mensajes</span>
-                <button onClick={() => setShowUserSearch(true)} className="text-gray-600 hover:text-emerald-500 transition-all p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-sidebar/5 active:scale-95"><Plus size={18} /></button>
+                <button onClick={() => setShowUserSearch(true)} className="text-gray-600 hover:text-emerald-500 transition-all p-2 rounded-lg hover:bg-gray-100 dark:hover:theme-sidebar/5 active:scale-95"><Plus size={18} /></button>
               </div>
               {channelsList.filter((c: any) => c.type === 'direct').map((c: any) => {
                 // Calculate unread (simple mock or from seenStatuses if we had unread counts)
@@ -1105,7 +1117,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
 
 
         {/* Bottom Nav */}
-        <div className="absolute bottom-0 left-0 right-0 backdrop-blur-xl border-t flex items-center justify-around px-2 pb-[env(safe-area-inset-bottom,0px)] pt-2 z-[160] theme-nav theme-border">
+        <div className="absolute bottom-0 left-0 right-0 backdrop-blur-xl border-t flex items-center justify-around px-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 z-[160] theme-nav theme-border">
           <button onClick={() => { setMobileView('list'); setShowExpenses(false); }}
             className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg transition-all ${!showExpenses ? 'text-primary' : 'theme-text-sec'}`}>
             <MessageCircle size={20} />
@@ -1214,14 +1226,14 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
 
         {/* Search Bar Area */}
         {showSearch && (
-          <div className="px-4 py-2 bg-black/20 border-b border-white/5 animate-in slide-in-from-top duration-300">
+          <div className="px-4 py-2 theme-bg/20 border-b border-white/5 animate-in slide-in-from-top duration-300">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={14} />
               <input
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder="Buscar en la conversación..."
-                className="w-full bg-sidebar/5 border border-white/10 rounded-lg pl-10 pr-10 py-2 text-xs theme-text outline-none focus:border-primary/50"
+                className="w-full theme-sidebar/5 border theme-border rounded-lg pl-10 pr-10 py-2 text-xs theme-text outline-none focus:border-primary/50"
                 autoFocus
               />
               {searchQuery && (
@@ -1246,7 +1258,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
               </button>
               <button
                 onClick={() => deleteChannelMutation({ channelId: (currentChat as any)._id })}
-                className="bg-sidebar/5 text-gray-400 px-6 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-white/10"
+                className="theme-sidebar/5 text-gray-400 px-6 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider border theme-border"
               >
                 Rechazar
               </button>
@@ -1346,7 +1358,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                     onClick={() => setViewingProfileUser({ _id: m.userId, name: m.nombre, avatar: m.avatar })}
                     className={`shrink-0 transition-transform hover:scale-105 ${sameAuthor ? 'invisible' : ''}`}
                   >
-                    <div className={`w-8 h-8 rounded-full overflow-hidden border border-white/10 ${recentStatuses?.find((s: any) => s.userId === m.userId) ? 'ring-1 ring-primary' : ''
+                    <div className={`w-8 h-8 rounded-full overflow-hidden border theme-border ${recentStatuses?.find((s: any) => s.userId === m.userId) ? 'ring-1 ring-primary' : ''
                       }`}>
                       <img src={m.avatar} className="w-full h-full object-cover" alt="" />
                     </div>
@@ -1367,7 +1379,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                         <textarea
                           value={editingMsgText}
                           onChange={e => setEditingMsgText(e.target.value)}
-                          className="flex-1 bg-sidebar/5 theme-text text-[13px] rounded-lg px-3 py-2 outline-none resize-none border border-white/10"
+                          className="flex-1 theme-sidebar/5 theme-text text-[13px] rounded-lg px-3 py-2 outline-none resize-none border theme-border"
                           rows={2}
                           autoFocus
                           onKeyDown={async e => {
@@ -1398,7 +1410,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                                setPreviewImage(m.imagenUrl!); 
                              }}>
                              <img src={m.imagenUrl} className="max-w-full max-h-[300px] object-cover transition-transform duration-500 group-hover/img:scale-105" alt=""/>
-                            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                            <div className="absolute inset-0 theme-bg/20 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
                               <Search size={24} className="theme-text/70" />
                             </div>
                           </div>
@@ -1407,9 +1419,9 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                         {m.audioUrl && (
                           <div className="flex items-center gap-2 my-1">
                             <button onClick={e => { const a = (e.currentTarget.nextSibling as HTMLAudioElement); a.paused ? a.play() : a.pause(); }}
-                              className="w-8 h-8 rounded-full bg-sidebar/20 flex items-center justify-center"><Volume2 size={14} /></button>
+                              className="w-8 h-8 rounded-full theme-sidebar/20 flex items-center justify-center"><Volume2 size={14} /></button>
                             <audio src={m.audioUrl} className="hidden" />
-                            <div className="w-20 h-0.5 bg-sidebar/20 rounded-full" />
+                            <div className="w-20 h-0.5 theme-sidebar/20 rounded-full" />
                           </div>
                         )}
                         {/* Text - use displayText (URL stripped when preview exists) */}
@@ -1418,7 +1430,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                         </div>
                         {/* Video Embed */}
                         {hasUrl && preview?.url && (preview.url.includes('youtube.com') || preview.url.includes('youtu.be') || preview.url.includes('instagram.com')) && (
-                          <div className="mt-2 rounded-xl overflow-hidden aspect-video border border-white/10 bg-black/20">
+                          <div className="mt-2 rounded-xl overflow-hidden aspect-video border theme-border theme-bg/20">
                             <iframe
                               src={preview.url.includes('youtube.com') || preview.url.includes('youtu.be')
                                 ? preview.url.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')
@@ -1469,7 +1481,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
         </div>
 
          {/* Input Area - WhatsApp style, always visible send on mobile */}
-         <div className="border-t px-2 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] relative z-20" style={{ background: 'var(--bg-sidebar)', borderColor: 'var(--border-glass)' }}>
+         <div className="border-t px-2 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] relative z-20" style={{ background: 'var(--theme-sidebar)', borderColor: 'var(--border-glass)' }}>
           {showEmoji && (
             <div className="absolute bottom-20 left-4 border p-2.5 rounded-2xl shadow-2xl flex gap-2 z-[100] animate-in fade-in slide-in-from-bottom-4 zoom-in-95 duration-200 theme-sidebar theme-border">
               {EMOJIS.map(emoji => (
@@ -1484,8 +1496,8 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                 {attachedImages.map((img, idx) => (
                   <div key={idx} className="relative w-12 h-12 shrink-0 rounded-lg overflow-hidden border theme-border">
                     <img src={img} className="w-full h-full object-cover" alt=""/>
-                    {uploading && <div className="absolute inset-0 bg-black/40 flex items-center justify-center"><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"/></div>}
-                    <button onClick={() => setAttachedImages(prev => prev.filter((_, i) => i !== idx))} className="absolute top-0 right-0 bg-black/60 theme-text p-0.5 rounded-bl-lg"><X size={10}/></button>
+                    {uploading && <div className="absolute inset-0 theme-bg/40 flex items-center justify-center"><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"/></div>}
+                    <button onClick={() => setAttachedImages(prev => prev.filter((_, i) => i !== idx))} className="absolute top-0 right-0 theme-bg/60 theme-text p-0.5 rounded-bl-lg"><X size={10}/></button>
                   </div>
                 ))}
               </div>
@@ -1529,59 +1541,69 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
         </div>
 
         {isMobile && isSidebarOpen && (
-          <div className="fixed inset-0 bg-black/40 z-[140] backdrop-blur-sm" onClick={() => setIsSidebarOpen(false)} />
+          <div className="fixed inset-0 theme-bg/40 z-[140] backdrop-blur-sm" onClick={() => setIsSidebarOpen(false)} />
         )}
       </main>
 
       {/* MODALS */}
       {showEvents && (
-        <div className="fixed inset-y-0 right-0 w-80 bg-[#111111] border-l border-white/10 z-[150] shadow-2xl overflow-hidden">
+        <div className="fixed inset-0 z-[1000] theme-bg animate-in slide-in-from-right duration-300 overflow-y-auto no-scrollbar">
+          <div className="sticky top-0 z-20 backdrop-blur-xl border-b theme-border px-4 pt-[env(safe-area-inset-top,8px)] pb-3 flex items-center justify-between">
+            <button onClick={() => setShowEvents(false)} className="flex items-center gap-2 theme-text-sec hover:theme-text transition-colors">
+              <ChevronLeft size={24} />
+              <span className="text-sm font-bold uppercase tracking-widest">Eventos</span>
+            </button>
+          </div>
           <CalendarView userId={user?._id || ''} channelId={currentChannel} onClose={() => setShowEvents(false)} />
         </div>
       )}
 
       {showPolls && (
-        <div className="fixed inset-y-0 right-0 w-80 bg-[#111111] border-l border-white/10 z-[150] shadow-2xl p-6 flex flex-col gap-6 overflow-y-auto">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-black theme-text uppercase tracking-widest flex items-center gap-2"><HardDrive size={18} className="theme-text" /> Encuestas</h2>
-            <button onClick={() => setShowPolls(false)} className="text-gray-500 hover:theme-text"><X size={20} /></button>
+        <div className="fixed inset-0 z-[1000] theme-bg animate-in slide-in-from-right duration-300 overflow-y-auto no-scrollbar">
+          <div className="sticky top-0 z-20 backdrop-blur-xl border-b theme-border px-4 pt-[env(safe-area-inset-top,8px)] pb-3 flex items-center justify-between">
+            <button onClick={() => setShowPolls(false)} className="flex items-center gap-2 theme-text-sec hover:theme-text transition-colors">
+              <ChevronLeft size={24} />
+              <span className="text-sm font-bold uppercase tracking-widest">Encuestas</span>
+            </button>
           </div>
-          <button onClick={() => setShowCreatePoll(true)} className="w-full bg-sidebar/5 border border-white/10 theme-text py-3 rounded-lg text-[10px] font-black uppercase hover:bg-sidebar/10 transition-all">Crear Encuesta</button>
-          <div className="space-y-4">
-            {polls?.map((poll: any) => (
-              <div key={poll._id} className="bg-sidebar/5 border border-white/5 p-4 rounded-lg space-y-4">
-                <h3 className="text-xs font-bold theme-text">{poll.question}</h3>
-                <div className="space-y-2">
-                  {poll.options.map((opt: any, idx: number) => {
-                    const totalVotes = poll.options.reduce((acc: number, o: any) => acc + o.votes.length, 0);
-                    const percentage = totalVotes > 0 ? Math.round((opt.votes.length / totalVotes) * 100) : 0;
-                    const hasVoted = poll.options.some((o: any) => o.votes.includes(user?._id));
+          <div className="p-6 space-y-6">
+            <button onClick={() => setShowCreatePoll(true)} className="w-full theme-sidebar/5 border theme-border theme-text py-4 rounded-2xl text-[10px] font-black uppercase hover:theme-sidebar/10 transition-all">Crear Encuesta</button>
+            <div className="space-y-4">
+              {polls?.map((poll: any) => (
+                <div key={poll._id} className="theme-sidebar/5 border border-white/5 p-4 rounded-lg space-y-4">
+                  <h3 className="text-xs font-bold theme-text">{poll.question}</h3>
+                  <div className="space-y-2">
+                    {poll.options.map((opt: any, idx: number) => {
+                      const totalVotes = poll.options.reduce((acc: number, o: any) => acc + o.votes.length, 0);
+                      const percentage = totalVotes > 0 ? Math.round((opt.votes.length / totalVotes) * 100) : 0;
+                      const hasVoted = poll.options.some((o: any) => o.votes.includes(user?._id));
 
-                    return (
-                      <div key={idx} className="space-y-1">
-                        <button
-                          disabled={hasVoted}
-                          onClick={() => voteInPoll({ pollId: poll._id, optionIndex: idx, userId: user?._id as any })}
-                          className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-[10px] transition-all ${hasVoted ? 'bg-sidebar/10 text-gray-400' : 'bg-sidebar/5 hover:bg-sidebar/10 theme-text'}`}
-                        >
-                          <span>{opt.text}</span>
-                          <span className="font-bold">{percentage}%</span>
-                        </button>
-                        <div className="h-1 bg-sidebar/5 rounded-full overflow-hidden">
-                          <div className="h-full bg-sidebar transition-all duration-1000" style={{ width: `${percentage}%` }} />
+                      return (
+                        <div key={idx} className="space-y-1">
+                          <button
+                            disabled={hasVoted}
+                            onClick={() => voteInPoll({ pollId: poll._id, optionIndex: idx, userId: user?._id as any })}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-[10px] transition-all ${hasVoted ? 'theme-sidebar/10 text-gray-400' : 'theme-sidebar/5 hover:theme-sidebar/10 theme-text'}`}
+                          >
+                            <span>{opt.text}</span>
+                            <span className="font-bold">{percentage}%</span>
+                          </button>
+                          <div className="h-1 theme-sidebar/5 rounded-full overflow-hidden">
+                            <div className="h-full theme-sidebar transition-all duration-1000" style={{ width: `${percentage}%` }} />
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       )}
 
       {showCreateChannel && (
-        <div className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[200] theme-bg/60 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-300">
           <div className="theme-surface border theme-border w-full sm:w-96 rounded-t-3xl sm:rounded-3xl p-6 sm:p-8 animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-4 shadow-2xl relative">
             <button onClick={() => setShowCreateChannel(false)} className="absolute top-6 right-6 theme-text-sec hover:theme-text"><X size={24} /></button>
             <h2 className="text-lg font-bold theme-text uppercase tracking-widest mb-6">Crear Nueva Sala</h2>
@@ -1645,110 +1667,137 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
       )}
 
       {showUserSearch && (
-        <div className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-300">
-          <div className="theme-surface border theme-border w-full sm:w-96 rounded-t-3xl sm:rounded-3xl p-6 sm:p-8 animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-4 shadow-2xl relative max-h-[80vh] flex flex-col">
-            <button onClick={() => setShowUserSearch(false)} className="absolute top-6 right-6 theme-text-sec hover:theme-text"><X size={24} /></button>
-            <h2 className="text-lg font-bold theme-text uppercase tracking-widest mb-4">Buscar Usuarios</h2>
-            <input value={userSearchQuery} onChange={e => setUserSearchQuery(e.target.value)} placeholder="Buscar por nombre o username..." className="w-full theme-input border theme-border rounded-lg px-4 py-3 text-sm outline-none theme-text mb-4" />
-
-            <div className="flex-1 overflow-y-auto no-scrollbar space-y-2">
+        <div className="fixed inset-0 z-[1000] theme-bg animate-in slide-in-from-right duration-300 overflow-y-auto no-scrollbar">
+          <div className="sticky top-0 z-20 backdrop-blur-xl border-b theme-border px-4 pt-[env(safe-area-inset-top,8px)] pb-3 flex items-center justify-between">
+            <button onClick={() => setShowUserSearch(false)} className="flex items-center gap-2 theme-text-sec hover:theme-text transition-colors">
+              <ChevronLeft size={24} />
+              <span className="text-sm font-bold uppercase tracking-widest">Buscar</span>
+            </button>
+          </div>
+          <div className="p-6 space-y-6">
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-4 flex items-center theme-text-muted"><Search size={18} /></div>
+              <input
+                autoFocus
+                value={userSearchQuery}
+                onChange={e => setUserSearchQuery(e.target.value)}
+                placeholder="Nombre o @usuario..."
+                className="w-full theme-sidebar border theme-border rounded-2xl pl-12 pr-4 py-4 theme-text outline-none focus:border-primary/50 transition-all shadow-sm"
+              />
+            </div>
+            <div className="space-y-3">
               {searchedUsers?.map((u: any) => (
-                <div key={u._id} className="flex items-center justify-between p-3 rounded-lg theme-input border theme-border">
-                  <div className="flex items-center gap-3">
-                    <img src={u.avatar} className="w-10 h-10 rounded-full object-cover" alt="" />
-                    <div>
-                      <p className="text-sm font-bold theme-text">{u.name}</p>
-                      <p className="text-xs theme-text-sec">@{u.username}</p>
-                    </div>
-                  </div>
-                  <button onClick={async () => {
-                    await getOrCreateDM({ user1Id: user?._id as string, user2Id: u._id as string });
+                <button
+                  key={u._id}
+                  onClick={() => {
+                    startDM(u);
                     setShowUserSearch(false);
                   }} className="text-primary p-2 hover:bg-primary/10 rounded-lg transition-colors">
                     <MessageSquare size={16} />
                   </button>
-                </div>
-              ))}
+                ))}
               {searchedUsers?.length === 0 && userSearchQuery && (
                 <p className="text-center text-sm theme-text-muted py-4">No se encontraron usuarios</p>
               )}
-            </div>
+               {showCreateEvent && (
+        <div className="fixed inset-0 z-[1100] theme-bg animate-in slide-in-from-bottom duration-300 overflow-y-auto no-scrollbar">
+          <div className="sticky top-0 z-20 backdrop-blur-xl border-b theme-border px-4 pt-[env(safe-area-inset-top,8px)] pb-3 flex items-center justify-between">
+            <button onClick={() => setShowCreateEvent(false)} className="flex items-center gap-2 theme-text-sec hover:theme-text transition-colors">
+              <ChevronLeft size={24} />
+              <span className="text-sm font-bold uppercase tracking-widest">Nuevo Evento</span>
+            </button>
           </div>
-        </div>
-      )}
-
-      {showCreateEvent && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[200] flex items-center justify-center p-4">
-          <div className="bg-[#111111] border border-white/10 rounded-[2rem] p-8 w-full max-w-sm space-y-6">
-            <h2 className="text-sm font-black theme-text uppercase tracking-widest text-center">Nuevo Evento</h2>
-            <div className="space-y-4">
-              <input value={newEventTitle} onChange={e => setNewEventTitle(e.target.value)} placeholder="Título del evento" className="w-full bg-sidebar/5 border border-white/10 rounded-lg px-4 py-3 theme-text text-xs outline-none focus:border-white" />
-              <textarea value={newEventDesc} onChange={e => setNewEventDesc(e.target.value)} placeholder="Descripción..." className="w-full bg-sidebar/5 border border-white/10 rounded-lg px-4 py-3 theme-text text-xs outline-none focus:border-white h-20 resize-none" />
-              <input type="date" value={newEventDate} onChange={e => setNewEventDate(e.target.value)} className="w-full bg-sidebar/5 border border-white/10 rounded-lg px-4 py-3 theme-text text-xs outline-none focus:border-white" />
+          <div className="p-6 space-y-8">
+            <div className="space-y-6">
+              <div className="space-y-1">
+                <label className="text-[9px] font-black theme-text-sec uppercase tracking-widest px-2">Título</label>
+                <input value={newEventTitle} onChange={e => setNewEventTitle(e.target.value)} placeholder="¿Qué vamos a hacer?" className="w-full theme-sidebar/5 border theme-border rounded-2xl px-5 py-4 theme-text text-sm font-bold outline-none focus:border-primary/50 transition-all shadow-sm" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[9px] font-black theme-text-sec uppercase tracking-widest px-2">Descripción</label>
+                <textarea value={newEventDesc} onChange={e => setNewEventDesc(e.target.value)} placeholder="Detalles de la actividad..." className="w-full theme-sidebar/5 border theme-border rounded-2xl px-5 py-4 theme-text text-sm outline-none focus:border-primary/50 h-32 resize-none transition-all shadow-sm" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[9px] font-black theme-text-sec uppercase tracking-widest px-2">Fecha y Hora</label>
+                <input type="datetime-local" value={newEventDate} onChange={e => setNewEventDate(e.target.value)} className="w-full theme-sidebar/5 border theme-border rounded-2xl px-5 py-4 theme-text text-sm outline-none focus:border-primary/50 transition-all shadow-sm" />
+              </div>
             </div>
-            <div className="flex gap-3">
-              <button onClick={() => setShowCreateEvent(false)} className="flex-1 py-3 text-[10px] font-black uppercase text-gray-500">Cancelar</button>
-              <button
-                onClick={async () => {
-                  const eventId = await createEvent({ channelId: currentChannel, title: newEventTitle, description: newEventDesc, date: new Date(newEventDate).getTime(), createdBy: user?._id as any });
-                  await sendMessage({
-                    userId: user?._id as string, nombre: user?.name || 'Usuario', avatar: user?.avatar || '',
-                    texto: encryptMessage(`📅 *NUEVO EVENTO:* ${newEventTitle}\n\n📝 ${newEventDesc}\n⏰ ${new Date(newEventDate).toLocaleString()}`, currentChannel),
-                    channelId: currentChannel,
-                    eventId: eventId
-                  });
-                  setShowCreateEvent(false);
-                  setNewEventTitle(''); setNewEventDesc(''); setNewEventDate('');
-                }}
-                className="flex-1 bg-sidebar text-black py-3 rounded-lg text-[10px] font-black uppercase"
-              >
-                Crear
-              </button>
-
-            </div>
+            <button
+              onClick={async () => {
+                if(!newEventTitle || !newEventDate) return;
+                const eventId = await createEvent({ channelId: currentChannel, title: newEventTitle, description: newEventDesc, date: new Date(newEventDate).getTime(), createdBy: user?._id as any });
+                await sendMessage({
+                  userId: user?._id as string, nombre: user?.name || 'Usuario', avatar: user?.avatar || '',
+                  texto: encryptMessage(`📅 *NUEVO EVENTO:* ${newEventTitle}\n\n📝 ${newEventDesc}\n⏰ ${new Date(newEventDate).toLocaleString()}`, currentChannel),
+                  channelId: currentChannel,
+                  eventId: eventId
+                });
+                setShowCreateEvent(false);
+                setNewEventTitle(''); setNewEventDesc(''); setNewEventDate('');
+              }}
+              className="w-full bg-primary theme-text-on-pri py-5 rounded-[2rem] text-sm font-black uppercase tracking-widest shadow-2xl active:scale-95 transition-all"
+            >
+              Crear Evento
+            </button>
           </div>
         </div>
       )}
 
       {showCreatePoll && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[200] flex items-center justify-center p-4">
-          <div className="bg-[#111111] border border-white/10 rounded-[2rem] p-8 w-full max-w-sm space-y-6">
-            <h2 className="text-sm font-black theme-text uppercase tracking-widest text-center">Nueva Encuesta</h2>
-            <div className="space-y-4">
-              <input value={newPollQuestion} onChange={e => setNewPollQuestion(e.target.value)} placeholder="¿Qué quieres preguntar?" className="w-full bg-sidebar/5 border border-white/10 rounded-lg px-4 py-3 theme-text text-xs outline-none focus:border-white" />
-              <div className="space-y-2">
+        <div className="fixed inset-0 z-[1100] theme-bg animate-in slide-in-from-bottom duration-300 overflow-y-auto no-scrollbar">
+          <div className="sticky top-0 z-20 backdrop-blur-xl border-b theme-border px-4 pt-[env(safe-area-inset-top,8px)] pb-3 flex items-center justify-between">
+            <button onClick={() => setShowCreatePoll(false)} className="flex items-center gap-2 theme-text-sec hover:theme-text transition-colors">
+              <ChevronLeft size={24} />
+              <span className="text-sm font-bold uppercase tracking-widest">Nueva Encuesta</span>
+            </button>
+          </div>
+          <div className="p-6 space-y-8">
+            <div className="space-y-6">
+              <div className="space-y-1">
+                <label className="text-[9px] font-black theme-text-sec uppercase tracking-widest px-2">Pregunta</label>
+                <input value={newPollQuestion} onChange={e => setNewPollQuestion(e.target.value)} placeholder="¿Qué quieres preguntar?" className="w-full theme-sidebar/5 border theme-border rounded-2xl px-5 py-4 theme-text text-sm font-bold outline-none focus:border-primary/50 transition-all shadow-sm" />
+              </div>
+              <div className="space-y-4">
+                <label className="text-[9px] font-black theme-text-sec uppercase tracking-widest px-2">Opciones</label>
                 {newPollOptions.map((opt, idx) => (
-                  <input key={idx} value={opt} onChange={e => {
-                    const copy = [...newPollOptions];
-                    copy[idx] = e.target.value;
-                    setNewPollOptions(copy);
-                  }} placeholder={`Opción ${idx + 1}`} className="w-full bg-sidebar/5 border border-white/10 rounded-lg px-4 py-3 theme-text text-xs outline-none focus:border-white" />
+                  <div key={idx} className="flex gap-2">
+                    <input value={opt} onChange={e => {
+                      const copy = [...newPollOptions];
+                      copy[idx] = e.target.value;
+                      setNewPollOptions(copy);
+                    }} placeholder={`Opción ${idx + 1}`} className="flex-1 theme-sidebar/5 border theme-border rounded-xl px-4 py-3 theme-text text-sm outline-none focus:border-primary/50 transition-all shadow-sm" />
+                    {newPollOptions.length > 2 && (
+                      <button onClick={() => setNewPollOptions(newPollOptions.filter((_, i) => i !== idx))} className="p-3 theme-text-sec hover:text-red-500"><X size={18} /></button>
+                    )}
+                  </div>
                 ))}
-                <button onClick={() => setNewPollOptions([...newPollOptions, ''])} className="text-[9px] font-black theme-text uppercase">+ Agregar Opción</button>
+                <button onClick={() => setNewPollOptions([...newPollOptions, ''])} className="text-[10px] font-black text-primary uppercase tracking-widest">+ Agregar Opción</button>
               </div>
             </div>
-            <div className="flex gap-3">
-              <button onClick={() => setShowCreatePoll(false)} className="flex-1 py-3 text-[10px] font-black uppercase text-gray-500">Cancelar</button>
-              <button
-                onClick={async () => {
-                  await createPoll({ channelId: currentChannel, question: newPollQuestion, options: newPollOptions.filter(o => o.trim()), userId: user?._id as any });
-                  setShowCreatePoll(false);
-                  setNewPollQuestion(''); setNewPollOptions(['', '']);
-                }}
-                className="flex-1 bg-sidebar text-black py-3 rounded-lg text-[10px] font-black uppercase"
-              >
-                Crear
-              </button>
+            <button
+              onClick={async () => {
+                if(!newPollQuestion || newPollOptions.filter(o => o.trim()).length < 2) return;
+                await createPoll({ channelId: currentChannel, question: newPollQuestion, options: newPollOptions.filter(o => o.trim()), userId: user?._id as any });
+                setShowCreatePoll(false);
+                setNewPollQuestion(''); setNewPollOptions(['', '']);
+              }}
+              className="w-full bg-primary theme-text-on-pri py-5 rounded-[2rem] text-sm font-black uppercase tracking-widest shadow-2xl active:scale-95 transition-all"
+            >
+              Crear Encuesta
+            </button>
+          </div>
+        </div>
+      )}
             </div>
           </div>
         </div>
       )}
 
       {sharingEventId && (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-xl z-[300] flex items-center justify-center p-4">
-          <div className="bg-[#111111] border border-white/10 rounded-xl p-8 w-full max-w-sm space-y-6 shadow-2xl">
+        <div className="fixed inset-0 theme-bg/90 backdrop-blur-xl z-[300] flex items-center justify-center p-4">
+          <div className="theme-surface border theme-border rounded-xl p-8 w-full max-w-sm space-y-6 shadow-2xl">
             <div className="text-center">
-              <div className="w-16 h-16 rounded-full bg-sidebar/10 flex items-center justify-center mx-auto theme-text mb-4">
+              <div className="w-16 h-16 rounded-full theme-sidebar/10 flex items-center justify-center mx-auto theme-text mb-4">
                 <Calendar size={32} />
               </div>
               <h2 className="text-sm font-black theme-text uppercase tracking-widest">¿Compartir Evento?</h2>
@@ -1763,9 +1812,9 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                     await sendMessage({ userId: user._id, nombre: user.name, avatar: user.avatar, texto: encrypted, channelId: c.slug, eventId: sharingEventId });
                     setSharingEventId(null);
                   }}
-                  className="w-full flex items-center gap-3 p-3 rounded-lg bg-sidebar/5 hover:bg-sidebar/10 transition-all border border-white/5"
+                  className="w-full flex items-center gap-3 p-3 rounded-lg theme-sidebar/5 hover:theme-sidebar/10 transition-all border border-white/5"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-sidebar/10 flex items-center justify-center theme-text"><Hash size={14} /></div>
+                  <div className="w-8 h-8 rounded-lg theme-sidebar/10 flex items-center justify-center theme-text"><Hash size={14} /></div>
                   <span className="text-xs theme-text font-bold">{c.name}</span>
                 </button>
               ))}
@@ -1778,30 +1827,37 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
       {/* Productivity Modals */}
 
       {showReminders && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[200] flex items-center justify-center p-4">
-          <div className="bg-[#111111] border border-white/10 rounded-xl p-8 w-full max-w-sm space-y-6 animate-in slide-in-from-bottom duration-300">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-black theme-text uppercase tracking-widest flex items-center gap-2"><Clock size={18} className="theme-text" /> Recordatorios</h2>
-              <button onClick={() => setShowReminders(false)} className="text-gray-500 hover:theme-text"><X size={20} /></button>
-            </div>
-            <div className="space-y-3">
-              <input value={newReminderText} onChange={e => setNewReminderText(e.target.value)} placeholder="¿Qué quieres recordar?" className="w-full bg-sidebar/5 border border-white/10 rounded-lg px-4 py-3 theme-text text-xs outline-none focus:border-white" />
-              <input type="datetime-local" value={newReminderDate} onChange={e => setNewReminderDate(e.target.value)} className="w-full bg-sidebar/5 border border-white/10 rounded-lg px-4 py-3 theme-text text-xs outline-none focus:border-white" />
+        <div className="fixed inset-0 z-[1000] theme-bg animate-in slide-in-from-right duration-300 overflow-y-auto no-scrollbar">
+          <div className="sticky top-0 z-20 backdrop-blur-xl border-b theme-border px-4 pt-[env(safe-area-inset-top,8px)] pb-3 flex items-center justify-between">
+            <button onClick={() => setShowReminders(false)} className="flex items-center gap-2 theme-text-sec hover:theme-text transition-colors">
+              <ChevronLeft size={24} />
+              <span className="text-sm font-bold uppercase tracking-widest">Recordatorios</span>
+            </button>
+          </div>
+          <div className="p-6 space-y-8">
+            <div className="theme-surface border theme-border rounded-[2rem] p-6 space-y-4 shadow-xl">
+              <p className="text-[10px] font-black theme-text-sec uppercase tracking-[0.2em] px-2">Nuevo Recordatorio</p>
+              <input value={newReminderText} onChange={e => setNewReminderText(e.target.value)} placeholder="¿Qué quieres recordar?" className="w-full theme-sidebar/5 border theme-border rounded-xl px-4 py-4 theme-text text-sm outline-none focus:border-primary/50 transition-all" />
+              <input type="datetime-local" value={newReminderDate} onChange={e => setNewReminderDate(e.target.value)} className="w-full theme-sidebar/5 border theme-border rounded-xl px-4 py-4 theme-text text-sm outline-none focus:border-primary/50 transition-all" />
               <button onClick={async () => {
                 await createReminder({ userId: user?._id as any, text: newReminderText, date: new Date(newReminderDate).getTime() });
                 setNewReminderText(''); setNewReminderDate('');
-              }} className="w-full bg-sidebar text-black py-3 rounded-lg text-[10px] font-black uppercase">Agregar Alerta</button>
+              }} className="w-full bg-primary theme-text-on-pri py-4 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-primary/20">Agregar Alerta</button>
             </div>
-            <div className="max-h-60 overflow-y-auto space-y-2 no-scrollbar">
+            <div className="space-y-3">
+              <p className="text-[10px] font-black theme-text-sec uppercase tracking-[0.2em] px-2">Pendientes</p>
               {reminders?.map((r: any) => (
-                <div key={r._id} className={`p-3 rounded-lg border border-white/5 flex items-center justify-between ${r.completed ? 'bg-sidebar/5 opacity-50' : 'bg-sidebar/[0.02]'}`}>
-                  <div>
-                    <p className={`text-xs theme-text ${r.completed ? 'line-through' : ''}`}>{r.text}</p>
-                    <p className="text-[8px] text-gray-500 uppercase font-black">{new Date(r.date).toLocaleString()}</p>
+                <div key={r._id} className={`p-5 rounded-2xl border theme-border flex items-center justify-between shadow-sm ${r.completed ? 'opacity-40 grayscale' : 'theme-surface'}`}>
+                  <div className="flex-1">
+                    <p className={`text-sm font-bold theme-text ${r.completed ? 'line-through' : ''}`}>{r.text}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Clock size={12} className="text-primary" />
+                      <p className="text-[10px] theme-text-sec font-bold">{new Date(r.date).toLocaleString()}</p>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => toggleReminder({ reminderId: r._id })} className="theme-text"><Clock size={14} /></button>
-                    <button onClick={() => deleteReminder({ reminderId: r._id })} className="theme-text/50"><X size={14} /></button>
+                  <div className="flex items-center gap-3">
+                    <button onClick={() => toggleReminder({ reminderId: r._id })} className={`p-2 rounded-lg transition-colors ${r.completed ? 'text-primary' : 'theme-text-sec hover:text-primary'}`}><Check size={20} /></button>
+                    <button onClick={() => deleteReminder({ reminderId: r._id })} className="p-2 theme-text-sec hover:text-red-500 transition-colors"><Trash2 size={20} /></button>
                   </div>
                 </div>
               ))}
@@ -1811,15 +1867,18 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
       )}
 
       {showNotes && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[200] flex items-center justify-center p-4">
-          <div className="bg-[#111111] border border-white/10 rounded-xl p-8 w-full max-w-sm space-y-6 animate-in slide-in-from-bottom duration-300">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-black theme-text uppercase tracking-widest flex items-center gap-2"><FileText size={18} className="theme-text" /> Mis Notas</h2>
-              <button onClick={() => setShowNotes(false)} className="text-gray-500 hover:theme-text"><X size={20} /></button>
-            </div>
-            <div className="space-y-3">
-              <input value={newNoteTitle} onChange={e => setNewNoteTitle(e.target.value)} placeholder="Título..." className="w-full bg-sidebar/5 border border-white/10 rounded-lg px-4 py-3 theme-text text-xs font-bold outline-none focus:border-white" />
-              <textarea value={newNoteContent} onChange={e => setNewNoteContent(e.target.value)} placeholder="Contenido de la nota..." className="w-full bg-sidebar/5 border border-white/10 rounded-lg px-4 py-3 theme-text text-xs outline-none focus:border-white h-24 resize-none" />
+        <div className="fixed inset-0 z-[1000] theme-bg animate-in slide-in-from-right duration-300 overflow-y-auto no-scrollbar">
+          <div className="sticky top-0 z-20 backdrop-blur-xl border-b theme-border px-4 pt-[env(safe-area-inset-top,8px)] pb-3 flex items-center justify-between">
+            <button onClick={() => setShowNotes(false)} className="flex items-center gap-2 theme-text-sec hover:theme-text transition-colors">
+              <ChevronLeft size={24} />
+              <span className="text-sm font-bold uppercase tracking-widest">Mis Notas</span>
+            </button>
+          </div>
+          <div className="p-6 space-y-8">
+            <div className="theme-surface border theme-border rounded-[2rem] p-6 space-y-4 shadow-xl">
+              <p className="text-[10px] font-black theme-text-sec uppercase tracking-[0.2em] px-2">Nueva Nota</p>
+              <input value={newNoteTitle} onChange={e => setNewNoteTitle(e.target.value)} placeholder="Título..." className="w-full theme-sidebar/5 border theme-border rounded-xl px-4 py-4 theme-text text-sm font-bold outline-none focus:border-primary/50 transition-all" />
+              <textarea value={newNoteContent} onChange={e => setNewNoteContent(e.target.value)} placeholder="Contenido de la nota..." className="w-full theme-sidebar/5 border theme-border rounded-xl px-4 py-4 theme-text text-sm outline-none focus:border-primary/50 h-32 resize-none transition-all" />
               <div className="flex gap-2">
                 <button onClick={async () => {
                   if (editingNoteId) {
@@ -1828,85 +1887,93 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                     await createNote({ userId: user?._id as any, title: newNoteTitle, content: newNoteContent });
                   }
                   setNewNoteTitle(''); setNewNoteContent(''); setEditingNoteId(null);
-                }} className="flex-1 bg-sidebar text-black py-3 rounded-lg text-[10px] font-black uppercase">
+                }} className="flex-1 bg-primary theme-text-on-pri py-4 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-primary/20">
                   {editingNoteId ? 'Actualizar Nota' : 'Guardar Nota'}
                 </button>
                 {editingNoteId && (
-                  <button onClick={() => { setEditingNoteId(null); setNewNoteTitle(''); setNewNoteContent(''); }} className="px-4 bg-sidebar/5 text-gray-500 rounded-lg"><X size={16} /></button>
+                  <button onClick={() => { setEditingNoteId(null); setNewNoteTitle(''); setNewNoteContent(''); }} className="px-6 theme-sidebar/5 theme-text-sec rounded-xl border theme-border transition-colors"><X size={20} /></button>
                 )}
               </div>
             </div>
-            <div className="max-h-60 overflow-y-auto space-y-2 no-scrollbar">
+            <div className="grid grid-cols-1 gap-4">
               {notes?.map((n: any) => (
-                <div key={n._id} className="p-3 rounded-lg border border-white/5 bg-sidebar/[0.02] group">
-                  <div className="flex items-center justify-between mb-1">
-                    <h4 className="text-[10px] font-black theme-text uppercase">{n.title}</h4>
-                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onClick={() => {
-                        setEditingNoteId(n._id);
-                        setNewNoteTitle(n.title);
-                        setNewNoteContent(n.content);
-                      }} className="theme-text"><Plus size={12} className="rotate-45" /></button>
+                <div key={n._id} className="p-6 rounded-[2rem] border theme-border theme-surface group shadow-sm transition-all hover:shadow-md">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-xs font-black theme-text uppercase tracking-widest">{n.title}</h4>
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                      <button onClick={() => { setEditingNoteId(n._id); setNewNoteTitle(n.title); setNewNoteContent(n.content); }} className="p-2 theme-text-sec hover:text-primary"><Edit2 size={16} /></button>
                       <button onClick={async () => {
                         const encrypted = encryptMessage(`📒 *Nota compartida:* ${n.title}\n\n${n.content}`, currentChannel);
                         await sendMessage({ userId: user._id, nombre: user.name, avatar: user.avatar, texto: encrypted, channelId: currentChannel });
                         setShowNotes(false);
-                      }} className="theme-text"><Send size={12} /></button>
-                      <button onClick={() => deleteNote({ noteId: n._id })} className="theme-text"><X size={12} /></button>
+                      }} className="p-2 theme-text-sec hover:text-emerald-500"><Send size={16} /></button>
+                      <button onClick={() => deleteNote({ noteId: n._id })} className="p-2 theme-text-sec hover:text-red-500"><Trash2 size={16} /></button>
                     </div>
                   </div>
-                  <p className="text-[11px] text-gray-500 line-clamp-3">{n.content}</p>
+                  <p className="text-xs theme-text-sec leading-relaxed line-clamp-4">{n.content}</p>
                 </div>
               ))}
             </div>
-
           </div>
         </div>
       )}
 
       {showFriendsModal && (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-xl z-[250] flex items-center justify-center p-4">
-          <div className="bg-[#111111] border border-white/10 rounded-xl p-8 w-full max-w-sm space-y-6 shadow-2xl">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-black theme-text uppercase tracking-widest flex items-center gap-2"><Users size={18} className="theme-text" /> Contactos</h2>
-              <button onClick={() => setShowFriendsModal(false)} className="text-gray-500 hover:theme-text"><X size={20} /></button>
-            </div>
-            <div className="max-h-80 overflow-y-auto space-y-2 no-scrollbar">
+        <div className="fixed inset-0 z-[1000] theme-bg animate-in slide-in-from-right duration-300 overflow-y-auto no-scrollbar">
+          <div className="sticky top-0 z-20 backdrop-blur-xl border-b theme-border px-4 pt-[env(safe-area-inset-top,8px)] pb-3 flex items-center justify-between">
+            <button onClick={() => setShowFriendsModal(false)} className="flex items-center gap-2 theme-text-sec hover:theme-text transition-colors">
+              <ChevronLeft size={24} />
+              <span className="text-sm font-bold uppercase tracking-widest">Contactos</span>
+            </button>
+          </div>
+          <div className="p-6 space-y-6">
+            <button
+              onClick={() => { setShowUserSearch(true); setShowFriendsModal(false); }}
+              className="w-full flex items-center justify-center gap-2 theme-sidebar/5 border theme-border theme-text py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all"
+            >
+              <Plus size={16} /> Buscar más personas
+            </button>
+            <div className="space-y-3">
               {friendsList?.length === 0 ? (
-                <p className="text-center text-[10px] text-gray-500 py-8 uppercase font-black">No tienes amigos agregados aún</p>
+                <div className="text-center py-20 opacity-40">
+                  <Users size={48} className="mx-auto mb-4" />
+                  <p className="text-[10px] font-black uppercase tracking-widest">No tienes contactos aún</p>
+                </div>
               ) : (
                 friendsList?.map((friend: any) => (
                   <button
                     key={friend._id}
                     onClick={() => { startDM(friend); setShowFriendsModal(false); }}
-                    className="w-full flex items-center justify-between p-4 rounded-lg bg-sidebar/5 hover:bg-sidebar/10 transition-all border border-white/5 group"
+                    className="w-full flex items-center justify-between p-5 rounded-[2rem] theme-surface border theme-border hover:border-primary/30 transition-all shadow-sm group"
                   >
-                    <div className="flex items-center gap-3">
-                      <img src={friend.avatar} className="w-10 h-10 rounded-lg border border-white/10" alt="" />
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 rounded-2xl border theme-border overflow-hidden shadow-sm">
+                        <img src={friend.avatar} className="w-full h-full object-cover" alt="" />
+                      </div>
                       <div className="text-left">
-                        <p className="text-xs font-bold theme-text">{friend.name}</p>
-                        <p className="text-[9px] text-gray-500 uppercase font-black">@{friend.username}</p>
+                        <p className="text-sm font-black theme-text">{friend.name}</p>
+                        <p className="text-[10px] theme-text-sec uppercase font-bold tracking-wider">@{friend.username}</p>
                       </div>
                     </div>
-                    <div className="bg-sidebar/10 p-2 rounded-lg theme-text opacity-0 group-hover:opacity-100 transition-opacity">
-                      <MessageSquare size={14} />
+                    <div className="p-3 rounded-full bg-primary/10 text-primary opacity-0 group-hover:opacity-100 transition-all">
+                      <MessageSquare size={18} />
                     </div>
                   </button>
                 ))
               )}
             </div>
-            <button
-              onClick={() => { setShowUserSearch(true); setShowFriendsModal(false); }}
-              className="w-full bg-sidebar/5 hover:bg-sidebar/10 theme-text/40 py-4 rounded-lg font-bold uppercase text-[10px] tracking-widest border border-white/10 transition-all"
-            >
-              Buscar más personas
-            </button>
           </div>
         </div>
       )}
 
       {showPasswords && (
-        <div className="fixed inset-y-0 right-0 w-80 bg-[#111111] border-l border-white/10 z-[150] shadow-2xl overflow-hidden">
+        <div className="fixed inset-0 z-[1000] theme-bg animate-in slide-in-from-right duration-300 overflow-y-auto no-scrollbar">
+          <div className="sticky top-0 z-20 backdrop-blur-xl border-b theme-border px-4 pt-[env(safe-area-inset-top,8px)] pb-3 flex items-center justify-between">
+            <button onClick={() => setShowPasswords(false)} className="flex items-center gap-2 theme-text-sec hover:theme-text transition-colors">
+              <ChevronLeft size={24} />
+              <span className="text-sm font-bold uppercase tracking-widest">Bóveda de Claves</span>
+            </button>
+          </div>
           <PasswordsView userId={user?._id || ''} onClose={() => setShowPasswords(false)} />
         </div>
       )}
@@ -1942,7 +2009,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                   <img src={editAvatar} className="w-full h-full object-cover" alt="" />
                   <button 
                     onClick={() => profileImageInputRef.current?.click()}
-                    className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center theme-text-on-pri gap-1"
+                    className="absolute inset-0 theme-bg/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center theme-text-on-pri gap-1"
                   >
                     <Camera size={24} />
                     <span className="text-[8px] font-bold uppercase">Cambiar</span>
@@ -1964,15 +2031,15 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                 <div className="space-y-4">
                   <div className="space-y-1">
                     <label className="text-[9px] font-bold text-gray-500 uppercase px-1">Nombre Público</label>
-                    <input value={editName} onChange={e => setEditName(e.target.value)} placeholder="¿Cómo te llamas?" className="w-full bg-sidebar/5 border theme-border rounded-xl px-4 py-3 theme-text text-sm outline-none focus:border-primary/50 transition-all" />
+                    <input value={editName} onChange={e => setEditName(e.target.value)} placeholder="¿Cómo te llamas?" className="w-full theme-sidebar/5 border theme-border rounded-xl px-4 py-3 theme-text text-sm outline-none focus:border-primary/50 transition-all" />
                   </div>
                   <div className="space-y-1">
                     <label className="text-[9px] font-bold text-gray-500 uppercase px-1">Biografía</label>
-                    <textarea value={editBio} onChange={e => setEditBio(e.target.value)} placeholder="Cuenta algo sobre ti..." className="w-full bg-sidebar/5 border theme-border rounded-xl px-4 py-3 theme-text text-sm outline-none focus:border-primary/50 resize-none h-24 transition-all" />
+                    <textarea value={editBio} onChange={e => setEditBio(e.target.value)} placeholder="Cuenta algo sobre ti..." className="w-full theme-sidebar/5 border theme-border rounded-xl px-4 py-3 theme-text text-sm outline-none focus:border-primary/50 resize-none h-24 transition-all" />
                   </div>
                   <div className="space-y-1">
                     <label className="text-[9px] font-bold text-gray-500 uppercase px-1">Teléfono</label>
-                    <input value={editPhone} onChange={e => setEditPhone(e.target.value)} placeholder="+54 9..." className="w-full bg-sidebar/5 border theme-border rounded-xl px-4 py-3 theme-text text-sm outline-none focus:border-primary/50 transition-all" />
+                    <input value={editPhone} onChange={e => setEditPhone(e.target.value)} placeholder="+54 9..." className="w-full theme-sidebar/5 border theme-border rounded-xl px-4 py-3 theme-text text-sm outline-none focus:border-primary/50 transition-all" />
                   </div>
                 </div>
               </div>
@@ -1982,7 +2049,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                 <h3 className="text-[10px] font-black theme-text-sec uppercase tracking-[0.2em] border-b theme-border pb-2">Ajustes de la App</h3>
                 <div className="space-y-6">
                   {/* Font Size */}
-                  <div className="bg-sidebar/5 border theme-border p-4 rounded-xl space-y-4">
+                  <div className="theme-sidebar/5 border theme-border p-4 rounded-xl space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 theme-text">
                         <Type size={16} />
@@ -2004,7 +2071,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                   {/* Privacy */}
                   <div className="space-y-2">
                     <label className="text-[9px] font-bold text-gray-500 uppercase px-1">Privacidad de Chat</label>
-                    <div className="flex bg-sidebar/5 border theme-border rounded-xl p-1">
+                    <div className="flex theme-sidebar/5 border theme-border rounded-xl p-1">
                       <button
                         onClick={() => setEditPrivacy('everyone')}
                         className={`flex-1 py-2 rounded-lg text-[9px] font-black uppercase transition-all ${editPrivacy === 'everyone' ? 'bg-primary theme-text-on-pri shadow-md' : 'theme-text-sec'}`}
@@ -2036,7 +2103,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                   </div>
 
                   {/* Theme Toggle */}
-                  <div className="flex items-center justify-between bg-sidebar/5 border theme-border p-4 rounded-xl">
+                  <div className="flex items-center justify-between theme-sidebar/5 border theme-border p-4 rounded-xl">
                     <div className="flex items-center gap-2 theme-text">
                       {theme === 'dark' ? <Moon size={16} /> : <Sun size={16} />}
                       <span className="text-[11px] font-bold uppercase">Tema {theme === 'dark' ? 'Oscuro' : 'Claro'}</span>
@@ -2072,7 +2139,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
 
       {/* View User Profile Modal */}
       {viewingProfileUser && (
-        <div className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[200] theme-bg/60 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-300">
           <div className="theme-surface border theme-border w-full sm:w-96 rounded-t-3xl sm:rounded-3xl p-6 sm:p-8 animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-4 shadow-2xl relative max-h-[85vh] flex flex-col">
             <button onClick={() => setViewingProfileUser(null)} className="absolute top-6 right-6 theme-text-sec hover:theme-text"><X size={24} /></button>
             <div className="text-center space-y-4 mb-6 shrink-0">
@@ -2138,24 +2205,24 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
       )}
 
       {showStatusModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-xl z-[100] flex items-center justify-center p-4">
-          <div className="bg-[#111111] rounded-[2rem] border border-white/10 p-8 w-full max-w-sm space-y-6 shadow-2xl">
+        <div className="fixed inset-0 theme-bg/80 backdrop-blur-xl z-[100] flex items-center justify-center p-4">
+          <div className="theme-surface rounded-[2rem] border theme-border p-8 w-full max-w-sm space-y-6 shadow-2xl">
             <h3 className="text-lg font-bold theme-text text-center uppercase tracking-widest">Publicar Estado</h3>
             <div className="grid grid-cols-2 gap-4">
-              <button onClick={() => { const text = prompt('Escribe tu estado:'); if (text) handlePostStatus(text, 'text'); }} className="aspect-square bg-sidebar/5 border border-white/5 flex flex-col items-center justify-center gap-3 theme-text">
+              <button onClick={() => { const text = prompt('Escribe tu estado:'); if (text) handlePostStatus(text, 'text'); }} className="aspect-square theme-sidebar/5 border border-white/5 flex flex-col items-center justify-center gap-3 theme-text">
                 <FileText size={32} /><span className="text-[10px] font-bold uppercase">Texto</span>
               </button>
-              <button onClick={() => { const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*'; input.onchange = (e: any) => handleImageUpload(e, 'status'); input.click(); }} className="aspect-square bg-sidebar/5 border border-white/5 flex flex-col items-center justify-center gap-3 theme-text">
+              <button onClick={() => { const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*'; input.onchange = (e: any) => handleImageUpload(e, 'status'); input.click(); }} className="aspect-square theme-sidebar/5 border border-white/5 flex flex-col items-center justify-center gap-3 theme-text">
                 <Camera size={32} /><span className="text-[10px] font-bold uppercase">Foto</span>
               </button>
             </div>
-            <button onClick={() => setShowStatusModal(false)} className="w-full bg-sidebar/5 text-gray-500 py-4 rounded-lg font-bold uppercase text-[10px]">Cancelar</button>
+            <button onClick={() => setShowStatusModal(false)} className="w-full theme-sidebar/5 text-gray-500 py-4 rounded-lg font-bold uppercase text-[10px]">Cancelar</button>
           </div>
         </div>
       )}
 
       {previewImage && (
-        <div className="fixed inset-0 bg-black/98 z-[9999] flex items-center justify-center p-4 md:p-8 animate-fadeIn" onClick={() => setPreviewImage(null)}>
+        <div className="fixed inset-0 theme-bg/98 z-[9999] flex items-center justify-center p-4 md:p-8 animate-fadeIn" onClick={() => setPreviewImage(null)}>
           <button className="absolute top-6 right-6 theme-text/40 hover:theme-text transition-all z-10"><X size={32}/></button>
           
           {currentGallery.length > 1 && (
@@ -2167,7 +2234,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                   setViewingGalleryIndex(newIdx);
                   setPreviewImage(currentGallery[newIdx]);
                 }}
-                className="absolute left-4 md:left-8 w-12 h-12 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center theme-text transition-all active:scale-90 border border-white/10"
+                className="absolute left-4 md:left-8 w-12 h-12 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center theme-text transition-all active:scale-90 border theme-border"
               >
                 <ChevronLeft size={24}/>
               </button>
@@ -2178,11 +2245,11 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                   setViewingGalleryIndex(newIdx);
                   setPreviewImage(currentGallery[newIdx]);
                 }}
-                className="absolute right-4 md:right-8 w-12 h-12 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center theme-text transition-all active:scale-90 border border-white/10"
+                className="absolute right-4 md:right-8 w-12 h-12 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center theme-text transition-all active:scale-90 border theme-border"
               >
                 <ChevronRight size={24}/>
               </button>
-              <div className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-md px-4 py-2 rounded-full text-[10px] font-black theme-text/70 uppercase tracking-[0.2em] border border-white/10">
+              <div className="absolute bottom-8 left-1/2 -translate-x-1/2 theme-bg/60 backdrop-blur-md px-4 py-2 rounded-full text-[10px] font-black theme-text/70 uppercase tracking-[0.2em] border theme-border">
                 Imagen {viewingGalleryIndex + 1} de {currentGallery.length}
               </div>
             </>
@@ -2200,10 +2267,10 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
       {viewingStatus && (() => {
         // Auto-close after 5s and mark as seen
         return (
-          <div className="fixed inset-0 bg-black z-[1000] flex flex-col items-center justify-center animate-in fade-in duration-200"
+          <div className="fixed inset-0 theme-bg z-[1000] flex flex-col items-center justify-center animate-in fade-in duration-200"
             onClick={() => { markStatusSeen(viewingStatus._id); setViewingStatus(null); }}>
             {/* Progress bar */}
-            <div className="absolute top-0 left-0 right-0 h-0.5 bg-sidebar/10 z-10">
+            <div className="absolute top-0 left-0 right-0 h-0.5 theme-sidebar/10 z-10">
               <div className="status-progress h-full bg-primary"
                 onAnimationEnd={() => { markStatusSeen(viewingStatus._id); setViewingStatus(null); }}
               />
@@ -2219,7 +2286,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
             <button onClick={e => { e.stopPropagation(); markStatusSeen(viewingStatus._id); setViewingStatus(null); }}
               className="absolute top-6 right-4 theme-text/50 hover:theme-text z-10"><X size={24} /></button>
             {/* Content */}
-            <div className="w-full max-w-xs aspect-[9/16] bg-sidebar/5 rounded-2xl overflow-hidden relative shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="w-full max-w-xs aspect-[9/16] theme-sidebar/5 rounded-2xl overflow-hidden relative shadow-2xl" onClick={e => e.stopPropagation()}>
               {viewingStatus.type === 'text' ? (
                 <div className="w-full h-full flex items-center justify-center p-8 text-center text-lg font-bold theme-text bg-gradient-to-br from-primary/20 to-purple-500/20">
                   {viewingStatus.content}
@@ -2237,7 +2304,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                     }} className="text-xl hover:scale-125 transition-transform">{emoji}</button>
                   ))}
                 </div>
-                <input placeholder="Responder..." className="w-full bg-sidebar/10 border border-white/10 rounded-lg px-3 py-2 theme-text text-[11px] outline-none focus:border-primary"
+                <input placeholder="Responder..." className="w-full theme-sidebar/10 border theme-border rounded-lg px-3 py-2 theme-text text-[11px] outline-none focus:border-primary"
                   onKeyDown={async e => {
                     if (e.key === 'Enter') {
                       const val = (e.target as HTMLInputElement).value;
@@ -2256,13 +2323,13 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
 
 
       {showUserSearch && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center p-4">
-          <div className="bg-[#111111] rounded-xl border border-white/10 p-6 w-full max-w-sm space-y-4">
+        <div className="fixed inset-0 theme-bg/80 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+          <div className="theme-surface rounded-xl border theme-border p-6 w-full max-w-sm space-y-4">
             <h3 className="text-sm font-bold theme-text uppercase tracking-wider">Buscar Usuarios</h3>
-            <input value={userSearchQuery} onChange={e => setUserSearchQuery(e.target.value)} placeholder="Nombre o @usuario..." className="w-full bg-sidebar/5 border border-white/10 rounded-lg px-4 py-3 theme-text text-xs outline-none focus:border-primary" autoFocus />
+            <input value={userSearchQuery} onChange={e => setUserSearchQuery(e.target.value)} placeholder="Nombre o @usuario..." className="w-full theme-sidebar/5 border theme-border rounded-lg px-4 py-3 theme-text text-xs outline-none focus:border-primary" autoFocus />
             <div className="space-y-2 max-h-64 overflow-y-auto">
               {searchedUsers?.filter((u: any) => u._id !== user._id).map((u: any) => (
-                <button key={u._id} onClick={() => startDM(u)} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-sidebar/5 transition-all">
+                <button key={u._id} onClick={() => startDM(u)} className="w-full flex items-center gap-3 p-3 rounded-lg hover:theme-sidebar/5 transition-all">
                   <img src={u.avatar} className="w-10 h-10 rounded-lg" alt="" />
                   <div className="text-left">
                     <div className="text-xs font-bold theme-text">{u.name}</div>
@@ -2278,8 +2345,8 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
 
       {/* Viewing Other User Profile Popup (Premium WhatsApp/Telegram Style) */}
       {viewingProfileUser && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-[200] flex items-center justify-center p-4 animate-fadeIn" onClick={() => setViewingProfileUser(null)}>
-          <div className="bg-[#111111] rounded-xl border border-white/10 w-full max-w-[320px] overflow-hidden shadow-[0_32px_64px_-12px_rgba(0,0,0,0.8)] relative" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 theme-bg/70 backdrop-blur-md z-[200] flex items-center justify-center p-4 animate-fadeIn" onClick={() => setViewingProfileUser(null)}>
+          <div className="theme-surface rounded-xl border theme-border w-full max-w-[320px] overflow-hidden shadow-[0_32px_64px_-12px_rgba(0,0,0,0.8)] relative" onClick={e => e.stopPropagation()}>
 
             {/* Header / Avatar */}
             <div className="bg-gradient-to-b from-primary/20 to-transparent p-8 text-center relative">
@@ -2294,7 +2361,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
 
             {/* Info Sections */}
             <div className="px-6 pb-8 space-y-4">
-              <div className="space-y-1 bg-sidebar/5 rounded-lg p-4 border border-white/5">
+              <div className="space-y-1 theme-sidebar/5 rounded-lg p-4 border border-white/5">
                 <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2 mb-1">
                   <Info size={12} className="text-primary" /> Información y Bio
                 </label>
@@ -2323,7 +2390,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
               )}
 
               {viewingProfileUser.phone && (
-                <div className="flex items-center gap-4 bg-sidebar/5 rounded-lg p-4 border border-white/5">
+                <div className="flex items-center gap-4 theme-sidebar/5 rounded-lg p-4 border border-white/5">
                   <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                     <Phone size={18} />
                   </div>
@@ -2346,7 +2413,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                 {user._id !== viewingProfileUser._id && !friendsList?.find((f: any) => f._id === viewingProfileUser._id) && !sentFriendRequests?.find((r: any) => r.user2Id === viewingProfileUser._id) && (
                   <button
                     onClick={() => sendFriendRequest({ fromId: user._id as any, toId: viewingProfileUser._id })}
-                    className="w-full bg-sidebar text-black py-4 rounded-lg font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 transition-all active:scale-95 shadow-xl"
+                    className="w-full theme-sidebar text-black py-4 rounded-lg font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 transition-all active:scale-95 shadow-xl"
                   >
                     <Users size={16} /> Agregar Amigo
                   </button>
@@ -2362,7 +2429,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                         await addModerator({ channelId: channelData._id, userId: viewingProfileUser._id, ownerId: user?._id as any });
                       }
                     }}
-                    className={`w-full py-4 rounded-lg font-black uppercase tracking-widest text-[10px] border transition-all ${channelData.moderators?.includes(viewingProfileUser._id) ? 'bg-red-500/10 text-red-500 border-red-500/20' : 'bg-sidebar/5 theme-text border-white/10'}`}
+                    className={`w-full py-4 rounded-lg font-black uppercase tracking-widest text-[10px] border transition-all ${channelData.moderators?.includes(viewingProfileUser._id) ? 'bg-red-500/10 text-red-500 border-red-500/20' : 'theme-sidebar/5 theme-text theme-border'}`}
                   >
                     {channelData.moderators?.includes(viewingProfileUser._id) ? 'Quitar Moderador' : 'Hacer Moderador'}
                   </button>
@@ -2388,8 +2455,8 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
       )}
 
       {showExpenses && (
-        <div className="fixed inset-0 z-[300] bg-black/90 backdrop-blur-xl md:p-12">
-          <div className="w-full h-full md:rounded-xl overflow-hidden border border-white/10 shadow-2xl animate-in slide-in-from-bottom duration-500">
+        <div className="fixed inset-0 z-[300] theme-bg/90 backdrop-blur-xl md:p-12">
+          <div className="w-full h-full md:rounded-xl overflow-hidden border theme-border shadow-2xl animate-in slide-in-from-bottom duration-500">
             <ExpensesHub userId={user._id} onClose={() => setShowExpenses(false)} />
           </div>
         </div>

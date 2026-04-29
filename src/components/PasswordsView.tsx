@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../api';
-import { Lock, Plus, Trash2, Edit2, Copy, Check, Eye, EyeOff } from 'lucide-react';
-import { Copy } from 'lucide-react';
+import { Lock, Plus, Trash2, Edit2, Copy, Check, Eye, EyeOff, Globe, ChevronLeft } from 'lucide-react';
 
 interface PasswordsViewProps {
   userId: string;
@@ -87,9 +86,9 @@ const PasswordsView: React.FC<PasswordsViewProps> = ({ userId, onClose }) => {
   const categories = ['General', 'Redes Sociales', 'Trabajo', 'Bancos', 'Email', 'Otros'];
 
   return (
-    <div className="flex flex-col h-full bg-[#0d0d0d]">
+    <div className="flex flex-col h-full theme-bg">
       {/* Header */}
-      <div className="pt-[env(safe-area-inset-top,12px)] pb-3 px-4 border-b border-white/[0.06] flex items-center justify-between">
+      <div className="pt-[env(safe-area-inset-top,12px)] pb-3 px-4 border-b theme-border flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button onClick={onClose} className="p-1.5 rounded-lg transition-all theme-hover">
             <ChevronLeft size={18} className="theme-text" />
@@ -114,7 +113,7 @@ const PasswordsView: React.FC<PasswordsViewProps> = ({ userId, onClose }) => {
           </div>
         ) : (
           passwords.map((pwd: any) => (
-            <div key={pwd._id} className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-3 space-y-2">
+            <div key={pwd._id} className="theme-surface border theme-border rounded-xl p-3 space-y-2">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <h4 className="text-xs font-bold theme-text">{pwd.title}</h4>
@@ -147,7 +146,7 @@ const PasswordsView: React.FC<PasswordsViewProps> = ({ userId, onClose }) => {
               </div>
 
               {/* Contraseña */}
-              <div className="flex items-center gap-2 bg-white/[0.02] rounded-lg px-3 py-2">
+              <div className="flex items-center gap-2 theme-sidebar/5 rounded-lg px-3 py-2">
                 <code className="flex-1 text-[11px] font-mono theme-text select-all">
                   {showPasswords.has(pwd._id) ? pwd.password : '••••••••••••'}
                 </code>
@@ -184,20 +183,20 @@ const PasswordsView: React.FC<PasswordsViewProps> = ({ userId, onClose }) => {
 
       {/* Formulario crear clave */}
       {showCreateForm && (
-        <div className="border-t border-white/[0.06] p-4 space-y-3">
+        <div className="border-t theme-border p-4 space-y-3">
           <h4 className="text-[10px] font-bold theme-text uppercase tracking-widest">Nueva Clave</h4>
           <input
             value={newPasswordTitle}
             onChange={e => setNewPasswordTitle(e.target.value)}
             placeholder="Título (ej: Gmail, Facebook)"
-            className="w-full bg-sidebar/5 border border-white/10 rounded-lg px-3 py-2 theme-text text-xs outline-none focus:border-primary/50"
+            className="w-full theme-sidebar/5 border border-white/10 rounded-lg px-3 py-2 theme-text text-xs outline-none focus:border-primary/50"
           />
           <input
             type={showPasswords.has('new') ? 'text' : 'password'}
             value={newPasswordValue}
             onChange={e => setNewPasswordValue(e.target.value)}
             placeholder="Contraseña"
-            className="w-full bg-sidebar/5 border border-white/10 rounded-lg px-3 py-2 theme-text text-xs outline-none focus:border-primary/50"
+            className="w-full theme-sidebar/5 border border-white/10 rounded-lg px-3 py-2 theme-text text-xs outline-none focus:border-primary/50"
           />
           <div className="flex items-center gap-2">
             <button
@@ -220,7 +219,7 @@ const PasswordsView: React.FC<PasswordsViewProps> = ({ userId, onClose }) => {
           <select
             value={newPasswordCategory}
             onChange={e => setNewPasswordCategory(e.target.value)}
-            className="w-full bg-sidebar/5 border border-white/10 rounded-lg px-3 py-2 theme-text text-xs outline-none"
+            className="w-full theme-sidebar/5 border border-white/10 rounded-lg px-3 py-2 theme-text text-xs outline-none"
           >
             {categories.map(cat => (
               <option key={cat} value={cat}>{cat}</option>
@@ -230,7 +229,7 @@ const PasswordsView: React.FC<PasswordsViewProps> = ({ userId, onClose }) => {
             value={newPasswordUrl}
             onChange={e => setNewPasswordUrl(e.target.value)}
             placeholder="URL (opcional)"
-            className="w-full bg-sidebar/5 border border-white/10 rounded-lg px-3 py-2 theme-text text-xs outline-none focus:border-primary/50"
+            className="w-full theme-sidebar/5 border border-white/10 rounded-lg px-3 py-2 theme-text text-xs outline-none focus:border-primary/50"
           />
           <div className="flex gap-2">
             <button

@@ -148,31 +148,31 @@ export default function Onboarding() {
 
 
   return (
-    <div className="fixed inset-0 bg-[#0a0a0a] z-[100] flex flex-col items-center justify-center p-4 safe-area-pt safe-area-pb selection:bg-primary/30 overflow-y-auto">
-      <div className="w-full max-w-md glass-panel rounded-[2rem] p-6 md:p-10 space-y-6 md:space-y-10 shadow-[0_32px_64px_rgba(0,0,0,0.5)] relative overflow-hidden animate-in fade-in zoom-in-95 duration-500 my-auto">
+    <div className="fixed inset-0 theme-bg z-[100] flex flex-col items-center justify-center p-4 safe-area-pt safe-area-pb selection:bg-primary/30 overflow-y-auto">
+      <div className="w-full max-w-md glass-panel rounded-[2rem] p-6 md:p-10 space-y-6 md:space-y-10 shadow-2xl relative overflow-hidden animate-in fade-in zoom-in-95 duration-500 my-auto">
         
         {/* Dynamic decorative elements */}
         <div className="absolute -top-32 -left-32 w-64 h-64 bg-primary/20 blur-[100px] rounded-full animate-pulse" />
         <div className="absolute -bottom-32 -right-32 w-64 h-64 bg-primary/10 blur-[100px] rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
         
         <div className="text-center space-y-4 relative">
-          <div className="w-20 h-20 bg-white/[0.03] rounded-[2rem] flex items-center justify-center border border-white/10 mx-auto mb-6 shadow-inner group hover:border-primary/50 transition-all duration-500">
-            <span className="material-symbols-outlined text-4xl text-white/40 group-hover:text-primary group-hover:scale-110 transition-all">smart_toy</span>
+          <div className="w-20 h-20 theme-surface/5 rounded-[2rem] flex items-center justify-center border theme-border mx-auto mb-6 shadow-inner group hover:border-primary/50 transition-all duration-500">
+            <span className="material-symbols-outlined text-4xl theme-text/40 group-hover:text-primary group-hover:scale-110 transition-all">smart_toy</span>
           </div>
-          <h1 className="text-3xl font-black text-white tracking-[-0.05em] uppercase italic">Aurora</h1>
-          <p className="text-gray-500 text-[10px] uppercase tracking-[0.4em] font-black opacity-60">Neural Messaging System</p>
+          <h1 className="text-3xl font-black theme-text tracking-[-0.05em] uppercase italic">Aurora</h1>
+          <p className="theme-text-sec text-[10px] uppercase tracking-[0.4em] font-black opacity-60">Neural Messaging System</p>
         </div>
 
-        <div className="flex bg-white/[0.03] p-1.5 rounded-2xl border border-white/5 relative z-10 backdrop-blur-md">
+        <div className="flex theme-surface/5 p-1.5 rounded-2xl border theme-border relative z-10 backdrop-blur-md">
           <button 
             onClick={() => { setIsRegistering(false); setError(null); }}
-            className={`flex-1 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${!isRegistering ? 'bg-white text-black shadow-xl scale-100' : 'text-gray-500 hover:text-white scale-95'}`}
+            className={`flex-1 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${!isRegistering ? 'theme-surface text-black shadow-xl scale-100' : 'theme-text-sec hover:theme-text scale-95'}`}
           >
             Acceder
           </button>
           <button 
             onClick={() => { setIsRegistering(true); setError(null); }}
-            className={`flex-1 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${isRegistering ? 'bg-white text-black shadow-xl scale-100' : 'text-gray-500 hover:text-white scale-95'}`}
+            className={`flex-1 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${isRegistering ? 'theme-surface text-black shadow-xl scale-100' : 'theme-text-sec hover:theme-text scale-95'}`}
           >
             Registrar
           </button>
@@ -182,11 +182,11 @@ export default function Onboarding() {
           {isRegistering && (
             <div className="flex flex-col items-center gap-4 mb-8">
               <div className="relative group">
-                <div className="w-28 h-28 rounded-[2rem] border-2 border-dashed border-white/10 flex items-center justify-center overflow-hidden bg-white/[0.02] group-hover:border-primary/50 transition-all duration-500 shadow-inner">
+                <div className="w-28 h-28 rounded-[2rem] border-2 border-dashed theme-border flex items-center justify-center overflow-hidden theme-surface/2 group-hover:border-primary/50 transition-all duration-500 shadow-inner">
                   {avatar ? (
                     <img src={avatar} className="w-full h-full object-cover" alt="Avatar" />
                   ) : (
-                    <Camera className="text-white/10 group-hover:text-primary/40 transition-colors" size={40} />
+                    <Camera className="theme-text/10 group-hover:text-primary/40 transition-colors" size={40} />
                   )}
                 </div>
                 <input 
@@ -196,19 +196,19 @@ export default function Onboarding() {
                   onChange={handleImageUpload}
                 />
               </div>
-              <span className="text-[9px] text-gray-500 uppercase font-black tracking-widest">Identidad Visual</span>
+              <span className="text-[9px] theme-text-sec uppercase font-black tracking-widest">Identidad Visual</span>
             </div>
           )}
 
           <div className="space-y-4">
             <div className="relative group">
-              <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-primary transition-colors" size={20} />
+              <Mail className="absolute left-5 top-1/2 -translate-y-1/2 theme-text-muted group-focus-within:text-primary transition-colors" size={20} />
               <input
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 placeholder="Email corporativo"
-                className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-14 py-5 text-white text-sm outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all placeholder:text-gray-700"
+                className="w-full theme-surface/5 border theme-border rounded-2xl px-14 py-5 theme-text text-sm outline-none focus:border-primary/50 focus:theme-surface/[0.05] transition-all placeholder:theme-text-muted"
                 required
               />
             </div>
@@ -216,24 +216,24 @@ export default function Onboarding() {
             {isRegistering && (
               <>
                 <div className="relative group">
-                  <AtSign className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-primary transition-colors" size={20} />
+                  <AtSign className="absolute left-5 top-1/2 -translate-y-1/2 theme-text-muted group-focus-within:text-primary transition-colors" size={20} />
                   <input
                     type="text"
                     value={username}
                     onChange={e => setUsername(e.target.value)}
                     placeholder="Alias de red"
-                    className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-14 py-5 text-white text-sm outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all placeholder:text-gray-700"
+                    className="w-full theme-surface/5 border theme-border rounded-2xl px-14 py-5 theme-text text-sm outline-none focus:border-primary/50 focus:theme-surface/[0.05] transition-all placeholder:theme-text-muted"
                     required
                   />
                 </div>
                 <div className="relative group">
-                  <User className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-primary transition-colors" size={20} />
+                  <User className="absolute left-5 top-1/2 -translate-y-1/2 theme-text-muted group-focus-within:text-primary transition-colors" size={20} />
                   <input
                     type="text"
                     value={name}
                     onChange={e => setName(e.target.value)}
                     placeholder="Nombre completo"
-                    className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-14 py-5 text-white text-sm outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all placeholder:text-gray-700"
+                    className="w-full theme-surface/5 border theme-border rounded-2xl px-14 py-5 theme-text text-sm outline-none focus:border-primary/50 focus:theme-surface/[0.05] transition-all placeholder:theme-text-muted"
                     required
                   />
                 </div>
@@ -241,13 +241,13 @@ export default function Onboarding() {
             )}
 
             <div className="relative group">
-              <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-primary transition-colors" size={20} />
+              <Lock className="absolute left-5 top-1/2 -translate-y-1/2 theme-text-muted group-focus-within:text-primary transition-colors" size={20} />
               <input
                 type="password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 placeholder="Llave de acceso"
-                className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-14 py-5 text-white text-sm outline-none focus:border-primary/50 focus:bg-white/[0.05] transition-all placeholder:text-gray-700"
+                className="w-full theme-surface/5 border theme-border rounded-2xl px-14 py-5 theme-text text-sm outline-none focus:border-primary/50 focus:theme-surface/[0.05] transition-all placeholder:theme-text-muted"
                 required
               />
             </div>
@@ -263,7 +263,7 @@ export default function Onboarding() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-white text-black py-5 rounded-2xl font-black text-[11px] uppercase tracking-[0.3em] transition-all shadow-2xl hover:bg-gray-100 active:scale-[0.98] flex items-center justify-center gap-3"
+              className="w-full theme-surface text-black py-5 rounded-2xl font-black text-[11px] uppercase tracking-[0.3em] transition-all shadow-2xl hover:bg-gray-100 active:scale-[0.98] flex items-center justify-center gap-3"
             >
               {loading ? <Loader2 className="animate-spin" size={20} /> : (isRegistering ? 'Inyectar Datos' : 'Autenticar')}
             </button>
@@ -284,7 +284,7 @@ export default function Onboarding() {
             <button
               type="button"
               onClick={handleRegisterBiometrics}
-              className="w-full bg-white/[0.01] hover:bg-white/[0.04] text-gray-600 py-3 rounded-xl font-black text-[8px] transition-all flex items-center justify-center gap-2 uppercase tracking-[0.3em] border border-white/5"
+              className="w-full theme-surface/1 hover:theme-surface/[0.04] theme-text-muted py-3 rounded-xl font-black text-[8px] transition-all flex items-center justify-center gap-2 uppercase tracking-[0.3em] border theme-border"
             >
                <span className="material-symbols-outlined text-sm">fingerprint</span>
                Activar Acceso Biométrico
@@ -292,22 +292,22 @@ export default function Onboarding() {
           )}
         </form>
 
-        <p className="text-center text-[10px] text-gray-600 uppercase tracking-[0.5em] font-black relative opacity-40">
+        <p className="text-center text-[10px] theme-text-muted uppercase tracking-[0.5em] font-black relative opacity-40">
           Aurora Neural • v1.0.0
         </p>
       </div>
 
       {isScanning && (
-        <div className="fixed inset-0 bg-black/95 z-[500] backdrop-blur-2xl flex flex-col items-center justify-center animate-in fade-in duration-500">
+        <div className="fixed inset-0 theme-bg/95 z-[500] backdrop-blur-2xl flex flex-col items-center justify-center animate-in fade-in duration-500">
           <div className="relative">
-            <div className="w-40 h-40 rounded-full border border-white/5 flex items-center justify-center bg-white/[0.02]">
-               <span className="material-symbols-outlined text-7xl text-white/20 animate-pulse">fingerprint</span>
+            <div className="w-40 h-40 rounded-full border theme-border flex items-center justify-center theme-surface/2">
+               <span className="material-symbols-outlined text-7xl theme-text/20 animate-pulse">fingerprint</span>
             </div>
             <div className="absolute inset-0 border-2 border-primary rounded-full animate-ping opacity-10" />
             <div className="absolute top-0 left-0 w-full h-0.5 bg-primary shadow-[0_0_20px_rgba(99,102,241,1)] animate-[scan_2s_infinite]" />
           </div>
-          <h3 className="text-white font-black text-xs uppercase tracking-[0.4em] mt-16 animate-pulse">Verificando Neuronas</h3>
-          <p className="text-gray-500 text-[9px] uppercase mt-4 tracking-[0.2em] font-bold">Escaneo de seguridad en curso</p>
+          <h3 className="theme-text font-black text-xs uppercase tracking-[0.4em] mt-16 animate-pulse">Verificando Neuronas</h3>
+          <p className="theme-text-sec text-[9px] uppercase mt-4 tracking-[0.2em] font-bold">Escaneo de seguridad en curso</p>
         </div>
       )}
     </div>

@@ -45,43 +45,44 @@ const ExpensesHub: React.FC<ExpensesHubProps> = ({ userId, onClose }) => {
   const [showSettings, setShowSettings] = useState(false);
   
   const [naturalInput, setNaturalInput] = useState('');
-  const [isRecording, setIsRecording] = useState(false);
-  const recognitionRef = useRef<any>(null);
-  
-  const handleNaturalInput = async () => {
-    if (!naturalInput.trim()) return;
-    const parsed = expenseAgent.parse(naturalInput);
-    if (parsed) {
-      await addExpense({
-        userId,
-        amount: parsed.amount,
-        type: parsed.type,
-        category: parsed.category,
-        date: new Date().toISOString().split('T')[0],
-        note: parsed.note,
-        accountId: selectedAccountId || undefined,
-        paymentMethod: 'app',
-        isRecurring: false
-      });
-      setNaturalInput('');
-    }
-  };
-  
+  const [interimTranscript, setInterimTranscript] = useState('');
+
+  // Voice recognition
   useEffect(() => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
       recognitionRef.current = new SpeechRecognition();
       recognitionRef.current.lang = 'es-ES';
-      recognitionRef.current.continuous = false;
-      recognitionRef.current.onresult = (e: any) => {
-        const transcript = e.results[0][0].transcript;
-        setNaturalInput(transcript);
+      recognitionRef.current.continuous = true;
+      recognitionRef.current.interimResults = true;
+
+      recognitionRef.current.onresult = (event: any) => {
+        let interim = '';
+        let final = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            final += event.results[i][0].transcript;
+          } else {
+            interim += event.results[i][0].transcript;
+          }
+        }
+        if (final) {
+          setNaturalInput(prev => prev + (prev ? ' ' : '') + final);
+        }
+        setInterimTranscript(interim);
+      };
+
+      recognitionRef.current.onerror = (err: any) => {
+        console.error('Speech recognition error:', err);
         setIsRecording(false);
       };
-      recognitionRef.current.onerror = () => setIsRecording(false);
+      recognitionRef.current.onend = () => {
+        setIsRecording(false);
+        setInterimTranscript('');
+      };
     }
   }, []);
-  
+
   const toggleRecording = () => {
     if (!recognitionRef.current) {
       alert("Tu navegador no soporta reconocimiento de voz.");
@@ -91,11 +92,13 @@ const ExpensesHub: React.FC<ExpensesHubProps> = ({ userId, onClose }) => {
       if (isRecording) {
         recognitionRef.current.stop();
         setIsRecording(false);
+        setInterimTranscript('');
       } else {
         recognitionRef.current.start();
         setIsRecording(true);
       }
     } catch (err) {
+      console.error("Mic error:", err);
       setIsRecording(false);
       alert("Error al iniciar el micrófono.");
     }

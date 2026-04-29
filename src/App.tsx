@@ -892,7 +892,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                   <CodeBlock lang={lang} code={codeStr} />
                 );
               }
-              return <code className="theme-sidebar/10 px-1.5 py-0.5 rounded text-[11px] font-mono text-primary/90">{children}</code>;
+              return <code className="theme-input px-1.5 py-0.5 rounded text-[11px] font-mono text-primary/90">{children}</code>;
             },
             a: ({ children, href, ...props }: any) => (
               <a className="text-primary hover:underline font-semibold break-all" target="_blank" rel="noopener noreferrer" href={href} {...props}>{children}</a>
@@ -969,10 +969,10 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
           ${isMobile ? 'relative z-[150]' : 'relative shrink-0'}
           border-r flex flex-col transition-all duration-300 ease-in-out overflow-hidden
           ${!isSidebarOpen && !isMobile ? 'border-none' : ''}
-        `} style={{ background: 'var(--theme-sidebar)', borderColor: 'var(--border-glass)' }}>
+        `} style={{ background: 'var(--bg-sidebar)', borderColor: 'var(--border-glass)' }}>
 
         {/* Compact User Header */}
-        <div className="pt-[env(safe-area-inset-top,12px)] pb-3 px-4 border-b border-white/[0.06] flex items-center justify-between">
+        <div className="pt-[env(safe-area-inset-top,12px)] pb-3 px-4 border-b theme-border flex items-center justify-between">
           <div className="flex items-center gap-3">
             {/* Avatar with electric loader ring when has unseen statuses */}
             <button
@@ -983,11 +983,11 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
               }}
               className="relative"
             >
-              <div className={`w-10 h-10 rounded-full overflow-hidden relative z-10 border-2 border-[#0d0d0d] ${displayStatuses?.some((s: any) => !seenStatuses.has(s._id)) ? 'status-ring' : ''
+              <div className={`w-10 h-10 rounded-full overflow-hidden relative z-10 border-2 theme-bg ${displayStatuses?.some((s: any) => !seenStatuses.has(s._id)) ? 'status-ring' : ''
                 }`}>
                 <img src={user.avatar} className="w-full h-full object-cover rounded-full" alt="" />
               </div>
-              <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full border-[1.5px] border-[#0d0d0d] z-20" />
+              <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full border-[1.5px] theme-bg z-20" />
             </button>
             <div>
               <h2 className="text-sm font-bold theme-text tracking-tight">Aurora</h2>
@@ -1017,7 +1017,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
         </div>
 
         {showFontSettings && (
-          <div className="px-4 py-3 border-b border-white/[0.06] theme-sidebar/50 animate-in slide-in-from-top duration-200">
+          <div className="px-4 py-3 border-b theme-border theme-input0 animate-in slide-in-from-top duration-200">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-bold theme-text-sec uppercase tracking-widest">Tamaño de Texto: {fontSize}px</span>
               <button onClick={() => setShowFontSettings(false)} className="theme-text-muted"><X size={14}/></button>
@@ -1039,8 +1039,8 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
           {/* Channels & Chats List (WhatsApp compact) */}
           <div className="pt-2 pb-1 px-3">
             <div className="flex items-center justify-between mb-1 px-1">
-              <span className="text-[9px] font-bold text-gray-600 uppercase tracking-widest">Salas</span>
-              <button onClick={() => setShowCreateChannel(true)} className="text-gray-600 hover:text-primary transition-all p-2 rounded-lg hover:bg-gray-100 dark:hover:theme-sidebar/5 active:scale-95"><Plus size={18} /></button>
+              <span className="text-[9px] font-bold theme-text-muted uppercase tracking-widest">Salas</span>
+              <button onClick={() => setShowCreateChannel(true)} className="theme-text-muted hover:text-primary transition-all p-2 rounded-lg hover:bg-gray-100 dark:hover:theme-input active:scale-95"><Plus size={18} /></button>
             </div>
             {/* Global */}
             <button onClick={() => handleSelectChannel('global')}
@@ -1064,9 +1064,9 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                 <div className="flex-1 text-left min-w-0">
                   <div className="flex justify-between items-baseline">
                     <span className="text-[13px] font-semibold theme-text truncate">{c.name}</span>
-                    {c.lastMessage && <span className="text-[10px] text-gray-600 shrink-0 ml-1">{new Date(c.lastMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>}
+                    {c.lastMessage && <span className="text-[10px] theme-text-muted shrink-0 ml-1">{new Date(c.lastMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>}
                   </div>
-                  <span className="text-[11px] text-gray-500 truncate block">{c.lastMessage ? decryptMessage(c.lastMessage.texto, c.slug).slice(0, 40) : 'Sin mensajes'}</span>
+                  <span className="text-[11px] theme-text-sec truncate block">{c.lastMessage ? decryptMessage(c.lastMessage.texto, c.slug).slice(0, 40) : 'Sin mensajes'}</span>
                 </div>
               </button>
             ))}
@@ -1076,8 +1076,8 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
           {channelsList.filter((c: any) => c.type === 'direct').length > 0 && (
             <div className="pt-2 pb-1 px-3">
               <div className="flex items-center justify-between mb-1 px-1">
-                <span className="text-[9px] font-bold text-gray-600 uppercase tracking-widest">Mensajes</span>
-                <button onClick={() => setShowUserSearch(true)} className="text-gray-600 hover:text-emerald-500 transition-all p-2 rounded-lg hover:bg-gray-100 dark:hover:theme-sidebar/5 active:scale-95"><Plus size={18} /></button>
+                <span className="text-[9px] font-bold theme-text-muted uppercase tracking-widest">Mensajes</span>
+                <button onClick={() => setShowUserSearch(true)} className="theme-text-muted hover:text-emerald-500 transition-all p-2 rounded-lg hover:bg-gray-100 dark:hover:theme-input active:scale-95"><Plus size={18} /></button>
               </div>
               {channelsList.filter((c: any) => c.type === 'direct').map((c: any) => {
                 // Calculate unread (simple mock or from seenStatuses if we had unread counts)
@@ -1155,12 +1155,12 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
         <div className="min-h-[3.5rem] pt-[env(safe-area-inset-top,8px)] pb-2 px-3 border-b flex items-center justify-between backdrop-blur-xl z-10" style={{ background: 'var(--bg-deep)', borderColor: 'var(--border-glass)' }}>
           <div className="flex items-center gap-2">
             {isMobile && (
-              <button onClick={() => setMobileView('list')} className="p-1.5 text-gray-500 hover:theme-text">
+              <button onClick={() => setMobileView('list')} className="p-1.5 theme-text-sec hover:theme-text">
                 <ChevronLeft size={20} />
               </button>
             )}
             {!isMobile && (
-              <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-1.5 text-gray-500 hover:theme-text transition-all">
+              <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-1.5 theme-text-sec hover:theme-text transition-all">
                 <MoreVertical size={16} />
               </button>
             )}
@@ -1206,38 +1206,38 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                   navigator.clipboard.writeText(url);
                   alert('Enlace de invitación copiado al portapapeles:\n' + url);
                 }}
-                className="p-1.5 rounded-lg transition-all text-gray-500 hover:theme-text"
+                className="p-1.5 rounded-lg transition-all theme-text-sec hover:theme-text"
                 title="Copiar enlace de invitación"
               >
                 <Share2 size={16} />
               </button>
             )}
-            <button onClick={() => setShowEvents(!showEvents)} className={`p-1.5 rounded-lg transition-all ${showEvents ? 'bg-primary theme-text' : 'text-gray-500 hover:theme-text'}`} title="Eventos"><Calendar size={16} /></button>
-            <button onClick={() => setShowPolls(!showPolls)} className={`p-1.5 rounded-lg transition-all ${showPolls ? 'bg-indigo-500 theme-text' : 'text-gray-500 hover:theme-text'}`} title="Encuestas"><HardDrive size={16} /></button>
+            <button onClick={() => setShowEvents(!showEvents)} className={`p-1.5 rounded-lg transition-all ${showEvents ? 'bg-primary theme-text' : 'theme-text-sec hover:theme-text'}`} title="Eventos"><Calendar size={16} /></button>
+            <button onClick={() => setShowPolls(!showPolls)} className={`p-1.5 rounded-lg transition-all ${showPolls ? 'bg-indigo-500 theme-text' : 'theme-text-sec hover:theme-text'}`} title="Encuestas"><HardDrive size={16} /></button>
             {(channelData?.createdBy === user?._id || channelData?.moderators?.includes(user?._id)) && (
               <button onClick={() => togglePause({ channelId: channelData._id, isPaused: !channelData.isPaused, userId: user?._id as any })}
-                className={`p-1.5 rounded-lg transition-all ${channelData?.isPaused ? 'bg-amber-500 theme-text' : 'text-gray-500 hover:theme-text'}`}>
+                className={`p-1.5 rounded-lg transition-all ${channelData?.isPaused ? 'bg-amber-500 theme-text' : 'theme-text-sec hover:theme-text'}`}>
                 {channelData?.isPaused ? <Play size={16} /> : <Pause size={16} />}
               </button>
             )}
-            <button onClick={() => setShowSearch(!showSearch)} className={`p-1.5 rounded-lg transition-all ${showSearch ? 'bg-primary theme-text' : 'text-gray-500 hover:theme-text'}`}><Search size={16} /></button>
+            <button onClick={() => setShowSearch(!showSearch)} className={`p-1.5 rounded-lg transition-all ${showSearch ? 'bg-primary theme-text' : 'theme-text-sec hover:theme-text'}`}><Search size={16} /></button>
           </div>
         </div>
 
         {/* Search Bar Area */}
         {showSearch && (
-          <div className="px-4 py-2 theme-bg/20 border-b border-white/5 animate-in slide-in-from-top duration-300">
+          <div className="px-4 py-2 theme-bg/20 border-b theme-border animate-in slide-in-from-top duration-300">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={14} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 theme-text-sec" size={14} />
               <input
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder="Buscar en la conversación..."
-                className="w-full theme-sidebar/5 border theme-border rounded-lg pl-10 pr-10 py-2 text-xs theme-text outline-none focus:border-primary/50"
+                className="w-full theme-input border theme-border rounded-lg pl-10 pr-10 py-2 text-xs theme-text outline-none focus:border-primary/50"
                 autoFocus
               />
               {searchQuery && (
-                <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:theme-text">
+                <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 theme-text-sec hover:theme-text">
                   <X size={14} />
                 </button>
               )}
@@ -1258,7 +1258,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
               </button>
               <button
                 onClick={() => deleteChannelMutation({ channelId: (currentChat as any)._id })}
-                className="theme-sidebar/5 text-gray-400 px-6 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider border theme-border"
+                className="theme-input theme-text-muted px-6 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider border theme-border"
               >
                 Rechazar
               </button>
@@ -1346,7 +1346,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
               if (m.isDeleted) {
                 return (
                   <div key={m._id || idx} className={`flex ${isMe ? 'justify-end' : 'justify-start'} mb-0.5`}>
-                    <span className="text-[11px] text-gray-600 italic px-3 py-1">Mensaje eliminado</span>
+                    <span className="text-[11px] theme-text-muted italic px-3 py-1">Mensaje eliminado</span>
                   </div>
                 );
               }
@@ -1369,7 +1369,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                     {!sameAuthor && (
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-[12px] font-bold theme-text">{m.nombre}</span>
-                        <span className="text-[9px] text-gray-500 uppercase">{new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        <span className="text-[9px] theme-text-sec uppercase">{new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                       </div>
                     )}
 
@@ -1379,7 +1379,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                         <textarea
                           value={editingMsgText}
                           onChange={e => setEditingMsgText(e.target.value)}
-                          className="flex-1 theme-sidebar/5 theme-text text-[13px] rounded-lg px-3 py-2 outline-none resize-none border theme-border"
+                          className="flex-1 theme-input theme-text text-[13px] rounded-lg px-3 py-2 outline-none resize-none border theme-border"
                           rows={2}
                           autoFocus
                           onKeyDown={async e => {
@@ -1393,7 +1393,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                             if (e.key === 'Escape') setEditingMsgId(null);
                           }}
                         />
-                        <button onClick={() => setEditingMsgId(null)} className="p-1 text-gray-500"><X size={14} /></button>
+                        <button onClick={() => setEditingMsgId(null)} className="p-1 theme-text-sec"><X size={14} /></button>
                       </div>
                     ) : (
                       <div
@@ -1401,7 +1401,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                         className={`relative py-1 w-full text-left theme-text-msg ${m.isPinned ? 'bg-primary/5' : ''}`}
                       >
                         {m.imageUrl && (
-                          <div className="relative mt-2 rounded-xl overflow-hidden cursor-zoom-in border border-white/5 shadow-lg group/img" 
+                          <div className="relative mt-2 rounded-xl overflow-hidden cursor-zoom-in border theme-border shadow-lg group/img" 
                             onClick={() => { 
                                const gallery = (displayMessages || []).filter(msg => msg.imagenUrl).map(msg => msg.imagenUrl!);
                                const idx = gallery.indexOf(m.imagenUrl!);
@@ -1419,9 +1419,9 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                         {m.audioUrl && (
                           <div className="flex items-center gap-2 my-1">
                             <button onClick={e => { const a = (e.currentTarget.nextSibling as HTMLAudioElement); a.paused ? a.play() : a.pause(); }}
-                              className="w-8 h-8 rounded-full theme-sidebar/20 flex items-center justify-center"><Volume2 size={14} /></button>
+                              className="w-8 h-8 rounded-full theme-input flex items-center justify-center"><Volume2 size={14} /></button>
                             <audio src={m.audioUrl} className="hidden" />
-                            <div className="w-20 h-0.5 theme-sidebar/20 rounded-full" />
+                            <div className="w-20 h-0.5 theme-input rounded-full" />
                           </div>
                         )}
                         {/* Text - use displayText (URL stripped when preview exists) */}
@@ -1474,14 +1474,14 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
               <div className="flex gap-0.5">
                 <div className="typing-dot" /><div className="typing-dot" /><div className="typing-dot" />
               </div>
-              <span className="text-[10px] text-gray-500">{typingUsers[0]} escribe...</span>
+              <span className="text-[10px] theme-text-sec">{typingUsers[0]} escribe...</span>
             </div>
           )}
           <div ref={messagesEndRef} className="h-2" />
         </div>
 
          {/* Input Area - WhatsApp style, always visible send on mobile */}
-         <div className="border-t px-2 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] relative z-20" style={{ background: 'var(--theme-sidebar)', borderColor: 'var(--border-glass)' }}>
+         <div className="border-t px-2 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] relative z-20" style={{ background: 'var(--bg-sidebar)', borderColor: 'var(--border-glass)' }}>
           {showEmoji && (
             <div className="absolute bottom-20 left-4 border p-2.5 rounded-2xl shadow-2xl flex gap-2 z-[100] animate-in fade-in slide-in-from-bottom-4 zoom-in-95 duration-200 theme-sidebar theme-border">
               {EMOJIS.map(emoji => (
@@ -1503,19 +1503,19 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
               </div>
             )}
             <form onSubmit={handleSubmit} className="flex items-center gap-2">
-              <button type="button" onClick={() => fileInputRef.current?.click()} className="p-2.5 text-gray-500 hover:theme-text transition-all shrink-0"><Plus size={22}/></button>
+              <button type="button" onClick={() => fileInputRef.current?.click()} className="p-2.5 theme-text-sec hover:theme-text transition-all shrink-0"><Plus size={22}/></button>
               <div className="flex-1 flex items-center gap-2 min-h-[44px] bg-transparent">
-                <button type="button" onClick={() => setShowEmoji(!showEmoji)} className="p-2 text-gray-500 hover:text-gray-300 transition-colors shrink-0"><Smile size={20}/></button>
+                <button type="button" onClick={() => setShowEmoji(!showEmoji)} className="p-2 theme-text-sec hover:theme-text-muted transition-colors shrink-0"><Smile size={20}/></button>
                 <textarea
                   value={text + (interimTranscript ? (text ? ' ' : '') + interimTranscript : '')}
                   onChange={e => { setText(e.target.value); handleTyping(); }}
                   onPaste={handlePaste}
                   placeholder="Escribe un mensaje..."
-                  className="flex-1 bg-transparent text-[15px] theme-text outline-none placeholder-gray-500 py-2.5 resize-none max-h-32 min-h-[44px] leading-relaxed no-scrollbar"
+                  className="flex-1 bg-transparent text-[15px] theme-text outline-none placeholder:theme-text-muted py-2.5 resize-none max-h-32 min-h-[44px] leading-relaxed no-scrollbar"
                   rows={1}
                   onKeyDown={e => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(e as any); } }}
                 />
-                <button type="button" onClick={() => cameraInputRef.current?.click()} className="p-2 text-gray-500 hover:theme-text transition-all"><Camera size={20}/></button>
+                <button type="button" onClick={() => cameraInputRef.current?.click()} className="p-2 theme-text-sec hover:theme-text transition-all"><Camera size={20}/></button>
               </div>
               <div className="shrink-0 flex items-center gap-1">
                 {uploading ? (
@@ -1529,7 +1529,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                   </button>
                 ) : (
                   <button type="button" onClick={() => isRecording ? stopRecording() : startRecording()}
-                    className={`w-11 h-11 rounded-full flex items-center justify-center transition-all active:scale-90 ${isRecording ? 'bg-red-500 theme-text animate-pulse' : 'text-gray-400 hover:text-gray-300'}`}>
+                    className={`w-11 h-11 rounded-full flex items-center justify-center transition-all active:scale-90 ${isRecording ? 'bg-red-500 theme-text animate-pulse' : 'theme-text-muted hover:theme-text-muted'}`}>
                     {isRecording ? <MicOff size={18}/> : <Mic size={18}/>}
                   </button>
                 )}
@@ -1567,10 +1567,10 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
             </button>
           </div>
           <div className="p-6 space-y-6">
-            <button onClick={() => setShowCreatePoll(true)} className="w-full theme-sidebar/5 border theme-border theme-text py-4 rounded-2xl text-[10px] font-black uppercase hover:theme-sidebar/10 transition-all">Crear Encuesta</button>
+            <button onClick={() => setShowCreatePoll(true)} className="w-full theme-input border theme-border theme-text py-4 rounded-2xl text-[10px] font-black uppercase hover:theme-input transition-all">Crear Encuesta</button>
             <div className="space-y-4">
               {polls?.map((poll: any) => (
-                <div key={poll._id} className="theme-sidebar/5 border border-white/5 p-4 rounded-lg space-y-4">
+                <div key={poll._id} className="theme-input border theme-border p-4 rounded-lg space-y-4">
                   <h3 className="text-xs font-bold theme-text">{poll.question}</h3>
                   <div className="space-y-2">
                     {poll.options.map((opt: any, idx: number) => {
@@ -1583,12 +1583,12 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                           <button
                             disabled={hasVoted}
                             onClick={() => voteInPoll({ pollId: poll._id, optionIndex: idx, userId: user?._id as any })}
-                            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-[10px] transition-all ${hasVoted ? 'theme-sidebar/10 text-gray-400' : 'theme-sidebar/5 hover:theme-sidebar/10 theme-text'}`}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-[10px] transition-all ${hasVoted ? 'theme-input theme-text-muted' : 'theme-input hover:theme-input theme-text'}`}
                           >
                             <span>{opt.text}</span>
                             <span className="font-bold">{percentage}%</span>
                           </button>
-                          <div className="h-1 theme-sidebar/5 rounded-full overflow-hidden">
+                          <div className="h-1 theme-input rounded-full overflow-hidden">
                             <div className="h-full theme-sidebar transition-all duration-1000" style={{ width: `${percentage}%` }} />
                           </div>
                         </div>
@@ -1711,15 +1711,15 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
             <div className="space-y-6">
               <div className="space-y-1">
                 <label className="text-[9px] font-black theme-text-sec uppercase tracking-widest px-2">Título</label>
-                <input value={newEventTitle} onChange={e => setNewEventTitle(e.target.value)} placeholder="¿Qué vamos a hacer?" className="w-full theme-sidebar/5 border theme-border rounded-2xl px-5 py-4 theme-text text-sm font-bold outline-none focus:border-primary/50 transition-all shadow-sm" />
+                <input value={newEventTitle} onChange={e => setNewEventTitle(e.target.value)} placeholder="¿Qué vamos a hacer?" className="w-full theme-input border theme-border rounded-2xl px-5 py-4 theme-text text-sm font-bold outline-none focus:border-primary/50 transition-all shadow-sm" />
               </div>
               <div className="space-y-1">
                 <label className="text-[9px] font-black theme-text-sec uppercase tracking-widest px-2">Descripción</label>
-                <textarea value={newEventDesc} onChange={e => setNewEventDesc(e.target.value)} placeholder="Detalles de la actividad..." className="w-full theme-sidebar/5 border theme-border rounded-2xl px-5 py-4 theme-text text-sm outline-none focus:border-primary/50 h-32 resize-none transition-all shadow-sm" />
+                <textarea value={newEventDesc} onChange={e => setNewEventDesc(e.target.value)} placeholder="Detalles de la actividad..." className="w-full theme-input border theme-border rounded-2xl px-5 py-4 theme-text text-sm outline-none focus:border-primary/50 h-32 resize-none transition-all shadow-sm" />
               </div>
               <div className="space-y-1">
                 <label className="text-[9px] font-black theme-text-sec uppercase tracking-widest px-2">Fecha y Hora</label>
-                <input type="datetime-local" value={newEventDate} onChange={e => setNewEventDate(e.target.value)} className="w-full theme-sidebar/5 border theme-border rounded-2xl px-5 py-4 theme-text text-sm outline-none focus:border-primary/50 transition-all shadow-sm" />
+                <input type="datetime-local" value={newEventDate} onChange={e => setNewEventDate(e.target.value)} className="w-full theme-input border theme-border rounded-2xl px-5 py-4 theme-text text-sm outline-none focus:border-primary/50 transition-all shadow-sm" />
               </div>
             </div>
             <button
@@ -1755,7 +1755,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
             <div className="space-y-6">
               <div className="space-y-1">
                 <label className="text-[9px] font-black theme-text-sec uppercase tracking-widest px-2">Pregunta</label>
-                <input value={newPollQuestion} onChange={e => setNewPollQuestion(e.target.value)} placeholder="¿Qué quieres preguntar?" className="w-full theme-sidebar/5 border theme-border rounded-2xl px-5 py-4 theme-text text-sm font-bold outline-none focus:border-primary/50 transition-all shadow-sm" />
+                <input value={newPollQuestion} onChange={e => setNewPollQuestion(e.target.value)} placeholder="¿Qué quieres preguntar?" className="w-full theme-input border theme-border rounded-2xl px-5 py-4 theme-text text-sm font-bold outline-none focus:border-primary/50 transition-all shadow-sm" />
               </div>
               <div className="space-y-4">
                 <label className="text-[9px] font-black theme-text-sec uppercase tracking-widest px-2">Opciones</label>
@@ -1765,7 +1765,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                       const copy = [...newPollOptions];
                       copy[idx] = e.target.value;
                       setNewPollOptions(copy);
-                    }} placeholder={`Opción ${idx + 1}`} className="flex-1 theme-sidebar/5 border theme-border rounded-xl px-4 py-3 theme-text text-sm outline-none focus:border-primary/50 transition-all shadow-sm" />
+                    }} placeholder={`Opción ${idx + 1}`} className="flex-1 theme-input border theme-border rounded-xl px-4 py-3 theme-text text-sm outline-none focus:border-primary/50 transition-all shadow-sm" />
                     {newPollOptions.length > 2 && (
                       <button onClick={() => setNewPollOptions(newPollOptions.filter((_, i) => i !== idx))} className="p-3 theme-text-sec hover:text-red-500"><X size={18} /></button>
                     )}
@@ -1797,11 +1797,11 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
         <div className="fixed inset-0 theme-bg/90 backdrop-blur-xl z-[300] flex items-center justify-center p-4">
           <div className="theme-surface border theme-border rounded-xl p-8 w-full max-w-sm space-y-6 shadow-2xl">
             <div className="text-center">
-              <div className="w-16 h-16 rounded-full theme-sidebar/10 flex items-center justify-center mx-auto theme-text mb-4">
+              <div className="w-16 h-16 rounded-full theme-input flex items-center justify-center mx-auto theme-text mb-4">
                 <Calendar size={32} />
               </div>
               <h2 className="text-sm font-black theme-text uppercase tracking-widest">¿Compartir Evento?</h2>
-              <p className="text-[10px] text-gray-500 mt-2">Selecciona un chat para enviar la invitación interactiva.</p>
+              <p className="text-[10px] theme-text-sec mt-2">Selecciona un chat para enviar la invitación interactiva.</p>
             </div>
             <div className="max-h-60 overflow-y-auto space-y-2 no-scrollbar">
               {displayChannels?.map((c: any) => (
@@ -1812,14 +1812,14 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                     await sendMessage({ userId: user._id, nombre: user.name, avatar: user.avatar, texto: encrypted, channelId: c.slug, eventId: sharingEventId });
                     setSharingEventId(null);
                   }}
-                  className="w-full flex items-center gap-3 p-3 rounded-lg theme-sidebar/5 hover:theme-sidebar/10 transition-all border border-white/5"
+                  className="w-full flex items-center gap-3 p-3 rounded-lg theme-input hover:theme-input transition-all border theme-border"
                 >
-                  <div className="w-8 h-8 rounded-lg theme-sidebar/10 flex items-center justify-center theme-text"><Hash size={14} /></div>
+                  <div className="w-8 h-8 rounded-lg theme-input flex items-center justify-center theme-text"><Hash size={14} /></div>
                   <span className="text-xs theme-text font-bold">{c.name}</span>
                 </button>
               ))}
             </div>
-            <button onClick={() => setSharingEventId(null)} className="w-full text-[10px] text-gray-500 font-bold uppercase tracking-widest">No compartir, solo guardar</button>
+            <button onClick={() => setSharingEventId(null)} className="w-full text-[10px] theme-text-sec font-bold uppercase tracking-widest">No compartir, solo guardar</button>
           </div>
         </div>
       )}
@@ -1837,8 +1837,8 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
           <div className="p-6 space-y-8">
             <div className="theme-surface border theme-border rounded-[2rem] p-6 space-y-4 shadow-xl">
               <p className="text-[10px] font-black theme-text-sec uppercase tracking-[0.2em] px-2">Nuevo Recordatorio</p>
-              <input value={newReminderText} onChange={e => setNewReminderText(e.target.value)} placeholder="¿Qué quieres recordar?" className="w-full theme-sidebar/5 border theme-border rounded-xl px-4 py-4 theme-text text-sm outline-none focus:border-primary/50 transition-all" />
-              <input type="datetime-local" value={newReminderDate} onChange={e => setNewReminderDate(e.target.value)} className="w-full theme-sidebar/5 border theme-border rounded-xl px-4 py-4 theme-text text-sm outline-none focus:border-primary/50 transition-all" />
+              <input value={newReminderText} onChange={e => setNewReminderText(e.target.value)} placeholder="¿Qué quieres recordar?" className="w-full theme-input border theme-border rounded-xl px-4 py-4 theme-text text-sm outline-none focus:border-primary/50 transition-all" />
+              <input type="datetime-local" value={newReminderDate} onChange={e => setNewReminderDate(e.target.value)} className="w-full theme-input border theme-border rounded-xl px-4 py-4 theme-text text-sm outline-none focus:border-primary/50 transition-all" />
               <button onClick={async () => {
                 await createReminder({ userId: user?._id as any, text: newReminderText, date: new Date(newReminderDate).getTime() });
                 setNewReminderText(''); setNewReminderDate('');
@@ -1877,8 +1877,8 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
           <div className="p-6 space-y-8">
             <div className="theme-surface border theme-border rounded-[2rem] p-6 space-y-4 shadow-xl">
               <p className="text-[10px] font-black theme-text-sec uppercase tracking-[0.2em] px-2">Nueva Nota</p>
-              <input value={newNoteTitle} onChange={e => setNewNoteTitle(e.target.value)} placeholder="Título..." className="w-full theme-sidebar/5 border theme-border rounded-xl px-4 py-4 theme-text text-sm font-bold outline-none focus:border-primary/50 transition-all" />
-              <textarea value={newNoteContent} onChange={e => setNewNoteContent(e.target.value)} placeholder="Contenido de la nota..." className="w-full theme-sidebar/5 border theme-border rounded-xl px-4 py-4 theme-text text-sm outline-none focus:border-primary/50 h-32 resize-none transition-all" />
+              <input value={newNoteTitle} onChange={e => setNewNoteTitle(e.target.value)} placeholder="Título..." className="w-full theme-input border theme-border rounded-xl px-4 py-4 theme-text text-sm font-bold outline-none focus:border-primary/50 transition-all" />
+              <textarea value={newNoteContent} onChange={e => setNewNoteContent(e.target.value)} placeholder="Contenido de la nota..." className="w-full theme-input border theme-border rounded-xl px-4 py-4 theme-text text-sm outline-none focus:border-primary/50 h-32 resize-none transition-all" />
               <div className="flex gap-2">
                 <button onClick={async () => {
                   if (editingNoteId) {
@@ -1891,7 +1891,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                   {editingNoteId ? 'Actualizar Nota' : 'Guardar Nota'}
                 </button>
                 {editingNoteId && (
-                  <button onClick={() => { setEditingNoteId(null); setNewNoteTitle(''); setNewNoteContent(''); }} className="px-6 theme-sidebar/5 theme-text-sec rounded-xl border theme-border transition-colors"><X size={20} /></button>
+                  <button onClick={() => { setEditingNoteId(null); setNewNoteTitle(''); setNewNoteContent(''); }} className="px-6 theme-input theme-text-sec rounded-xl border theme-border transition-colors"><X size={20} /></button>
                 )}
               </div>
             </div>
@@ -1929,7 +1929,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
           <div className="p-6 space-y-6">
             <button
               onClick={() => { setShowUserSearch(true); setShowFriendsModal(false); }}
-              className="w-full flex items-center justify-center gap-2 theme-sidebar/5 border theme-border theme-text py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all"
+              className="w-full flex items-center justify-center gap-2 theme-input border theme-border theme-text py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all"
             >
               <Plus size={16} /> Buscar más personas
             </button>
@@ -2030,16 +2030,16 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                 <h3 className="text-[10px] font-black theme-text-sec uppercase tracking-[0.2em] border-b theme-border pb-2">Información Personal</h3>
                 <div className="space-y-4">
                   <div className="space-y-1">
-                    <label className="text-[9px] font-bold text-gray-500 uppercase px-1">Nombre Público</label>
-                    <input value={editName} onChange={e => setEditName(e.target.value)} placeholder="¿Cómo te llamas?" className="w-full theme-sidebar/5 border theme-border rounded-xl px-4 py-3 theme-text text-sm outline-none focus:border-primary/50 transition-all" />
+                    <label className="text-[9px] font-bold theme-text-sec uppercase px-1">Nombre Público</label>
+                    <input value={editName} onChange={e => setEditName(e.target.value)} placeholder="¿Cómo te llamas?" className="w-full theme-input border theme-border rounded-xl px-4 py-3 theme-text text-sm outline-none focus:border-primary/50 transition-all" />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[9px] font-bold text-gray-500 uppercase px-1">Biografía</label>
-                    <textarea value={editBio} onChange={e => setEditBio(e.target.value)} placeholder="Cuenta algo sobre ti..." className="w-full theme-sidebar/5 border theme-border rounded-xl px-4 py-3 theme-text text-sm outline-none focus:border-primary/50 resize-none h-24 transition-all" />
+                    <label className="text-[9px] font-bold theme-text-sec uppercase px-1">Biografía</label>
+                    <textarea value={editBio} onChange={e => setEditBio(e.target.value)} placeholder="Cuenta algo sobre ti..." className="w-full theme-input border theme-border rounded-xl px-4 py-3 theme-text text-sm outline-none focus:border-primary/50 resize-none h-24 transition-all" />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[9px] font-bold text-gray-500 uppercase px-1">Teléfono</label>
-                    <input value={editPhone} onChange={e => setEditPhone(e.target.value)} placeholder="+54 9..." className="w-full theme-sidebar/5 border theme-border rounded-xl px-4 py-3 theme-text text-sm outline-none focus:border-primary/50 transition-all" />
+                    <label className="text-[9px] font-bold theme-text-sec uppercase px-1">Teléfono</label>
+                    <input value={editPhone} onChange={e => setEditPhone(e.target.value)} placeholder="+54 9..." className="w-full theme-input border theme-border rounded-xl px-4 py-3 theme-text text-sm outline-none focus:border-primary/50 transition-all" />
                   </div>
                 </div>
               </div>
@@ -2049,7 +2049,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                 <h3 className="text-[10px] font-black theme-text-sec uppercase tracking-[0.2em] border-b theme-border pb-2">Ajustes de la App</h3>
                 <div className="space-y-6">
                   {/* Font Size */}
-                  <div className="theme-sidebar/5 border theme-border p-4 rounded-xl space-y-4">
+                  <div className="theme-input border theme-border p-4 rounded-xl space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 theme-text">
                         <Type size={16} />
@@ -2070,8 +2070,8 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
 
                   {/* Privacy */}
                   <div className="space-y-2">
-                    <label className="text-[9px] font-bold text-gray-500 uppercase px-1">Privacidad de Chat</label>
-                    <div className="flex theme-sidebar/5 border theme-border rounded-xl p-1">
+                    <label className="text-[9px] font-bold theme-text-sec uppercase px-1">Privacidad de Chat</label>
+                    <div className="flex theme-input border theme-border rounded-xl p-1">
                       <button
                         onClick={() => setEditPrivacy('everyone')}
                         className={`flex-1 py-2 rounded-lg text-[9px] font-black uppercase transition-all ${editPrivacy === 'everyone' ? 'bg-primary theme-text-on-pri shadow-md' : 'theme-text-sec'}`}
@@ -2089,7 +2089,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
 
                   {/* Theme Color */}
                   <div className="space-y-2">
-                    <label className="text-[9px] font-bold text-gray-500 uppercase px-1">Acento de Color</label>
+                    <label className="text-[9px] font-bold theme-text-sec uppercase px-1">Acento de Color</label>
                     <div className="flex flex-wrap gap-3 px-1">
                       {['#6366f1', '#ec4899', '#f59e0b', '#10b981', '#06b6d4', '#8b5cf6', '#e8eaed'].map(color => (
                         <button
@@ -2103,7 +2103,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                   </div>
 
                   {/* Theme Toggle */}
-                  <div className="flex items-center justify-between theme-sidebar/5 border theme-border p-4 rounded-xl">
+                  <div className="flex items-center justify-between theme-input border theme-border p-4 rounded-xl">
                     <div className="flex items-center gap-2 theme-text">
                       {theme === 'dark' ? <Moon size={16} /> : <Sun size={16} />}
                       <span className="text-[11px] font-bold uppercase">Tema {theme === 'dark' ? 'Oscuro' : 'Claro'}</span>
@@ -2209,14 +2209,14 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
           <div className="theme-surface rounded-[2rem] border theme-border p-8 w-full max-w-sm space-y-6 shadow-2xl">
             <h3 className="text-lg font-bold theme-text text-center uppercase tracking-widest">Publicar Estado</h3>
             <div className="grid grid-cols-2 gap-4">
-              <button onClick={() => { const text = prompt('Escribe tu estado:'); if (text) handlePostStatus(text, 'text'); }} className="aspect-square theme-sidebar/5 border border-white/5 flex flex-col items-center justify-center gap-3 theme-text">
+              <button onClick={() => { const text = prompt('Escribe tu estado:'); if (text) handlePostStatus(text, 'text'); }} className="aspect-square theme-input border theme-border flex flex-col items-center justify-center gap-3 theme-text">
                 <FileText size={32} /><span className="text-[10px] font-bold uppercase">Texto</span>
               </button>
-              <button onClick={() => { const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*'; input.onchange = (e: any) => handleImageUpload(e, 'status'); input.click(); }} className="aspect-square theme-sidebar/5 border border-white/5 flex flex-col items-center justify-center gap-3 theme-text">
+              <button onClick={() => { const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*'; input.onchange = (e: any) => handleImageUpload(e, 'status'); input.click(); }} className="aspect-square theme-input border theme-border flex flex-col items-center justify-center gap-3 theme-text">
                 <Camera size={32} /><span className="text-[10px] font-bold uppercase">Foto</span>
               </button>
             </div>
-            <button onClick={() => setShowStatusModal(false)} className="w-full theme-sidebar/5 text-gray-500 py-4 rounded-lg font-bold uppercase text-[10px]">Cancelar</button>
+            <button onClick={() => setShowStatusModal(false)} className="w-full theme-input theme-text-sec py-4 rounded-lg font-bold uppercase text-[10px]">Cancelar</button>
           </div>
         </div>
       )}
@@ -2270,7 +2270,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
           <div className="fixed inset-0 theme-bg z-[1000] flex flex-col items-center justify-center animate-in fade-in duration-200"
             onClick={() => { markStatusSeen(viewingStatus._id); setViewingStatus(null); }}>
             {/* Progress bar */}
-            <div className="absolute top-0 left-0 right-0 h-0.5 theme-sidebar/10 z-10">
+            <div className="absolute top-0 left-0 right-0 h-0.5 theme-input z-10">
               <div className="status-progress h-full bg-primary"
                 onAnimationEnd={() => { markStatusSeen(viewingStatus._id); setViewingStatus(null); }}
               />
@@ -2280,13 +2280,13 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
               <img src={viewingStatus.userAvatar} className="w-9 h-9 rounded-full border-2 border-primary" alt="" />
               <div>
                 <p className="text-sm font-semibold theme-text">{viewingStatus.userName}</p>
-                <p className="text-[10px] text-gray-500">{new Date(viewingStatus.createdAt).toLocaleTimeString()}</p>
+                <p className="text-[10px] theme-text-sec">{new Date(viewingStatus.createdAt).toLocaleTimeString()}</p>
               </div>
             </div>
             <button onClick={e => { e.stopPropagation(); markStatusSeen(viewingStatus._id); setViewingStatus(null); }}
               className="absolute top-6 right-4 theme-text/50 hover:theme-text z-10"><X size={24} /></button>
             {/* Content */}
-            <div className="w-full max-w-xs aspect-[9/16] theme-sidebar/5 rounded-2xl overflow-hidden relative shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="w-full max-w-xs aspect-[9/16] theme-input rounded-2xl overflow-hidden relative shadow-2xl" onClick={e => e.stopPropagation()}>
               {viewingStatus.type === 'text' ? (
                 <div className="w-full h-full flex items-center justify-center p-8 text-center text-lg font-bold theme-text bg-gradient-to-br from-primary/20 to-purple-500/20">
                   {viewingStatus.content}
@@ -2304,7 +2304,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                     }} className="text-xl hover:scale-125 transition-transform">{emoji}</button>
                   ))}
                 </div>
-                <input placeholder="Responder..." className="w-full theme-sidebar/10 border theme-border rounded-lg px-3 py-2 theme-text text-[11px] outline-none focus:border-primary"
+                <input placeholder="Responder..." className="w-full theme-input border theme-border rounded-lg px-3 py-2 theme-text text-[11px] outline-none focus:border-primary"
                   onKeyDown={async e => {
                     if (e.key === 'Enter') {
                       const val = (e.target as HTMLInputElement).value;
@@ -2326,19 +2326,19 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
         <div className="fixed inset-0 theme-bg/80 backdrop-blur-md z-[100] flex items-center justify-center p-4">
           <div className="theme-surface rounded-xl border theme-border p-6 w-full max-w-sm space-y-4">
             <h3 className="text-sm font-bold theme-text uppercase tracking-wider">Buscar Usuarios</h3>
-            <input value={userSearchQuery} onChange={e => setUserSearchQuery(e.target.value)} placeholder="Nombre o @usuario..." className="w-full theme-sidebar/5 border theme-border rounded-lg px-4 py-3 theme-text text-xs outline-none focus:border-primary" autoFocus />
+            <input value={userSearchQuery} onChange={e => setUserSearchQuery(e.target.value)} placeholder="Nombre o @usuario..." className="w-full theme-input border theme-border rounded-lg px-4 py-3 theme-text text-xs outline-none focus:border-primary" autoFocus />
             <div className="space-y-2 max-h-64 overflow-y-auto">
               {searchedUsers?.filter((u: any) => u._id !== user._id).map((u: any) => (
-                <button key={u._id} onClick={() => startDM(u)} className="w-full flex items-center gap-3 p-3 rounded-lg hover:theme-sidebar/5 transition-all">
+                <button key={u._id} onClick={() => startDM(u)} className="w-full flex items-center gap-3 p-3 rounded-lg hover:theme-input transition-all">
                   <img src={u.avatar} className="w-10 h-10 rounded-lg" alt="" />
                   <div className="text-left">
                     <div className="text-xs font-bold theme-text">{u.name}</div>
-                    <div className="text-[10px] text-gray-500">@{u.username}</div>
+                    <div className="text-[10px] theme-text-sec">@{u.username}</div>
                   </div>
                 </button>
               ))}
             </div>
-            <button onClick={() => setShowUserSearch(false)} className="w-full text-xs text-gray-500 py-2 uppercase font-bold tracking-widest">Cerrar</button>
+            <button onClick={() => setShowUserSearch(false)} className="w-full text-xs theme-text-sec py-2 uppercase font-bold tracking-widest">Cerrar</button>
           </div>
         </div>
       )}
@@ -2361,11 +2361,11 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
 
             {/* Info Sections */}
             <div className="px-6 pb-8 space-y-4">
-              <div className="space-y-1 theme-sidebar/5 rounded-lg p-4 border border-white/5">
-                <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2 mb-1">
+              <div className="space-y-1 theme-input rounded-lg p-4 border theme-border">
+                <label className="text-[9px] font-black theme-text-sec uppercase tracking-widest flex items-center gap-2 mb-1">
                   <Info size={12} className="text-primary" /> Información y Bio
                 </label>
-                <p className="text-xs text-gray-300 leading-relaxed italic">
+                <p className="text-xs theme-text-muted leading-relaxed italic">
                   {viewingProfileUser.bio || "Este usuario prefiere mantener su bio en misterio... ✨"}
                 </p>
               </div>
@@ -2390,12 +2390,12 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
               )}
 
               {viewingProfileUser.phone && (
-                <div className="flex items-center gap-4 theme-sidebar/5 rounded-lg p-4 border border-white/5">
+                <div className="flex items-center gap-4 theme-input rounded-lg p-4 border theme-border">
                   <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                     <Phone size={18} />
                   </div>
                   <div>
-                    <p className="text-[9px] font-bold text-gray-500 uppercase">Teléfono</p>
+                    <p className="text-[9px] font-bold theme-text-sec uppercase">Teléfono</p>
                     <p className="text-sm theme-text font-mono">{viewingProfileUser.phone}</p>
                   </div>
                 </div>
@@ -2413,7 +2413,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                 {user._id !== viewingProfileUser._id && !friendsList?.find((f: any) => f._id === viewingProfileUser._id) && !sentFriendRequests?.find((r: any) => r.user2Id === viewingProfileUser._id) && (
                   <button
                     onClick={() => sendFriendRequest({ fromId: user._id as any, toId: viewingProfileUser._id })}
-                    className="w-full theme-sidebar text-black py-4 rounded-lg font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 transition-all active:scale-95 shadow-xl"
+                    className="w-full theme-input theme-text py-4 rounded-lg font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 transition-all active:scale-95 shadow-xl"
                   >
                     <Users size={16} /> Agregar Amigo
                   </button>
@@ -2429,7 +2429,7 @@ imagenUrl: attachedImages.length > 0 ? attachedImages[0] : undefined
                         await addModerator({ channelId: channelData._id, userId: viewingProfileUser._id, ownerId: user?._id as any });
                       }
                     }}
-                    className={`w-full py-4 rounded-lg font-black uppercase tracking-widest text-[10px] border transition-all ${channelData.moderators?.includes(viewingProfileUser._id) ? 'bg-red-500/10 text-red-500 border-red-500/20' : 'theme-sidebar/5 theme-text theme-border'}`}
+                    className={`w-full py-4 rounded-lg font-black uppercase tracking-widest text-[10px] border transition-all ${channelData.moderators?.includes(viewingProfileUser._id) ? 'bg-red-500/10 text-red-500 border-red-500/20' : 'theme-input theme-text theme-border'}`}
                   >
                     {channelData.moderators?.includes(viewingProfileUser._id) ? 'Quitar Moderador' : 'Hacer Moderador'}
                   </button>

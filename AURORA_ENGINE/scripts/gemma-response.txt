@@ -1,0 +1,31 @@
+GEMMA-4, Senior Software Architect.
+Spanish.
+Markdown.
+Analyze an optimization plan for an "Instagram Marketing Hub" and give a verdict (APPROVED or REJECTED) with reasons.
+
+    *   *Goal:* Fix critical bugs (reconnection failure, inactive manage button) and improve UX.
+    *   *Key Changes:*
+        *   `InstagramMarketingView.tsx`: Change connection check from `accounts.length > 0` to `accounts.some(a => a.status === 'connected')`. This is a crucial fix for handling disconnected accounts.
+        *   `InstagramMarketingView.tsx`: Implement `onManage` to switch tabs and set `selectedAccountId`.
+        *   `InstagramConnect.tsx`: Ensure "Verified" state depends on actual connection, not just DB record.
+        *   `InstagramDashboard.tsx`: Link disconnect button and add toasts.
+        *   *New Features:* Smart sync for Analytics, prep for Facebook Pages.
+    *   *Verification Plan:* Automated tests for the logic and manual end-to-end testing.
+
+    *   *Bug Fixes:* The logic change from `.length > 0` to `.some(...)` is correct. If a user has a record in the DB but the token is expired/disconnected, the previous logic would think they are connected, preventing them from reconnecting. This is a classic bug.
+    *   *UX/UI:* The "Manage" button logic is sound. Switching tabs based on account status is standard behavior.
+    *   *Professionalization:* Toasts and disconnect buttons are basic but necessary for a professional feel.
+    *   *Scalability:* Preparing for Facebook Pages shows foresight.
+    *   *Verification:* The manual test cases cover the critical path.
+
+    *   *Verdict:* **APROBADO** (Approved).
+    *   *Reasoning:*
+        1.  *Correctness:* Addresses the root cause of the reconnection bug.
+        2.  *UX:* Improves the flow from connection to management.
+        3.  *Robustness:* The verification plan is clear and covers the edge cases.
+        4.  *Strategic:* The addition of Facebook Pages integration prepares the system for growth.
+
+    *   *Critique/Suggestions (as a Senior Architect):*
+        *   *Edge Case:* What happens if there are *multiple* connected accounts? The plan mentions `selectedAccountId`, but doesn't specify how to handle the selection if `accounts.filter(a => a.status === 'connected').length > 1`.
+        *   *Performance:* "Smart Sync" in Analytics needs a debounce or a cooldown to avoid hitting API rate limits.
+        *   *Security:* Ensure the disconnect action actually revokes the token on the backend, not just changing a status in the DB.

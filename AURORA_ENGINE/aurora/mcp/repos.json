@@ -1,0 +1,42 @@
+{
+  "activo": "tradeportal-2025-platinum",
+  "repositorios": [
+    {
+      "nombre": "tradeportal-2025-platinum",
+      "ruta": "C:\\Users\\iurato\\Downloads\\tradeportal-2025-platinum",
+      "tipo": "web_platform",
+      "estado": "activo",
+      "dominio": "community trading platform",
+      "stack": ["typescript", "react", "vite", "convex", "express", "tailwindcss"],
+      "superficies": ["feed", "creator_dashboard", "leaderboard", "signals", "communities", "referrals"],
+      "ultimoAcceso": "2026-03-23"
+    },
+    {
+      "nombre": "antigravity-workspace",
+      "ruta": "C:\\Users\\iurato\\antigravity",
+      "tipo": "workspace",
+      "estado": "inactivo",
+      "dominio": "agent workspace",
+      "stack": ["node", "scripts"],
+      "superficies": ["research", "coordination", "learning"],
+      "ultimoAcceso": null
+    }
+  ],
+  "indices": {
+    "tradeportal-2025-platinum": {
+      "archivosClave": [
+        "convex/*.ts",
+        "views/*.tsx",
+        "components/*.tsx",
+        "services/*.ts",
+        "AGENTS.md"
+      ],
+      "patrones": {
+        "backend": "convex/",
+        "frontend": "views/|components/",
+        "tests": "__tests__/",
+        "config": "*.config.ts|vite.config"
+      }
+    }
+  }
+}

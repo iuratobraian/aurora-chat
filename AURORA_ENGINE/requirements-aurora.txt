@@ -1,0 +1,7 @@
+notebooklm-py[browser]
+playwright
+httpx
+rich
+mempalace
+chromadb
+pysqlite3-binary

@@ -1,0 +1,14 @@
+{
+  "artifact": "aurora_task_context_pack",
+  "version": 1,
+  "requiredFields": [
+    "query",
+    "matchedTask",
+    "surface",
+    "relatedFiles",
+    "knowledge",
+    "risks",
+    "nextAction",
+    "validation"
+  ]
+}

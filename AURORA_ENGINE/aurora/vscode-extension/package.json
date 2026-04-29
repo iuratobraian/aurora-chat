@@ -1,0 +1,37 @@
+{
+  "name": "aurora-vscode",
+  "displayName": "Aurora AI Assistant",
+  "description": "AI coding assistant with Aurora integration",
+  "version": "0.1.0",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Other"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      { "command": "aurora.review", "title": "Aurora: Code Review" },
+      { "command": "aurora.analyze", "title": "Aurora: Deep Analysis" },
+      { "command": "aurora.optimize", "title": "Aurora: Optimize" },
+      { "command": "aurora.explain", "title": "Aurora: Explain Code" },
+      { "command": "aurora.fix", "title": "Aurora: Auto-Fix Errors" },
+      { "command": "aurora.status", "title": "Aurora: Status" }
+    ],
+    "configuration": {
+      "title": "Aurora AI",
+      "properties": {
+        "aurora.apiUrl": { "type": "string", "default": "http://localhost:4310", "description": "Aurora API URL" },
+        "aurora.apiKey": { "type": "string", "default": "", "description": "Aurora API Key" },
+        "aurora.model": { "type": "string", "default": "auto", "description": "Preferred AI model" }
+      }
+    }
+  },
+  "scripts": {
+    "build": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
+    "watch": "npm run build -- --watch"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "esbuild": "^0.20.0",
+    "typescript": "^5.3.0"
+  }
+}

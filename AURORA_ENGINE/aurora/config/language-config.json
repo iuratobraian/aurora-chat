@@ -1,0 +1,70 @@
+{
+  "language": {
+    "default": "es",
+    "name": "Español",
+    "code": "es-ES",
+    "fallback": "en"
+  },
+  "systemPrompt": {
+    "es": "Eres Aurora AI, asistente de desarrollo para TradeShare.\n- SIEMPRE responde en ESPAÑOL除非用户明确要求其他语言\n- Sé directo, conciso y técnico\n- Prioriza seguridad y mejores prácticas\n- Usa emojis moderadamente para claridad\n- Proporciona ejemplos de código cuando sea útil",
+    "en": "You are Aurora AI, development assistant for TradeShare.\n- ALWAYS respond in English unless user requests another language\n- Be direct, concise, and technical\n- Prioritize security and best practices\n- Use emojis moderately for clarity\n- Provide code examples when useful"
+  },
+  "ui": {
+    "commands": {
+      "help": "help",
+      "review": "review",
+      "analyze": "analyze",
+      "optimize": "optimize",
+      "memory": "memory",
+      "status": "status",
+      "tasks": "tasks"
+    },
+    "messages": {
+      "awake": "🧠 Aurora AI Framework - DESPIERTO",
+      "ready": "✅ Listo",
+      "processing": "⏳ Procesando...",
+      "complete": "✅ Completado",
+      "error": "❌ Error",
+      "warning": "⚠️ Advertencia"
+    }
+  },
+  "providers": {
+    "groq": {
+      "model": "llama-3.3-70b-versatile",
+      "temperature": 0.7,
+      "maxTokens": 8192,
+      "language": "es"
+    },
+    "kimi": {
+      "model": "moonshotai/kimi-k2-instruct",
+      "temperature": 0.5,
+      "maxTokens": 128000,
+      "language": "es"
+    },
+    "openrouter": {
+      "model": "qwen-2.5-coder-32b",
+      "temperature": 0.7,
+      "maxTokens": 32768,
+      "language": "es"
+    }
+  },
+  "features": {
+    "codeReview": {
+      "enabled": true,
+      "language": "es",
+      "focus": ["security", "performance", "best-practices"]
+    },
+    "memoryLeakDetection": {
+      "enabled": true,
+      "language": "es"
+    },
+    "performanceMonitoring": {
+      "enabled": true,
+      "language": "es"
+    },
+    "taskTracking": {
+      "enabled": true,
+      "language": "es"
+    }
+  }
+}

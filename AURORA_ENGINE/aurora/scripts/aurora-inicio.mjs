@@ -1,0 +1,491 @@
+#!/usr/bin/env node
+/**
+ * aurora-inicio.mjs — Punto de Entrada TradeShare
+ *
+ * Ejecutar con: node scripts/aurora-inicio.mjs
+ * O via npm:    npm run inicio
+ *
+ * 🧠 IDENTIDAD: @aurora — Agente Integrador Principal
+ * 
+ * AURORA PRESENCE PROTOCOL:
+ * - Este script inicia la sesión de Aurora en el chat
+ * - Todos los comandos @aurora están disponibles después de ejecutar
+ * - Notion es la fuente de verdad para tareas
+ *
+ * FLUJO OBLIGATORIO:
+ * 1. git pull → sincronizar código y TASK_BOARD.md
+ * 2. @aurora verify notion → verificar conexión con Notion (fuente de verdad)
+ * 3. Mostrar tareas desde Notion → ver estado real
+ * 4. Corroborar con TASK_BOARD.md local → confirmar
+ * 5. Elegir tarea → marcarla en Notion como "En progreso"
+ * 6. Actualizar TASK_BOARD.md local → equipo sincronizado
+ * 7. Trabajar → al terminar, marcar "Listo" en Notion
+ * 8. git commit + push → compartir avances
+ * 9. REPETIR → loop infinito hasta que no haya tareas
+ *
+ * COMANDOS @aurora DISPONIBLES:
+ * - @aurora help → Mostrar todos los comandos
+ * - @aurora review [archivo] → Code review
+ * - @aurora analyze → Análisis profundo
+ * - @aurora optimize → Optimización de performance
+ * - @aurora memory → Memory leak detection
+ * - @aurora status → Estado del sistema
+ * - @aurora tasks → Ver tareas pendientes
+ */
+
+import fs from 'node:fs';
+import path from 'node:path';
+import { execSync } from 'node:child_process';
+
+// Load .env.local manually (no dotenv dependency needed)
+function loadEnv(filePath) {
+  try {
+    const content = fs.readFileSync(filePath, 'utf8');
+    content.split('\n').forEach(line => {
+      line = line.trim();
+      if (!line || line.startsWith('#')) return;
+      const eqIdx = line.indexOf('=');
+      if (eqIdx === -1) return;
+      let key = line.slice(0, eqIdx).trim();
+      let val = line.slice(eqIdx + 1).trim();
+      if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+        val = val.slice(1, -1);
+      }
+      if (!process.env[key]) process.env[key] = val;
+    });
+  } catch { /* file not found, skip */ }
+}
+loadEnv('.env.local');
+
+const NOTION_API_KEY = process.env.NOTION_API_KEY;
+const NOTION_DATABASE_ID = process.env.NOTION_DATABASE_ID;
+const ROOT = process.cwd();
+
+// Colors
+const RESET = '\x1b[0m';
+const BOLD = '\x1b[1m';
+const CYAN = '\x1b[36m';
+const GREEN = '\x1b[32m';
+const YELLOW = '\x1b[33m';
+const MAGENTA = '\x1b[35m';
+const RED = '\x1b[31m';
+const DIM = '\x1b[2m';
+const WHITE = '\x1b[37m';
+
+// Priority order for sorting
+const PRIORITY_ORDER = { 'Critical': 0, 'High': 1, 'Medium': 2, 'Low': 3 };
+
+function banner() {
+  console.log(`\n${BOLD}${CYAN}╔══════════════════════════════════════════════════════╗${RESET}`);
+  console.log(`${BOLD}${CYAN}║   🌊 @aurora — INICIO DE SESIÓN                      ║${RESET}`);
+  console.log(`${BOLD}${CYAN}║   Agente Integrador Principal                        ║${RESET}`);
+  console.log(`${BOLD}${CYAN}║   Fuente de verdad: Notion                           ║${RESET}`);
+  console.log(`${BOLD}${CYAN}╚══════════════════════════════════════════════════════╝${RESET}\n`);
+  console.log(`${DIM}Fecha: ${new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' })}${RESET}\n`);
+  
+  // Aurora AI Presence Banner
+  console.log(`${BOLD}${MAGENTA}╔══════════════════════════════════════════════════════╗${RESET}`);
+  console.log(`${BOLD}${MAGENTA}║   🤖 AURORA AI PRESENCE ACTIVADA                    ║${RESET}`);
+  console.log(`${BOLD}${MAGENTA}║   Comandos disponibles:                              ║${RESET}`);
+  console.log(`${BOLD}${MAGENTA}║   @aurora help     → Mostrar comandos               ║${RESET}`);
+  console.log(`${BOLD}${MAGENTA}║   @aurora review   → Code review                     ║${RESET}`);
+  console.log(`${BOLD}${MAGENTA}║   @aurora analyze  → Análisis profundo               ║${RESET}`);
+  console.log(`${BOLD}${MAGENTA}║   @aurora optimize → Optimización                    ║${RESET}`);
+  console.log(`${BOLD}${MAGENTA}║   @aurora memory   → Memory leak detection           ║${RESET}`);
+  console.log(`${BOLD}${MAGENTA}║   @aurora status   → Estado del sistema              ║${RESET}`);
+  console.log(`${BOLD}${MAGENTA}║   @aurora tasks    → Ver tareas pendientes           ║${RESET}`);
+  console.log(`${BOLD}${MAGENTA}╚══════════════════════════════════════════════════════╝${RESET}\n`);
+  
+  console.log(`${BOLD}${RED}🚫 PROHIBIDO: TurboQuant eliminado permanentemente. No referenciar.${RESET}`);
+  console.log(`${DIM}────────────────────────────────────────────────────────${RESET}\n`);
+}
+
+function divider(label = '') {
+  const line = '─'.repeat(label ? Math.max(0, 56 - label.length - 2) : 56);
+  console.log(`\n${BOLD}${MAGENTA}── ${label} ${line}${RESET}`);
+}
+
+async function notionConnection() {
+  try {
+    const res = await fetch('https://api.notion.com/v1/users/me', {
+      headers: {
+        'Authorization': `Bearer ${NOTION_API_KEY}`,
+        'Notion-Version': '2022-06-28',
+      },
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    return { ok: true, user: data.name || 'Notion' };
+  } catch (err) {
+    return { ok: false, error: err.message };
+  }
+}
+
+async function fetchTasks() {
+  let allTasks = [];
+  let hasMore = true;
+  let cursor = undefined;
+
+  while (hasMore) {
+    const res = await fetch(`https://api.notion.com/v1/databases/${NOTION_DATABASE_ID}/query`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${NOTION_API_KEY}`,
+        'Notion-Version': '2022-06-28',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        page_size: 100,
+        start_cursor: cursor,
+        sorts: [
+          { property: 'Execution Order', direction: 'ascending' },
+        ],
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`Notion API error: ${err}`);
+    }
+
+    const data = await res.json();
+    allTasks = allTasks.concat(data.results);
+    hasMore = data.has_more;
+    cursor = data.next_cursor;
+  }
+
+  return allTasks.map(page => ({
+    id: page.id,
+    name: page.properties?.Name?.title?.[0]?.plain_text || 'Untitled',
+    status: page.properties?.Status?.select?.name || 'Backlog',
+    type: page.properties?.Type?.select?.name || '-',
+    priority: page.properties?.Priority?.select?.name || 'Medium',
+    domain: page.properties?.Domain?.rich_text?.[0]?.plain_text || '',
+    blocked: page.properties?.Blocked?.checkbox || false,
+    autoGenerated: page.properties?.['Auto Generated']?.checkbox || false,
+    executionOrder: page.properties?.['Execution Order']?.number || 999,
+    techNotes: page.properties?.['Tech Notes']?.rich_text?.[0]?.plain_text || '',
+    url: page.url || '',
+  }));
+}
+
+function statusIcon(status) {
+  switch (status) {
+    case 'Backlog': return `${DIM}○${RESET}`;
+    case 'Ready': return `${GREEN}●${RESET}`;
+    case 'En progreso':
+    case 'In Progress': return `${CYAN}◉${RESET}`;
+    case 'Listo':
+    case 'Done': return `${DIM}✓${RESET}`;
+    default: return `${DIM}○${RESET}`;
+  }
+}
+
+function priorityBadge(priority) {
+  switch (priority) {
+    case 'Critical': return `${BOLD}${RED}[CRIT]${RESET}`;
+    case 'High': return `${YELLOW}[HIGH]${RESET}`;
+    case 'Medium': return `${DIM}[MED]${RESET}`;
+    case 'Low': return `${DIM}[LOW]${RESET}`;
+    default: return `${DIM}[---]${RESET}`;
+  }
+}
+
+function typeBadge(type) {
+  switch (type) {
+    case 'Feature': return `${CYAN}[FEAT]${RESET}`;
+    case 'Infra': return `${MAGENTA}[INFRA]${RESET}`;
+    default: return `${DIM}[----]${RESET}`;
+  }
+}
+
+function groupByDomain(tasks) {
+  const groups = {};
+  tasks.forEach(t => {
+    const domain = t.domain || 'Sin dominio';
+    if (!groups[domain]) groups[domain] = [];
+    groups[domain].push(t);
+  });
+  Object.values(groups).forEach(group => {
+    group.sort((a, b) => (PRIORITY_ORDER[a.priority] ?? 9) - (PRIORITY_ORDER[b.priority] ?? 9));
+  });
+  return groups;
+}
+
+function showTaskSummary(tasks) {
+  const total = tasks.length;
+  const backlog = tasks.filter(t => t.status === 'Backlog').length;
+  const ready = tasks.filter(t => t.status === 'Ready').length;
+  const inProgress = tasks.filter(t => t.status === 'En progreso' || t.status === 'In Progress').length;
+  const done = tasks.filter(t => t.status === 'Listo' || t.status === 'Done').length;
+  const blocked = tasks.filter(t => t.blocked).length;
+
+  console.log(`${BOLD}${WHITE}Resumen del tablero:${RESET}`);
+  console.log(`  Total: ${BOLD}${total}${RESET}  |  ${DIM}Backlog:${RESET} ${YELLOW}${backlog}${RESET}  |  ${DIM}Ready:${RESET} ${GREEN}${ready}${RESET}  |  ${DIM}En progreso:${RESET} ${CYAN}${inProgress}${RESET}  |  ${DIM}Done:${RESET} ${DIM}${done}${RESET}  |  ${DIM}Blocked:${RESET} ${RED}${blocked}${RESET}`);
+}
+
+function showTasksByDomain(tasks) {
+  const groups = groupByDomain(tasks);
+  const domainOrder = ['Auth', 'Profiles', 'Communities', 'Payments', 'Content', 'Admin', 'Bitacora', 'Infra', 'Realtime', 'Notifications', 'Gamification', 'UI', 'Testing', 'Launch', 'Coordination', 'General'];
+
+  const sortedDomains = Object.keys(groups).sort((a, b) => {
+    const ia = domainOrder.indexOf(a);
+    const ib = domainOrder.indexOf(b);
+    if (ia === -1 && ib === -1) return a.localeCompare(b);
+    if (ia === -1) return 1;
+    if (ib === -1) return -1;
+    return ia - ib;
+  });
+
+  sortedDomains.forEach(domain => {
+    const domainTasks = groups[domain];
+    const pending = domainTasks.filter(t => !['Listo', 'Done'].includes(t.status));
+    if (pending.length === 0) return;
+
+    console.log(`\n${BOLD}${CYAN}📁 ${domain}${RESET} ${DIM}(${pending.length} tareas)${RESET}`);
+
+    pending.forEach((t, i) => {
+      const icon = statusIcon(t.status);
+      const prio = priorityBadge(t.priority);
+      const type = typeBadge(t.type);
+      const blocked = t.blocked ? ` ${RED}🚫 BLOQUEADA${RESET}` : '';
+      const order = t.executionOrder < 999 ? ` #${t.executionOrder}` : '';
+      console.log(`  ${icon} ${String(i + 1).padStart(2)}. ${BOLD}${t.name}${RESET}${order} ${prio} ${type}${blocked}`);
+    });
+  });
+}
+
+function showReadyToWork(tasks) {
+  const ready = tasks.filter(t => t.status === 'Ready' && !t.blocked);
+  const backlog = tasks.filter(t => t.status === 'Backlog' && !t.blocked);
+
+  if (ready.length === 0 && backlog.length === 0) {
+    console.log(`\n${GREEN}✅ No hay tareas pendientes. ¡Tablero limpio!${RESET}`);
+    return;
+  }
+
+  divider('LISTAS PARA TRABAJAR');
+
+  if (ready.length > 0) {
+    console.log(`\n${GREEN}● Tareas READY (prioridad inmediata):${RESET}\n`);
+    ready.forEach((t, i) => {
+      const prio = priorityBadge(t.priority);
+      const type = typeBadge(t.type);
+      console.log(`  ${GREEN}${String(i + 1).padStart(2)}.${RESET} ${BOLD}${t.name}${RESET} ${prio} ${type} ${DIM}→ ${t.domain}${RESET}`);
+    });
+  }
+
+  if (backlog.length > 0) {
+    console.log(`\n${YELLOW}○ Tareas en BACKLOG (planificar):${RESET}\n`);
+    backlog.slice(0, 10).forEach((t, i) => {
+      const prio = priorityBadge(t.priority);
+      const type = typeBadge(t.type);
+      console.log(`  ${YELLOW}${String(i + 1).padStart(2)}.${RESET} ${t.name} ${prio} ${type} ${DIM}→ ${t.domain}${RESET}`);
+    });
+    if (backlog.length > 10) {
+      console.log(`  ${DIM}... y ${backlog.length - 10} más${RESET}`);
+    }
+  }
+}
+
+function showNextSteps() {
+  divider('📋 FLUJO OBLIGATORIO PARA CADA AGENTE');
+  console.log(`\n${BOLD}PASO 1 — Sincronizar:${RESET}`);
+  console.log(`  ✅ git pull → ya hecho automáticamente`);
+  console.log(`  ✅ TASK_BOARD.md local → ya sincronizado con Notion`);
+  console.log(`\n${BOLD}PASO 2 — @aurora verifica Notion:${RESET}`);
+  console.log(`  🤖 @aurora ya verificó Notion automáticamente al iniciar`);
+  console.log(`  🌐 URL de Notion → https://www.notion.so/${NOTION_DATABASE_ID}`);
+  console.log(`  👀 Tareas en Notion = fuente de verdad`);
+  console.log(`  📋 TASK_BOARD.md local = espejo sincronizado`);
+  console.log(`\n${BOLD}PASO 3 — Elegir y marcar tarea:${RESET}`);
+  console.log(`  🎯 Elegir tarea crítica o ready de más prioridad`);
+  console.log(`  🏷️  Marcarla como ${CYAN}"En progreso"${RESET} en Notion`);
+  console.log(`  📄 TASK_BOARD.md local se actualiza automáticamente`);
+  console.log(`  📝 Comando: ${DIM}node scripts/notion-task-action.mjs progress "nombre tarea"${RESET}`);
+  console.log(`\n${BOLD}PASO 4 — Trabajar con @aurora:${RESET}`);
+  console.log(`  💻 Implementar la solución`);
+  console.log(`  🤖 Usar @aurora review → para code review`);
+  console.log(`  🤖 Usar @aurora analyze → para análisis profundo`);
+  console.log(`  🤖 Usar @aurora optimize → para optimización`);
+  console.log(`  🧪 Probar localmente`);
+  console.log(`\n${BOLD}PASO 5 — Terminar:${RESET}`);
+  console.log(`  🏷️  Marcar como ${YELLOW}"Listo"${RESET} en Notion`);
+  console.log(`  📝 Comando: ${DIM}node scripts/notion-task-action.mjs done "nombre tarea"${RESET}`);
+  console.log(`  💾 git add . && git commit -m "fix: descripción"`);
+  console.log(`  📤 git push origin main`);
+  console.log(`\n${BOLD}PASO 6 — Loop infinito:${RESET}`);
+  console.log(`  🔄 Volver al PASO 2 → elegir nueva tarea → repetir`);
+  console.log(`  🚫 PROHIBIDO detenerse si hay tareas pendientes`);
+  console.log(`\n${BOLD}${YELLOW}⚠️  REGLA DE ORO: Cada 5 tareas terminadas → git push${RESET}`);
+  console.log(`\n${BOLD}${CYAN}🔄 SINCRONIZACIÓN AUTOMÁTICA:${RESET}`);
+  console.log(`${CYAN}   • Al iniciar → git pull + @aurora verifica Notion + sync TASK_BOARD.md${RESET}`);
+  console.log(`${CYAN}   • Al marcar tarea → TASK_BOARD.md se actualiza automáticamente${RESET}`);
+  console.log(`${CYAN}   • Al hacer commit → push actualiza TASK_BOARD.md para otros agentes${RESET}`);
+  console.log(`${CYAN}   • Segundo agente → git pull → TASK_BOARD.md ya está actualizado${RESET}`);
+  console.log(`\n${DIM}URL de Notion: https://www.notion.so/${NOTION_DATABASE_ID}${RESET}`);
+  console.log(`${DIM}Repositorio: https://github.com/iuratobraian/trade-share${RESET}\n`);
+}
+
+async function syncTaskBoard(tasks) {
+  const boardPath = path.join(ROOT, 'TASK_BOARD.md');
+  const pending = tasks.filter(t => !['Listo', 'Done'].includes(t.status));
+
+  let content = `# 📋 TASK BOARD - TRADESHARE\n\n`;
+  content += `> 🧠 @aurora — Sincronizado desde Notion — ${new Date().toLocaleString('es-AR')}\n`;
+  content += `> ⚠️  Este archivo se actualiza automáticamente al ejecutar npm run inicio\n`;
+  content += `> 🤖 @aurora AI Presence activada - Usar @aurora help para comandos\n`;
+  content += `> 🔄 Cada 5 tareas terminadas → git push para sincronizar equipo\n\n`;
+
+  // Summary
+  const total = tasks.length;
+  const critical = tasks.filter(t => t.priority === 'Critical').length;
+  const high = tasks.filter(t => t.priority === 'High').length;
+  content += `## 📊 Resumen\n\n`;
+  content += `| Total | Críticas | Altas | Medias | Bajas |\n`;
+  content += `|-------|----------|-------|--------|-------|\n`;
+  content += `| ${total} | ${critical} | ${high} | ${tasks.filter(t => t.priority === 'Medium').length} | ${tasks.filter(t => t.priority === 'Low').length} |\n\n`;
+  content += `---\n\n`;
+
+  // Group by domain
+  const groups = {};
+  pending.forEach(t => {
+    const d = t.domain || 'General';
+    if (!groups[d]) groups[d] = [];
+    groups[d].push(t);
+  });
+
+  const domainOrder = ['Auth', 'Profiles', 'Communities', 'Payments', 'Content', 'Admin', 'Bitacora', 'Infra', 'Realtime', 'Notifications', 'Gamification', 'UI', 'Testing', 'Launch', 'Coordination', 'General'];
+  const sortedDomains = Object.keys(groups).sort((a, b) => {
+    const ia = domainOrder.indexOf(a);
+    const ib = domainOrder.indexOf(b);
+    if (ia === -1 && ib === -1) return a.localeCompare(b);
+    if (ia === -1) return 1;
+    if (ib === -1) return -1;
+    return ia - ib;
+  });
+
+  let taskNum = 0;
+  for (const domain of sortedDomains) {
+    const domainTasks = groups[domain];
+    content += `## 📁 ${domain} (${domainTasks.length} tareas)\n\n`;
+    content += `| # | Tarea | Prioridad | Estado | Archivos |\n`;
+    content += `|---|-------|-----------|--------|----------|\n`;
+
+    for (const t of domainTasks) {
+      taskNum++;
+      const statusIcon = t.status === 'Backlog' ? '⏳' : t.status === 'Ready' ? '🚀' : '🔧';
+      const priorityIcon = t.priority === 'Critical' ? '🔴' : t.priority === 'High' ? '🟡' : t.priority === 'Medium' ? '🟢' : '⚪';
+
+      // Parse files from tech notes
+      const filesMatch = t.techNotes.match(/📂 ARCHIVOS A EDITAR:\n([\s\S]*?)\n\n🚫/);
+      const files = filesMatch ? filesMatch[1].trim() : '-';
+
+      content += `| ${taskNum} | **${t.name}** | ${priorityIcon} ${t.priority} | ${statusIcon} ${t.status} | ${files} |\n`;
+    }
+    content += `\n`;
+  }
+
+  // Detailed task list
+  content += `---\n\n`;
+  content += `## 📝 DETALLE DE TAREAS\n\n`;
+  content += `> Cada tarea incluye descripción, archivos a editar, archivos prohibidos y definición de Done.\n\n`;
+
+  taskNum = 0;
+  for (const domain of sortedDomains) {
+    const domainTasks = groups[domain];
+    for (const t of domainTasks) {
+      taskNum++;
+      content += `### TSK-${String(taskNum).padStart(3, '0')}: ${t.name}\n\n`;
+      content += `- **ID:** TSK-${String(taskNum).padStart(3, '0')}\n`;
+      content += `- **Estado:** ${t.status}\n`;
+      content += `- **Prioridad:** ${t.priority}\n`;
+      content += `- **Tipo:** ${t.type}\n`;
+      content += `- **Dominio:** ${t.domain}\n`;
+      content += `- **Orden:** ${t.executionOrder}\n`;
+      content += `- **URL Notion:** ${t.url}\n\n`;
+      content += t.techNotes + '\n\n';
+      content += `---\n\n`;
+    }
+  }
+
+  fs.writeFileSync(boardPath, content, 'utf8');
+  console.log(`\n${DIM}📄 TASK_BOARD.md actualizado con ${pending.length} tareas detalladas${RESET}`);
+}
+
+async function main() {
+  banner();
+
+  // ═══════════════════════════════════════════
+  // PASO 0: Git Pull — Sincronizar con lo último
+  // ═══════════════════════════════════════════
+  console.log(`${DIM}🔄 Paso 0: Sincronizando con Git...${RESET}`);
+  try {
+    const pullOutput = execSync('git pull origin main 2>&1', {
+      cwd: ROOT,
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
+    if (pullOutput.includes('Already up to date')) {
+      console.log(`${GREEN}✓ Repositorio actualizado (ya estaba al día)${RESET}`);
+    } else {
+      const lines = pullOutput.trim().split('\n');
+      const summary = lines.filter(l => l.includes('file') || l.includes('insertion') || l.includes('deletion') || l.includes('changed') || l.includes('From') || l.includes('Updating') || l.includes('Fast')).join(' | ');
+      console.log(`${GREEN}✓ Repositorio sincronizado${RESET} ${DIM}${summary}${RESET}`);
+    }
+  } catch (err) {
+    const msg = err.stderr || err.stdout || err.message || '';
+    if (msg.includes('not a git') || msg.includes('no upstream')) {
+      console.log(`${YELLOW}⚠ Git pull omitido (no hay remote configurado)${RESET}`);
+    } else {
+      console.log(`${YELLOW}⚠ Git pull falló: ${msg.split('\n')[0]}${RESET}`);
+      console.log(`${DIM}   Verificar conexión a internet y acceso al repo${RESET}`);
+    }
+  }
+
+  // Check Notion config
+  if (!NOTION_API_KEY || !NOTION_DATABASE_ID) {
+    console.log(`${RED}✗ Configuración de Notion faltante${RESET}`);
+    console.log(`${DIM}Agregar a .env.local:${RESET}`);
+    console.log(`${DIM}  NOTION_API_KEY=ntn_...${RESET}`);
+    console.log(`${DIM}  NOTION_DATABASE_ID=...${RESET}\n`);
+    process.exit(1);
+  }
+
+  // Test connection with @aurora presence
+  console.log(`${DIM}🔗 Paso 1: @aurora verificando conexión con Notion...${RESET}`);
+  const conn = await notionConnection();
+  if (!conn.ok) {
+    console.log(`${RED}✗ Error conectando a Notion: ${conn.error}${RESET}\n`);
+    process.exit(1);
+  }
+  console.log(`${GREEN}✓ @aurora conectado a Notion como: ${conn.user}${RESET}`);
+
+  // Fetch tasks
+  console.log(`${DIM}📥 Paso 2: @aurora obteniendo tareas desde Notion (fuente de verdad)...${RESET}`);
+  const tasks = await fetchTasks();
+  console.log(`${GREEN}✓ ${tasks.length} tareas encontradas en Notion${RESET}`);
+
+  // Sync local board
+  console.log(`${DIM}🔄 Paso 3: @aurora sincronizando TASK_BOARD.md con Notion...${RESET}`);
+  await syncTaskBoard(tasks);
+
+  // Show summary
+  divider('TABLERO DE TAREAS (desde Notion)');
+  showTaskSummary(tasks);
+
+  // Show tasks by domain
+  divider('TAREAS POR DOMINIO');
+  showTasksByDomain(tasks);
+
+  // Show ready to work
+  showReadyToWork(tasks);
+
+  // Next steps
+  showNextSteps();
+}
+
+main().catch(err => {
+  console.error(`${RED}Error:${RESET} ${err.message}`);
+  process.exit(1);
+});

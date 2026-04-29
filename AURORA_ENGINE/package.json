@@ -1,0 +1,54 @@
+{
+  "name": "@aurora/engine-standalone",
+  "version": "1.0.0",
+  "description": "Aurora AI Engine - Standalone Toolkit for development teams",
+  "type": "module",
+  "bin": {
+    "aurora": "./cli/aurora-cli.mjs"
+  },
+  "scripts": {
+    "inicio": "node scripts/aurora-inicio.mjs",
+    "awaken": "node scripts/aurora-awaken.mjs",
+    "daemon": "node aurora/scripts/aurora-api-server.mjs",
+    "shell": "node scripts/aurora-shell.mjs",
+    "cli": "node scripts/aurora-cli.mjs menu",
+    "status": "node scripts/aurora-status.mjs",
+    "doctor": "node scripts/aurora-doctor.mjs",
+    "vault:write": "node scripts/vault-write.mjs",
+    "vault:query": "node scripts/vault-query.mjs",
+    "vault:intel:sync": "node scripts/vault-intel.mjs sync",
+    "vault:intel:query": "node scripts/vault-intel.mjs query",
+    "vault:intel:mempalace:init": "node scripts/vault-intel.mjs mempalace:init",
+    "vault:intel:mempalace:mine": "node scripts/vault-intel.mjs mempalace:mine",
+    "vault:intel:mempalace:search": "node scripts/vault-intel.mjs mempalace:search",
+    "gemma:briefing": "node gemma/src/cli/gemma-cli.mjs briefing",
+    "gemma:audit": "node gemma/src/cli/gemma-cli.mjs audit",
+    "deepseek:audit": "node deepseek/src/cli/deepseek-cli.mjs audit",
+    "kimi": "powershell -ExecutionPolicy Bypass -File scripts/chat-kimi.ps1",
+    "setup": "powershell -ExecutionPolicy Bypass -File setup.ps1"
+  },
+  "dependencies": {
+    "@google/genai": "^1.50.1",
+    "@notionhq/client": "^5.20.0",
+    "@openrouter/sdk": "^0.9.11",
+    "axios": "^1.15.2",
+    "chalk": "^5.6.2",
+    "commander": "^13.1.0",
+    "date-fns": "^4.1.0",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "node-fetch": "^3.3.2",
+    "ora": "^8.2.0",
+    "tsx": "^4.21.0",
+    "undici": "^8.1.0",
+    "ws": "^8.20.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.17",
+    "typescript": "~5.8.2",
+    "vitest": "^4.1.5"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

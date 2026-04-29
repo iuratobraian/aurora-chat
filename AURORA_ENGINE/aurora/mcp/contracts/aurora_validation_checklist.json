@@ -1,0 +1,11 @@
+{
+  "artifact": "aurora_validation_checklist",
+  "version": 1,
+  "requiredFields": [
+    "taskId",
+    "domain",
+    "checks",
+    "minimumValidation",
+    "expandedValidation"
+  ]
+}

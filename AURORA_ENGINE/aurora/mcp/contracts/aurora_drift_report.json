@@ -1,0 +1,10 @@
+{
+  "artifact": "aurora_drift_report",
+  "version": 1,
+  "requiredFields": [
+    "generatedAt",
+    "signals",
+    "summary",
+    "recommendedActions"
+  ]
+}

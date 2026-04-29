@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env
+*.log
+
+.vercel
+AURORA_ENGINE/.env.local
+AURORA_ENGINE/.env.aurora
+.env.production
+.env.local

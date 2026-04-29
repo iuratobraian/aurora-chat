@@ -1,0 +1,17 @@
+{
+  "name": "Aurora Chat Premium",
+  "short_name": "Aurora",
+  "description": "Premium Standalone Chat Client with Expense Control",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f1115",
+  "theme_color": "#6366f1",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2593/2593635.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

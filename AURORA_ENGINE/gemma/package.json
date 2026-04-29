@@ -1,0 +1,51 @@
+{
+  "name": "gemma-code-studio",
+  "version": "1.0.0",
+  "description": "Gemma Code Studio - Codificador profesional de nivel senior integrado con Aurora AI",
+  "type": "module",
+  "main": "src/cli/gemma-cli.mjs",
+  "bin": {
+    "gemma": "src/cli/gemma-cli.mjs"
+  },
+  "scripts": {
+    "start": "node src/cli/gemma-cli.mjs",
+    "chat": "node src/cli/gemma-cli.mjs chat",
+    "generate": "node src/cli/gemma-cli.mjs generate",
+    "refactor": "node src/cli/gemma-cli.mjs refactor",
+    "review": "node src/cli/gemma-cli.mjs review",
+    "test": "node src/cli/gemma-cli.mjs test",
+    "analyze": "node src/cli/gemma-cli.mjs analyze",
+    "lint": "echo 'Gemma Code Studio - No lint config needed'",
+    "dev": "node --watch src/cli/gemma-cli.mjs chat"
+  },
+  "keywords": [
+    "ai",
+    "code-generation",
+    "gemma",
+    "aurora",
+    "coder",
+    "refactoring",
+    "testing"
+  ],
+  "author": "TradeShare + Aurora AI",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "boxen": "^7.1.1",
+    "gradient-string": "^2.0.2",
+    "ora": "^7.0.1",
+    "marked": "^9.1.6",
+    "marked-terminal": "^6.1.0",
+    "commander": "^11.1.0",
+    "glob": "^10.3.10",
+    "esprima": "^4.0.1",
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.3"
+  },
+  "peerDependencies": {
+    "undici": ">=5.28.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

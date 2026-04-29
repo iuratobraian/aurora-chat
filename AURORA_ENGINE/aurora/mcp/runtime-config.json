@@ -1,0 +1,98 @@
+{
+  "name": "Aurora Core Local Runtime",
+  "version": "3.0",
+  "port": 4310,
+  "incubatorRoot": ".agent/workspace/incubator",
+  "knowledgeCollections": [
+    ".agent/brain/db/heuristics.jsonl",
+    ".agent/brain/db/anti_patterns.jsonl",
+    ".agent/brain/db/patterns.jsonl",
+    ".agent/brain/db/ideas.jsonl",
+    ".agent/brain/db/references.jsonl",
+    ".agent/brain/db/error_catalog.jsonl",
+    ".agent/brain/db/teamwork_knowledge.jsonl",
+    ".agent/brain/db/decisions_graph.jsonl",
+    ".agent/brain/db/agent_metrics.jsonl"
+  ],
+  "webProviders": [
+    "brave",
+    "tavily",
+    "serpapi"
+  ],
+  "creationModes": [
+    "web_platform",
+    "mobile_app",
+    "mobile_game",
+    "ai_system",
+    "future_product"
+  ],
+  "auroraScripts": [
+    "aurora-knowledge-validator.mjs",
+    "aurora-surface-monitor.mjs",
+    "aurora-auto-destil.mjs",
+    "aurora-context-pack-generator.mjs",
+    "aurora-contract-validator.mjs",
+    "aurora-scorecard.mjs",
+    "aurora-shell.mjs",
+    "aurora-api.mjs",
+    "aurora-sovereign.mjs",
+    "aurora-reasoning.mjs"
+  ],
+  "skillRegistry": ".agent/aurora/aurora_skill_registry.json",
+  "validation": {
+    "autoLint": true,
+    "autoTest": false,
+    "smokeTests": true,
+    "contractValidation": true,
+    "knowledgeValidation": true
+  },
+  "contextInjection": {
+    "maxFiles": 10,
+    "maxTokens": 8000,
+    "priorityFiles": [
+      "AGENTS.md",
+      "convex/schema.ts",
+      "package.json"
+    ]
+  },
+  "agentRouting": {
+    "default": "codex_local",
+    "fallback": ["opencode_local", "codex_cloud"],
+    "specialized": {
+      "research": "openrouter",
+      "quick": "groq",
+      "local": "ollama_local"
+    }
+  },
+  "healthMetrics": {
+    "knowledgeHealth": {
+      "target": 90,
+      "warning": 70
+    },
+    "surfaceHealth": {
+      "target": 85,
+      "warning": 70
+    },
+    "contractHealth": {
+      "target": 100,
+      "warning": 90
+    }
+  },
+  "autoRun": [
+    {
+      "name": "knowledge-validator",
+      "schedule": "daily",
+      "script": "aurora-knowledge-validator.mjs"
+    },
+    {
+      "name": "surface-monitor",
+      "schedule": "daily",
+      "script": "aurora-surface-monitor.mjs"
+    },
+    {
+      "name": "contract-validator",
+      "schedule": "on-commit",
+      "script": "aurora-contract-validator.mjs"
+    }
+  ]
+}

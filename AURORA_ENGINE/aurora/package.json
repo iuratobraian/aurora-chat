@@ -1,0 +1,105 @@
+{
+  "name": "@aurora/ai-framework",
+  "version": "1.0.0",
+  "description": "Aurora AI Framework - Always-on AI assistant for development teams",
+  "type": "module",
+  "main": "scripts/aurora-always-on.mjs",
+  "bin": {
+    "aurora": "./cli/aurora-cli.mjs"
+  },
+  "scripts": {
+    "awaken": "node scripts/aurora-awaken.mjs",
+    "inicio": "node cli/aurora-inicio.mjs",
+    "daemon": "node scripts/aurora-always-on.mjs",
+    "daemon:background": "node scripts/aurora-always-on.mjs &",
+    "daemon:stop": "node scripts/aurora-always-on.mjs stop",
+    "daemon:status": "node scripts/aurora-status.mjs",
+    "api": "node scripts/aurora-api.mjs",
+    "api:start": "node scripts/aurora-api.mjs",
+    "shell": "node cli/aurora-shell.mjs",
+    "cli": "node cli/aurora-cli.mjs menu",
+    "aurora:review": "node cli/aurora-cli.mjs review",
+    "aurora:analyze": "node cli/aurora-cli.mjs analyze",
+    "aurora:optimize": "node cli/aurora-cli.mjs optimize",
+    "aurora:memory": "node cli/aurora-cli.mjs memory",
+    "aurora:status": "node scripts/aurora-status.mjs",
+    "aurora:health": "node scripts/aurora-health-check.mjs",
+    "aurora:scorecard": "node scripts/aurora-scorecard.mjs",
+    "aurora:doctor": "node scripts/aurora-doctor.mjs",
+    "aurora:notion": "node scripts/aurora-notion-sync.mjs",
+    "aurora:kairos": "node core/kairos/aurora-kairos.mjs",
+    "aurora:dream": "node core/dream/aurora-dream.mjs",
+    "aurora:dream:force": "node core/dream/aurora-dream.mjs --force",
+    "backup": "node scripts/backup/aurora-backup.mjs",
+    "sync:notion": "node scripts/aurora-notion-sync.mjs",
+    "sync:antigravity": "node scripts/aurora-antigravity-sync.mjs",
+    "test": "vitest",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "lint": "tsc --noEmit",
+    "build": "echo 'Aurora is runtime - no build step'"
+  },
+  "keywords": [
+    "ai",
+    "assistant",
+    "developer-tools",
+    "automation",
+    "multi-agent",
+    "llm",
+    "orchestration"
+  ],
+  "author": "Aurora Development Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iuratobraian/aurora-ai-framework"
+  },
+  "bugs": {
+    "url": "https://github.com/iuratobraian/aurora-ai-framework/issues"
+  },
+  "homepage": "https://github.com/iuratobraian/aurora-ai-framework#readme",
+  "dependencies": {
+    "@openrouter/sdk": "^0.9.11",
+    "axios": "^1.13.6",
+    "chalk": "^5.4.1",
+    "commander": "^13.1.0",
+    "date-fns": "^4.1.0",
+    "express": "^5.2.1",
+    "node-fetch": "^3.3.2",
+    "ora": "^8.2.0",
+    "ws": "^8.19.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@types/ws": "^8.18.1",
+    "typescript": "~5.8.2",
+    "vitest": "^4.1.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "files": [
+    "core/",
+    "agents/",
+    "mcp/",
+    "skills/",
+    "cli/",
+    "api/",
+    "scripts/",
+    "lib/",
+    "README.md",
+    "LICENSE"
+  ],
+  "peerDependencies": {
+    "groq-sdk": "*",
+    "openai": "*"
+  },
+  "peerDependenciesMeta": {
+    "groq-sdk": {
+      "optional": true
+    },
+    "openai": {
+      "optional": true
+    }
+  }
+}

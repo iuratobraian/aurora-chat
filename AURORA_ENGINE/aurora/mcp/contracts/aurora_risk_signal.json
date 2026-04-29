@@ -1,0 +1,12 @@
+{
+  "artifact": "aurora_risk_signal",
+  "version": 1,
+  "requiredFields": [
+    "id",
+    "severity",
+    "domain",
+    "title",
+    "statement",
+    "recommendedAction"
+  ]
+}

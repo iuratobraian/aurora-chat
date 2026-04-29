@@ -1,0 +1,10 @@
+{
+  "artifact": "aurora_next_best_step",
+  "version": 1,
+  "requiredFields": [
+    "domain",
+    "statement",
+    "whyNow",
+    "validation"
+  ]
+}
